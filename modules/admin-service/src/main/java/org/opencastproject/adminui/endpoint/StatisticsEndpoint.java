@@ -27,11 +27,11 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.ProviderQuery;
 import org.opencastproject.adminui.impl.RawProviderQuery;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -106,7 +106,7 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
@@ -121,7 +121,7 @@ public class StatisticsEndpoint {
   }
 
   @Reference
-  public void setSearchIndex(ElasticsearchIndex searchIndex) {
+  public void setSearchIndex(OpenSearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 

@@ -24,11 +24,6 @@ package org.opencastproject.search.impl;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
@@ -39,6 +34,11 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
@@ -64,18 +64,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import org.apache.commons.io.IOUtils;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.OpenSearchStatusException;
+import org.opensearch.action.DocWriteResponse;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.update.UpdateRequest;
+import org.opensearch.action.update.UpdateResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.core.rest.RestStatus;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -101,7 +101,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * A Elasticsearch-based {@link SearchService} implementation.
+ * A OpenSearch-based {@link SearchService} implementation.
  */
 @Component(
         immediate = true,
@@ -125,7 +125,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private final Gson gson = new Gson();
 
-  private ElasticsearchIndex esIndex;
+  private OpenSearchIndex esIndex;
 
   private SeriesService seriesService;
 
@@ -169,14 +169,14 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void createIndex() {
     var mapping = "";
-    try (var in = this.getClass().getResourceAsStream("/elasticsearch/search-mapping.json")) {
+    try (var in = this.getClass().getResourceAsStream("/opensearch/search-mapping.json")) {
       mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new SearchException("Could not read mapping.", e);
     }
     try {
       logger.debug("Trying to create index for '{}'", INDEX_NAME);
-      InputStream is = getClass().getResourceAsStream("/elasticsearch/indexSettings.json");
+      InputStream is = getClass().getResourceAsStream("/opensearch/indexSettings.json");
       String indexSettings = IOUtils.toString(is, StandardCharsets.UTF_8);
       final CreateIndexRequest request = new CreateIndexRequest(INDEX_NAME)
           .settings(indexSettings, XContentType.JSON)
@@ -185,7 +185,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       if (!response.isAcknowledged()) {
         throw new SearchException("Unable to create index for '" + INDEX_NAME + "'");
       }
-    } catch (ElasticsearchStatusException e) {
+    } catch (OpenSearchStatusException e) {
       if (e.getDetailedMessage().contains("already_exists_exception")) {
         logger.info("Detected existing index '{}'", INDEX_NAME);
       } else {
@@ -197,7 +197,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   }
 
   @Reference
-  public void setEsIndex(ElasticsearchIndex esIndex) {
+  public void setEsIndex(OpenSearchIndex esIndex) {
     this.esIndex = esIndex;
   }
 
@@ -322,7 +322,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       throw new SearchException(e);
     }
 
-    // Elasticsearch series
+    // OpenSearch series
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
       AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
@@ -421,7 +421,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       var updateRequst = new UpdateRequest(INDEX_NAME, mediaPackageId)
           .doc(gson.toJson(json), XContentType.JSON);
       esIndex.getClient().update(updateRequst, RequestOptions.DEFAULT);
-    } catch (ElasticsearchStatusException e) {
+    } catch (OpenSearchStatusException e) {
       if (e.status().getStatus() != RestStatus.NOT_FOUND.getStatus()) {
         throw e;
       }
@@ -462,7 +462,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
             try {
               esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
-            } catch (ElasticsearchStatusException e) {
+            } catch (OpenSearchStatusException e) {
               if (RestStatus.NOT_FOUND == e.status()) {
                 logger.warn("Attempted to modify {}, but that series does not exist in the index.", seriesId);
               }
@@ -501,7 +501,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
         //NB: We're marking things as deleted but *not actually deleting them**
         return DocWriteResponse.Result.UPDATED == response.getResult();
-      } catch (ElasticsearchStatusException e) {
+      } catch (OpenSearchStatusException e) {
         if (RestStatus.NOT_FOUND == e.status()) {
           logger.debug("Attempted to delete {}, but that series does not exist in the index.", seriesId);
           return true;

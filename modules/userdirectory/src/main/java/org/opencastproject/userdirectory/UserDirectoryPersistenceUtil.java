@@ -226,7 +226,7 @@ public final class UserDirectoryPersistenceUtil {
         fulltextConditions.add(cb.or(fieldConditions.toArray(new Predicate[0])));
       }
       // all token have to match something
-      // (different to fulltext search for Elasticsearch, where only one token has to match!)
+      // (different to fulltext search for OpenSearch, where only one token has to match!)
       conditions.add(cb.and(fulltextConditions.toArray(new Predicate[0])));
     }
     query.where(cb.and(conditions.toArray(new Predicate[0])));

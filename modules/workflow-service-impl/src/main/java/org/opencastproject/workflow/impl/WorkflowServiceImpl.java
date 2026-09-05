@@ -33,16 +33,6 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
@@ -55,6 +45,16 @@ import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MetadataService;
 import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
@@ -232,8 +232,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final Striped<Lock> updateLock = Striped.lazyWeakLock(1024);
   private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
-  /** The Elasticsearch indices */
-  private ElasticsearchIndex index;
+  /** The OpenSearch indices */
+  private OpenSearchIndex index;
 
   /**
    * Constructs a new workflow service impl, with a priority-sorted map of metadata services
@@ -2027,7 +2027,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          the admin UI index.
    */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 
@@ -2315,7 +2315,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Remove a workflow instance from the Elasticsearch index.
+   * Remove a workflow instance from the OpenSearch index.
    *
    * @param workflowInstanceId
    *         the identifier of the workflow instance to remove
@@ -2376,7 +2376,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Update a workflow instance in the Elasticsearch index.
+   * Update a workflow instance in the OpenSearch index.
    *
    * @param id
    *         workflow id
@@ -2412,7 +2412,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Get the function to update the workflow state for an event in the Elasticsearch index.
+   * Get the function to update the workflow state for an event in the OpenSearch index.
    *
    * @return the function to do the update
    */

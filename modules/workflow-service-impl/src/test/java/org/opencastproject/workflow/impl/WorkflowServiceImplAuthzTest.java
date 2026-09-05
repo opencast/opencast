@@ -29,12 +29,12 @@ import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -237,7 +237,7 @@ public class WorkflowServiceImplAuthzTest {
     // Search Index
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    final OpenSearchIndex index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);

@@ -39,13 +39,13 @@ import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.db.DBSession;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -180,7 +180,7 @@ public class TestTasksEndpoint extends TasksEndpoint {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex esIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), anyObject(Function.class),
             anyObject(Organization.class), anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);

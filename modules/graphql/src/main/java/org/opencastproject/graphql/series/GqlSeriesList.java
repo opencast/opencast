@@ -21,10 +21,10 @@
 
 package org.opencastproject.graphql.series;
 
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.graphql.type.output.OffsetPageInfo;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.objects.series.Series;
 
 import java.util.Arrays;
 import java.util.List;

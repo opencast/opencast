@@ -73,9 +73,6 @@ import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.db.DBSession;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -96,6 +93,9 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -201,7 +201,7 @@ public class SchedulerServiceImplTest {
   private Organization currentOrg = new DefaultOrganization();
 
   private static SchedulerServiceImpl schedSvc;
-  private static ElasticsearchIndex index;
+  private static OpenSearchIndex index;
 
   // persistent properties
   private static SchedulerServiceDatabaseImpl schedulerDatabase;
@@ -257,7 +257,7 @@ public class SchedulerServiceImplTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
@@ -1629,7 +1629,7 @@ public class SchedulerServiceImplTest {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex esIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(),
             EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))

@@ -21,9 +21,9 @@
 
 package org.opencastproject.graphql.acl;
 
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.graphql.series.GqlSeries;
 import org.opencastproject.graphql.type.output.GqlAccessControlList;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 

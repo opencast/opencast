@@ -24,16 +24,16 @@ package org.opencastproject.external.endpoint;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.util.statistics.QueryUtils;
 import org.opencastproject.external.util.statistics.ResourceTypeUtils;
 import org.opencastproject.external.util.statistics.StatisticsProviderUtils;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -108,7 +108,7 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
@@ -123,8 +123,8 @@ public class StatisticsEndpoint {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Reference
@@ -348,7 +348,7 @@ public class StatisticsEndpoint {
             parameters.getFrom(),
             parameters.getTo(),
             parameters.getDataResolution(),
-            this.elasticsearchIndex,
+            this.opensearchIndex,
             ZoneId.systemDefault(),
             true,
             parameters.getDetailLevel(),
@@ -382,7 +382,7 @@ public class StatisticsEndpoint {
   }
 
   private void checkMediapackageAccess(final String mpId) throws UnauthorizedException, SearchIndexException {
-    final Optional<Event> event = indexService.getEvent(mpId, elasticsearchIndex);
+    final Optional<Event> event = indexService.getEvent(mpId, opensearchIndex);
     if (event.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
@@ -390,7 +390,7 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Optional<Series> series = elasticsearchIndex.getSeries(seriesId, securityService.getOrganization(),
+    final Optional<Series> series = opensearchIndex.getSeries(seriesId, securityService.getOrganization(),
         securityService.getUser());
     if (series.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized

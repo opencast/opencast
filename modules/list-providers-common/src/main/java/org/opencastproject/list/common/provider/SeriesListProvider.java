@@ -21,18 +21,18 @@
 
 package org.opencastproject.list.common.provider;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.common.query.SeriesListQuery;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Tuple;
@@ -82,7 +82,7 @@ public class SeriesListProvider implements ResourceListProvider {
       SERIES_WRITE_ONLY };
 
   /** The search index. */
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
 
   /** The security service. */
   private SecurityService securityService;
@@ -94,7 +94,7 @@ public class SeriesListProvider implements ResourceListProvider {
 
   /** OSGi callback for series services. */
   @Reference
-  public void setSearchIndex(ElasticsearchIndex searchIndex) {
+  public void setSearchIndex(OpenSearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 

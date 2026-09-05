@@ -21,10 +21,6 @@
 
 package org.opencastproject.index.service.api;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.UnsupportedAssetException;
@@ -36,6 +32,10 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -77,7 +77,7 @@ public interface IndexService {
    * @throws SearchIndexException
    *           Thrown if the index cannot be read
    */
-  Optional<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException;
+  Optional<Event> getEvent(String id, OpenSearchIndex index) throws SearchIndexException;
 
   /**
    * Creates a new event based on a request.
@@ -202,7 +202,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the current user is unable to edit the event.
    */
-  MetadataList updateEventMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
+  MetadataList updateEventMetadata(String id, MetadataList metadataList, OpenSearchIndex index)
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException;
 
   /**
@@ -226,7 +226,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the current user is unable to update the event.
    */
-  MetadataList updateAllEventMetadata(String id, String metadataJSON, ElasticsearchIndex index)
+  MetadataList updateAllEventMetadata(String id, String metadataJSON, OpenSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException;
 
@@ -269,7 +269,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the action is unauthorized.
    */
-  AccessControlList updateEventAcl(String id, AccessControlList acl, ElasticsearchIndex index)
+  AccessControlList updateEventAcl(String id, AccessControlList acl, OpenSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException;
 
@@ -378,7 +378,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the current user is unable to update the event.
    */
-  MetadataList updateAllSeriesMetadata(String id, String metadataJSON, ElasticsearchIndex index)
+  MetadataList updateAllSeriesMetadata(String id, String metadataJSON, OpenSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException;
 
   /**
@@ -398,7 +398,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the user is unable to update the series.
    */
-  MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
+  MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, OpenSearchIndex index)
           throws IndexServiceException, NotFoundException, UnauthorizedException;
 
   /**

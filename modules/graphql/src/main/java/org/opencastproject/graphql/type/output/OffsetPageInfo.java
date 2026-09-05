@@ -21,7 +21,7 @@
 
 package org.opencastproject.graphql.type.output;
 
-import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResult;
 
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLNonNull;

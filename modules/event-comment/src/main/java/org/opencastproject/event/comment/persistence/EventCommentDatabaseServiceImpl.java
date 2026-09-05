@@ -24,15 +24,15 @@ import static org.opencastproject.db.Queries.namedQuery;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Comment;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.event.comment.EventComment;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Comment;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -95,8 +95,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /** The component context this bundle is running in. */
   private ComponentContext cc;
 
-  /** The elasticsearch indices */
-  private ElasticsearchIndex index;
+  /** The opensearch indices */
+  private OpenSearchIndex index;
 
   /** OSGi component activation callback */
   @Activate
@@ -151,13 +151,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   /**
-   * OSgi callback for the Elasticsearch index.
+   * OSgi callback for the OpenSearch index.
    *
    * @param index
-   *          the Elasticsearch index.
+   *          the OpenSearch index.
    */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 
@@ -412,7 +412,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   /**
-   * Get the function to update a commented event in the Elasticsearch index.
+   * Get the function to update a commented event in the OpenSearch index.
    *
    * @param eventId
    *          The id of the current event

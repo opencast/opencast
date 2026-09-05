@@ -35,14 +35,6 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
@@ -59,6 +51,14 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -160,15 +160,15 @@ public class SeriesEndpoint {
   protected String endpointBaseUrl;
 
   /* OSGi service references */
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private IndexService indexService;
   private SecurityService securityService;
   private SeriesService seriesService;
 
   /** OSGi DI */
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   /** OSGi DI */
@@ -351,7 +351,7 @@ public class SeriesEndpoint {
 
       logger.trace("Using Query: " + query.toString());
 
-      SearchResult<Series> result = elasticsearchIndex.getByQuery(query);
+      SearchResult<Series> result = opensearchIndex.getByQuery(query);
       final boolean includeAcl = (withAcl != null && withAcl);
       return queryResultToJson(result, includeAcl, requestedVersion);
 
@@ -449,7 +449,7 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
@@ -535,7 +535,7 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -559,7 +559,7 @@ public class SeriesEndpoint {
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -765,7 +765,7 @@ public class SeriesEndpoint {
     Optional<DublinCoreMetadataCollection> optCollection = Optional.empty();
     SeriesCatalogUIAdapter adapter = null;
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -820,7 +820,7 @@ public class SeriesEndpoint {
     }
 
     metadataList.add(adapter, collection);
-    indexService.updateAllSeriesMetadata(id, metadataList, elasticsearchIndex);
+    indexService.updateAllSeriesMetadata(id, metadataList, opensearchIndex);
     return ApiResponseBuilder.Json.ok(acceptHeader, "");
   }
 
@@ -867,7 +867,7 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -900,7 +900,7 @@ public class SeriesEndpoint {
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
       Series series = optSeries.get();
@@ -937,7 +937,7 @@ public class SeriesEndpoint {
       })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
-    if (elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    if (opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
@@ -1004,7 +1004,7 @@ public class SeriesEndpoint {
       @PathParam("seriesId") String seriesID, @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
-      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, elasticsearchIndex);
+      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, opensearchIndex);
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
       boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
       return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true,
@@ -1593,7 +1593,7 @@ public class SeriesEndpoint {
     }
 
     try {
-      return elasticsearchIndex.getByQuery(q);
+      return opensearchIndex.getByQuery(q);
     } catch (SearchIndexException e) {
       logger.error("Failed to execute search query: {}", e.getMessage());
       throw new SeriesException(e);

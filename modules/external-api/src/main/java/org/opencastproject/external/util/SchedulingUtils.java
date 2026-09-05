@@ -27,11 +27,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
@@ -347,7 +347,7 @@ public final class SchedulingUtils {
    *          The conflicting {@link MediaPackage}s.
    * @param indexService
    *          The {@link IndexService} for getting the corresponding events for the conflicting {@link MediaPackage}s.
-   * @param elasticsearchIndex
+   * @param opensearchIndex
    *          The index to use for getting the corresponding events for the conflicting MediaPackages.
    *
    * @return A List of conflicting events, represented as JSON objects.
@@ -359,11 +359,11 @@ public final class SchedulingUtils {
       Optional<String> checkedEventId,
       List<MediaPackage> mediaPackages,
       IndexService indexService,
-      ElasticsearchIndex elasticsearchIndex
+      OpenSearchIndex opensearchIndex
   ) throws SearchIndexException {
     List<JsonObject> result = new ArrayList<>();
     for (MediaPackage mediaPackage : mediaPackages) {
-      Optional<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), elasticsearchIndex);
+      Optional<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), opensearchIndex);
       if (eventOpt.isPresent()) {
         final Event event = eventOpt.get();
         if (checkedEventId.isPresent() && checkedEventId.get().equals(event.getIdentifier())) {

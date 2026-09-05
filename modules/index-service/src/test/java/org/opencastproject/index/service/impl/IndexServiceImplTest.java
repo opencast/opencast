@@ -27,14 +27,6 @@ import static org.junit.Assert.assertTrue;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.ingest.api.IngestException;
@@ -57,6 +49,14 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchQuery;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.impl.SearchResultItemImpl;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.Util;
@@ -756,7 +756,7 @@ public class IndexServiceImplTest {
 
     SearchResult<Event> result = new SearchResultImpl<>(query, 0, 0);
 
-    ElasticsearchIndex abstractIndex = EasyMock.createMock(ElasticsearchIndex.class);
+    OpenSearchIndex abstractIndex = EasyMock.createMock(OpenSearchIndex.class);
     EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
     EasyMock.replay(abstractIndex);
 
@@ -837,7 +837,7 @@ public class IndexServiceImplTest {
     SearchResultImpl<Event> searchResult = new SearchResultImpl<>(query, 0, 0);
     searchResult.addResultItem(searchResultItem);
     SecurityService securityService = setupSecurityService(username, org);
-    ElasticsearchIndex index = EasyMock.createMock(ElasticsearchIndex.class);
+    OpenSearchIndex index = EasyMock.createMock(OpenSearchIndex.class);
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(getClass().getResourceAsStream("/events/update-event-mp.xml"));
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(searchResult);

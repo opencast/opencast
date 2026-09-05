@@ -33,12 +33,12 @@ import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.common.query.GroupsListQuery;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.impl.jpa.JpaGroup;
@@ -116,14 +116,14 @@ public class GroupsEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(GroupsEndpoint.class);
 
   /* OSGi service references */
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
   private SecurityService securityService;
 
   /** OSGi DI */
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   /** OSGi DI. */
