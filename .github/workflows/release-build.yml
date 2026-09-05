@@ -66,7 +66,7 @@ jobs:
 
       - name: changelog
         id: opencast_changelog
-        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        uses: mikepenz/release-changelog-builder-action@cb021f9b36a51a7c6f18e4679b6fa2cb77a1260c #6.3.0
         with:
           configuration: ".github/changelog/opencast.json"
           owner: opencast
@@ -76,7 +76,7 @@ jobs:
 
       - name: changelog
         id: admin_changelog
-        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        uses: mikepenz/release-changelog-builder-action@cb021f9b36a51a7c6f18e4679b6fa2cb77a1260c #6.3.0
         with:
           configuration: ".github/changelog/admin-interface.json"
           owner: opencast
@@ -86,7 +86,7 @@ jobs:
 
       - name: changelog
         id: editor_changelog
-        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        uses: mikepenz/release-changelog-builder-action@cb021f9b36a51a7c6f18e4679b6fa2cb77a1260c #6.3.0
         with:
           configuration: ".github/changelog/editor.json"
           owner: opencast
@@ -96,7 +96,7 @@ jobs:
 
       - name: changelog
         id: studio_changelog
-        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        uses: mikepenz/release-changelog-builder-action@cb021f9b36a51a7c6f18e4679b6fa2cb77a1260c #6.3.0
         with:
           configuration: ".github/changelog/studio.json"
           owner: opencast
