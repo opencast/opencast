@@ -219,7 +219,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
     URL url = null;
     try {
-      url = new URL(posterimageUrlOpt);
+      url = URI.create(posterimageUrlOpt).toURL();
     } catch (Exception e) {
       logger.debug("Given poster image URI '{}' is not valid", posterimageUrlOpt);
     }

@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -117,7 +119,12 @@ public class OrganizationFilter implements Filter {
           ServletException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
-    URL url = new URL(httpRequest.getRequestURL().toString());
+    URL url;
+    try {
+      url = URI.create(httpRequest.getRequestURL().toString()).toURL();
+    } catch (IllegalArgumentException e) {
+      throw new MalformedURLException(httpRequest.getRequestURL() + " is not a valid URL");
+    }
 
     Organization org = null;
 
