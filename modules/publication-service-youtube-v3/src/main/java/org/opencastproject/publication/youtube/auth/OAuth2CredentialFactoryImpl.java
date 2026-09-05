@@ -73,42 +73,49 @@ public final class OAuth2CredentialFactoryImpl implements OAuth2CredentialFactor
   ) throws IOException {
     final GoogleCredential gCred;
     final LocalServerReceiver localReceiver = new LocalServerReceiver();
-    final String accessToken;
-    final String refreshToken;
 
     try {
       // Reads the client id and client secret from a file name passed in authContext
       final GoogleClientSecrets gClientSecrets = GoogleClientSecrets.load(new JacksonFactory(),
               new FileReader(authContext.getClientSecrets()));
 
-      // Obtain tokens from credential in data store, or obtains a new one from
-      // Google if one doesn't exist
-      final StoredCredential sCred = datastore.get(authContext.getClientId());
-      if (sCred != null) {
-        accessToken = sCred.getAccessToken();
-        refreshToken = sCred.getRefreshToken();
-        logger.debug(MessageFormat.format(
-            "Found credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
-      } else {
-        // This flow supports installed applications
-        final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                new NetHttpTransport(), new JacksonFactory(), gClientSecrets, authContext.getScopes())
-            .setCredentialDataStore(datastore)
-            .setApprovalPrompt("auto")
-            .setAccessType("offline")
-            .build();
-        final Credential cred = new AuthorizationCodeInstalledApp(flow, localReceiver)
-            .authorize(authContext.getClientId());
-        accessToken = cred.getAccessToken();
-        refreshToken = cred.getRefreshToken();
+      // This flow supports installed applications
+      final GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+              new NetHttpTransport(), new JacksonFactory(), gClientSecrets, authContext.getScopes())
+          .setCredentialDataStore(datastore)
+          .setApprovalPrompt("auto")
+          .setAccessType("offline")
+          .build();
+
+      // Reuse the credential in the data store if there is one and Google still honors its refresh
+      // token. Actively exercising the refresh token here also keeps Google from considering it
+      // inactive and revoking it, even if this credential ends up never being used to call the
+      // YouTube API. If there's no stored credential, or Google has already revoked it (e.g. after
+      // prolonged inactivity), fall back to the interactive consent flow to obtain a new one.
+      Credential cred = flow.loadCredential(authContext.getClientId());
+      if (cred != null) {
+        try {
+          cred.refreshToken();
+          logger.debug(MessageFormat.format(
+              "Found credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
+        } catch (final IOException e) {
+          logger.warn("Stored YouTube credential for client {} could not be refreshed, requesting a new one: {}",
+              authContext.getClientId(), e.getMessage());
+          datastore.delete(authContext.getClientId());
+          cred = null;
+        }
+      }
+      if (cred == null) {
+        cred = new AuthorizationCodeInstalledApp(flow, localReceiver).authorize(authContext.getClientId());
         logger.debug(MessageFormat.format(
             "Created new credential for client {0} in data store {1}", authContext.getClientId(), datastore.getId()));
       }
+
       gCred = new GoogleCredential.Builder()
           .setClientSecrets(gClientSecrets).setJsonFactory(new JacksonFactory())
           .setTransport(new NetHttpTransport()).build();
-      gCred.setAccessToken(accessToken);
-      gCred.setRefreshToken(refreshToken);
+      gCred.setAccessToken(cred.getAccessToken());
+      gCred.setRefreshToken(cred.getRefreshToken());
       logger.debug(MessageFormat.format(
           "Found credential {0} using {1}", gCred.getRefreshToken(), authContext.toString()));
     } finally {
