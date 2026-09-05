@@ -124,13 +124,17 @@ public class YouTubePublicationAdapter {
     }
 
     String description = "";
-    if (dcSeries != null) {
-      description = StringUtils.trimToEmpty(dcSeries.getFirst(DublinCore.PROPERTY_TITLE));
-    }
-
+    
     String episodeDescription = dcEpisode.getFirst(DublinCore.PROPERTY_DESCRIPTION);
     if (episodeDescription != null) {
-      description += '\n' + episodeDescription;
+      description += episodeDescription + '\n'; /** appended newline: this is the main data content and should always be separated from any additions */
+    }
+
+    if (dcSeries != null) {
+      String seriesTitle = StringUtils.trimToEmpty(dcSeries.getFirst(DublinCore.PROPERTY_TITLE));
+      if seriesTitle != null) {
+        description += '\n' + seriesTitle; /** prepended newline at the beginning: this adds a line at the top to signify the missing (actual) description */
+      }
     }
 
     String episodeLicense = dcEpisode.getFirst(DublinCore.PROPERTY_LICENSE);
