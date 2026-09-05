@@ -60,13 +60,13 @@ import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -1079,15 +1079,13 @@ public class EditorServiceImpl implements EditorService {
   private boolean isAdmin() {
     final User currentUser = securityService.getUser();
 
-    // Global admin
-    if (currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+    if (SecurityUtil.isGlobalAdmin(currentUser)) {
       return true;
     }
 
-    // Organization admin
     final Organization currentOrg = securityService.getOrganization();
     return currentUser.getOrganization().getId().equals(currentOrg.getId())
-            && currentUser.hasRole(currentOrg.getAdminRole());
+            && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg);
   }
 
   private MediaPackage getMediaPackage(Event event) throws EditorServiceException {

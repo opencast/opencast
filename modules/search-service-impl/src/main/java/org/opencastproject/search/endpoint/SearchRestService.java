@@ -40,12 +40,12 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.search.impl.SearchServiceIndex;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -201,8 +201,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
         .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
     final var user = securityService.getUser();
-    final var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+    if (!SecurityUtil.isAdmin(user, securityService.getOrganization())) {
       query.filter(QueryBuilders.termsQuery(
           SearchResult.INDEX_ACL + ".read",
           user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
@@ -394,8 +393,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    var admin = SecurityUtil.isAdmin(user, securityService.getOrganization());
     var query = QueryBuilders.boolQuery()
         .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
         .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
