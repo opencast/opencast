@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Prelude.sleep;
@@ -84,7 +83,7 @@ public final class HttpUtil {
   }
 
   private static void setFormParams(HttpEntityEnclosingRequest r, NameValuePair[] formParams) {
-    final List<NameValuePair> params = list(formParams);
+    final List<NameValuePair> params = Arrays.asList(formParams);
     try {
       r.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {

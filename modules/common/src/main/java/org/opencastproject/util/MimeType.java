@@ -23,9 +23,6 @@
 package org.opencastproject.util;
 
 import static org.opencastproject.util.EqualsUtil.eqObj;
-import static org.opencastproject.util.data.Collections.list;
-
-import org.opencastproject.util.data.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,12 +100,12 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   }
 
   public static MimeType mimeType(String type, String subtype, String suffix) {
-    return new MimeType(type, subtype, list(suffix), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(),
+    return new MimeType(type, subtype, List.of(suffix), List.of(), Optional.empty(), Optional.empty(),
         Optional.empty());
   }
 
   public static MimeType mimeType(String type, String subtype) {
-    return new MimeType(type, subtype, Collections.<String>nil(), Collections.<MimeType>nil(), Optional.empty(),
+    return new MimeType(type, subtype, List.of(), List.of(), Optional.empty(),
         Optional.empty(), Optional.empty());
   }
 

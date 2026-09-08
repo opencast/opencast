@@ -37,12 +37,13 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
@@ -56,7 +57,7 @@ public class GroupRoleEndpointTest {
   @Before
   public void setUp() throws Exception {
     JpaUser adminUser = new JpaUser("admin", "pass1", org1, "Admin", "admin@localhost", "opencast", true,
-            Collections.set(new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
+            Set.of(new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
 
     // Set the security sevice
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -76,7 +77,7 @@ public class GroupRoleEndpointTest {
 
   @Test
   public void testUpdateGroupNotAllowedAsNonAdminUser() throws UnauthorizedException {
-    JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Collections.set(
+    JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Set.of(
             new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
     try {
       provider.addGroup(group);
@@ -88,7 +89,7 @@ public class GroupRoleEndpointTest {
     }
 
     JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
-            Collections.set(new JpaRole("ROLE_USER", org1)));
+            Set.of(new JpaRole("ROLE_USER", org1)));
 
     // Set the security sevice
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -116,7 +117,7 @@ public class GroupRoleEndpointTest {
 
   @Test
   public void testRemoveGroupNotAllowedAsNonAdminUser() throws UnauthorizedException {
-    JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Collections.set(
+    JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Set.of(
             new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
     try {
       provider.addGroup(group);
@@ -128,7 +129,7 @@ public class GroupRoleEndpointTest {
     }
 
     JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
-            Collections.set(new JpaRole("ROLE_USER", org1)));
+            Set.of(new JpaRole("ROLE_USER", org1)));
 
     // Set the security sevice
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);

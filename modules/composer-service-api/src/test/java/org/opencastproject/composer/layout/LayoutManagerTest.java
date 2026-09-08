@@ -27,7 +27,6 @@ import static org.opencastproject.composer.layout.Dimension.dimension;
 import static org.opencastproject.composer.layout.LayoutManager.aspectRatio;
 import static org.opencastproject.composer.layout.LayoutManager.scaleToFit;
 import static org.opencastproject.composer.layout.Offset.offset;
-import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.util.JsonObj;
@@ -211,7 +210,7 @@ public class LayoutManagerTest {
     final double watermarkCoverage = 0.05;
     LayoutManager.multiShapeLayout(
         canvas,
-        list(tuple(lower,
+        List.of(tuple(lower,
             new HorizontalCoverageLayoutSpec(
                 anchorOffset(Anchors.BOTTOM_RIGHT, Anchors.BOTTOM_RIGHT, 0, 0), lowerCoverage)),
          tuple(upper, new HorizontalCoverageLayoutSpec(
@@ -232,7 +231,7 @@ public class LayoutManagerTest {
   /** SWITCHP-337 */
   @Test
   public void testWatermarkLayout() {
-    final List<Tuple<Offset, String>> fixtures = list(
+    final List<Tuple<Offset, String>> fixtures = List.of(
             // top left
             tuple(offset(20, 20), "{\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
                 + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":0.0,\"top\":0.0}}}"),
@@ -249,7 +248,7 @@ public class LayoutManagerTest {
       final AbsolutePositionLayoutSpec spec = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(fixture.getB()));
       final MultiShapeLayout layout = LayoutManager.absoluteMultiShapeLayout(
               Dimension.dimension(1900, 1080),
-              list(tuple(Dimension.dimension(540, 720), spec)));
+              List.of(tuple(Dimension.dimension(540, 720), spec)));
       assertEquals(1, layout.getShapes().size());
       assertEquals(fixture.getA(), layout.getShapes().get(0).getOffset());
     }

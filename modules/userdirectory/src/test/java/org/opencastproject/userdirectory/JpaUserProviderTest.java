@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
-import static org.opencastproject.util.data.Collections.set;
 
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
@@ -39,7 +38,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
@@ -253,7 +251,7 @@ public class JpaUserProviderTest {
     provider.setSecurityService(mockSecurityServiceWithUser(user));
 
     // try to add ROLE_USER
-    Set<JpaRole> updatedRoles = Collections.set(
+    Set<JpaRole> updatedRoles = Set.of(
             new JpaRole("ROLE_USER", org1),
             new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1));
 
@@ -266,7 +264,7 @@ public class JpaUserProviderTest {
     }
 
     // try to remove ROLE_ADMIN
-    updatedRoles = Collections.set(new JpaRole("ROLE_USER", org1));
+    updatedRoles = Set.of(new JpaRole("ROLE_USER", org1));
     try {
       provider.updateUser(new JpaUser(adminUser.getUsername(), adminUser.getPassword(), org1,
               adminUser.getName(), true, updatedRoles));
@@ -314,8 +312,8 @@ public class JpaUserProviderTest {
 
   @Test
   public void testDuplicateUser() {
-    set(new JpaRole("ROLE_COOL_ONE", org1));
-    set(new JpaRole("ROLE_COOL_ONE", org2));
+    Set.of(new JpaRole("ROLE_COOL_ONE", org1));
+    Set.of(new JpaRole("ROLE_COOL_ONE", org2));
     try {
       provider.addUser(createUserWithRoles(org1, "user1", "ROLE_COOL_ONE"));
       provider.addUser(createUserWithRoles(org1, "user2", "ROLE_COOL_ONE"));

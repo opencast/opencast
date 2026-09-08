@@ -36,7 +36,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 
 import com.google.common.cache.CacheBuilder;
@@ -65,6 +64,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -452,7 +452,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     final boolean manageable = user1.isManageable() || user2.isManageable();
 
     final JaxbOrganization organization = JaxbOrganization.fromOrganization(user1.getOrganization());
-    final String provider = StringUtils.join(Collections.nonNullList(user1.getProvider(), user2.getProvider()), ",");
+    final String provider = StringUtils.join(
+        Stream.of(user1.getProvider(), user2.getProvider()).filter(Objects::nonNull).collect(Collectors.toList()),
+        ",");
 
     JaxbUser jaxbUser = new JaxbUser(user1.getUsername(), password, name, email, provider, organization, mergedRoles);
     jaxbUser.setManageable(manageable);

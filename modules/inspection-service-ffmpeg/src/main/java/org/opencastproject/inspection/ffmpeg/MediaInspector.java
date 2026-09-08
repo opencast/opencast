@@ -22,7 +22,6 @@
 package org.opencastproject.inspection.ffmpeg;
 
 import static org.opencastproject.inspection.api.MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT;
-import static org.opencastproject.util.data.Collections.map;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
@@ -49,7 +48,6 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UnknownFileTypeException;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
@@ -394,7 +392,7 @@ public class MediaInspector {
     }
     try {
       MediaAnalyzer analyzer = new FFmpegAnalyzer(accurateFrameCount);
-      analyzer.setConfig(map(Tuple.<String, Object> tuple(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG, ffprobePath)));
+      analyzer.setConfig(Map.of(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG, ffprobePath));
 
       MediaContainerMetadata metadata = analyzer.analyze(file);
       // - setting mimetype for all media

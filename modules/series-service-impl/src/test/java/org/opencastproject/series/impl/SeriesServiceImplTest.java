@@ -27,7 +27,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
-import static org.opencastproject.util.data.Collections.list;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
@@ -234,11 +233,11 @@ public class SeriesServiceImplTest {
     assertFalse(DublinCoreUtil.equals(a, b));
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertTrue(DublinCoreUtil.equals(a, b));
-    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Paul"), DublinCoreValue.mk("Peter")));
+    a.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Paul"), DublinCoreValue.mk("Peter")));
     assertFalse(DublinCoreUtil.equals(a, b));
     //
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     assertTrue(DublinCoreUtil.equals(a, b));
     //
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
@@ -255,8 +254,8 @@ public class SeriesServiceImplTest {
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
-    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    a.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     b.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     b.set(DublinCore.PROPERTY_SPATIAL, "room1");
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");

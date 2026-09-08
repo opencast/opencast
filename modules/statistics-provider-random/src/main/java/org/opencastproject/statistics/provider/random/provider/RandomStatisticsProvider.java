@@ -26,7 +26,6 @@ import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsUtil;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
-import org.opencastproject.util.data.Collections;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -79,7 +78,7 @@ public class RandomStatisticsProvider implements TimeSeriesProvider {
 
   @Override
   public Set<DataResolution> getDataResolutions() {
-    return Collections.set(DataResolution.values());
+    return Set.of(DataResolution.values());
   }
 
   @Override

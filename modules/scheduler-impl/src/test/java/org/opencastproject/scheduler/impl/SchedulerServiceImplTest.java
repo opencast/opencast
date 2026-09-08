@@ -57,7 +57,6 @@ import static org.opencastproject.scheduler.api.RecordingState.UPLOADING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -1033,7 +1032,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackage = generateEvent(Optional.empty());
     String elementId = addDublinCore(Optional.empty(), mediaPackage, initalEvent);
 
-    Map<String, String> caProperties = map(tuple("org.opencastproject.workflow.definition", "full"));
+    Map<String, String> caProperties = Map.of("org.opencastproject.workflow.definition", "full");
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Optional.empty());
 

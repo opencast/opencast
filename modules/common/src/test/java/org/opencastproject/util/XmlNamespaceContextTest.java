@@ -27,24 +27,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Tuple.tuple;
-
-import org.opencastproject.util.data.Collections;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 
 public class XmlNamespaceContextTest {
   @Test
   public void testGetNamespaceURI() throws Exception {
-    testGetNamespaceURI(new XmlNamespaceContext(Collections.map(
-            tuple("foo", "http://foo.org"),
-            tuple("bar", "http://bar.org"))));
+    testGetNamespaceURI(new XmlNamespaceContext(Map.of(
+            "foo", "http://foo.org",
+            "bar", "http://bar.org")));
     testGetNamespaceURI(XmlNamespaceContext.mk(asList(
             new XmlNamespaceBinding("foo", "http://foo.org"),
             new XmlNamespaceBinding("bar", "http://bar.org"))));
@@ -60,9 +58,9 @@ public class XmlNamespaceContextTest {
 
   @Test
   public void testGetPrefix() throws Exception {
-    testGetPrefix(new XmlNamespaceContext(Collections.map(
-            tuple("foo", "http://foo.org"),
-            tuple("bar", "http://bar.org"))));
+    testGetPrefix(new XmlNamespaceContext(Map.of(
+            "foo", "http://foo.org",
+            "bar", "http://bar.org")));
     testGetPrefix(XmlNamespaceContext.mk(asList(
             new XmlNamespaceBinding("foo", "http://foo.org"),
             new XmlNamespaceBinding("bar", "http://bar.org"))));
@@ -76,10 +74,10 @@ public class XmlNamespaceContextTest {
 
   @Test
   public void testGetPrefixes() throws Exception {
-    testGetPrefixes(new XmlNamespaceContext(Collections.map(
-                            tuple("foo", "http://foo.org"),
-                            tuple("bar", "http://bar.org"),
-                            tuple("baz", "http://bar.org"))),
+    testGetPrefixes(new XmlNamespaceContext(Map.of(
+                            "foo", "http://foo.org",
+                            "bar", "http://bar.org",
+                            "baz", "http://bar.org")),
                     asList("bar", "baz"));
     testGetPrefixes(XmlNamespaceContext.mk(asList(
                             new XmlNamespaceBinding("foo", "http://foo.org"),

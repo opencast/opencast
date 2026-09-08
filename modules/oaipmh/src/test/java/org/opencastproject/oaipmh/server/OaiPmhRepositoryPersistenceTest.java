@@ -30,7 +30,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.encodeDate;
 import static org.opencastproject.security.util.SecurityUtil.createSystemUser;
-import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.xmlmatchers.XmlMatchers.hasXPath;
 import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
@@ -345,7 +344,7 @@ public class OaiPmhRepositoryPersistenceTest {
 
       @Override
       public List<MetadataProvider> getRepositoryMetadataProviders() {
-        return nil();
+        return List.of();
       }
 
       @Override
