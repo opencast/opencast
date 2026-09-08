@@ -27,4 +27,3 @@ package org.opencastproject.usertracking.endpoint;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-

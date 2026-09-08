@@ -26,4 +26,3 @@ import org.opencastproject.elasticsearch.index.objects.IndexObject;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-

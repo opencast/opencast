@@ -270,4 +270,3 @@ public class DublinCoreCatalogTest {
     return DublinCoreXmlFormat.read(IoSupport.classPathResourceAsFile(dcFile).get(), includeEmptiedElements);
   }
 }
-

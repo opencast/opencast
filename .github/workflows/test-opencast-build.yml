@@ -66,10 +66,17 @@ jobs:
             tesseract-ocr-deu \
             unzip
 
+      - name: check code format
+        run: |
+          ./mvnw spotless:check -Pnone \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
       - name: build opencast
         run: |
           ./mvnw clean install -Pnone \
             --batch-mode \
+            -Dspotless.apply.skip=true \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
@@ -82,6 +89,7 @@ jobs:
         run: |
           ../mvnw clean install \
             --batch-mode \
+            -Dspotless.apply.skip=true \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \

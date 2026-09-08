@@ -82,4 +82,3 @@ public class UserOffsetDataFetcher extends ParameterDataFetcher<GqlUserList> {
   }
 
 }
-

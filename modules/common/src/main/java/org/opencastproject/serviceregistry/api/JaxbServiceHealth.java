@@ -53,4 +53,3 @@ public class JaxbServiceHealth {
     this.error = error;
   }
 }
-

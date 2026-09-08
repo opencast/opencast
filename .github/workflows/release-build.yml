@@ -41,7 +41,8 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
             -DskipTests \
-            -Dcheckstyle.skip=true
+            -Dcheckstyle.skip=true \
+            -Dspotless.apply.skip=true
 
       - name: Get the version
         id: get_version

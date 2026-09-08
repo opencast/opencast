@@ -27,4 +27,3 @@ package org.opencastproject.smil.entity.media.element;
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-

@@ -93,16 +93,11 @@
     <module name="RedundantImport">
       <property name="severity" value="error" />
     </module>
-    <module name="UnusedImports">
-      <property name="severity" value="error" />
-    </module>
-    <module name="ImportOrder">
-      <property name="groups" value="org.opencastproject,com,net,org,java,javax"/>
-      <property name="ordered" value="true"/>
-      <property name="separated" value="true"/>
-      <property name="option" value="top"/>
-      <property name="sortStaticImportsAlphabetically" value="true"/>
-    </module>
+    <!-- Note that `UnusedImports` and `ImportOrder` used to live here.  Both are now handled by the
+         spotless-maven-plugin (see the root pom.xml), which does not just report them but fixes
+         them.  Checking them here as well would only mean that a build can fail on something
+         spotless would not repair, e.g. because checkstyle and spotless disagree on whether an
+         import used exclusively in Javadoc counts as used. -->
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
