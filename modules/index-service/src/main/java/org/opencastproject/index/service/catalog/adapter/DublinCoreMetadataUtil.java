@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
@@ -70,6 +71,13 @@ public final class DublinCoreMetadataUtil {
    */
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, DublinCoreMetadataCollection metadata) {
     for (MetadataField field : metadata.getOutputFields().values()) {
+      // Check this regardless of whether the field was actually touched by the caller: an untouched required
+      // field can still be blank, e.g. because it uses its default value or was never submitted at all.
+      if (field.isRequired() && isBlankValue(field.getValue())) {
+        throw new IllegalArgumentException(String.format(
+                "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+                field.getInputID(), field.getType()));
+      }
       if (field.isUpdated() && field.getValue() != null) {
         final String namespace = field.getNamespace() == null ? DublinCore.TERMS_NS_URI : field.getNamespace();
         final EName ename = new EName(namespace, field.getInputID());
@@ -87,19 +95,28 @@ public final class DublinCoreMetadataUtil {
         } else if (field.getType() == MetadataField.Type.MIXED_TEXT || field.getType() == Type.ITERABLE_TEXT) {
           setIterableString(dc, field, ename);
         } else {
-          if (field.isRequired() && StringUtils.isBlank(field.getValue().toString())) {
-            throw new IllegalArgumentException(String.format(
-                "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                field.getInputID(), field.getType()));
-          }
           dc.set(ename, field.getValue().toString());
         }
-      } else if (field.getValue() == null && field.isRequired()) {
-        throw new IllegalArgumentException(String.format(
-                "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                field.getInputID(), field.getType()));
       }
     }
+  }
+
+  /**
+   * @param value
+   *          The value of a {@link MetadataField}.
+   * @return True if the value is missing, i.e. null, a blank string or an empty collection of values.
+   */
+  private static boolean isBlankValue(final Object value) {
+    if (value == null) {
+      return true;
+    }
+    if (value instanceof String) {
+      return StringUtils.isBlank((String) value);
+    }
+    if (value instanceof Collection) {
+      return ((Collection<?>) value).isEmpty();
+    }
+    return false;
   }
 
   /**

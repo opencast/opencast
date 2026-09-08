@@ -870,6 +870,12 @@ public class IndexServiceImpl implements IndexService {
 
     DublinCoreMetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
             .getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+    if (eventMetadata == null) {
+      // No common event metadata catalog was submitted at all, e.g. an empty metadata list.
+      // Fall back to the raw (empty) fields so that missing required fields (e.g. title) are rejected below
+      // instead of silently creating an event without them.
+      eventMetadata = getCommonEventCatalogUIAdapter().getRawFields();
+    }
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
@@ -1846,9 +1852,13 @@ public class IndexServiceImpl implements IndexService {
 
     DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(
         MediaPackageElements.SERIES.toString());
-    if (seriesMetadata != null) {
-      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
+    if (seriesMetadata == null) {
+      // No series metadata catalog was submitted at all, e.g. an empty metadata list.
+      // Validate against the raw (empty) fields anyway so that missing required fields (e.g. title) are rejected
+      // instead of silently creating a series without them.
+      seriesMetadata = getCommonSeriesCatalogUIAdapter().getRawFields();
     }
+    DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
 
     AccessControlList acl;
     if (optAcl.isPresent()) {
