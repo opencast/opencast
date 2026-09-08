@@ -506,6 +506,43 @@ public class IngestRestServiceTest {
     EasyMock.verify(ingestService);
   }
 
+  @Test
+  public void testAddMediaPackageRejectsUnparsableDate() throws Exception {
+    // An unparsable date used to be accepted here and only blow up much later during indexing, surfacing as a 500.
+    // The validation has to reject it up front, before the catalog is built.
+    Response response = restService.addMediaPackage(newMockRequestWithDate("created", "banana"), null);
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testAddMediaPackageDoesNotValidateTemporalAsDate() throws Exception {
+    // "temporal" carries a DCMI period rather than a plain date, so it must not be rejected as an unparsable date.
+    // This request does not reach a 200 because the shared mock has no DublinCoreCatalogService, but it must not
+    // fail with 400 either - that would mean legitimate scheduled recordings were being turned away.
+    String period = "start=2024-01-01T00:00:00Z; end=2024-01-01T01:00:00Z; scheme=W3C-DTF;";
+    Response response = restService.addMediaPackage(newMockRequestWithDate("temporal", period), null);
+    Assert.assertNotEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  private HttpServletRequest newMockRequestWithDate(String field, String value) throws Exception {
+    StringBuilder requestBody = new StringBuilder();
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"flavor\"\r\n");
+    requestBody.append("\r\ntest/flavor\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"" + field + "\"\r\n");
+    requestBody.append("\r\n" + value + "\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"BODY\"; filename=\"video.mp4\"\r\n");
+    requestBody.append("Content-Type: video/mp4\r\n");
+    requestBody.append("\r\n");
+    requestBody.append("This is the content of the file\n");
+    requestBody.append("\r\n");
+    requestBody.append("-----1234");
+    return new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"),
+            "multipart/form-data; boundary=---1234");
+  }
+
   private HttpServletRequest newMockRequest() throws Exception {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     StringBuilder requestBody = new StringBuilder();
