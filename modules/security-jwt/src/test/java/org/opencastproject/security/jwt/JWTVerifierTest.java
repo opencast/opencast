@@ -147,4 +147,51 @@ public class JWTVerifierTest {
     );
   }
 
+  /**
+   * A JWT whose algorithm implies a different key type than the one offered by the JWK set must be
+   * rejected as unverifiable rather than causing a {@link ClassCastException}.
+   */
+  @Test
+  public void testVerifyAlgorithmKeyTypeMismatch() throws Exception {
+    // EC-signed JWT against an OKP (Ed25519) JWK set, the combination reported in the issue
+    JWKSetProvider okpProvider = createMock(JWKSetProvider.class);
+    expect(okpProvider.getAll())
+        .andReturn(List.of(generator.getOkpJWK().toPublicJWK()))
+        .atLeastOnce();
+    replay(okpProvider);
+
+    assertThrows(
+        JOSEException.class,
+        () -> JWTVerifier.verify(
+            generator.generateValidEcJWT(),
+            okpProvider,
+            generator.generateValidClaimConstraints()
+        )
+    );
+
+    // EC-signed JWT against an RSA JWK set
+    assertThrows(
+        JOSEException.class,
+        () -> JWTVerifier.verify(
+            generator.generateValidEcJWT(),
+            validProvider,
+            generator.generateValidClaimConstraints()
+        )
+    );
+
+    // A JWK set mixing an unusable and a usable key must still verify via the usable one
+    JWKSetProvider mixedProvider = createMock(JWKSetProvider.class);
+    expect(mixedProvider.getAll())
+        .andReturn(List.of(generator.getOkpJWK().toPublicJWK(), generator.getEcJWK().toPublicJWK()))
+        .atLeastOnce();
+    replay(mixedProvider);
+
+    SignedJWT signedJWT = JWTVerifier.verify(
+        generator.generateValidEcJWT(),
+        mixedProvider,
+        generator.generateValidClaimConstraints()
+    );
+    assertEquals(generator.getUsername(), signedJWT.getJWTClaimsSet().getClaimAsString("username"));
+  }
+
 }

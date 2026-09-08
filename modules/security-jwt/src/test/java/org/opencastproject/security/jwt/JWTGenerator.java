@@ -29,9 +29,15 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.KeyLengthException;
+import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
+import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -56,6 +62,8 @@ public final class JWTGenerator {
   // Asymmetric Algorithm
   private final int keySize = 2048;
   private final RSAKey rsaJWK;
+  private ECKey ecJWK;
+  private OctetKeyPair okpJWK;
 
   // Claims
   private final String issuer = "https://auth.example.org";
@@ -220,6 +228,34 @@ public final class JWTGenerator {
     return new RSAKeyGenerator(keySize)
         .keyID("ABC")
         .generate();
+  }
+
+  /**
+   * Generates a JWT signed with an EC key, i.e. using an algorithm whose key type does not match
+   * an RSA or OKP JWK set.
+   *
+   * @return The serialized JWT.
+   */
+  public String generateValidEcJWT() throws JOSEException {
+    return generateValidJWT(new ECDSASigner(getEcJWK()), JWSAlgorithm.ES256, name, email, roles, 60 * 60 * 1000);
+  }
+
+  public ECKey getEcJWK() throws JOSEException {
+    if (ecJWK == null) {
+      ecJWK = new ECKeyGenerator(Curve.P_256)
+          .keyID("EC")
+          .generate();
+    }
+    return ecJWK;
+  }
+
+  public OctetKeyPair getOkpJWK() throws JOSEException {
+    if (okpJWK == null) {
+      okpJWK = new OctetKeyPairGenerator(Curve.Ed25519)
+          .keyID("OKP")
+          .generate();
+    }
+    return okpJWK;
   }
 
   public String getSecret() {
