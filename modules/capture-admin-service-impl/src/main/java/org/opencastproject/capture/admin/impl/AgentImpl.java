@@ -338,7 +338,7 @@ public class AgentImpl implements Agent {
    */
   public void setConfiguration(Properties configuration) {
     if (configuration == null) {
-      return;
+      throw new IllegalArgumentException("configuration cannot be null");
     }
 
     // Set the configuration variables

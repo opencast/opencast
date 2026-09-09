@@ -350,6 +350,11 @@ public class CaptureAgentStateServiceImplTest {
     }
   }
 
+  @Test
+  public void testNullConfiguration() {
+    assert2xAgentException("agentFail", IDLE, null);
+  }
+
   // This verifies the *configuration* of the agent.  This is the config data + the capabilities
   private void assert2xAgentConf(String agentName, String agentState, Properties sentConfig, Properties returnedConfig) {
     service.setAgentState(agentName, agentState);
