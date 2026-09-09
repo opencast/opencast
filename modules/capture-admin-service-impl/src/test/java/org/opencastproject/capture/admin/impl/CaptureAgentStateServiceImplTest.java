@@ -231,7 +231,7 @@ public class CaptureAgentStateServiceImplTest {
       }
     } catch (NotFoundException e) {
       if (state != null) {
-        fail();
+        fail("Agent not found by the service, but the desired state is not null");
       }
     }
   }
@@ -251,7 +251,7 @@ public class CaptureAgentStateServiceImplTest {
       }
     } catch (NotFoundException e) {
       if (state != null)
-        fail();
+        fail("Agent not found by the service, but the desired state is not null");
     }
   }
 
