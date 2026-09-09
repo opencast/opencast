@@ -342,14 +342,8 @@ public class AgentImpl implements Agent {
     }
 
     // Set the configuration variables
-    configurationProperties = configuration;
-    try {
-      StringWriter sw = new StringWriter();
-      configuration.store(sw, "");
-      this.configurationString = sw.toString();
-    } catch (IOException e) {
-      log.warn("Unable to store agent " + "'s capabilities to the database, IO exception occurred.", e);
-    }
+    configurationProperties = new Properties();
+    configurationProperties.putAll(configuration);
 
     Set<String> requiredKeys2x = Set.of(
       CaptureParameters.VENDOR_NAME,
@@ -359,14 +353,28 @@ public class AgentImpl implements Agent {
 
     Set<String> configs = configuration.stringPropertyNames().stream()
         .filter(requiredKeys2x::contains).collect(Collectors.toSet());
-    boolean hasRequired2xKeys = configs.size() == 4 && configs.stream().map(String::length).allMatch(i -> i < 256);
+    // Ensure there are four strings, and that they're all between 1 and at most 256 characters
+    boolean hasRequired2xKeys = configs.size() == 4
+        // Strings must be at least 1 character, and less than 256
+        && configs.stream()
+            .map(configuration::getProperty)
+            .map(String::length)
+            .allMatch(i -> i > 0 && i <= 256);
 
     if (hasRequired2xKeys) {
       set2xAgentConfiguration(configuration);
+      configurationProperties.putAll(capabilitiesProperties);
     } else {
       set1xAgentConfiguration(configuration);
     }
 
+    try {
+      StringWriter sw = new StringWriter();
+      configuration.store(sw, "");
+      this.configurationString = sw.toString();
+    } catch (IOException e) {
+      log.warn("Unable to store agent " + "'s capabilities to the database, IO exception occurred.", e);
+    }
   }
 
   private void set1xAgentConfiguration(Properties configuration) {
@@ -374,6 +382,7 @@ public class AgentImpl implements Agent {
 
     capabilitiesProperties = new Properties();
     capabilitiesProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    configurationProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     // Parse names
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
@@ -443,6 +452,7 @@ public class AgentImpl implements Agent {
 
     capabilitiesProperties = new Properties();
     capabilitiesProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+    configurationProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
 
     // Parse names
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
