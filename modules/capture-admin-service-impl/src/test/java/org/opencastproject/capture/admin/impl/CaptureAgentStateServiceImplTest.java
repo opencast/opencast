@@ -351,6 +351,29 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
+  public void testAgentDowngrade() {
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+    service.setAgentState("agent1", IDLE);
+    service.setAgentConfiguration("agent1", agentRegistration2x);
+    verifyAgentCapabilities("agent1", IDLE, agentCaps2x);
+    verifyAgentConfiguration("agent1", IDLE, agentConfig2x);
+
+    // This is an edge case, but re-configuring an agent that's *already* a 2.x agent
+    // should spit out a 1.x agent
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "");
+    Properties downgraded = new Properties();
+    downgraded.putAll(agentRegistration2x);
+    downgraded.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    downgraded.setProperty(CaptureParameters.VENDOR_NAME, "");
+
+    service.setAgentConfiguration("agent1", agentRegistration2x);
+    verifyAgentCapabilities("agent1", IDLE, bare1xAgent);
+    verifyAgentConfiguration("agent1", IDLE, downgraded);
+  }
+
+  @Test
   public void testNullConfiguration() {
     assert2xAgentException("agentFail", IDLE, null);
   }
