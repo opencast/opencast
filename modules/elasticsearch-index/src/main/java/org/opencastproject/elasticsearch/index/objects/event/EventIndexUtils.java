@@ -31,6 +31,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.elasticsearch.index.rebuild.DenyAclCollector;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.mediapackage.Attachment;
@@ -407,7 +408,10 @@ public final class EventIndexUtils {
     // Convert roles to permission blocks
     for (AccessControlEntry entry : entries) {
       if (!entry.isAllow()) {
-        logger.info("Event index does not support denial via ACL, ignoring {}", entry);
+        // The index cannot express denial, so the entry is dropped. Record the event rather than
+        // logging here: during a rebuild this fires once per deny entry per event, which floods
+        // the log. IndexRebuildService reports the collected events once the rebuild finishes.
+        DenyAclCollector.record(eventId);
         continue;
       }
       List<String> actionPermissions = permissions.get(entry.getAction());
