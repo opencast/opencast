@@ -441,6 +441,53 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
+  public void agent2xWithCaps() {
+    // Case 1: Happy path
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty("capture.device.alpha.capability1", "test");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedCaps = new Properties();
+    returnedCaps.putAll(agentCaps2x);
+    returnedCaps.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedCaps.setProperty("capture.device.alpha.capability1", "test");
+
+    Properties returnedConf = new Properties();
+    returnedConf.putAll(agentConfig2x);
+    returnedConf.putAll(returnedCaps);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedCaps);
+    assert2xAgentConf("test", IDLE, sentConfig, returnedConf);
+
+    // Case 2: Still happy, fixed inputs so no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+
+    // This is what the core should respond with in terms of configuration data
+    returnedCaps = new Properties();
+    returnedCaps.putAll(agentCaps2x);
+
+    assert2xAgentCaps("test2", IDLE, sentConfig, returnedCaps);
+
+    // Case 3: Devices string is too long (> 256 char)
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "a".repeat(257));
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+
+    // Case 4: Provide the key, but no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "");
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+  }
+
+  @Test
   public void agent2xLocalStartPaused() {
     // Case 1: starting paused is *not* supported
     // This is what the CA is sending to the core
