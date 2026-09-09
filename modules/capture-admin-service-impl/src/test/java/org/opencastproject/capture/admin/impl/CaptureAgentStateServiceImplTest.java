@@ -242,7 +242,7 @@ public class CaptureAgentStateServiceImplTest {
   @Test
   public void oneAgentState() {
     Properties bare1xAgent = new Properties();
-    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1);
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
@@ -260,10 +260,10 @@ public class CaptureAgentStateServiceImplTest {
   @Test
   public void agentRegistration2x() {
     Properties bare1xAgent = new Properties();
-    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1);
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     Properties bare2xAgent = new Properties();
-    bare2xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2);
+    bare2xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
 
     // We're going to make agent2 a 2.x agent.  These *must* register with more info, but this one didn't
     // What happens now?
