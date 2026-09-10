@@ -27,13 +27,15 @@ import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.util.ResumptionTokenStore;
 import org.opencastproject.systems.OpencastConstants;
 
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,10 +45,9 @@ import java.util.Optional;
  */
 @Component(
     immediate = true,
-    service = { OaiPmhRepository.class, ManagedService.class },
+    service = { OaiPmhRepository.class },
     property = {
-        "service.description=Opencast default OAI-PMH repository",
-        "service.pid=org.opencastproject.oaipmh.server.DefaultRepository"
+        "service.description=Opencast default OAI-PMH repository"
     }
 )
 public class DefaultRepository extends OaiPmhRepository {
@@ -65,8 +66,10 @@ public class DefaultRepository extends OaiPmhRepository {
 
   /** OSGi callback */
   @Activate
-  public void activate(ComponentContext cc) {
+  @Modified
+  public void updated(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     adminEmail = Objects.toString(cc.getBundleContext().getProperty(OpencastConstants.ADMIN_EMAIL_PROPERTY), "");
+    super.updated(properties);
   }
 
   @Override
