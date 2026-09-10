@@ -23,6 +23,7 @@ package org.opencastproject.publication.youtube.remote;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
@@ -64,11 +65,14 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
   }
 
   @Override
-  public Job publish(MediaPackage mediaPackage, Track track) throws PublicationException {
+  public Job publish(MediaPackage mediaPackage, Track track, Attachment thumbnail) throws PublicationException {
     final String trackId = track.getIdentifier();
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", trackId));
+    if (thumbnail != null) {
+      params.add(new BasicNameValuePair("thumbnailId", thumbnail.getIdentifier()));
+    }
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     try {

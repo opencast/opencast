@@ -23,6 +23,7 @@ package org.opencastproject.workflow.handler.distribution;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -43,11 +44,13 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -118,6 +121,28 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
       }
     }
 
+    // Thumbnail configuration
+    List<String> thumbnailTags = asList(StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration("thumbnail-tags")));
+    List<MediaPackageElementFlavor> thumbnailFlavors = new ArrayList<>();
+    List<String> thumbnailFlavorStrings = asList(StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration("thumbnail-flavors")));
+    for (String flavorString : thumbnailFlavorStrings) {
+      try {
+        thumbnailFlavors.add(MediaPackageElementFlavor.parseFlavor(flavorString));
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException(flavorString + " is not a valid flavor!");
+      }
+    }
+
+    AbstractMediaPackageElementSelector<MediaPackageElement> thumbnailSelector = new SimpleElementSelector();
+    for (MediaPackageElementFlavor flavor : thumbnailFlavors) {
+      thumbnailSelector.addFlavor(flavor);
+    }
+    for (String tag : thumbnailTags) {
+      thumbnailSelector.addTag(tag);
+    }
+
     try {
       // Look for elements matching the tag
       final Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
@@ -131,10 +156,20 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
         return createResult(mediaPackage, Action.SKIP);
       }
 
+      // Look for thumbnail
+      final Collection<MediaPackageElement> thumbnails = thumbnailSelector.select(mediaPackage, true);
+      Attachment thumbnail = null;
+      if (thumbnails.size() > 1) {
+        throw new WorkflowOperationException(
+            "More than one thumbnail element has been found for publishing to youtube: " + thumbnails);
+      } else if (thumbnails.size() == 1) {
+        thumbnail = (Attachment) thumbnails.iterator().next();
+      }
+
       Job youtubeJob;
       try {
         Track track = mediaPackage.getTrack(elements.iterator().next().getIdentifier());
-        youtubeJob = publicationService.publish(mediaPackage, track);
+        youtubeJob = publicationService.publish(mediaPackage, track, thumbnail);
       } catch (PublicationException e) {
         throw new WorkflowOperationException(e);
       }
