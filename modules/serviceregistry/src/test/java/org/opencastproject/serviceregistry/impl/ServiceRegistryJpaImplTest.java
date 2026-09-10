@@ -238,7 +238,10 @@ public class ServiceRegistryJpaImplTest {
     // Setup the job dispatcher
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     Dictionary<String, Object> jdProps = new Hashtable<>();
-    jdProps.put(JobDispatcher.OPT_DISPATCHINTERVAL, "0");
+    // Use a large interval so the periodic auto-dispatch never actually fires during the test (that would race with
+    // the manually-triggered runnable below) while still being > 0 so the dispatch lease manager gets created and
+    // manually-triggered dispatch runs can win the (uncontested) lease.
+    jdProps.put(JobDispatcher.OPT_DISPATCHINTERVAL, "600");
     EasyMock.expect(cc.getProperties()).andReturn(jdProps).anyTimes();
     EasyMock.replay(cc);
     jobDispatcher = new JobDispatcher();
