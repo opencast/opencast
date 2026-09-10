@@ -21,12 +21,11 @@
 
 package org.opencastproject.assetmanager.auth;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
@@ -108,7 +107,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
   public boolean verifyUrlAccess(final String path) {
     // Always allow access for admin
     final User user = securityService.getUser();
-    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    if (SecurityUtil.isGlobalAdmin(user)) {
       logger.debug("Allow access for admin `{}`", user);
       return true;
     }
