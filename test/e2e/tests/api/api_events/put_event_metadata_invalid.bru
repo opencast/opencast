@@ -1,0 +1,23 @@
+meta {
+  name: put_event_metadata_invalid
+  type: http
+  seq: 24
+}
+
+put {
+  url: {{baseUrl}}/api/events/:eventId/metadata?type=dublincore/episode
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:form-urlencoded {
+  metadata: malformed_metadata_json
+}
+
+assert {
+  res.status: eq 400
+}

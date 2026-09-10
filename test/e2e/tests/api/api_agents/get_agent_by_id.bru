@@ -1,0 +1,35 @@
+meta {
+  name: get_agent_by_id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/agents/:agentId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  agentId: test-agent-bruno
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Capture agent by ID properties should have correct types", function() {
+    if (res.status === 200) {
+      const agent = res.getBody();
+      expect(agent).to.be.an('object');
+      expect(agent.agent_id).to.be.a('string');
+      expect(agent.status).to.be.a('string');
+      expect(agent.inputs).to.be.an('array');
+      if (agent.update) {
+        expect(agent.update).to.be.a('string');
+      }
+      expect(agent.url).to.be.a('string');
+    }
+  });
+}

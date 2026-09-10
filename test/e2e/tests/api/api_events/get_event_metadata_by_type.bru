@@ -1,0 +1,44 @@
+meta {
+  name: get_event_metadata_by_type
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId/metadata
+  body: none
+  auth: inherit
+}
+
+params:query {
+  type: dublincore/episode
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Metadata catalog fields by type should have correct types", function() {
+    if (res.status === 200) {
+      const fields = res.getBody();
+      expect(fields).to.be.an('array');
+      fields.forEach(function(field) {
+        if (field.flavor !== undefined) {
+          expect(field.flavor).to.be.a('string');
+          expect(field.fields).to.be.an('array');
+        } else {
+          expect(field.id).to.be.a('string');
+          if (field.label !== undefined) expect(field.label).to.be.a('string');
+          expect(field.type).to.be.a('string');
+          if (field.readOnly !== undefined) expect(field.readOnly).to.be.a('boolean');
+          if (field.required !== undefined) expect(field.required).to.be.a('boolean');
+        }
+      });
+    }
+  });
+}

@@ -1,0 +1,23 @@
+meta {
+  name: put_event_acl_invalid
+  type: http
+  seq: 23
+}
+
+put {
+  url: {{baseUrl}}/api/events/:eventId/acl
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:form-urlencoded {
+  acl: malformed_acl_json
+}
+
+assert {
+  res.status: eq 400
+}

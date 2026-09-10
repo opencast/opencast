@@ -1,0 +1,45 @@
+meta {
+  name: get_event_media
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId/media
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Event media tracks should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(function(track) {
+        if (track.duration !== undefined && track.duration !== null) {
+          expect(track.duration).to.be.a('number');
+        }
+        expect(track.flavor).to.be.a('string');
+        expect(track.identifier).to.be.a('string');
+        if (track.mimetype !== undefined) expect(track.mimetype).to.be.a('string');
+        if (track.size !== undefined) expect(track.size).to.be.a('number');
+        if (track.checksum !== undefined) expect(track.checksum).to.be.a('string');
+        if (track.has_audio !== undefined) expect(track.has_audio).to.be.a('boolean');
+        if (track.has_video !== undefined) expect(track.has_video).to.be.a('boolean');
+        if (track.is_master_playlist !== undefined) expect(track.is_master_playlist).to.be.a('boolean');
+        if (track.is_live !== undefined) expect(track.is_live).to.be.a('boolean');
+        if (track['element-description'] !== undefined) expect(track['element-description']).to.be.a('string');
+        expect(track.uri).to.be.a('string');
+        if (track.tags !== undefined) expect(track.tags).to.be.an('array');
+      });
+    }
+  });
+}

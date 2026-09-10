@@ -1,0 +1,46 @@
+meta {
+  name: get_events
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/events
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Events list should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      if (body.length > 0) {
+        const item = body[0];
+        expect(item.identifier).to.be.a('string');
+        if (item.creator !== undefined) expect(item.creator).to.be.a('string');
+        if (item.presenter !== undefined) expect(item.presenter).to.be.an('array');
+        if (item.created !== undefined) expect(item.created).to.be.a('string');
+        if (item.subjects !== undefined) expect(item.subjects).to.be.an('array');
+        if (item.start !== undefined) expect(item.start).to.be.a('string');
+        if (item.description !== undefined) expect(item.description).to.be.a('string');
+        expect(item.title).to.be.a('string');
+        if (item.processing_state !== undefined) expect(item.processing_state).to.be.a('string');
+        if (item.duration !== undefined) {
+          expect(item.duration).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+        }
+        if (item.archive_version !== undefined) {
+          expect(item.archive_version).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+        }
+        if (item.contributor !== undefined) expect(item.contributor).to.be.an('array');
+        if (item.has_previews !== undefined) expect(item.has_previews).to.be.a('boolean');
+        if (item.location !== undefined) expect(item.location).to.be.a('string');
+        if (item.publication_status !== undefined) expect(item.publication_status).to.be.an('array');
+      }
+    }
+  });
+}

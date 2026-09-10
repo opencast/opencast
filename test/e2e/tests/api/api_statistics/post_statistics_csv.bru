@@ -1,0 +1,19 @@
+meta {
+  name: post_statistics_csv
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/statistics/data/export.csv
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  data: {"parameters":{"resourceId":"mh_default_org","detailLevel":"EPISODE","from":"2018-12-31T23:00:00.000Z","to":"2019-12-31T22:59:59.999Z","dataResolution":"YEARLY"},"provider":{"identifier":"organization.views.sum.influx","resourceType":"organization"}}
+}
+
+assert {
+  res.status: eq 400
+}

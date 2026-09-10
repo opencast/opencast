@@ -1,0 +1,19 @@
+meta {
+  name: delete_event
+  type: http
+  seq: 25
+}
+
+delete {
+  url: {{baseUrl}}/api/events/:eventId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: in [202, 204]
+}

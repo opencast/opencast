@@ -1,0 +1,23 @@
+meta {
+  name: post_group_member
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/groups/:groupId/members
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  groupId: {{groupId}}
+}
+
+body:form-urlencoded {
+  member: admin2
+}
+
+assert {
+  res.status: eq 200
+}

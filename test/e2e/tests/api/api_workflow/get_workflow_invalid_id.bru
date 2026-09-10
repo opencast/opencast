@@ -1,0 +1,15 @@
+meta {
+  name: get_workflow_invalid_id
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/workflows/999999999
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

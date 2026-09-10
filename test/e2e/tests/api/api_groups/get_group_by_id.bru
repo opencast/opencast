@@ -1,0 +1,36 @@
+meta {
+  name: get_group_by_id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/groups/:groupId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  groupId: {{groupId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Group by ID properties should have correct types", function() {
+    if (res.status === 200) {
+      const gp = res.getBody();
+      expect(gp).to.be.an('object');
+      expect(gp.identifier).to.be.a('string');
+      expect(gp.role).to.be.a('string');
+      expect(gp.organization).to.be.a('string');
+      expect(gp.roles).to.be.a('string');
+      expect(gp.members).to.be.a('string');
+      expect(gp.name).to.be.a('string');
+      expect(gp.description).to.be.a('string');
+    }
+  });
+}
+

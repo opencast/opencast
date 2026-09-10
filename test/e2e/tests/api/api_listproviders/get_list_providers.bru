@@ -1,0 +1,31 @@
+meta {
+  name: get_list_providers
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/listproviders/providers.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("List providers response should be an array of strings", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      let items = body;
+      if (body.length > 0 && Array.isArray(body[0])) {
+        items = body[0];
+      }
+      items.forEach(function(item) {
+        expect(item).to.be.a('string');
+      });
+    }
+  });
+}

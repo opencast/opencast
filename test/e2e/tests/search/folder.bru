@@ -1,0 +1,16 @@
+meta {
+  name: /search
+  seq: 6
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const searchBaseUrl = bru.getEnvVar("searchBaseUrl") || bru.getVar("searchBaseUrl");
+  if (!searchBaseUrl) {
+    const baseUrl = bru.getEnvVar("baseUrl") || bru.getVar("baseUrl");
+    bru.setVar("searchBaseUrl", baseUrl);
+  }
+}

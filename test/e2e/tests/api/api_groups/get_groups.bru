@@ -1,0 +1,35 @@
+meta {
+  name: get_groups
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/groups?limit=10&offset=0
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Groups list should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      if (body.length > 0) {
+        const gp = body[0];
+        expect(gp.identifier).to.be.a('string');
+        expect(gp.role).to.be.a('string');
+        expect(gp.organization).to.be.a('string');
+        expect(gp.roles).to.be.a('string');
+        expect(gp.members).to.be.a('string');
+        expect(gp.name).to.be.a('string');
+        expect(gp.description).to.be.a('string');
+      }
+    }
+  });
+}
+
