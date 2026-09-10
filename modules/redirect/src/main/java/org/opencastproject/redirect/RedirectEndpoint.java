@@ -33,10 +33,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -102,15 +99,16 @@ public class RedirectEndpoint {
 
     URI baseUri = uriInfo.getBaseUri();
     try {
-      URI targetUri = new URL(baseUri.toURL(), target).toURI();
-      if (!targetUri.getAuthority().equals(baseUri.getAuthority())
+      URI targetUri = baseUri.resolve(target);
+      if (targetUri.getAuthority() == null
+              || !targetUri.getAuthority().equals(baseUri.getAuthority())
               || !targetUri.getScheme().equals(baseUri.getScheme())) {
         return Response.status(Status.BAD_REQUEST).entity("non-relative redirect").build();
       }
 
       return Response.seeOther(targetUri).build();
 
-    } catch (MalformedURLException | URISyntaxException e) {
+    } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).entity("invalid `target` URL").build();
     }
   }

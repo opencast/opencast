@@ -434,7 +434,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         Organization organization = organizationDirectoryService.getOrganization(workflowInstance.getOrganizationId());
         engageUrlString = StringUtils.trimToNull(organization.getProperties().get(ENGAGE_URL_PROPERTY));
         if (engageUrlString != null) {
-          engageBaseUrl = new URL(engageUrlString);
+          try {
+            engageBaseUrl = URI.create(engageUrlString).toURL();
+          } catch (IllegalArgumentException e) {
+            throw new MalformedURLException(engageUrlString + " is not a valid URL");
+          }
         } else {
           engageBaseUrl = serverUrl;
           logger.info(
