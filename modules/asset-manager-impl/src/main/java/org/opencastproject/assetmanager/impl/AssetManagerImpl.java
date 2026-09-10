@@ -40,6 +40,7 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
@@ -315,6 +316,25 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         }
         return Optional.empty();
     }
+  }
+
+  @Override
+  public List<Optional<MediaPackage>> getAllMediaPackages(int offset, int limit) {
+    final AQueryBuilder q = createQuery();
+    ASelectQuery aq = q.select(q.snapshot()).where(q.version().isLatest());
+    if (offset > 0 || limit > 0) {
+      aq = aq.page(offset, limit);
+    }
+    final AResult r = aq.run();
+
+    List<Optional<MediaPackage>> mediaPackages = Optional.of(r.getRecords().stream().collect(
+        Collectors.mapping(
+            record -> record.getSnapshot().map(Snapshot::getMediaPackage),
+            Collectors.toList()
+        )
+    )).orElse(Collections.emptyList());
+
+    return mediaPackages;
   }
 
   @Override
