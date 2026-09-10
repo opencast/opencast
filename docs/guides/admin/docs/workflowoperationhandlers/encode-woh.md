@@ -117,3 +117,17 @@ There are currently two resolution based conditionally set variables supported:
 |`if-height-geq-<height>`                  |`if-height-geq-720`                |The value is set if the height of the video is greater or equal to `<height>` pixels.                                           |
 |`if-width-or-height-geq-<width>-<height>` |`if-width-or-height-geq-1280-720`  |The value is set if the width of the video is greater or equal to `<width>` or if the height is greater or equal to `<height>`. |
 |`if-height-lt-<height>`                   |`if-height-lt-480`                 |The value is set if the height of the video is less than `<height>` pixels.                                                     |
+
+### Random Range Placeholder
+
+The `ffmpeg.command` templating also supports random range placeholders in the form `#{random:min:max}`.
+The generated value is an integer in the inclusive range between `min` and `max` (for example, `#{random:0:3}` can produce `0`, `1`, `2`, or `3`).
+
+This is useful when worker nodes have multiple GPUs and you want a simple distribution of jobs across devices, for example:
+
+```properties
+profile.parallel.http.ffmpeg.command = -i #{in.video.path} -gpu #{random:0:3} \
+  -c:v h264_nvenc #{out.dir}/#{out.name}#{out.suffix.low-quality}
+```
+
+In this example, each encoding invocation picks one GPU index from `0` to `3`, which provides a basic form of load balancing.
