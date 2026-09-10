@@ -22,6 +22,7 @@
 package org.opencastproject.publication.youtube;
 
 import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -133,12 +134,37 @@ public class YouTubePublicationAdapter {
       description += '\n' + episodeDescription;
     }
 
-    String episodeLicense = dcEpisode.getFirst(DublinCore.PROPERTY_LICENSE);
+    String episodeLicense = getEpisodeLicense();
     if (episodeLicense != null) {
       description += '\n' + episodeLicense;
     }
 
     return description;
+  }
+
+  /**
+   * Gets the license for the episode of the media package
+   *
+   * @return the license of the episode
+   */
+  public String getEpisodeLicense() {
+    return getEpisodeProperty(DublinCore.PROPERTY_LICENSE);
+  }
+
+  /**
+   * Gets a property for the episode of the media package
+   *
+   * @param property the property to get
+   * @return the property value
+   */
+  private String getEpisodeProperty(EName property) {
+    if (dcSeries != null) {
+      return dcSeries.getFirst(property);
+    }
+    if (dcEpisode != null) {
+      return dcEpisode.getFirst(property);
+    }
+    return null;
   }
 
   /**
