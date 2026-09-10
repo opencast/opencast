@@ -1,0 +1,1 @@
+- Add full comment and reply support to the editor, matching the functionality available in the Admin UI. [[#7452](https://github.com/opencast/opencast/pull/7452)]
