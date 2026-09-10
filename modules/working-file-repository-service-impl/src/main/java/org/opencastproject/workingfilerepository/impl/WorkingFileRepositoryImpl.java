@@ -29,7 +29,6 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -556,7 +555,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       directory = getCollectionDirectory(collectionId, false);
       if (directory == null) {
         //getCollectionDirectory returns null on a non-existant directory which is not being created...
-        directory = new File(PathSupport.concat(new String[] { rootDirectory, COLLECTION_PATH_PREFIX, collectionId }));
+        directory = Paths.get(rootDirectory, COLLECTION_PATH_PREFIX, collectionId).toFile();
         throw new NotFoundException(directory.getAbsolutePath());
       }
     } catch (IOException e) {
@@ -590,8 +589,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *         if creating a non-existing directory fails
    */
   private File getCollectionDirectory(String collectionId, boolean create) throws IOException {
-    File collectionDir = new File(
-            PathSupport.concat(new String[]{rootDirectory, COLLECTION_PATH_PREFIX, collectionId}));
+    File collectionDir = Paths.get(rootDirectory, COLLECTION_PATH_PREFIX, collectionId).toFile();
     if (!collectionDir.exists()) {
       if (!create) {
         return null;

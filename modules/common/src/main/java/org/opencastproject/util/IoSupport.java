@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
@@ -55,6 +54,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.BiFunction;
@@ -396,7 +397,7 @@ public final class IoSupport {
 
   /** Create a file from the list of path elements. */
   public static File file(String... pathElems) {
-    return new File(path(pathElems));
+    return Paths.get(pathElems[0], Arrays.copyOfRange(pathElems, 1, pathElems.length)).toFile();
   }
 
   /**
