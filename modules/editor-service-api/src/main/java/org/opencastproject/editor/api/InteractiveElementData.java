@@ -18,29 +18,22 @@
  * the License.
  *
  */
+package org.opencastproject.editor.api;
 
-package org.opencastproject.videoeditor.impl;
+public class InteractiveElementData {
+  private final String id;
+  private final String elementsJSON;
 
-/**
- * VideoEditorService properties that can be used to modify default processing values.
- */
-public interface VideoEditorProperties {
+  public InteractiveElementData(String id, String elementsJSON) {
+    this.id = id;
+    this.elementsJSON = elementsJSON;
+  }
 
-  /** audio encoder codec */
-  String AUDIO_CODEC = "audio.codec";
+  public String getId() {
+    return id;
+  }
 
-  /** video codec */
-  String VIDEO_CODEC = "video.codec";
-
-  /** Custom output file extension */
-  String OUTPUT_FILE_EXTENSION = "outputfile.extension";
-  String FFMPEG_PROPERTIES = "ffmpeg.properties";
-  String FFMPEG_PRESET = "ffmpeg.preset";
-  String FFMPEG_SCALE_FILTER = "ffmpeg.scalefilter";
-  String AUDIO_FADE = "audio.fade";
-  String VIDEO_FADE = "video.fade";
-  String DEFAULT_EXTENSION = ".mp4";
-  String WEBVTT_EXTENSION = "vtt";
-  String INTERACTIVE_ELEMENT_EXTENSION = "json";
-  long SUBTITLE_GRACE_PERIOD = 500; //ms
+  public String getElementsJSON() {
+    return elementsJSON;
+  }
 }

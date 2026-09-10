@@ -63,13 +63,16 @@ public class EditingData {
   private final List<String> waveformURIs;
   private final List<Subtitle> subtitles;
   private final List<Subtitle> chapters;
+  private final InteractiveElementData textboxes;
+  private final InteractiveElementData quizzes;
   private final Boolean local;
 
   private final String metadataJSON;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
-          List<String> waveformURIs, List<Subtitle> subtitles, List<Subtitle> chapters, Boolean local,
+          List<String> waveformURIs, List<Subtitle> subtitles, List<Subtitle> chapters,
+          InteractiveElementData textboxes, InteractiveElementData quizzes, Boolean local,
           Boolean lockingActive, Integer lockRefresh, User user, String metadataJSON) {
     this.segments = segments;
     this.tracks = tracks;
@@ -82,6 +85,8 @@ public class EditingData {
     this.waveformURIs = waveformURIs;
     this.subtitles = subtitles;
     this.chapters = chapters;
+    this.textboxes = textboxes;
+    this.quizzes = quizzes;
     this.local = local;
     this.lockingActive = lockingActive;
     this.lockRefresh = lockRefresh * 1000;
@@ -123,8 +128,17 @@ public class EditingData {
     return subtitles;
   }
 
+
   public List<Subtitle> getChapters() {
     return chapters;
+  }
+
+  public InteractiveElementData getTextboxes() {
+    return textboxes;
+  }
+
+  public InteractiveElementData getQuizzes() {
+    return quizzes;
   }
 
   public String getMetadataJSON() {
