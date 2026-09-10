@@ -139,7 +139,7 @@ public class PolicyCheckRunner {
             try {
               policies = lifeCycleService.getActiveLifeCyclePolicies();
             } catch (NullPointerException | LifeCycleServiceException e) {
-              logger.info("NPE: ", e);
+              logger.info("Could not get active policies ", e);
               return;
             }
 
