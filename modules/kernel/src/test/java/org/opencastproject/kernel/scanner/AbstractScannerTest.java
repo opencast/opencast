@@ -237,16 +237,6 @@ public class AbstractScannerTest {
   }
 
   @Test
-  public void finalizeExpectsShutdownOfQuartz() throws Throwable {
-    mockQuartz = EasyMock.createMock(Scheduler.class);
-    mockQuartz.shutdown();
-    EasyMock.expectLastCall();
-    EasyMock.replay(mockQuartz);
-    abstractScanner.setQuartz(mockQuartz);
-    abstractScanner.finalize();
-  }
-
-  @Test
   public void triggerExpectsTriggerOfQuartz() throws SchedulerException {
     mockQuartz = EasyMock.createMock(Scheduler.class);
     mockQuartz.triggerJobWithVolatileTrigger(jobName, jobGroup);

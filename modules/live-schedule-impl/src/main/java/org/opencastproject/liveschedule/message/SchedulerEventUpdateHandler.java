@@ -81,7 +81,7 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
   public void execute(final String mpId, final SchedulerItem schedulerItem) {
     try {
       logger.debug("Scheduler message handler START for mp {} event type {} in thread {}", mpId,
-              schedulerItem.getType(), Thread.currentThread().getId());
+              schedulerItem.getType(), Thread.currentThread().threadId());
 
       switch (schedulerItem.getType()) {
         case UpdateCatalog:
@@ -140,7 +140,7 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
       logger.warn("Exception occurred for mp {}, event type {}", mpId, schedulerItem.getType(), e);
     } finally {
       logger.debug("Scheduler message handler END for mp {} event type {} in thread {}", mpId, schedulerItem.getType(),
-              Thread.currentThread().getId());
+              Thread.currentThread().threadId());
     }
   }
 

@@ -201,7 +201,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           /* Duration */
           obj = stream.get("duration");
           if (obj != null) {
-            duration = new Double((String) obj) * 1000;
+            duration = Double.parseDouble((String) obj) * 1000;
             aMetadata.setDuration(duration.longValue());
           } else {
             /*
@@ -213,7 +213,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           /* Bitrate */
           obj = stream.get("bit_rate");
           if (obj != null) {
-            aMetadata.setBitRate(new Float((String) obj));
+            aMetadata.setBitRate(Float.parseFloat((String) obj));
           }
 
           /* Channels */
@@ -259,7 +259,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           /* Duration */
           obj = stream.get("duration");
           if (obj != null) {
-            duration = new Double((String) obj) * 1000;
+            duration = Double.parseDouble((String) obj) * 1000;
             vMetadata.setDuration(duration.longValue());
           } else {
             /*
@@ -271,7 +271,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           /* Bitrate */
           obj = stream.get("bit_rate");
           if (obj != null) {
-            vMetadata.setBitRate(new Float((String) obj));
+            vMetadata.setBitRate(Float.parseFloat((String) obj));
           }
 
           /* Width */

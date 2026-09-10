@@ -576,7 +576,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
           throws TrustedHttpClientException {
     HttpRequestBase digestRequest;
     try {
-      digestRequest = (HttpRequestBase) httpUriRequest.getClass().newInstance();
+      digestRequest = (HttpRequestBase) httpUriRequest.getClass().getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalStateException("Can not create a new " + httpUriRequest.getClass().getName());
     }

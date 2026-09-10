@@ -128,13 +128,6 @@ public class WorkingFileRepositoryCleaner {
     }
   }
 
-  // just to make sure Quartz is being shut down...
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    shutdown();
-  }
-
   // call working file repository cleaner to clean up
   private void cleanup() {
     for (String collectionId : collectionIds) {

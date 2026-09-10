@@ -246,14 +246,6 @@ public abstract class AbstractScanner {
     }
   }
 
-  /** Just to make sure Quartz is being shut down... */
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    shutdown();
-  }
-
-
   /**
    * Please remember that derived classes need a no-arg constructor in order to work with Quartz. Sample usage:
    *

@@ -122,9 +122,9 @@ public final class PolicyUtils {
     JSONObject policyJSON = new JSONObject();
 
     Map<String, Object> conditions = new TreeMap<String, Object>();
-    conditions.put(DATE_LESS_THAN_KEY, new Long(policy.getValidUntil().getMillis()));
+    conditions.put(DATE_LESS_THAN_KEY, Long.valueOf(policy.getValidUntil().getMillis()));
     if (policy.getValidFrom().isPresent()) {
-      conditions.put(DATE_GREATER_THAN_KEY, new Long(policy.getValidFrom().get().getMillis()));
+      conditions.put(DATE_GREATER_THAN_KEY, Long.valueOf(policy.getValidFrom().get().getMillis()));
     }
     if (policy.getClientIpAddress().isPresent()) {
       conditions.put(IP_ADDRESS_KEY, policy.getClientIpAddress().get().getHostAddress());

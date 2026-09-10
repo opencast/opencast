@@ -237,13 +237,6 @@ public class CaptureNowProlongingService implements ManagedService {
     }
   }
 
-  // just to make sure Quartz is being shut down...
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    shutdown();
-  }
-
   /**
    * Returns the initial time duration (in milliseconds) of a recording started by the CaptureNow service
    *

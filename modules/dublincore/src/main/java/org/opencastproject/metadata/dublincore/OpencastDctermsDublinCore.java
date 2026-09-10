@@ -370,7 +370,7 @@ public abstract class OpencastDctermsDublinCore {
       String doLang = lang;
       if (lang.length() == 2) {
         try {
-          doLang = new Locale(lang).getISO3Language();
+          doLang = Locale.of(lang).getISO3Language();
         } catch (MissingResourceException ignore) {
         }
       }
