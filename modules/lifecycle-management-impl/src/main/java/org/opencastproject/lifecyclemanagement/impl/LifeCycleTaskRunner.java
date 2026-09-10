@@ -423,7 +423,7 @@ public class LifeCycleTaskRunner {
       event = indexService.getEvent(mediaPackageId, elasticsearchIndex);
 
       if (event.isEmpty()) {
-        logger.info("Event for given id " + mediaPackageId + " does not exist.");
+        logger.debug("Event for given id " + mediaPackageId + " does not exist. No deletion necessary.");
         return;
       }
 
