@@ -83,6 +83,7 @@ public class XACMLSecurityTest {
     securityService = EasyMock.createMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andAnswer(
             () -> new JaxbUser(currentUser, "test", organization, currentRoles)).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
 
     // Mock workspace
     Workspace workspace = EasyMock.createMock(Workspace.class);

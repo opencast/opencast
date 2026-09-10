@@ -53,6 +53,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -858,6 +859,33 @@ public class LiveScheduleServiceImplTest {
 
     @Override
     public boolean hasPermission(AccessControlList acl, String action) {
+      return false;
+    }
+
+    @Override
+    public boolean hasPermission(MediaPackage mp, User user, Organization org, String action) {
+      return false;
+    }
+
+    @Override
+    public boolean hasPermission(AccessControlList acl, User user, Organization org, String action) {
+      return false;
+    }
+
+    @Override
+    public boolean hasPermissionPerformance(AccessControlList acl, User user, Organization org, String action,
+        String mediaPackageId) {
+      return false;
+    }
+
+    @Override
+    public boolean hasPermission(MediaPackage mp, User user, Organization org, String action, String entityOrgId) {
+      return false;
+    }
+
+    @Override
+    public boolean hasPermission(AccessControlList acl, User user, Organization org, String action,
+        String mediaPackageId) {
       return false;
     }
 

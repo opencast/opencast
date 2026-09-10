@@ -21,8 +21,6 @@
 
 package org.opencastproject.security.api;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.data.Either.left;
@@ -41,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -52,142 +48,6 @@ public final class AccessControlUtil {
 
   /** Disallow construction of this utility class */
   private AccessControlUtil() {
-  }
-
-  /**
-   * Determines whether the {@link AccessControlList} permits a user to perform an action.
-   *
-   * There are three ways a user can be allowed to perform an action:
-   * <ol>
-   * <li>They have the superuser role</li>
-   * <li>They have their local organization's admin role</li>
-   * <li>They have a role listed in the series ACL, with write permission</li>
-   * </ol>
-   *
-   * @param acl
-   *          the {@link AccessControlList}
-   * @param user
-   *          the user
-   * @param org
-   *          the organization
-   * @param action
-   *          The action to perform. <code>action</code> may be an arbitrary object. The authorization check is done on
-   *          the string representation of the object (<code>#toString()</code>). This allows to group actions as enums
-   *          and use them without converting them to a string manually. See
-   *          {@link org.opencastproject.security.api.Permissions.Action}.
-   * @return whether this action should be allowed
-   * @throws IllegalArgumentException
-   *           if any of the arguments are null
-   */
-  public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action) {
-    return isAuthorized(acl, user, org, action, null);
-  }
-
-  /**
-   * Determines whether the {@link AccessControlList} permits a user to perform an action.
-   *
-   * There are three ways a user can be allowed to perform an action:
-   * <ol>
-   * <li>They have the superuser role</li>
-   * <li>They have their local organization's admin role</li>
-   * <li>They have a role listed in the series ACL, with write permission</li>
-   * </ol>
-   *
-   * @param acl
-   *          the {@link AccessControlList}
-   * @param user
-   *          the user
-   * @param org
-   *          the organization
-   * @param action
-   *          The action to perform. <code>action</code> may be an arbitrary object. The authorization check is done on
-   *          the string representation of the object (<code>#toString()</code>). This allows to group actions as enums
-   *          and use them without converting them to a string manually. See
-   *          {@link org.opencastproject.security.api.Permissions.Action}.
-   * @param mediaPackageId
-   *          Only required if episodeRoleId is true.
-   * @return whether this action should be allowed
-   * @throws IllegalArgumentException
-   *           if any of the arguments are null
-   */
-  public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action,
-      String mediaPackageId) {
-    if (action == null || user == null || acl == null || org == null) {
-      throw new IllegalArgumentException();
-    }
-
-    // Check for the global and local admin role
-    if (user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole())) {
-      return true;
-    }
-
-    // Check for episode role ids, if activated
-    if (mediaPackageId != null && user.hasRole(getEpisodeRoleId(mediaPackageId, action.toString()))) {
-      return true;
-    }
-
-    Set<Role> userRoles = user.getRoles();
-    for (AccessControlEntry entry : acl.getEntries()) {
-      if (action.toString().equals(entry.getAction())) {
-        for (Role role : userRoles) {
-          if (role.getName().equals(entry.getRole())) {
-            return entry.isAllow();
-          }
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * {@link AccessControlUtil#isAuthorized(org.opencastproject.security.api.AccessControlList,
-   *        org.opencastproject.security.api.User, org.opencastproject.security.api.Organization, Object)}
-   * as a predicate function.
-   */
-  private static Predicate<Object> isAuthorizedFn(final AccessControlList acl, final User user,
-      final Organization org) {
-    return action -> isAuthorized(acl, user, org, action);
-  }
-
-  /**
-   * Returns true only if <em>all</em> actions are authorized.
-   *
-   * @see #isAuthorized(AccessControlList, User, Organization, Object)
-   */
-  public static boolean isAuthorizedAll(AccessControlList acl, User user, Organization org, Object... actions) {
-    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
-    return Arrays.stream(actions).allMatch(isAuthorized);
-  }
-
-  /**
-   * Returns true if at least <em>one</em> action is authorized.
-   *
-   * @see #isAuthorized(AccessControlList, User, Organization, Object)
-   */
-  public static boolean isAuthorizedOne(AccessControlList acl, User user, Organization org, Object... actions) {
-    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
-    return Arrays.stream(actions).anyMatch(isAuthorized);
-  }
-
-  /**
-   * Returns true if <em>all</em> actions are prohibited.
-   *
-   * @see #isAuthorized(AccessControlList, User, Organization, Object)
-   */
-  public static boolean isProhibitedAll(AccessControlList acl, User user, Organization org, Object... actions) {
-    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
-    return Arrays.stream(actions).noneMatch(isAuthorized);
-  }
-
-  /**
-   * Returns true if at least <em>one</em> action is prohibited.
-   *
-   * @see #isAuthorized(AccessControlList, User, Organization, Object)
-   */
-  public static boolean isProhibitedOne(AccessControlList acl, User user, Organization org, Object... actions) {
-    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
-    return Arrays.stream(actions).anyMatch(isAuthorized.negate());
   }
 
   /**
