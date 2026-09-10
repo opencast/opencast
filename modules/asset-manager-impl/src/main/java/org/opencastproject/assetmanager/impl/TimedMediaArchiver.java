@@ -34,11 +34,11 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.CronExpression;
 import org.quartz.JobDetail;
@@ -49,18 +49,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Dictionary;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Component(
     immediate = true,
-    service = ManagedService.class,
     property = {
         "service.description=Timed media archiver Service"
     }
 )
-public class TimedMediaArchiver extends AbstractScanner implements ManagedService {
+public class TimedMediaArchiver extends AbstractScanner {
   private static final Logger logger = LoggerFactory.getLogger(TimedMediaArchiver.class);
 
   public static final String PARAM_KEY_STORE_ID = "store-id";
@@ -91,19 +90,17 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     }
   }
 
-  @Activate
-  @Override
-  public void activate(ComponentContext cc) {
-    super.activate(cc);
-  }
-
   @Deactivate
   @Override
   public void deactivate() {
     super.deactivate();
   }
 
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void updated(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
+    super.activate(cc);
+
     String cronExpression;
     boolean enabled;
 

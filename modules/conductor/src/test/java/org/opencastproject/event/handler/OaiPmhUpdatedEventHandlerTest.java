@@ -62,11 +62,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
 
 import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -107,12 +109,16 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
   @Before
   public void setup() throws Exception {
-    cut.systemAccount = SYSTEM_ACCOUNT;
-    Hashtable<String, String> props = new Hashtable<>();
+    BundleContext bundleContextMock = EasyMock.createNiceMock(BundleContext.class);
+    expect(bundleContextMock.getProperty("org.opencastproject.security.digest.user"))
+        .andReturn(SYSTEM_ACCOUNT).anyTimes();
+    EasyMock.replay(bundleContextMock);
+
+    Map<String, Object> props = new HashMap<>();
     props.put(OaiPmhUpdatedEventHandler.CFG_PROPAGATE_EPISODE, "true");
     props.put(OaiPmhUpdatedEventHandler.CFG_FLAVORS, "dublincore/*,security/*");
     props.put(OaiPmhUpdatedEventHandler.CFG_TAGS, "archive");
-    cut.updated(props);
+    cut.updated(bundleContextMock, props);
 
     expect(workspace.read(anyObject())).andAnswer(() -> getClass().getResourceAsStream("/episode.xml")).anyTimes();
   }
