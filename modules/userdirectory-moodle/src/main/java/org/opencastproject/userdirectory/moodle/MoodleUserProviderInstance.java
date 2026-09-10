@@ -26,12 +26,14 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.userdirectory.moodle.MoodleWebService.CoreUserGetUserByFieldFilters;
+import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -39,16 +41,28 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -57,7 +71,68 @@ import java.util.regex.PatternSyntaxException;
 /**
  * A UserProvider that reads user roles from Moodle.
  */
+@Component(
+    immediate = true,
+    configurationPid = "org.opencastproject.userdirectory.moodle",
+    configurationPolicy = ConfigurationPolicy.REQUIRE,
+    service = { UserProvider.class, RoleProvider.class },
+    property = {
+        "service.description=Provides Moodle user directory instances"
+    }
+)
 public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
+  /**
+   * The key to look up the organization identifier in the service configuration properties
+   */
+  private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.moodle.org";
+
+  /**
+   * The key to look up the REST webservice URL of the Moodle instance
+   */
+  private static final String MOODLE_URL_KEY = "org.opencastproject.userdirectory.moodle.url";
+
+  /**
+   * The key to look up the user token to use for performing searches.
+   */
+  private static final String MOODLE_TOKEN_KEY = "org.opencastproject.userdirectory.moodle.token";
+
+  /**
+   * The key to look up the number of user records to cache
+   */
+  private static final String CACHE_SIZE = "org.opencastproject.userdirectory.moodle.cache.size";
+
+  /**
+   * The key to look up the number of minutes to cache users
+   */
+  private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.moodle.cache.expiration";
+
+  /**
+   * The key to look up whether to activate group roles
+   */
+  private static final String GROUP_ROLES_KEY = "org.opencastproject.userdirectory.moodle.group.roles.enabled";
+
+  /**
+   * The key to look up the regular expression used to validate courses
+   */
+  private static final String COURSE_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.course.pattern";
+
+  /**
+   * The key to look up the regular expression used to validate users
+   */
+  private static final String USER_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.user.pattern";
+
+  /**
+   * The key to look up the regular expression used to validate groups
+   */
+  private static final String GROUP_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.group.pattern";
+
+  /** Key specifying if usernames should be converted to lowercase */
+  private static final String LOWERCASE_USERNAME = "org.opencastproject.userdirectory.moodle.user.lowercase.conversion";
+
+  /**
+   * Key for configuring a context role prefix
+   */
+  private static final String CONTEXT_ROLE_PREFIX = "org.opencastproject.userdirectory.moodle.context.role.prefix";
   /**
    * User and role provider name.
    */
@@ -121,7 +196,7 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
   /**
    * String to prepend to context roles like “1234_Learner”
    */
-  private final String contextRolePrefix;
+  private String contextRolePrefix;
 
   /**
    * A cache of users, which lightens the load on Moodle.
@@ -144,46 +219,92 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
   private AtomicLong moodleWebServiceRequests;
 
   /** If usernames requested from Moodle shall be converted to lowercase */
-  private final boolean lowercaseUsername;
+  private boolean lowercaseUsername;
 
-  private final List<String> ignoredUsernames;
+  private List<String> ignoredUsernames;
 
-  /**
-   * Constructs an Moodle user provider with the needed settings.
-   *
-   * @param pid             The pid of this service.
-   * @param client          The Moodle web service client.
-   * @param organization    The organization.
-   * @param coursePattern   The pattern of a Moodle course ID.
-   * @param userPattern     The pattern of a Moodle user ID.
-   * @param groupPattern    The pattern of a Moodle group ID.
-   * @param groupRoles      Whether to activate groupRoles
-   * @param cacheSize       The number of users to cache.
-   * @param cacheExpiration The number of minutes to cache users.
-   * @param adminUserName   Name of the global admin user.
-   * @param contextRolePrefix Prefix to prepend to context roles like 1234_Learner
-   */
-  public MoodleUserProviderInstance(String pid, MoodleWebService client, Organization organization,
-          String coursePattern, String userPattern, String groupPattern, boolean groupRoles, int cacheSize,
-          int cacheExpiration, String adminUserName, final boolean lowercaseUsername, final String contextRolePrefix) {
-    this.client = client;
-    this.organization = organization;
-    this.groupRoles = groupRoles;
-    this.coursePattern = coursePattern;
-    this.userPattern = userPattern;
-    this.groupPattern = groupPattern;
-    this.lowercaseUsername = lowercaseUsername;
-    this.contextRolePrefix = contextRolePrefix;
+  /** The organization directory service */
+  private OrganizationDirectoryService orgDirectory;
+
+  /** OSGi DI */
+  @Reference
+  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
+    this.orgDirectory = orgDirectory;
+  }
+
+  @Activate
+  @Modified
+  public void updated(BundleContext bundleContext, Map<String, Object> properties) throws ConfigurationException {
+    String adminUserName = StringUtils.trimToNull(
+        bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY)
+    );
+
+    String organizationId = (String) properties.get(ORGANIZATION_KEY);
+    if (StringUtils.isBlank(organizationId)) {
+      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    }
+
+    String urlStr = (String) properties.get(MOODLE_URL_KEY);
+    URI url;
+    if (StringUtils.isBlank(urlStr)) {
+      throw new ConfigurationException(MOODLE_URL_KEY, "is not set");
+    }
+    try {
+      url = new URI(urlStr);
+    } catch (URISyntaxException e) {
+      throw new ConfigurationException(MOODLE_URL_KEY, "not a URL");
+    }
+
+    String token = (String) properties.get(MOODLE_TOKEN_KEY);
+    if (StringUtils.isBlank(token)) {
+      throw new ConfigurationException(MOODLE_TOKEN_KEY, "is not set");
+    }
+
+    groupRoles = BooleanUtils.toBoolean((String) properties.get(GROUP_ROLES_KEY));
+
+    coursePattern = (String) properties.get(COURSE_PATTERN_KEY);
+    userPattern = (String) properties.get(USER_PATTERN_KEY);
+    groupPattern = (String) properties.get(GROUP_PATTERN_KEY);
+    lowercaseUsername = BooleanUtils.toBoolean((String) properties.get(LOWERCASE_USERNAME));
+
+    contextRolePrefix = Objects.toString(properties.get(CONTEXT_ROLE_PREFIX), "");
+
+    int cacheSize = 1000;
+    try {
+      if (properties.get(CACHE_SIZE) != null) {
+        cacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
+      }
+    } catch (NumberFormatException e) {
+      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
+    }
+
+    int cacheExpiration = 60;
+    try {
+      if (properties.get(CACHE_EXPIRATION) != null) {
+        cacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
+      }
+    } catch (NumberFormatException e) {
+      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
+    }
+
+    try {
+      organization = orgDirectory.getOrganization(organizationId);
+    } catch (NotFoundException e) {
+      logger.warn("Organization {} not found!", organizationId);
+      throw new ConfigurationException(ORGANIZATION_KEY, "not found");
+    }
+
+    client = new MoodleWebServiceImpl(url, token);
 
     // initialize user filter
-    this.ignoredUsernames = new ArrayList<>();
-    this.ignoredUsernames.add("");
-    this.ignoredUsernames.add(SecurityConstants.GLOBAL_ANONYMOUS_USERNAME);
+    ignoredUsernames = new ArrayList<>();
+    ignoredUsernames.add("");
+    ignoredUsernames.add(SecurityConstants.GLOBAL_ANONYMOUS_USERNAME);
     if (StringUtils.isNoneEmpty(adminUserName)) {
       ignoredUsernames.add(adminUserName);
     }
 
-    logger.info("Creating new MoodleUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={})", pid,
+    logger.info("Configured MoodleUserProviderInstance(url={}, cacheSize={}, cacheExpiration={})",
             client.getURL(), cacheSize, cacheExpiration);
 
     // Setup the caches

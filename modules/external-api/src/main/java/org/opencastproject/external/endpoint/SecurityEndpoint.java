@@ -43,9 +43,9 @@ import com.google.gson.JsonObject;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Dictionary;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -78,7 +78,7 @@ import javax.ws.rs.core.Response;
 )
 @Component(
     immediate = true,
-    service = { SecurityEndpoint.class,ManagedService.class },
+    service = { SecurityEndpoint.class },
     property = {
         "service.description=External API - Security Endpoint",
         "opencast.service.type=org.opencastproject.external.security",
@@ -86,7 +86,7 @@ import javax.ws.rs.core.Response;
     }
 )
 @JaxrsResource
-public class SecurityEndpoint implements ManagedService {
+public class SecurityEndpoint {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
@@ -107,14 +107,9 @@ public class SecurityEndpoint implements ManagedService {
     this.urlSigningService = urlSigningService;
   }
 
-  /** OSGi activation method */
   @Activate
-  void activate() {
-    log.info("Activating External API - Security Endpoint");
-  }
-
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Modified
+  void updated(Map<String, Object> properties) throws ConfigurationException {
     if (properties == null) {
       log.info("No configuration available, using defaults");
       return;

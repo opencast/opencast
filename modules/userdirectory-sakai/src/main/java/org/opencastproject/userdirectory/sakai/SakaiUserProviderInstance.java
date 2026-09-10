@@ -26,10 +26,12 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlSafeParser;
 
 import com.google.common.cache.CacheBuilder;
@@ -40,6 +42,13 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -59,6 +68,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -69,6 +79,15 @@ import javax.xml.parsers.DocumentBuilder;
 /**
  * A UserProvider that reads user roles from Sakai.
  */
+@Component(
+    immediate = true,
+    configurationPid = "org.opencastproject.userdirectory.sakai",
+    configurationPolicy = ConfigurationPolicy.REQUIRE,
+    service = { UserProvider.class, RoleProvider.class },
+    property = {
+        "service.description=Provides Sakai user directory instances"
+    }
+)
 public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   private static final String LTI_LEARNER_ROLE = "Learner";
@@ -78,6 +97,33 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
   public static final String PROVIDER_NAME = "sakai";
 
   private static final String OC_USERAGENT = "Opencast";
+
+  /** The key to look up the organization identifer in the service configuration properties */
+  private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.sakai.org";
+
+  /** The key to look up the user DN to use for performing searches. */
+  private static final String SAKAI_SEARCH_USER = "org.opencastproject.userdirectory.sakai.user";
+
+  /** The key to look up the password to use for performing searches */
+  private static final String SEARCH_PASSWORD = "org.opencastproject.userdirectory.sakai.password";
+
+  /** The key to look up the regular expression used to validate sites */
+  private static final String SITE_PATTERN_KEY = "org.opencastproject.userdirectory.sakai.site.pattern";
+
+  /** The key to look up the regular expression used to validate users */
+  private static final String USER_PATTERN_KEY = "org.opencastproject.userdirectory.sakai.user.pattern";
+
+  /** The key to look up the number of user records to cache */
+  private static final String CACHE_SIZE = "org.opencastproject.userdirectory.sakai.cache.size";
+
+  /** The key to look up the URL of the Sakai instance */
+  private static final String SAKAI_URL_KEY = "org.opencastproject.userdirectory.sakai.url";
+
+  /** The key to look up the list of Instructor roles on the Sakai instance */
+  private static final String SAKAI_INSTRUCTOR_ROLES_KEY = "org.opencastproject.userdirectory.sakai.instructor.roles";
+
+  /** The key to look up the number of minutes to cache users */
+  private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.sakai.cache.expiration";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SakaiUserProviderInstance.class);
@@ -115,47 +161,88 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
   /** A map of roles which are regarded as Instructor roles */
   private Set<String> instructorRoles;
 
-  /**
-   * Constructs an Sakai user provider with the needed settings.
-   *
-   * @param pid
-   *          the pid of this service
-   * @param organization
-   *          the organization
-   * @param url
-   *          the url of the Sakai server
-   * @param userName
-   *          the user to authenticate as
-   * @param password
-   *          the user credentials
-   * @param cacheSize
-   *          the number of users to cache
-   * @param cacheExpiration
-   *          the number of minutes to cache users
-   */
-  public SakaiUserProviderInstance(
-      String pid,
-      Organization organization,
-      String url,
-      String userName,
-      String password,
-      String sitePattern,
-      String userPattern,
-      Set<String> instructorRoles,
-      int cacheSize,
-      int cacheExpiration
-  ) {
+  /** The organization directory service */
+  private OrganizationDirectoryService orgDirectory;
 
-    this.organization = organization;
-    this.sakaiUrl = url;
-    this.sakaiUsername = userName;
-    this.sakaiPassword = password;
-    this.sitePattern = sitePattern;
-    this.userPattern = userPattern;
-    this.instructorRoles = instructorRoles;
+  /** OSGi DI */
+  @Reference
+  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
+    this.orgDirectory = orgDirectory;
+  }
 
-    logger.info("Creating new SakaiUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={})",
-                 pid, url, cacheSize, cacheExpiration);
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
+    String organizationId = (String) properties.get(ORGANIZATION_KEY);
+    if (StringUtils.isBlank(organizationId)) {
+      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    }
+
+    String url = (String) properties.get(SAKAI_URL_KEY);
+    if (StringUtils.isBlank(url)) {
+      throw new ConfigurationException(SAKAI_URL_KEY, "is not set");
+    }
+
+    String userName = (String) properties.get(SAKAI_SEARCH_USER);
+    String password = (String) properties.get(SEARCH_PASSWORD);
+
+    sitePattern = (String) properties.get(SITE_PATTERN_KEY);
+    userPattern = (String) properties.get(USER_PATTERN_KEY);
+
+    int cacheSize = 1000;
+    try {
+      if (properties.get(CACHE_SIZE) != null) {
+        Integer configuredCacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
+        if (configuredCacheSize != null) {
+          cacheSize = configuredCacheSize.intValue();
+        }
+      }
+    } catch (Exception e) {
+      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
+    }
+
+
+    int cacheExpiration = 60;
+    try {
+      if (properties.get(CACHE_EXPIRATION) != null) {
+        Integer configuredCacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
+        if (configuredCacheExpiration != null) {
+          cacheExpiration = configuredCacheExpiration.intValue();
+        }
+      }
+    } catch (Exception e) {
+      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
+    }
+
+    // Instructor roles
+    String instructorRoleList = (String) properties.get(SAKAI_INSTRUCTOR_ROLES_KEY);
+
+    if (!StringUtils.isEmpty(instructorRoleList)) {
+      String trimmedRoles = StringUtils.trim(instructorRoleList);
+      String[] roles = trimmedRoles.split(",");
+      instructorRoles = new HashSet<String>(Arrays.asList(roles));
+      logger.info("Sakai instructor roles: {}", Arrays.toString(roles));
+    } else {
+      // Default instructor roles
+      instructorRoles = new HashSet<String>();
+      instructorRoles.add("Site owner");
+      instructorRoles.add("Instructor");
+      instructorRoles.add("maintain");
+    }
+
+    try {
+      organization = orgDirectory.getOrganization(organizationId);
+    } catch (NotFoundException e) {
+      logger.warn("Organization {} not found!", organizationId);
+      throw new ConfigurationException(ORGANIZATION_KEY, "not found");
+    }
+
+    sakaiUrl = url;
+    sakaiUsername = userName;
+    sakaiPassword = password;
+
+    logger.info("Configured SakaiUserProviderInstance(url={}, cacheSize={}, cacheExpiration={})",
+                 url, cacheSize, cacheExpiration);
 
     // Setup the caches
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
