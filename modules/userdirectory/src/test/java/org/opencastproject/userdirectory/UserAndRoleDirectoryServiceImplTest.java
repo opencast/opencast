@@ -115,7 +115,8 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(roleProvider1.getRolesForUser((String) EasyMock.anyObject())).andReturn(rolesForUser1).anyTimes();
     EasyMock.expect(roleProvider1.findRoles("%", Role.Target.ALL, 0, 0)).andReturn(roles1.iterator()).anyTimes();
     EasyMock.expect(roleProvider1.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles1.iterator()).once();
-    EasyMock.expect(roleProvider1.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles1.iterator()).once();
+    // offset=1, limit=1 in the test call below becomes providerLimit = offset + limit = 2 per provider
+    EasyMock.expect(roleProvider1.findRoles("%2012%", Role.Target.ALL, 0, 2)).andReturn(findRoles1.iterator()).once();
 
     List<Role> roles2 = new ArrayList<Role>();
     roles2.add(new JaxbRole("ROLE_MATH_2011", org));
@@ -132,7 +133,8 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(roleProvider2.getRolesForUser((String) EasyMock.anyObject())).andReturn(rolesForUser2).anyTimes();
     EasyMock.expect(roleProvider2.findRoles("%", Role.Target.ALL, 0, 0)).andReturn(roles2.iterator()).anyTimes();
     EasyMock.expect(roleProvider2.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles2.iterator()).once();
-    EasyMock.expect(roleProvider2.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles2.iterator()).once();
+    // offset=1, limit=1 in the test call below becomes providerLimit = offset + limit = 2 per provider
+    EasyMock.expect(roleProvider2.findRoles("%2012%", Role.Target.ALL, 0, 2)).andReturn(findRoles2.iterator()).once();
 
     RoleProvider otherOrgRoleProvider = EasyMock.createNiceMock(RoleProvider.class);
     EasyMock.expect(otherOrgRoleProvider.getOrganization()).andReturn("otherOrg").anyTimes();
