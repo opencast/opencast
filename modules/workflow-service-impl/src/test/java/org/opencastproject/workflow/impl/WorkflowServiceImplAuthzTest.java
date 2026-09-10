@@ -336,20 +336,21 @@ public class WorkflowServiceImplAuthzTest {
     def.add(new WorkflowOperationDefinitionImpl("op1", "op1", null, true));
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
-    // As an instructor, create a workflow
+    // An instructor with no security policy granting them access must not be able to start a workflow
     userResponder.setResponse(instructor1);
+    try {
+      service.start(def, mp);
+      fail();
+    } catch (UnauthorizedException e) {
+      // expected
+    }
+
+    // The organization admin can start the workflow regardless of the (missing) security policy
+    userResponder.setResponse(DEFAULT_ORG_ADMIN);
     WorkflowInstance workflow = service.start(def, mp);
     service.suspend(workflow.getId());
 
-    // Ensure that this instructor can access the workflow
-    try {
-      service.getWorkflowById(workflow.getId());
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
     // Ensure the organization admin can access that workflow
-    userResponder.setResponse(DEFAULT_ORG_ADMIN);
     try {
       service.getWorkflowById(workflow.getId());
     } catch (Exception e) {
@@ -364,7 +365,7 @@ public class WorkflowServiceImplAuthzTest {
       fail(e.getMessage());
     }
 
-    // Ensure the other instructor can not see the workflow, since there is no security policy granting access
+    // Ensure an instructor can not see the workflow, since there is no security policy granting access
     userResponder.setResponse(instructor2);
     try {
       service.getWorkflowById(workflow.getId());

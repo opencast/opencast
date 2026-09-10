@@ -83,6 +83,7 @@ public class XACMLSecurityTest {
     securityService = EasyMock.createMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andAnswer(
             () -> new JaxbUser(currentUser, "test", organization, currentRoles)).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
 
     // Mock workspace
     Workspace workspace = EasyMock.createMock(Workspace.class);
@@ -200,5 +201,46 @@ public class XACMLSecurityTest {
     Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
     Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+  }
+
+  /**
+   * An organization admin (holding the organization's actual admin role, unlike the "admin"-named ACL role used in
+   * {@link #testSecurity()}) must be granted permission regardless of what the ACL says, including on an ACL that
+   * explicitly denies their role or has no entries at all.
+   */
+  @Test
+  public void testOrganizationAdminBypassesAcl() {
+    AccessControlList acl = new AccessControlList();
+    acl.getEntries().add(new AccessControlEntry(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, "write", false));
+
+    currentRoles.clear();
+    currentRoles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, organization, ""));
+    Assert.assertTrue("org admin should bypass an explicit deny entry for their own role",
+            authzService.hasPermission(acl, "write"));
+    Assert.assertTrue("org admin should bypass an ACL with no matching entries",
+            authzService.hasPermission(new AccessControlList(), "write"));
+  }
+
+  /**
+   * When a user holds two roles that both have entries for the same action, the outcome is decided by whichever
+   * entry appears first in the ACL, not by an explicit deny always winning regardless of order.
+   */
+  @Test
+  public void testFirstMatchingAclEntryWins() {
+    currentRoles.clear();
+    currentRoles.add(new JaxbRole("ROLE_GROUP_X", organization, ""));
+    currentRoles.add(new JaxbRole("ROLE_USER_BOB", organization, ""));
+
+    AccessControlList allowFirst = new AccessControlList();
+    allowFirst.getEntries().add(new AccessControlEntry("ROLE_GROUP_X", "write", true));
+    allowFirst.getEntries().add(new AccessControlEntry("ROLE_USER_BOB", "write", false));
+    Assert.assertTrue("the allow entry for ROLE_GROUP_X comes first, so it decides the outcome",
+            authzService.hasPermission(allowFirst, "write"));
+
+    AccessControlList denyFirst = new AccessControlList();
+    denyFirst.getEntries().add(new AccessControlEntry("ROLE_USER_BOB", "write", false));
+    denyFirst.getEntries().add(new AccessControlEntry("ROLE_GROUP_X", "write", true));
+    Assert.assertFalse("the deny entry for ROLE_USER_BOB comes first, so it decides the outcome",
+            authzService.hasPermission(denyFirst, "write"));
   }
 }
