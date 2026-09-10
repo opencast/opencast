@@ -4,19 +4,26 @@ on:
     types:
       - opened
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   check-icla:
-    if: github.event.pull_request.user.login != 'dependabot[bot]' && 
+    if: github.event.pull_request.user.login != 'dependabot[bot]' &&
         github.event.pull_request.user.login != 'opencastproject'
     runs-on: ubuntu-24.04
     steps:
+      - name: Determine ICLA user
+        run: echo "ICLA_USER=${{ github.event.pull_request.user.login == 'Copilot' && github.event.sender.login || github.event.pull_request.user.login }}" >> "$GITHUB_ENV"
+
       - uses: actions/setup-python@v7
 
       - name: Install Python module
         run: pip install --break-system-packages apereocla
 
       - name: Check Apereo ICLA for GitHub user
-        run: apereocla -g "${{ github.event.pull_request.user.login }}"
+        run: apereocla -g "${{ env.ICLA_USER }}"
 
       - name: Comment if no CLA has been filed
         if: ${{ failure() }}
@@ -24,7 +31,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: >
-            Hi @${{ github.event.pull_request.user.login }}
+            Hi @${{ env.ICLA_USER }}
 
             Thank you for contributing to Opencast.
 
