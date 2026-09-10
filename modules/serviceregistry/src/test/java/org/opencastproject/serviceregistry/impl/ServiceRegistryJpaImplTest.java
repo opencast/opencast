@@ -618,4 +618,9 @@ public class ServiceRegistryJpaImplTest {
     Assert.assertEquals(dateCompleted, updatedJob.getDateCompleted());
     Assert.assertEquals(runTime, updatedJob.getRunTime());
   }
+
+  @Test
+  public void testUpdatedWithNullProperties() throws ConfigurationException {
+    serviceRegistryJpaImpl.updated(null);
+  }
 }
