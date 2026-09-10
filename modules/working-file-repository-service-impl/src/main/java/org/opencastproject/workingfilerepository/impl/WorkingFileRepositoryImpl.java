@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -391,7 +392,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       // Store the hash
       String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
       try {
-        FileUtils.writeStringToFile(md5FileTmp, md5);
+        FileUtils.writeStringToFile(md5FileTmp, md5, StandardCharsets.UTF_8);
       } catch (IOException e) {
         FileUtils.deleteQuietly(md5FileTmp);
         throw e;
@@ -452,7 +453,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       String md5 = DigestUtils.md5Hex(md5In);
       IOUtils.closeQuietly(md5In);
       md5File = getMd5File(f);
-      FileUtils.writeStringToFile(md5File, md5);
+      FileUtils.writeStringToFile(md5File, md5, StandardCharsets.UTF_8);
       return md5File;
     } catch (IOException e) {
       FileUtils.deleteQuietly(md5File);
@@ -688,7 +689,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       File md5File = null;
       try {
         md5File = getMd5File(f);
-        FileUtils.writeStringToFile(md5File, md5);
+        FileUtils.writeStringToFile(md5File, md5, StandardCharsets.UTF_8);
       } catch (IOException e) {
         FileUtils.deleteQuietly(md5File);
         throw e;

@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -176,7 +177,7 @@ public class SmilResponseImpl implements SmilResponse {
    * @throws JAXBException if deserialization fail
    */
   public static SmilResponse fromXml(String smilResponseXml) throws JAXBException {
-    InputStream smilStream = IOUtils.toInputStream(smilResponseXml);
+    InputStream smilStream = IOUtils.toInputStream(smilResponseXml, StandardCharsets.UTF_8);
     try {
       return fromXml(smilStream);
     } finally {

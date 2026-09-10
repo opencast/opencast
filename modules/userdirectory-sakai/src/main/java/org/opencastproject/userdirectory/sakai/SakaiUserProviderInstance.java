@@ -52,6 +52,7 @@ import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -412,7 +413,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       connection.setRequestProperty("Authorization", "Basic " + encoded);
       connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
-      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()));
+      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()), StandardCharsets.UTF_8);
       logger.debug(xml);
 
       DocumentBuilder parser = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -474,7 +475,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       connection.setRequestProperty("Authorization", "Basic " + encoded);
       connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
-      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()));
+      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()), StandardCharsets.UTF_8);
       logger.debug(xml);
 
       // Parse the document
