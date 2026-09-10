@@ -262,7 +262,7 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
         } catch (UnauthorizedException ex) {
           logger.error("System admin user not authorized to add lifecycle policy to database. By all accounts "
               + "this should not have happened");
-          throw new RuntimeException(e);
+          throw new RuntimeException(ex);
         } catch (LifeCycleServiceException ex) {
           logger.error("Could not add lifecycle policy to database", ex);
           throw new RuntimeException(ex);
