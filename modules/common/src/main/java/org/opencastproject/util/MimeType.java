@@ -22,13 +22,12 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.eqObj;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -258,7 +257,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(type, subtype);
+    return Objects.hash(type, subtype);
   }
 
   @Override
@@ -267,8 +266,8 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   }
 
   private boolean eqFields(MimeType that) {
-    return eqObj(this.type, that.type)
-            && eqObj(this.subtype, that.subtype);
+    return Objects.equals(this.type, that.type)
+            && Objects.equals(this.subtype, that.subtype);
   }
 
   static class Adapter extends XmlAdapter<String, MimeType> {

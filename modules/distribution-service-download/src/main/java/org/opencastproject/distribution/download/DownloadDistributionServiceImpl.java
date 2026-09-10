@@ -22,7 +22,6 @@ package org.opencastproject.distribution.download;
 
 import static java.lang.String.format;
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.HttpUtil.waitForResource;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
@@ -92,6 +91,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -897,7 +897,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
           .fold(
               Misc.chuck(),
               status -> {
-                if (ne(status, HttpServletResponse.SC_OK)) {
+                if (!Objects.equals(status, HttpServletResponse.SC_OK)) {
                   logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
                   Misc.chuck(new DistributionException("Unable to load distributed file " + uri.toString()));
                 }

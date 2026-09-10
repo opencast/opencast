@@ -23,7 +23,6 @@ package org.opencastproject.security.impl.jpa;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -297,7 +296,7 @@ public class JpaUser implements User {
     }
     User other = (User) obj;
     return username.equals(other.getUsername()) && organization.equals(other.getOrganization())
-            && EqualsUtil.eq(provider, other.getProvider());
+            && Objects.equals(provider, other.getProvider());
   }
 
   /**

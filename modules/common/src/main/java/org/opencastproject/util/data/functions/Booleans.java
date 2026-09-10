@@ -21,8 +21,7 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.opencastproject.util.EqualsUtil;
-
+import java.util.Objects;
 import java.util.function.Function;
 
 /** Boolean functions. */
@@ -31,7 +30,7 @@ public final class Booleans {
   }
 
   public static <A> Function<A, Boolean> eq(final A a) {
-    return x -> EqualsUtil.eq(x, a);
+    return x -> Objects.equals(x, a);
   }
 
   public static <A extends Comparable<A>> Function<A, Boolean> lt(final A a) {

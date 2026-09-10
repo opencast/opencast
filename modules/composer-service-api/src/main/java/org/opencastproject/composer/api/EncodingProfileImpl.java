@@ -22,8 +22,6 @@
 
 package org.opencastproject.composer.api;
 
-import org.opencastproject.util.EqualsUtil;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -31,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -493,7 +492,7 @@ public class EncodingProfileImpl implements EncodingProfile {
 
     @Override
     public int hashCode() {
-      return EqualsUtil.hash(key, value);
+      return Objects.hash(key, value);
     }
   }
 
