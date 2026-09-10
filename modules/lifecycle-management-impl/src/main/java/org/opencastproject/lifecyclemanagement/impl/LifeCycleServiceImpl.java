@@ -479,6 +479,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       final Organization organization = securityService.getOrganization();
       final User user = securityService.getUser();
       EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
+      query.sortByUID(SortCriterion.Order.Ascending); // Ensure order
       List<EventCatalogUIAdapter> extendedCatalogUIAdapters = indexService.getExtendedEventCatalogUIAdapters();
       EventCatalogUIAdapter commonCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       boolean isFilterPresent = false;
