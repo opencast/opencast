@@ -27,6 +27,7 @@ Tags and flavors can be used in combination.
 |match-value       |"Joe Bloggs"         |the Dublin Core term value to check for|EMPTY|
 |default-value     |"Anon"               |the implied value if the dubincore term is not present in the catalog|EMPTY|
 |*configProperty*  |true / false         |a configuration property and the value it will be given if a match is found|EMPTY|
+|check-regex       |"true" or "false"    |enables regex matching for the dcterm value against match-value when set to true.|FALSE|
 
 ### dccatalog
 
@@ -39,7 +40,7 @@ additional term adding to the catalog.
 
 ### match-value
 
-The value of the `dcterm` which to match against. The comparison is case sensitive.
+The target string or regex pattern to match against `dcterm` values. The comparison is case-sensitive. If `check-regex` is `true`, this value is treated as a regular expression pattern to match the `dcterm` value, and comparison stops on the first match.
 
 ### default-value
 
@@ -59,6 +60,9 @@ configuration properties can be used to modify the execution of subsequent opera
 will be evaluated as `false` in practice the only useful value which can set is `true`.  However operation `if`
 conditions can be negated though so it is possible to skip subsequent operations on matched `dcterm`  value.
 
+### check-regex
+
+Controls whether `match-value` is evaluated as a regular expression pattern against the `dcterm` value. When set to `true`, the process uses regex matching and stops at the first match.
 
 Operation Example
 -----------------
@@ -82,5 +86,27 @@ Operation Example
     if: NOT ${publishPrivate}
     description: Publish to global audience
    ...
+
+```
+
+Operation Example with regular expression
+-----------------
+
+```yaml
+  - id: configure-by-dcterm
+    description: Configure publication channel by dcterm
+    configurations:
+      - dccatalog: series
+      - dcterm: creator
+      - match-value: "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+      - check-regex: true
+      - hasEmails: true
+
+...
+
+  - id: send-emails
+    if: ${hasEmails}
+    description: Send Emails to Series Organizers
+    ...
 
 ```
