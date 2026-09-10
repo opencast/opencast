@@ -532,7 +532,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Indicates if zip has a root folder or not, initialized as true
       boolean hasRootFolder = true;
       // While there are entries write them to a collection
-      while ((entry = zis.getNextZipEntry()) != null) {
+      while ((entry = zis.getNextEntry()) != null) {
         try {
           if (entry.isDirectory() || entry.getName().contains("__MACOSX")) {
             continue;

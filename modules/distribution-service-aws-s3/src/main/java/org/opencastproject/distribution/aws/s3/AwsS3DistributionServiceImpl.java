@@ -67,6 +67,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketWebsiteConfiguration;
 import com.amazonaws.services.s3.model.SetBucketWebsiteConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -360,7 +361,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
               .withClientConfiguration(clientConfiguration)
               .withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
 
-      s3TransferManager = new TransferManager(s3);
+      s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
 
       // Create AWS S3 bucket if not there yet
       createAWSBucket();
