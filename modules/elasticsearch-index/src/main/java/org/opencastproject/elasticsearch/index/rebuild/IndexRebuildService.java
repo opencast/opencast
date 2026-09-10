@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -209,14 +210,43 @@ public class IndexRebuildService implements BundleActivator {
     Service service = indexProducer.getService();
     logger.info("Starting to rebuild the {} index", service);
     setRebuildState(service, IndexRebuildService.State.RUNNING);
+    DenyAclCollector.start();
     try {
       indexProducer.repopulate(dataType);
       setRebuildState(service, IndexRebuildService.State.OK);
     } catch (IndexRebuildException e) {
       setRebuildState(service, IndexRebuildService.State.ERROR);
       throw e;
+    } finally {
+      reportDeniedAcls(service);
+      DenyAclCollector.stop();
     }
     logger.info("Finished rebuilding the {} index", service);
+  }
+
+  /**
+   * Report objects whose ACL contains deny rules, which the index cannot express and therefore
+   * dropped while indexing.
+   *
+   * <p>Deny entries mean the data in Opencast should be corrected, so the summary is a warning.
+   * It is emitted once per rebuilt service rather than once per entry, which is what used to
+   * flood the rebuild log. The affected identifiers follow at debug level so they remain
+   * obtainable on the fly without turning the summary itself into a wall of text.
+   *
+   * @param service
+   *          the service that was rebuilt
+   */
+  private void reportDeniedAcls(Service service) {
+    Set<String> denied = DenyAclCollector.collected();
+    if (denied.isEmpty()) {
+      return;
+    }
+    logger.warn("Rebuilding the {} index ignored deny rules in the access control lists of {} object(s). "
+            + "The index cannot express denial, so those rules have no effect and the data should be corrected. "
+            + "Enable debug logging for {} to list the affected identifiers.",
+        service, denied.size(), IndexRebuildService.class.getName());
+    logger.debug("Objects with deny rules in their access control list while rebuilding the {} index: {}",
+        service, String.join(", ", denied));
   }
 
   /**
