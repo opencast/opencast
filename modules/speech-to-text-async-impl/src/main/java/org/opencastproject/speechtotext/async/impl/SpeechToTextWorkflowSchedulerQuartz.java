@@ -45,11 +45,11 @@ import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.CronExpression;
 import org.quartz.JobDetail;
@@ -62,7 +62,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,13 +74,10 @@ import java.util.stream.Collectors;
  */
 @Component(
     immediate = true,
-    service = {
-        ManagedService.class
-    },
     property = {
         "service.description=Speech to Text Workflow Scheduler"
     })
-public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner implements ManagedService {
+public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner {
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextWorkflowSchedulerQuartz.class);
 
   public static final String JOB_GROUP = "org-opencast-stt-wf-scheduler-group";
@@ -124,13 +120,6 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
   private Workflows wfUtil;
 
   @Override
-  @Activate
-  protected void activate(ComponentContext cc) {
-    logger.info("Activating!");
-    super.activate(cc);
-  }
-
-  @Override
   @Deactivate
   public void deactivate() {
     super.deactivate();
@@ -151,9 +140,12 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
     }
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void updated(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     logger.info("Updating!");
+    super.activate(cc);
+
     unschedule();
 
     if (properties != null) {

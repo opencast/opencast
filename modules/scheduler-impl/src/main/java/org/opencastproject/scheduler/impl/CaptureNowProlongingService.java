@@ -49,11 +49,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -68,19 +68,19 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /** Prolong immediate recordings before reaching the end, as long as there are no conflicts */
 @Component(
     immediate = true,
-    service = { ManagedService.class,CaptureNowProlongingService.class },
+    service = { CaptureNowProlongingService.class },
     property = {
         "service.description=Capture Prolonging Service"
     }
 )
-public class CaptureNowProlongingService implements ManagedService {
+public class CaptureNowProlongingService {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(CaptureNowProlongingService.class);
@@ -157,7 +157,7 @@ public class CaptureNowProlongingService implements ManagedService {
    *          the component's context
    */
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     componentContext = cc;
     try {
       quartz = new StdSchedulerFactory().getScheduler();
@@ -171,6 +171,7 @@ public class CaptureNowProlongingService implements ManagedService {
     } catch (org.quartz.SchedulerException e) {
       throw new RuntimeException(e);
     }
+    updated(properties);
   }
 
   /**
@@ -182,8 +183,8 @@ public class CaptureNowProlongingService implements ManagedService {
     shutdown();
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     // Read configuration for the default initial duration
     try {
       initialTime = Integer.parseInt(StringUtils.defaultIfBlank((String) properties.get(CFG_KEY_INITIAL_TIME), "300"));
