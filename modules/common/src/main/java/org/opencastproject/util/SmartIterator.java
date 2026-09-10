@@ -23,19 +23,18 @@ package org.opencastproject.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utility class for applying limit and offset to a map or collection
  */
 public class SmartIterator<A> {
-  private int limit;
-  private int offset;
-  private Iterator<?> iterator;
+  private final int limit;
+  private final int offset;
 
   public SmartIterator(int limit, int offset) {
     this.limit = limit;
@@ -50,21 +49,8 @@ public class SmartIterator<A> {
    * @return the filtered map
    */
   public Map<String, A> applyLimitAndOffset(Map<String, A> map) {
-    iterator = map.entrySet().iterator();
-
-    Map<String, A> filteredMap = new LinkedHashMap<String, A>();
-    int i = 0;
-    while (isRecordRequired(filteredMap.size())) {
-      Entry<String, A> item = (Entry<String, A>) iterator.next();
-      if (i++ >= offset) {
-        filteredMap.put(item.getKey(), item.getValue());
-      }
-    }
-    return filteredMap;
-  }
-
-  private boolean isRecordRequired(int filteredMapSize) {
-    return (filteredMapSize < limit || limit == 0) && iterator.hasNext();
+    return limited(map.entrySet().stream())
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
   }
 
   /**
@@ -75,15 +61,15 @@ public class SmartIterator<A> {
    * @return the filtered list
    */
   public List<A> applyLimitAndOffset(Collection<A> unfilteredCollection) {
-    iterator = unfilteredCollection.iterator();
-    List<A> filteredList = new ArrayList<A>();
-    int i = 0;
-    while (isRecordRequired(filteredList.size())) {
-      A nextItem = (A) iterator.next();
-      if (i++ >= offset) {
-        filteredList.add(nextItem);
-      }
+    return limited(unfilteredCollection.stream()).collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  /** Skip {@link #offset} elements, then take at most {@link #limit} of what remains ({@code 0} means no cap). */
+  private <T> Stream<T> limited(Stream<T> stream) {
+    if (limit < 0) {
+      return Stream.empty();
     }
-    return filteredList;
+    Stream<T> skipped = stream.skip(Math.max(offset, 0));
+    return limit == 0 ? skipped : skipped.limit(limit);
   }
 }
