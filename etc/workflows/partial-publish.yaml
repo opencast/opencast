@@ -243,7 +243,7 @@ operations:
     exception-handler-workflow: partial-error
     description: Publishing to Opencast Media Module
     configurations:
-      - download-source-flavors: dublincore/*,security/*,textboxes/source,quizzes/source
+      - download-source-flavors: dublincore/*,security/*
       - download-source-tags: engage-download
       - streaming-source-tags: engage-streaming
       - check-availability: false
