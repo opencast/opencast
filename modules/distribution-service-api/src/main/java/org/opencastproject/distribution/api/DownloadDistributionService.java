@@ -24,7 +24,6 @@ package org.opencastproject.distribution.api;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageException;
 
 import java.util.List;
 import java.util.Set;
@@ -35,10 +34,10 @@ import java.util.Set;
 public interface DownloadDistributionService extends DistributionService {
 
   Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException, MediaPackageException;
+          throws DistributionException;
 
   Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
-          throws DistributionException, MediaPackageException;
+          throws DistributionException;
 
   Job distribute(
       String pubChannelId,
@@ -46,10 +45,13 @@ public interface DownloadDistributionService extends DistributionService {
       Set<String> downloadIds,
       boolean checkAvailability,
       boolean preserveReference
-  ) throws DistributionException, MediaPackageException;
+  ) throws DistributionException;
 
   Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException;
+
+  List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability) throws DistributionException;
 
   /**
    * Distributes the given elements synchronously. This should be used rarely since load balancing will be unavailable.
