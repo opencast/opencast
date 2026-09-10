@@ -23,8 +23,6 @@ package org.opencastproject.util.data.functions;
 
 import static org.opencastproject.util.EqualsUtil.eq;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 /** Various functions not directly bound to any type. */
@@ -78,17 +76,4 @@ public final class Misc {
     }
   }
 
-  /** Widening cast. */
-  public static <A> List<A> widen(List<? extends A> xs) {
-    return (List<A>) xs;
-  }
-
-  /** Widening cast. */
-  public static <A> Optional<A> widen(Optional<? extends A> xs) {
-    return (Optional<A>) xs;
-  }
-
-  public static <A> Function<A, A> ifThen(A predicate, A b) {
-    return a -> predicate.equals(a) ? b : a;
-  }
 }
