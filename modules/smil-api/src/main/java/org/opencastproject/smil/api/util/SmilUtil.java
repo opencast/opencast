@@ -34,7 +34,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.android.mms.dom.smil.parser.SmilXmlParser;
 
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +160,7 @@ public final class SmilUtil {
     Element element = smilDocument.createElement(hasVideo ? "video" : "audio");
     element.setAttribute("begin", Long.toString(startTime) + "ms");
     element.setAttribute("dur", Long.toString(duration) + "ms");
-    element.setAttribute("src", URIUtil.getPath(uri.toString()));
+    element.setAttribute("src", uri.getRawPath());
     if (trackId != null) {
       element.setAttribute("xml:id", trackId);
     }
