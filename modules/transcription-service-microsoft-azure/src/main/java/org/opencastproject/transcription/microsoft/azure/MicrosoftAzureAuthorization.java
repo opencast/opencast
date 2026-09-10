@@ -25,6 +25,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +181,7 @@ public class MicrosoftAzureAuthorization {
     //    canonicalizedResource ()
     String canonicalizedResource = Paths.get("/blob", azureStorageAccountName, StringUtils.trimToEmpty(resource))
         .normalize().toString();
-    if (StringUtils.endsWith(canonicalizedResource,"/")) {
+    if (Strings.CS.endsWith(canonicalizedResource,"/")) {
       canonicalizedResource = StringUtils.substring(canonicalizedResource, 0, canonicalizedResource.length() - 1);
     }
     stringBuilder.append(canonicalizedResource + "\n");

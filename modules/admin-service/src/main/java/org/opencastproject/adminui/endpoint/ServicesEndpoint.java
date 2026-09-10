@@ -43,6 +43,7 @@ import org.opencastproject.util.requests.SortCriterion.Order;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
@@ -152,19 +153,19 @@ public class ServicesEndpoint {
     List<Service> services = new ArrayList<Service>();
     for (ServiceStatistics stats : serviceRegistry.getServiceStatistics()) {
       Service service = new Service(stats, findServerByHost(stats.getServiceRegistration().getHost(), servers));
-      if (fName != null && !StringUtils.equalsIgnoreCase(service.getName(), fName)) {
+      if (fName != null && !Strings.CI.equals(service.getName(), fName)) {
         continue;
       }
 
-      if (fHostname != null && !StringUtils.equalsIgnoreCase(service.getHost(), fHostname)) {
+      if (fHostname != null && !Strings.CI.equals(service.getHost(), fHostname)) {
         continue;
       }
 
-      if (fNodeName != null && !StringUtils.equalsIgnoreCase(service.getNodeName(), fNodeName)) {
+      if (fNodeName != null && !Strings.CI.equals(service.getNodeName(), fNodeName)) {
         continue;
       }
 
-      if (fStatus != null && !StringUtils.equalsIgnoreCase(service.getStatus().toString(), fStatus)) {
+      if (fStatus != null && !Strings.CI.equals(service.getStatus().toString(), fStatus)) {
         continue;
       }
 
@@ -182,10 +183,10 @@ public class ServicesEndpoint {
         }
       }
 
-      if (fFreeText != null && !StringUtils.containsIgnoreCase(service.getName(), fFreeText)
-          && !StringUtils.containsIgnoreCase(service.getHost(), fFreeText)
-          && !StringUtils.containsIgnoreCase(service.getNodeName(), fFreeText)
-          && !StringUtils.containsIgnoreCase(service.getStatus().toString(), fFreeText)) {
+      if (fFreeText != null && !Strings.CI.contains(service.getName(), fFreeText)
+          && !Strings.CI.contains(service.getHost(), fFreeText)
+          && !Strings.CI.contains(service.getNodeName(), fFreeText)
+          && !Strings.CI.contains(service.getStatus().toString(), fFreeText)) {
         continue;
       }
 
@@ -407,23 +408,23 @@ public class ServicesEndpoint {
 
     /** Constructor. */
     ServiceStatisticsComparator(String sortBy, boolean ascending) {
-      if (StringUtils.equalsIgnoreCase(Service.COMPLETED_NAME, sortBy)) {
+      if (Strings.CI.equals(Service.COMPLETED_NAME, sortBy)) {
         this.sortBy = Service.COMPLETED_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.HOST_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.HOST_NAME, sortBy)) {
         this.sortBy = Service.HOST_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.NODE_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.NODE_NAME, sortBy)) {
         this.sortBy = Service.NODE_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.MEAN_QUEUE_TIME_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.MEAN_QUEUE_TIME_NAME, sortBy)) {
         this.sortBy = Service.MEAN_QUEUE_TIME_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.MEAN_RUN_TIME_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.MEAN_RUN_TIME_NAME, sortBy)) {
         this.sortBy = Service.MEAN_RUN_TIME_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.NAME_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.NAME_NAME, sortBy)) {
         this.sortBy = Service.NAME_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.QUEUED_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.QUEUED_NAME, sortBy)) {
         this.sortBy = Service.QUEUED_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.RUNNING_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.RUNNING_NAME, sortBy)) {
         this.sortBy = Service.RUNNING_NAME;
-      } else if (StringUtils.equalsIgnoreCase(Service.STATUS_NAME, sortBy)) {
+      } else if (Strings.CI.equals(Service.STATUS_NAME, sortBy)) {
         this.sortBy = Service.STATUS_NAME;
       } else {
         throw new IllegalArgumentException(String.format("Can't sort services by %s.", sortBy));

@@ -39,7 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -173,9 +173,9 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
 
     // Figure out which request method to use
     HttpEntityEnclosingRequestBase request;
-    if (StringUtils.equalsIgnoreCase(POST, method)) {
+    if (Strings.CI.equals(POST, method)) {
       request = new HttpPost(urlPath);
-    } else if (StringUtils.equalsIgnoreCase(PUT, method)) {
+    } else if (Strings.CI.equals(PUT, method)) {
       request = new HttpPut(urlPath);
     } else {
       throw new WorkflowOperationException("The configuration key '" + OPT_METHOD + "' only supports 'post' and 'put'");

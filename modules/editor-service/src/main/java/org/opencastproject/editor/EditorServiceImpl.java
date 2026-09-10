@@ -317,7 +317,7 @@ public class EditorServiceImpl implements EditorService {
 
     // SMIL catalog flavor
     smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(
-            StringUtils.defaultString((String) properties.get(OPT_SMIL_CATALOG_FLAVOR), DEFAULT_SMIL_CATALOG_FLAVOR));
+            Objects.toString(properties.get(OPT_SMIL_CATALOG_FLAVOR), DEFAULT_SMIL_CATALOG_FLAVOR));
     logger.debug("Smil catalog flavor configuration set to '{}'", smilCatalogFlavor);
 
     // SMIL catalog tags
@@ -330,7 +330,7 @@ public class EditorServiceImpl implements EditorService {
 
     // SMIL silence flavor
     smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(
-            StringUtils.defaultString((String) properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
+            Objects.toString(properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
     logger.debug("Smil silence flavor configuration set to '{}'", smilSilenceFlavor);
 
     // Preview Video subtype
@@ -340,12 +340,12 @@ public class EditorServiceImpl implements EditorService {
 
     // Flavor for captions
     captionsFlavor = MediaPackageElementFlavor.parseFlavor(
-            StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
+            Objects.toString(properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
     logger.debug("Caption flavor set to '{}'", captionsFlavor);
 
     // Flavor for chapters
     chapterFlavor = MediaPackageElementFlavor.parseFlavor(
-        StringUtils.defaultString((String) properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
+        Objects.toString(properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
     logger.debug("Chapter flavor set to '{}'", chapterFlavor);
 
     thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);

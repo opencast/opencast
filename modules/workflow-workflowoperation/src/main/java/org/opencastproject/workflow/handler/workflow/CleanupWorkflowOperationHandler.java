@@ -47,6 +47,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpDelete;
@@ -281,11 +282,11 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     String elementUri = elementToRemove.getURI().toString();
     String deleteUri;
-    if (StringUtils.containsIgnoreCase(elementUri, UrlSupport.concat(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
+    if (Strings.CI.contains(elementUri, UrlSupport.concat(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
               elementToRemove.getMediaPackage().getIdentifier().toString(), elementToRemove.getIdentifier()))) {
       deleteUri = UrlSupport.concat(repositoryBaseUrl, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
               elementToRemove.getMediaPackage().getIdentifier().toString(), elementToRemove.getIdentifier());
-    } else if (StringUtils.containsIgnoreCase(elementUri, WorkingFileRepository.COLLECTION_PATH_PREFIX)) {
+    } else if (Strings.CI.contains(elementUri, WorkingFileRepository.COLLECTION_PATH_PREFIX)) {
       deleteUri = UrlSupport.concat(repositoryBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX,
           StringUtils.substringAfter(elementToRemove.getURI().getPath(), WorkingFileRepository.COLLECTION_PATH_PREFIX));
     } else {

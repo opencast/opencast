@@ -29,6 +29,7 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -79,12 +80,12 @@ public class JobsListProvider implements ResourceListProvider {
 
     String listNameTrimmed = StringUtils.trimToEmpty(listName);
     Map<String, String> jobList = new HashMap<String, String>();
-    if (StringUtils.equalsIgnoreCase(LIST_STATUS, listName)) {
+    if (Strings.CI.equals(LIST_STATUS, listName)) {
       jobList.put(Job.Status.PAUSED.toString(), JOB_STATUS_FILTER_PREFIX + Job.Status.PAUSED.toString());
       jobList.put(Job.Status.QUEUED.toString(), JOB_STATUS_FILTER_PREFIX + Job.Status.QUEUED.toString());
       jobList.put(Job.Status.RUNNING.toString(), JOB_STATUS_FILTER_PREFIX + Job.Status.RUNNING.toString());
       jobList.put(Job.Status.WAITING.toString(), JOB_STATUS_FILTER_PREFIX + Job.Status.WAITING.toString());
-    } else if (StringUtils.equalsIgnoreCase(LIST_WORKFLOW, listNameTrimmed)) {
+    } else if (Strings.CI.equals(LIST_WORKFLOW, listNameTrimmed)) {
       try {
         for (WorkflowDefinition workflowDef : workflowService.listAvailableWorkflowDefinitions()) {
           if (StringUtils.isNotBlank(workflowDef.getTitle())
@@ -115,7 +116,7 @@ public class JobsListProvider implements ResourceListProvider {
 
   @Override
   public boolean isTranslatable(String listName) {
-    return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
+    return Strings.CI.equals(LIST_STATUS, listName);
   }
 
   @Override

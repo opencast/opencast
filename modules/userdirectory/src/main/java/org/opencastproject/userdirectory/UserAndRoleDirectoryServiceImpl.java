@@ -448,7 +448,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
     final String name = StringUtils.defaultIfBlank(user1.getName(), user2.getName());
     final String email = StringUtils.defaultIfBlank(user1.getEmail(), user2.getEmail());
-    final String password = StringUtils.defaultString(user1.getPassword(), user2.getPassword());
+    final String password = Objects.toString(user1.getPassword(), user2.getPassword());
     final boolean manageable = user1.isManageable() || user2.isManageable();
 
     final JaxbOrganization organization = JaxbOrganization.fromOrganization(user1.getOrganization());

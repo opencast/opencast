@@ -39,6 +39,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -424,7 +425,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)
             // On shared filesystems like NFS the move operation may create temporary .nfsXXX files
             // which will be removed by the NFS subsystem itself. We should skip these files.
-            && !StringUtils.startsWith(fileToDelete.getName(), ".nfs")) {
+            && !Strings.CS.startsWith(fileToDelete.getName(), ".nfs")) {
           logger.trace("delete {}", fileToDelete.getAbsolutePath());
           if (!fileToDelete.delete() && fileToDelete.exists()) {
             throw new IllegalStateException("Unable to delete file: " + fileToDelete.getAbsolutePath());
