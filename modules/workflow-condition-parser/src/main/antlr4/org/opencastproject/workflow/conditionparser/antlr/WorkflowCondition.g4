@@ -1,5 +1,6 @@
 grammar WorkflowCondition;
 
+parse : booleanExpression EOF ;
 booleanExpression : booleanTerm ( OR booleanExpression )? ;
 booleanTerm : booleanValue ( AND booleanTerm )? ;
 booleanValue : ( NOT )* ( '(' booleanExpression ')' | relation | BOOL ) ;
