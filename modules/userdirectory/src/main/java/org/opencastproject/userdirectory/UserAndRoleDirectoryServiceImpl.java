@@ -504,7 +504,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   }
 
   @Override
-  public List<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+  public List<Role> findRoles(String query, Role.Target target, int offset, int limit, Boolean hasUser) {
     if (query == null) {
       throw new IllegalArgumentException("Query must be set");
     }
@@ -515,7 +515,11 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
     // Instead of getting all roles from all providers, limit the providers by "limit" and "offset" if possible.
     // Intended to reduce computing time for low offset + limit requests.
-    final int providerLimit = limit > 0 ? (int) Math.min((long) offset + limit, Integer.MAX_VALUE) : 0;
+    // This optimization cannot be applied when filtering by "hasUser", since that filter is applied after fetching
+    // from the providers: trimming the provider results to offset+limit beforehand could discard roles that would have
+    // passed the filter, leaving fewer than "limit" results even though more were available.
+    final int providerLimit = limit > 0 && hasUser == null
+        ? (int) Math.min((long) offset + limit, Integer.MAX_VALUE) : 0;
 
     // Multiple providers can return the same role (e.g.built-in system roles), so deduplicate them using a
     // LinkedHashSet, before limit is applied.
@@ -523,14 +527,33 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     for (RoleProvider roleProvider : roleProviders) {
       final String providerOrgId = roleProvider.getOrganization();
       if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
-        roleProvider.findRoles(query, target, 0, providerLimit).forEachRemaining(roles::add);
+        roleProvider.findRoles(query, target, 0, providerLimit, hasUser).forEachRemaining(roles::add);
       }
     }
-    Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName)).skip(offset);
+    Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName));
+    // Filter by whether or not the role resolves to an actual user account, before offset/limit are applied, so
+    // that a page of `limit` results is not silently shortened by roles excluded after the fact.
+    if (hasUser != null) {
+      stream = stream.filter(role -> hasUser.equals(roleHasUser(role)));
+    }
+    stream = stream.skip(offset);
     if (limit > 0) {
       return stream.limit(limit).collect(Collectors.toList());
     }
     return stream.collect(Collectors.toList());
+  }
+
+  /**
+   * Determines whether the given role corresponds to an actual user account, i.e. whether
+   * {@link #loadUser(String)} returns a non-null user for the role's name with the configured user role prefix
+   * stripped off.
+   *
+   * @param role
+   *          the role to check
+   * @return <code>true</code> if the role resolves to a user account, <code>false</code> otherwise
+   */
+  private boolean roleHasUser(Role role) {
+    return loadUser(role.getName().replaceFirst(UserIdRoleProvider.getUserRolePrefix(), "")) != null;
   }
 
   @Override

@@ -61,4 +61,29 @@ public interface RoleProvider {
    */
   Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit);
 
+  /**
+   * Return the found roles as an iterator, optionally filtered by whether or not each role corresponds to an
+   * actual user account.
+   *
+   * @param query
+   *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
+   *          characters (including zero characters).
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit. 0 means no limit
+   * @param hasUser
+   *          if <code>null</code>, roles are not filtered by this criterion. If <code>true</code>, only roles
+   *          that resolve to an actual user account should be returned. If <code>false</code>, only roles that
+   *          do not resolve to a user account should be returned. Providers that can never produce a role
+   *          resolving to a user account may use this to skip expensive work when <code>hasUser</code> is
+   *          <code>true</code>, and vice versa.
+   * @return an iterator of role's
+   * @throws IllegalArgumentException
+   *           if the query is <code>null</code>
+   */
+  default Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit, Boolean hasUser) {
+    return findRoles(query, target, offset, limit);
+  }
+
 }
