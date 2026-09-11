@@ -35,19 +35,19 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[0], "agent-1"));
     am.setProperty(p.agent(mp[1], "agent-2"));
     am.setProperty(p.agent(mp[2], "agent-5"));
-    assertTotals(6, 6, 3);
+    assertTotals(6, 6, 9);
     assertEquals(
-        "One property should be deleted",
-        1,
+        "Three properties should be deleted",
+        3,
         am.deleteProperties(mp[0])
     );
-    assertTotals(6, 6, 2);
+    assertTotals(6, 6, 6);
     assertEquals(
-        "One property should be deleted",
-        1,
+        "Three properties should be deleted",
+        3,
         am.deleteProperties(mp[1])
     );
-    assertTotals(6, 6, 1);
+    assertTotals(6, 6, 3);
     assertEquals(Value.mk("agent-5"),
         am.selectProperties(mp[2], p.getNamespace()).get(0).getValue());
   }
@@ -59,19 +59,19 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[1], "agent-2"));
     am.setProperty(p2.agent(mp[1], "agent-12"));
     am.setProperty(p.agent(mp[2], "agent-5"));
-    assertTotals(6, 6, 4);
+    assertTotals(6, 6, 10);
     assertEquals(
         "One property should be deleted",
         1,
         am.deleteProperties(mp[0], p.getNamespace())
     );
-    assertTotals(6, 6, 3);
+    assertTotals(6, 6, 9);
     assertEquals(
         "One property should be deleted",
         1,
         am.deleteProperties(mp[1], p.getNamespace())
     );
-    assertTotals(6, 6, 2);
+    assertTotals(6, 6, 8);
     assertEquals(Value.mk("agent-12"),
         am.selectProperties(mp[1], p2.getNamespace()).get(0).getValue());
     assertEquals(Value.mk("agent-5"),
@@ -98,8 +98,7 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
     assertEquals(3L, Properties.removeProperties(
         am, mp[0], p.getNamespace()
     ));
-    assertEquals(1L, am.selectProperties(mp[0], null).size());
-//    assertEquals(1L, enrich(q.select(q.properties()).where(q.mediaPackageId(mp[0])).run()).countProperties());
+    assertEquals(3L, am.selectProperties(mp[0], null).size());
     assertEquals(1L, Properties.removeProperties(
         am, mp[0], p2.getNamespace()
     ));
