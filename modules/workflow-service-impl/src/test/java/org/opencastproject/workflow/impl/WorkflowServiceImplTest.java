@@ -620,6 +620,48 @@ public class WorkflowServiceImplTest {
   }
 
   /**
+   * max-attempts without a retry-strategy is a no-op: the operation is attempted exactly once. This documents the
+   * current behaviour, which is only reported via a warning rather than corrected.
+   */
+  @Test
+  public void testMaxAttemptsWithoutRetryStrategy() throws Exception {
+    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
+    def.setId("workflow-definition-1");
+    def.setTitle("workflow-definition-1");
+    def.setDescription("workflow-definition-1");
+
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once",
+        null, true);
+    opDef.setMaxAttempts(2);
+    def.add(opDef);
+
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+
+    WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.FAILED);
+
+    WorkflowOperationInstance operation = service.getWorkflowById(workflow.getId()).getOperations().get(0);
+    Assert.assertEquals(OperationState.FAILED, operation.getState());
+    Assert.assertEquals(2, operation.getMaxAttempts());
+    // never retried despite max-attempts being 2, because the retry strategy defaults to NONE
+    Assert.assertEquals(1, operation.getFailedAttempts());
+  }
+
+  /** A max-attempts below one is rejected, including the -1 that the dead retry guard once implied. */
+  @Test
+  public void testInvalidMaxAttemptsIsRejected() {
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once",
+        null, true);
+    opDef.setMaxAttempts(0);
+    Assert.assertThrows(IllegalArgumentException.class, () -> new WorkflowOperationInstance(opDef));
+
+    opDef.setMaxAttempts(-1);
+    Assert.assertThrows(IllegalArgumentException.class, () -> new WorkflowOperationInstance(opDef));
+
+    opDef.setMaxAttempts(-2);
+    Assert.assertThrows(IllegalArgumentException.class, () -> new WorkflowOperationInstance(opDef));
+  }
+
+  /**
    * Starts many concurrent workflows to test DB deadlock.
    *
    * @throws Exception
