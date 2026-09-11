@@ -25,6 +25,10 @@
       <artifactId>jakarta.persistence</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component</artifactId>
     </dependency>
