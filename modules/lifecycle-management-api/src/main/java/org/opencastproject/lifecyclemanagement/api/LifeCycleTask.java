@@ -20,6 +20,8 @@
  */
 package org.opencastproject.lifecyclemanagement.api;
 
+import java.util.Date;
+
 public interface LifeCycleTask {
   String getId();
 
@@ -40,4 +42,8 @@ public interface LifeCycleTask {
   Status getStatus();
 
   void setStatus(Status status);
+
+  Date getCreationDate();
+
+  void setCreationDate(Date creationDate);
 }

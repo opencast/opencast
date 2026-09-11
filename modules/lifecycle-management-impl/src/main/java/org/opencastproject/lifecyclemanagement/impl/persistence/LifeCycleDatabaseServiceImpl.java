@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -394,6 +395,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
       }
       return db.execTx(em -> {
         task.setOrganization(orgId);
+        task.setCreationDate(new Date());
         em.persist(task);
         return task;
       });

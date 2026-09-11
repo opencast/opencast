@@ -24,6 +24,8 @@ package org.opencastproject.lifecyclemanagement.impl;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
 import org.opencastproject.lifecyclemanagement.api.Status;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,6 +36,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * A life cycle task represents a prompt to the task runner to execute the action of the related life cycle
@@ -53,7 +57,8 @@ import javax.persistence.Table;
     ),
     @NamedQuery(
         name = "LifeCycleTask.withStatus",
-        query = "SELECT p FROM LifeCycleTask p WHERE p.status = :status and p.organization = :organizationId"
+        query = "SELECT p FROM LifeCycleTask p WHERE p.status = :status and p.organization = :organizationId "
+            + "ORDER BY p.creationDate ASC"
     ),
 })
 public class LifeCycleTaskImpl implements LifeCycleTask {
@@ -74,6 +79,10 @@ public class LifeCycleTaskImpl implements LifeCycleTask {
 
   @Column(name = "status")
   private Status status;
+
+  @Column(name = "creationDate")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date creationDate;
 
   public LifeCycleTaskImpl() {
 
@@ -117,5 +126,13 @@ public class LifeCycleTaskImpl implements LifeCycleTask {
 
   public void setStatus(Status status) {
     this.status = status;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 }
