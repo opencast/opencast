@@ -500,6 +500,13 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
+  public List<SeriesCatalogUIAdapter> getExtendedSeriesCatalogUIAdapters() {
+    String organization = securityService.getOrganization().getId();
+    return seriesCatalogUIAdapters.stream().filter(a -> !(a instanceof CommonSeriesCatalogUIAdapter))
+        .filter(a -> a.handlesOrganization(organization)).collect(Collectors.toList());
+  }
+
+  @Override
   public EventCatalogUIAdapter getCommonEventCatalogUIAdapter() {
     return getCommonEventCatalogUIAdapter(securityService.getOrganization().getId());
   }
