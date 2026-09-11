@@ -93,7 +93,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
   private static final Gson gson = new Gson();
 
   /** Max number of events to fetch at a time in {@link #filterForEvents(Map)} */
-  private static final int EVENT_QUERY_LIMIT = 10000;
+  private static final int EVENT_QUERY_LIMIT = 1000;
 
   /** Persistent storage */
   protected LifeCycleDatabaseService persistence;
