@@ -551,6 +551,10 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    */
   public void createGroup(String name, String description, String roles, String users)
           throws IllegalArgumentException, UnauthorizedException, ConflictException {
+
+    if (StringUtils.isBlank(name)) {
+      throw new IllegalArgumentException("name is required");
+    }
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
     HashSet<JpaRole> roleSet = new HashSet<>();
