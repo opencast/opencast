@@ -21,20 +21,16 @@
 
 package org.opencastproject.scheduler.api;
 
-import static net.fortuna.ical4j.model.parameter.Value.DATE_TIME;
-
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -48,7 +44,6 @@ public final class Util {
   public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 0;
 
   private static final Logger logger = LoggerFactory.getLogger(Util.class);
-  private static final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
   private Util() {
   }
@@ -69,8 +64,8 @@ public final class Util {
           "RRules with multiple hours/minutes are not supported by Opencast. " + recur.toString());
     }
     final ZonedDateTime adjustedDate = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC)
-            .withHour(recur.getHourList().get(0))
-            .withMinute(recur.getMinuteList().get(0))
+            .withHour((Integer) recur.getHourList().get(0))
+            .withMinute((Integer) recur.getMinuteList().get(0))
             .withZoneSameInstant(tz.toZoneId());
     recur.getHourList().set(0, adjustedDate.getHour());
     recur.getMinuteList().set(0, adjustedDate.getMinute());
@@ -105,6 +100,7 @@ public final class Util {
    * @param tz, the timezone of the scheduled CA
    * @return a list of event Periods that match the rule and start and end times
    */
+  @SuppressWarnings("unchecked")
   public static List<Period> calculatePeriods(
       Calendar startCalTz, Calendar endCalTz, long duration, Recur recur, TimeZone tz) {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
@@ -115,35 +111,27 @@ public final class Util {
         simpleDateFormat.format(startCalTz.getTime()),
         simpleDateFormat.format(endCalTz.getTime()), tzStr);
 
-    DateTime periodStart = new DateTime(startCalTz.getTime());
-    logger.debug("ical4j timeZone for {} is {}", tzStr, registry.getTimeZone(tzStr).toZoneId());
-    periodStart.setTimeZone(registry.getTimeZone(tzStr));
-    DateTime periodEnd = new DateTime(endCalTz.getTime());
-    periodEnd.setTimeZone(registry.getTimeZone(tzStr));
+    ZoneId zoneId = tz.toZoneId();
+    logger.debug("ical4j timeZone for {} is {}", tzStr, zoneId);
+    ZonedDateTime periodStart = startCalTz.toInstant().atZone(zoneId);
+    ZonedDateTime periodEnd = endCalTz.toInstant().atZone(zoneId);
 
-    logger.trace("is utc {}? Tz is {} ", periodStart.isUtc(), periodStart.getTimeZone().toZoneId());
-    logger.debug("({}) Looking at recurrences for {} to {}, duration {}, {}", periodStart.getTimeZone().toZoneId(),
-        simpleDateFormat.format(new Date(periodStart.getTime())),
-        simpleDateFormat.format(new Date(periodEnd.getTime())), duration, recur.toString());
+    logger.debug("({}) Looking at recurrences for {} to {}, duration {}, {}", zoneId,
+        simpleDateFormat.format(Date.from(periodStart.toInstant())),
+        simpleDateFormat.format(Date.from(periodEnd.toInstant())), duration, recur.toString());
 
-    DateList dates = recur.getDates(periodStart, periodEnd, DATE_TIME);
-    logger.trace("Got {} dates: {}, tz '{}'", dates.size(), dates.toString(), dates.getTimeZone().toZoneId());
+    List<ZonedDateTime> dates = recur.getDates(periodStart, periodEnd);
+    logger.trace("Got {} dates: {}, tz '{}'", dates.size(), dates, zoneId);
 
-    for (Date date : dates) {
-      Date endTZ = new DateTime(date.getTime() + duration);
-      DateTime startDT = new DateTime(date);
-      DateTime endDT = new DateTime(endTZ);
-      Period p = new Period(startDT, endDT);
+    for (ZonedDateTime date : dates) {
+      ZonedDateTime endDT = date.plus(Duration.ofMillis(duration));
+      Period p = new Period(date, endDT);
       event.add(p);
     }
     for (Period e: event) {
-      Calendar cal = Calendar.getInstance(e.getStart().getTimeZone());
-      cal.setTimeInMillis(e.getStart().getTime());
+      ZonedDateTime eStart = (ZonedDateTime) e.getStart();
       logger.debug("EventList start {} Instance {}, calendar hour {}, zone {}",
-          e.getStart().toString(),
-          simpleDateFormat.format(cal.getTime()),
-          cal.get(Calendar.HOUR_OF_DAY),
-          e.getStart().getTimeZone().toZoneId());
+          eStart, eStart, eStart.getHour(), eStart.getZone());
     }
     return event;
   }

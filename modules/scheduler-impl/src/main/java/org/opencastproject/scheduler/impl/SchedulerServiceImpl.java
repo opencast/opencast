@@ -96,8 +96,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
@@ -120,6 +118,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -533,8 +532,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       periods.parallelStream().forEach(event -> SecurityUtil.runAs(securityService, org, user, () -> {
         final int currentCounter = periods.indexOf(event);
         MediaPackage mediaPackage = (MediaPackage) templateMp.clone();
-        Date startDate = new Date(event.getStart().getTime());
-        Date endDate = new Date(event.getEnd().getTime());
+        Date startDate = Date.from(((ZonedDateTime) event.getStart()).toInstant());
+        Date endDate = Date.from(((ZonedDateTime) event.getEnd()).toInstant());
         Id id = ids.get(currentCounter);
 
         //Get, or make, the DC catalog
@@ -571,9 +570,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String mediaPackageId = mediaPackage.getIdentifier().toString();
         //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTime(event.getStart());
+        cal.setTime(Date.from(((ZonedDateTime) event.getStart()).toInstant()));
         Date startDateTime = cal.getTime();
-        cal.setTime(event.getEnd());
+        cal.setTime(Date.from(((ZonedDateTime) event.getEnd()).toInstant()));
         Date endDateTime = cal.getTime();
         // Load dublincore and acl for update
         Optional<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
@@ -1090,10 +1089,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private boolean checkPeriodOverlap(final List<Period> periods) {
     final List<Period> sortedPeriods = new ArrayList<>(periods);
-    sortedPeriods.sort(Comparator.comparing(Period::getStart));
+    sortedPeriods.sort(Comparator.comparing(p -> (ZonedDateTime) p.getStart()));
     Period prior = periods.get(0);
     for (Period current : periods.subList(1, periods.size())) {
-      if (current.getStart().compareTo(prior.getEnd()) < 0) {
+      if (((ZonedDateTime) current.getStart()).compareTo((ZonedDateTime) prior.getEnd()) < 0) {
         return true;
       }
       prior = current;
@@ -1115,14 +1114,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     try {
-      TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-
       Set<MediaPackage> events = new HashSet<>();
 
       for (Period event : periods) {
-        event.setTimeZone(registry.getTimeZone(tz.getID()));
-        final Date startDate = event.getStart();
-        final Date endDate = event.getEnd();
+        final Date startDate = Date.from(((ZonedDateTime) event.getStart()).toInstant());
+        final Date endDate = Date.from(((ZonedDateTime) event.getEnd()).toInstant());
 
         events.addAll(findConflictingEvents(captureAgentId, startDate, endDate));
       }

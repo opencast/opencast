@@ -83,7 +83,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -107,6 +106,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -972,8 +972,9 @@ public class IndexServiceImplTest {
     Iterator<Period> iter = periods.iterator();
     while (iter.hasNext()) {
       Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getStart()).toInstant())),
+              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getEnd()).toInstant())));
     }
     //Expecting 4 days to be scheduled: Sat (26th), Sun (27th), Mon (28th), Tues(29th)
     assertEquals(4, periods.size());
@@ -991,8 +992,9 @@ public class IndexServiceImplTest {
     iter = periods.iterator();
     while (iter.hasNext()) {
       Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getStart()).toInstant())),
+              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getEnd()).toInstant())));
     }
     // Expecting 4 days to be scheduled:
     //period Fri Mar 25 00:05:52 CET 2016 to Fri Mar 25 00:10:52 CET 2016
@@ -1015,8 +1017,9 @@ public class IndexServiceImplTest {
     iter = periods.iterator();
     while (iter.hasNext()) {
       Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getStart()).toInstant())),
+              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getEnd()).toInstant())));
     }
     // Expecting 4 days to be scheduled:
     // Got period Fri Mar 11 00:05:40 MST 2016 to Fri Mar 11 00:10:40 MST 2016
@@ -1048,9 +1051,9 @@ public class IndexServiceImplTest {
 
     TimeZone.setDefault(cet);
     for (Period d : periods) {
-      DateTime dEnd = d.getEnd();
+      ZonedDateTime dEnd = (ZonedDateTime) d.getEnd();
 
-      Date date = new Date(dEnd.getTime());
+      Date date = Date.from(dEnd.toInstant());
       Calendar instance = Calendar.getInstance();
       instance.setTime(date);
 

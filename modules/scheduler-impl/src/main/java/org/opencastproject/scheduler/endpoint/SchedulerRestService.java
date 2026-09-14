@@ -108,7 +108,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -977,7 +976,7 @@ public class SchedulerRestService {
     RRule rrule;
     try {
       rrule = new RRule(rruleString);
-    } catch (ParseException e) {
+    } catch (IllegalArgumentException e) {
       logger.debug("Could not parse recurrence rule");
       return RestUtil.R.badRequest("Could not parse recurrence rule");
     }

@@ -66,6 +66,10 @@
       <groupId>org.mnode.ical4j</groupId>
       <artifactId>ical4j</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.threeten</groupId>
+      <artifactId>threeten-extra</artifactId>
+    </dependency>
     <!-- OSGi -->
     <dependency>
       <groupId>org.osgi</groupId>
@@ -205,6 +209,8 @@
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- probably needed for the module scheduler-api -->
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
+            <!-- mandatory transitive dependency of ical4j, embedded alongside it -->
+            <ignoredUnusedDeclaredDependency>org.threeten:threeten-extra</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>net.sf.saxon:Saxon-HE</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
@@ -251,6 +257,10 @@
               !org.zeroturnaround.javarebel.*,
               !groovy.*,
               !org.codehaus.groovy.*,
+              !org.jparsec.*,
+              !org.joda.convert.*,
+              !org.jspecify.annotations.*,
+              !com.github.benmanes.caffeine.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               javax.ws.rs.ext;version=2.0.1,
@@ -259,7 +269,8 @@
             <Embed-Dependency>
               truezip;inline=true,
               freemarker;inline=true,
-              ical4j;inline=true
+              ical4j;inline=true,
+              threeten-extra;inline=true
             </Embed-Dependency>
             <Private-Package>
               freemarker.core,
@@ -270,15 +281,19 @@
               net.fortuna.ical4j.agent,
               net.fortuna.ical4j.data,
               net.fortuna.ical4j.filter,
+              net.fortuna.ical4j.filter.expression,
               net.fortuna.ical4j.model,
               net.fortuna.ical4j.model.component,
               net.fortuna.ical4j.model.parameter,
               net.fortuna.ical4j.model.property,
+              net.fortuna.ical4j.model.property.immutable,
               net.fortuna.ical4j.transform,
+              net.fortuna.ical4j.transform.recurrence,
               net.fortuna.ical4j.util,
               net.fortuna.ical4j.validate,
               net.fortuna.ical4j.validate.component,
-              net.fortuna.ical4j.validate.property
+              net.fortuna.ical4j.validate.property,
+              org.threeten.extra
             </_exportcontents>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,

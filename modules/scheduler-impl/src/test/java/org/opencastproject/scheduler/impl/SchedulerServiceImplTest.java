@@ -127,13 +127,10 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.codec.binary.Base64;
@@ -160,6 +157,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -777,10 +775,10 @@ public class SchedulerServiceImplTest {
         schedulingSource
     );
 
+    final ZoneId zoneId = tz.toZoneId();
     final int expectedEventCount = rrule.getRecur().getDates(
-        new net.fortuna.ical4j.model.Date(start),
-        new net.fortuna.ical4j.model.Date(end),
-        Value.DATE
+        start.toInstant().atZone(zoneId),
+        end.toInstant().atZone(zoneId)
     ).size();
     assertEquals(expectedEventCount, scheduled.keySet().size());
     final String randomMpId = scheduled.keySet().stream().findAny()
@@ -793,8 +791,8 @@ public class SchedulerServiceImplTest {
     assertTrue(eventLoaded.getFirst(PROPERTY_TITLE).startsWith(dublinCoreCatalog.getFirst(PROPERTY_TITLE)));
     assertEquals(randomMpId, technicalMetadata.getEventId());
     assertEquals(captureAgentId, technicalMetadata.getAgentId());
-    assertEquals(new Date(period.getStart().getTime()), technicalMetadata.getStartDate());
-    assertEquals(new Date(period.getEnd().getTime()), technicalMetadata.getEndDate());
+    assertEquals(Date.from(((ZonedDateTime) period.getStart()).toInstant()), technicalMetadata.getStartDate());
+    assertEquals(Date.from(((ZonedDateTime) period.getEnd()).toInstant()), technicalMetadata.getEndDate());
     assertEquals(userIds, technicalMetadata.getPresenters());
     assertTrue(technicalMetadata.getRecording().isEmpty());
     assertTrue(technicalMetadata.getCaptureAgentConfiguration().size() >= caProperties.size());
@@ -1084,12 +1082,13 @@ public class SchedulerServiceImplTest {
     try {
       String icalString = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
       cal = calBuilder.build(IOUtils.toInputStream(icalString, "UTF-8"));
-      ComponentList vevents = cal.getComponents(VEVENT);
+      List<VEvent> vevents = cal.getComponents(VEVENT);
       for (int i = 0; i < vevents.size(); i++) {
-        PropertyList attachments = ((VEvent) vevents.get(i)).getProperties(Property.ATTACH);
+        List<Property> attachments = vevents.get(i).getProperties(Property.ATTACH);
         for (int j = 0; j < attachments.size(); j++) {
-          String attached = ((Property) attachments.get(j)).getValue();
-          String filename = ((Property) attachments.get(j)).getParameter("X-APPLE-FILENAME").getValue();
+          String attached = attachments.get(j).getValue();
+          String filename = attachments.get(j).getParameter("X-APPLE-FILENAME")
+                  .map(Parameter::getValue).orElse(null);
           attached = new String(Base64.decodeBase64(attached));
           if ("org.opencastproject.capture.agent.properties".equals(filename)) {
             Assert.assertTrue(attached.contains("capture.device.id=testdevice"));
@@ -1528,12 +1527,10 @@ public class SchedulerServiceImplTest {
     final String cs = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
     final Calendar cal = new CalendarBuilder().build(new StringReader(cs));
     assertEquals("number of entries", 1, cal.getComponents().size());
-    for (Object co : cal.getComponents()) {
-      final Component c = (Component) co;
-      assertEquals("SUMMARY property should contain the DC title", title, c.getProperty(Property.SUMMARY).getValue());
-      final List<Property> attachments = c.getProperties(Property.ATTACH).stream()
-          .map(obj -> (Property) obj)
-          .collect(Collectors.toList());
+    for (Component c : cal.getComponents()) {
+      final String summary = c.<Property>getProperty(Property.SUMMARY).map(Property::getValue).orElse(null);
+      assertEquals("SUMMARY property should contain the DC title", title, summary);
+      final List<Property> attachments = c.getProperties(Property.ATTACH);
       // episode dublin core
       final List<DublinCoreCatalog> dcsIcal = attachments.stream()
           .filter(p -> byParamNameAndValue(p,"X-APPLE-FILENAME", "episode.xml"))
@@ -1552,8 +1549,8 @@ public class SchedulerServiceImplTest {
   }
 
   private Boolean byParamNameAndValue(Property p, final String name, final String value) {
-    final Parameter param = p.getParameter(name);
-    return param != null && param.getValue().equals(value);
+    final Optional<Parameter> param = p.getParameter(name);
+    return param.isPresent() && param.get().getValue().equals(value);
   }
 
   private static DublinCoreCatalog parseDc(String s) {
