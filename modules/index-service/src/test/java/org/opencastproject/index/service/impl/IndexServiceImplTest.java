@@ -731,7 +731,7 @@ public class IndexServiceImplTest {
     // Setup scheduler service
     Capture<Date> schedStart = EasyMock.newCapture();
     Capture<Date> schedEnd = EasyMock.newCapture();
-    Capture<RRule> schedRRule = EasyMock.newCapture();
+    Capture<RRule<ZonedDateTime>> schedRRule = EasyMock.newCapture();
     Capture schedDuration = EasyMock.newCapture();
     Capture<TimeZone> schedTz = EasyMock.newCapture();
 
@@ -744,14 +744,14 @@ public class IndexServiceImplTest {
             EasyMock.captureLong(schedDuration), EasyMock.capture(schedTz), EasyMock.anyString(),
             EasyMock.<Set<String>>anyObject(), EasyMock.capture(mp), EasyMock.<Map<String, String>>anyObject(),
             EasyMock.<Map<String, String>>anyObject(), EasyMock.<Optional<String>>anyObject())).
-            andAnswer(new IAnswer<Map<String, Period>>() {
+            andAnswer(new IAnswer<Map<String, Period<ZonedDateTime>>>() {
               @Override
-              public Map<String, Period> answer() throws Throwable {
-                List<Period> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
+              public Map<String, Period<ZonedDateTime>> answer() throws Throwable {
+                List<Period<ZonedDateTime>> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
                     schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
-                Map<String, Period> mapping = new LinkedHashMap<>();
+                Map<String, Period<ZonedDateTime>> mapping = new LinkedHashMap<>();
                 int counter = 0;
-                for (Period p : periods) {
+                for (Period<ZonedDateTime> p : periods) {
                   mapping.put(new IdImpl(UUID.randomUUID().toString()).toString(), p);
                 }
                 return mapping;
@@ -944,7 +944,7 @@ public class IndexServiceImplTest {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
 
@@ -969,12 +969,12 @@ public class IndexServiceImplTest {
 
     periods = generatePeriods(pst, start, end, days, durationMillis);
     simpleDateFormat.setTimeZone(pst);
-    Iterator<Period> iter = periods.iterator();
+    Iterator<Period<ZonedDateTime>> iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
+      Period<ZonedDateTime> p = iter.next();
       logger.trace("Got period {} to {}",
-              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getStart()).toInstant())),
-              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getEnd()).toInstant())));
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     //Expecting 4 days to be scheduled: Sat (26th), Sun (27th), Mon (28th), Tues(29th)
     assertEquals(4, periods.size());
@@ -991,10 +991,10 @@ public class IndexServiceImplTest {
     simpleDateFormat.setTimeZone(cet);
     iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
+      Period<ZonedDateTime> p = iter.next();
       logger.trace("Got period {} to {}",
-              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getStart()).toInstant())),
-              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getEnd()).toInstant())));
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     // Expecting 4 days to be scheduled:
     //period Fri Mar 25 00:05:52 CET 2016 to Fri Mar 25 00:10:52 CET 2016
@@ -1016,10 +1016,10 @@ public class IndexServiceImplTest {
     simpleDateFormat.setTimeZone(nonDstTz);
     iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
+      Period<ZonedDateTime> p = iter.next();
       logger.trace("Got period {} to {}",
-              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getStart()).toInstant())),
-              simpleDateFormat.format(Date.from(((ZonedDateTime) p.getEnd()).toInstant())));
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     // Expecting 4 days to be scheduled:
     // Got period Fri Mar 11 00:05:40 MST 2016 to Fri Mar 11 00:10:40 MST 2016
@@ -1035,7 +1035,7 @@ public class IndexServiceImplTest {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     // CET
     TimeZone.setDefault(cet);
@@ -1050,8 +1050,8 @@ public class IndexServiceImplTest {
     assertEquals(5, periods.size());
 
     TimeZone.setDefault(cet);
-    for (Period d : periods) {
-      ZonedDateTime dEnd = (ZonedDateTime) d.getEnd();
+    for (Period<ZonedDateTime> d : periods) {
+      ZonedDateTime dEnd = d.getEnd();
 
       Date date = Date.from(dEnd.toInstant());
       Calendar instance = Calendar.getInstance();
@@ -1195,11 +1195,12 @@ public class IndexServiceImplTest {
             updatedPresenters.getB().containsAll(multiUserList));
   }
 
-  private List<Period> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days, Long duration)
-          throws ParseException {
+  private List<Period<ZonedDateTime>> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days,
+          Long duration) throws ParseException {
     Calendar tzDate = Calendar.getInstance(tz);
     tzDate.setTime(start.getTime());
-    RRule rRule = new RRule(generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
+    RRule<ZonedDateTime> rRule = new RRule<>(
+            generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
     return calculatePeriods(rRule, start.getTime(), end.getTime(), duration, tz);
   }
 
@@ -1208,7 +1209,8 @@ public class IndexServiceImplTest {
   }
 
   // The Util class is in the scheduler-api bundle (this Test class is very similar to the test class in schduler-api)
-  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
+  public List<Period<ZonedDateTime>> calculatePeriods(RRule<ZonedDateTime> rrule, Date start, Date end,
+          long duration, TimeZone tz) {
     return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 }

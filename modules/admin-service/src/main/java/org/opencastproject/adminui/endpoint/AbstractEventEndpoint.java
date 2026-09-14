@@ -176,6 +176,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -3073,12 +3074,12 @@ public abstract class AbstractEventEndpoint {
 
     String rruleString = (String) metadataJson.get("rrule");
 
-    RRule rrule = null;
+    RRule<ZonedDateTime> rrule = null;
     TimeZone timeZone = TimeZone.getDefault();
     String durationString = null;
     if (StringUtils.isNotEmpty(rruleString)) {
       try {
-        rrule = new RRule(rruleString);
+        rrule = new RRule<>(rruleString);
         rrule.validate();
       } catch (Exception e) {
         logger.warn("Unable to parse rrule {}: {}", rruleString, e.getMessage());

@@ -57,15 +57,15 @@ public final class Util {
    *
    * @param tz The target timezone.
    */
-  public static void adjustRrule(final RRule rRule, final Date start, final TimeZone tz) {
-    final Recur recur = rRule.getRecur();
+  public static void adjustRrule(final RRule<ZonedDateTime> rRule, final Date start, final TimeZone tz) {
+    final Recur<ZonedDateTime> recur = rRule.getRecur();
     if (recur.getHourList().size() != 1 || recur.getMinuteList().size() != 1) {
       throw new IllegalArgumentException(
           "RRules with multiple hours/minutes are not supported by Opencast. " + recur.toString());
     }
     final ZonedDateTime adjustedDate = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC)
-            .withHour((Integer) recur.getHourList().get(0))
-            .withMinute((Integer) recur.getMinuteList().get(0))
+            .withHour(recur.getHourList().get(0))
+            .withMinute(recur.getMinuteList().get(0))
             .withZoneSameInstant(tz.toZoneId());
     recur.getHourList().set(0, adjustedDate.getHour());
     recur.getMinuteList().set(0, adjustedDate.getMinute());
@@ -81,7 +81,8 @@ public final class Util {
    * @param tz, time zone of the scheduled event
    * @return the calculated periods
    */
-  public static List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
+  public static List<Period<ZonedDateTime>> calculatePeriods(Date start, Date end, long duration,
+          RRule<ZonedDateTime> rRule, TimeZone tz) {
     Calendar startCal = Calendar.getInstance(tz);
     Calendar endCal = Calendar.getInstance(tz);
     startCal.setTime(start);
@@ -100,13 +101,12 @@ public final class Util {
    * @param tz, the timezone of the scheduled CA
    * @return a list of event Periods that match the rule and start and end times
    */
-  @SuppressWarnings("unchecked")
-  public static List<Period> calculatePeriods(
-      Calendar startCalTz, Calendar endCalTz, long duration, Recur recur, TimeZone tz) {
+  public static List<Period<ZonedDateTime>> calculatePeriods(
+      Calendar startCalTz, Calendar endCalTz, long duration, Recur<ZonedDateTime> recur, TimeZone tz) {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
     simpleDateFormat.setTimeZone(tz);
     String tzStr = tz.getID();
-    List<Period> event = new LinkedList<>();
+    List<Period<ZonedDateTime>> event = new LinkedList<>();
     logger.debug("Inbound start of recurrence {} to end of recurrence {}, in Tz {}",
         simpleDateFormat.format(startCalTz.getTime()),
         simpleDateFormat.format(endCalTz.getTime()), tzStr);
@@ -125,11 +125,11 @@ public final class Util {
 
     for (ZonedDateTime date : dates) {
       ZonedDateTime endDT = date.plus(Duration.ofMillis(duration));
-      Period p = new Period(date, endDT);
+      Period<ZonedDateTime> p = new Period<>(date, endDT);
       event.add(p);
     }
-    for (Period e: event) {
-      ZonedDateTime eStart = (ZonedDateTime) e.getStart();
+    for (Period<ZonedDateTime> e: event) {
+      ZonedDateTime eStart = e.getStart();
       logger.debug("EventList start {} Instance {}, calendar hour {}, zone {}",
           eStart, eStart, eStart.getHour(), eStart.getZone());
     }

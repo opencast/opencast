@@ -708,7 +708,7 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testAddMultipleEventsEmptyRange() throws Exception {
-    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
+    final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
     final Date end = start;
     final Long duration = 6900000L;
@@ -725,7 +725,7 @@ public class SchedulerServiceImplTest {
     final Map<String, String> wfProperties = this.wfProperties;
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Optional<String> schedulingSource = Optional.empty();
-    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+    final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
         rrule,
         start,
         end,
@@ -743,7 +743,7 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testAddMultipleEvents() throws Exception {
-    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
+    final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
     final Date end = new Date(1570953300000L); // 2019-10-13T07:55:00Z
     final Long duration = 6900000L;
@@ -761,7 +761,7 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Optional<String> schedulingSource = Optional.empty();
     assertEquals("mod0", schedSvc.getScheduleLastModified(captureAgentId));
-    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+    final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
         rrule,
         start,
         end,
@@ -783,7 +783,7 @@ public class SchedulerServiceImplTest {
     assertEquals(expectedEventCount, scheduled.keySet().size());
     final String randomMpId = scheduled.keySet().stream().findAny()
         .orElseThrow(() -> new RuntimeException("This should never happen"));
-    final Period period = scheduled.get(randomMpId);
+    final Period<ZonedDateTime> period = scheduled.get(randomMpId);
     final MediaPackage mediaPackage = schedSvc.getMediaPackage(randomMpId);
     final DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(randomMpId);
     final TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(randomMpId);
@@ -791,8 +791,8 @@ public class SchedulerServiceImplTest {
     assertTrue(eventLoaded.getFirst(PROPERTY_TITLE).startsWith(dublinCoreCatalog.getFirst(PROPERTY_TITLE)));
     assertEquals(randomMpId, technicalMetadata.getEventId());
     assertEquals(captureAgentId, technicalMetadata.getAgentId());
-    assertEquals(Date.from(((ZonedDateTime) period.getStart()).toInstant()), technicalMetadata.getStartDate());
-    assertEquals(Date.from(((ZonedDateTime) period.getEnd()).toInstant()), technicalMetadata.getEndDate());
+    assertEquals(Date.from(period.getStart().toInstant()), technicalMetadata.getStartDate());
+    assertEquals(Date.from(period.getEnd().toInstant()), technicalMetadata.getEndDate());
     assertEquals(userIds, technicalMetadata.getPresenters());
     assertTrue(technicalMetadata.getRecording().isEmpty());
     assertTrue(technicalMetadata.getCaptureAgentConfiguration().size() >= caProperties.size());
@@ -805,7 +805,7 @@ public class SchedulerServiceImplTest {
   @Test(expected = SchedulerException.class)
   public void testAddMultipleEventsConflict() throws Exception {
     for (int i = 0; i < 2; i++) {
-      final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
+      final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
       final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
       final Date end = new Date(1570953300000L); // 2019-10-13T07:55:00Z
       final Long duration = 6900000L;
@@ -820,7 +820,7 @@ public class SchedulerServiceImplTest {
       final Map<String, String> wfProperties = this.wfProperties;
       final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
       final Optional<String> schedulingSource = Optional.empty();
-      final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+      final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
           rrule,
           start,
           end,
@@ -917,7 +917,7 @@ public class SchedulerServiceImplTest {
     {
       ZonedDateTime startZdt = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC);
       List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
+              new RRule<>("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
                   + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
@@ -926,7 +926,7 @@ public class SchedulerServiceImplTest {
       // No events are contained in the RRule and date range:
       // 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
       List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
+              new RRule<>("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
               new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
       assertEquals(0, conflicts.size());
     }

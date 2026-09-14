@@ -29,6 +29,7 @@ import org.opencastproject.util.NotFoundException;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -137,8 +138,8 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if creating new events failed
    */
-  Map<String, Period> addMultipleEvents(
-      RRule rRule,
+  Map<String, Period<ZonedDateTime>> addMultipleEvents(
+      RRule<ZonedDateTime> rRule,
       Date start,
       Date end,
       Long duration,
@@ -427,8 +428,8 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  List<MediaPackage> findConflictingEvents(String captureAgentId, RRule rrule, Date startDate, Date endDate,
-          long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException;
+  List<MediaPackage> findConflictingEvents(String captureAgentId, RRule<ZonedDateTime> rrule, Date startDate,
+          Date endDate, long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException;
 
 
   /**
