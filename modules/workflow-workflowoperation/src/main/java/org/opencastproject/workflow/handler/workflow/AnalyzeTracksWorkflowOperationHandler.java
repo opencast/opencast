@@ -93,7 +93,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
         throw new WorkflowOperationException("No matching tracks for flavor " + singleSourceFlavor.toString());
       }
       logger.info("No tracks with specified flavors ({}) to analyse.", singleSourceFlavor.toString());
-      return createResult(mediaPackage, properties, Action.CONTINUE, 0);
+      return createResult(mediaPackage, properties, Action.SKIP, 0);
     }
 
     List<Fraction> aspectRatios = getAspectRatio(getConfig(workflowInstance, OPT_VIDEO_ASPECT, ""));
