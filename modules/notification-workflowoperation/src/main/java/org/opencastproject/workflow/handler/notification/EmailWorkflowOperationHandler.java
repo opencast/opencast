@@ -47,8 +47,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 
 /**
  * Please describe what this handler does.

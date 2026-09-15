@@ -28,13 +28,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.Properties;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.MimeMessage;
 
 /**
- * Base implementation that allows to send e-mails using <code>javax.mail</code>.
+ * Base implementation that allows to send e-mails using <code>jakarta.mail</code>.
  */
 public class BaseSmtpService {
 
@@ -258,7 +258,7 @@ public class BaseSmtpService {
     Transport t = getSession().getTransport(mailTransport);
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     try {
-      Thread.currentThread().setContextClassLoader(javax.mail.Session.class.getClassLoader());
+      Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
       if (user != null) {
         t.connect(user, password);
       } else {

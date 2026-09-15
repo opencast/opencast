@@ -31,15 +31,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
-import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 /**
- * OSGi service that allows to send e-mails using <code>javax.mail</code>.
+ * OSGi service that allows to send e-mails using <code>jakarta.mail</code>.
  */
 @Component(
     immediate = true,
@@ -340,7 +340,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
   }
 
   /**
-   * Process an array of recipients with the given {@link javax.mail.Message.RecipientType}
+   * Process an array of recipients with the given {@link jakarta.mail.Message.RecipientType}
    *
    * @param message
    *          The message to add the recipients to
