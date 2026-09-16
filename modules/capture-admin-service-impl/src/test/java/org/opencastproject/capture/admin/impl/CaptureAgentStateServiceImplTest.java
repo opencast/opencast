@@ -362,6 +362,12 @@ public class CaptureAgentStateServiceImplTest {
     verifyAgentCapabilities("agent1", IDLE, agentCaps2x);
     verifyAgentConfiguration("agent1", IDLE, agentConfig2x);
 
+    try {
+      assertEquals(AgentVersion.VERSION_2, service.getAgent("agent1").getVersion());
+    } catch (NotFoundException e) {
+      fail("Agent not found");
+    }
+
     // This is an edge case, but re-configuring an agent that's *already* a 2.x agent
     // should spit out a 1.x agent
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "");
@@ -373,6 +379,12 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("agent1", agentRegistration2x);
     verifyAgentCapabilities("agent1", IDLE, bare1xAgent);
     verifyAgentConfiguration("agent1", IDLE, downgraded);
+
+    try {
+      assertEquals(AgentVersion.VERSION_1, service.getAgent("agent1").getVersion());
+    } catch (NotFoundException e) {
+      fail("Agent not found");
+    }
   }
 
   @Test
