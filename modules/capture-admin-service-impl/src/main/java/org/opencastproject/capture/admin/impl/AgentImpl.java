@@ -535,6 +535,23 @@ public class AgentImpl implements Agent {
           String.join(",", agentDevicePositions));
     }
 
+    if (configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_CONTENT)) {
+      //GDLGDL: Do we want to define a maximum number of options here?
+      TreeSet<String> agentContent =
+          Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "")
+                  .split(","))
+              .map(String::trim)
+              .collect(Collectors.toCollection(TreeSet::new));
+      // If someone passes a blank string, the length here is still 1...
+      if (agentContent.stream().anyMatch(String::isEmpty)) {
+        throw new RuntimeException("Content configs have a configuration which is empty");
+      } else if (agentContent.stream().anyMatch(s -> s.length() > 256)) {
+        throw new RuntimeException("Content configs have a configuration which is too long");
+      }
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT,
+          String.join(",", agentContent));
+    }
+
     // These, assuming they match the regex, are passed through unmodified since they're vendor tools
     Set<String> vendorKeys = configuration.stringPropertyNames().stream()
         .filter(s -> s.startsWith(CaptureParameters.CAPTURE_EXTENSION_PREFIX))

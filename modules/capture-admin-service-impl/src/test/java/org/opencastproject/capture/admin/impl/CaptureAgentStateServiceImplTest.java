@@ -768,6 +768,64 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
+  public void agent2xContent() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "my content with spaces");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "my content with spaces");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // NOTE: There's an extra space here after the comma!
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content,  a content");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    // NOTE: The extra space above has been trimmed, and the configs sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a content,b content");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b," + "A".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "A".repeat(257) + ", b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Note: There's a double comma here, so three items but one of them is blank
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a,,b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
   public void agent2xVendorExtensions() {
     // Case 1: The happy path
     Properties sentConfig = new Properties();
