@@ -29,6 +29,8 @@ interface EditFormProps extends WithTranslation {
     readonly pending: boolean;
     readonly hasSubmit: boolean;
     readonly captionFormat?: string;
+    readonly presenterFileWarning: boolean;
+    readonly captionFileWarning: boolean;
 }
 
 interface MetadataFieldProps {
@@ -178,16 +180,30 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
             {this.props.withUpload === true &&
                 <div className="form-group my-4">
                     <label className="pr-3" htmlFor="presenter">{this.props.t("LTI.VIDEOFILE")}</label>
-                    <input type="file" className="form-control-file px-3" onChange={this.onChangePresenterFile.bind(this)} />
+                    <input
+                        type="file"
+                        id="presenter"
+                        accept="video/*"
+                        className="form-control-file px-3"
+                        onChange={this.onChangePresenterFile.bind(this)} />
                     <small className="form-text text-muted">{this.props.t("LTI.VIDEOFILE_DESCRIPTION")}</small>
+                    {this.props.presenterFileWarning === true &&
+                        <div className="alert alert-warning mt-2">{this.props.t("LTI.NOT_A_VIDEO_FILE_WARNING")}</div>}
                 </div>
             }
             {this.props.withUpload === true &&
                 <>
                     <div className="form-group my-4">
                         <label className="pr-3" htmlFor="caption">{this.props.t("LTI.CAPTION")}</label>
-                        <input type="file" className="form-control-file px-3" onChange={this.onChangeCaptionFile.bind(this)} />
+                        <input
+                            type="file"
+                            id="caption"
+                            accept=".vtt,text/vtt"
+                            className="form-control-file px-3"
+                            onChange={this.onChangeCaptionFile.bind(this)} />
                         <small className="form-text text-muted">{this.props.t("LTI.CAPTION_DESCRIPTION")}</small>
+                        {this.props.captionFileWarning === true &&
+                            <div className="alert alert-warning mt-2">{this.props.t("LTI.NOT_A_CAPTION_FILE_WARNING")}</div>}
                     </div>
                     { this.props.captionFormat === "vtt" && languageOptions.length > 0 &&
                         <div className="form-group my-4">

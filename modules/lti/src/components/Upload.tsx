@@ -32,7 +32,9 @@ interface UploadState {
     readonly uploadState: "success" | "error" | "pending" | "none";
     readonly metadata: MetadataResult | "error" | undefined;
     readonly presenterFile?: Blob;
+    readonly presenterFileWarning: boolean;
     readonly captionFile?: Blob;
+    readonly captionFileWarning: boolean;
     readonly captionFormat?: string;
     readonly captionLanguage?: string;
     readonly copyState: "success" | "error" | "pending" | "none";
@@ -57,7 +59,9 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             uploadState: "none",
             copyState: "none",
             metadata: undefined,
-            uploadProgress: 0
+            uploadProgress: 0,
+            presenterFileWarning: false,
+            captionFileWarning: false
         };
     }
 
@@ -177,34 +181,20 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
+    looksLikeVttFile(file: Blob): boolean {
+        if (file.type === "text/vtt")
+            return true;
+        if (!(file instanceof File) || file.name === "")
+            return false;
+        return file.name.substring(file.name.lastIndexOf(".") + 1).toLowerCase() === "vtt";
+    }
+
     onCaptionFileChange(newFile: Blob | File) {
-        let captionFormat: string | undefined = undefined
-        if(newFile.type === 'text/vtt') {
-            captionFormat = 'vtt';
-        } else {
-            if(newFile instanceof File){
-                captionFormat = newFile.name !== '' ? newFile.name.substring(newFile.name.lastIndexOf('.') + 1) : undefined;
-                if(captionFormat === 'dfxp') {
-                    const fileReader = new FileReader();
-                    fileReader.onloadend = (e) =>
-                    {
-                        if(e.target?.result !== null && typeof e.target?.result === 'string'){
-                            const parser = new DOMParser();
-                            const xml = parser.parseFromString(e.target.result, 'text/xml');
-                            const lang = xml.querySelector('tt')?.getAttribute('xml:lang');
-                            if(lang !== null && lang !== undefined) {
-                                this.onCaptionLanguageChange(lang);
-                            }
-                        }
-                    }
-                    fileReader.readAsText(newFile);
-                }
-            }
-        }
         this.setState({
             ...this.state,
             captionFile: newFile,
-            captionFormat: captionFormat
+            captionFormat: 'vtt',
+            captionFileWarning: !this.looksLikeVttFile(newFile)
         });
     }
 
@@ -216,9 +206,11 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
     }
 
     onPresenterFileChange(newFile: Blob) {
+        const looksLikeVideo = newFile.type === '' || newFile.type.startsWith('video/');
         this.setState({
             ...this.state,
-            presenterFile: newFile
+            presenterFile: newFile,
+            presenterFileWarning: !looksLikeVideo
         });
     }
 
@@ -308,7 +300,9 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                 captionFormat={this.state.captionFormat}
                 onSubmit={this.onSubmit.bind(this)}
                 hasSubmit={this.state.metadata.edited.locked === undefined}
-                pending={this.state.uploadState === "pending"} />
+                pending={this.state.uploadState === "pending"}
+                presenterFileWarning={this.state.presenterFileWarning}
+                captionFileWarning={this.state.captionFileWarning} />
             {this.state.eventId !== undefined && this.state.metadata.edited.locked === undefined &&
                 <>
                     <h2>{this.props.t("LTI.COPY_TO_SERIES")}</h2>
