@@ -11,7 +11,7 @@ import Select, { OnChangeValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
 import i18n, { TFunction } from "i18next";
 
-const allowedFields = ["title", "language", "license", "creator"];
+export const allowedFields = ["title", "language", "license", "creator"];
 
 interface OptionType {
     value: string;

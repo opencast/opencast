@@ -13,7 +13,7 @@ import {
     collectionToPairs
 } from "../OpencastRest";
 import { parsedQueryString } from "../utils";
-import { EditForm } from "./EditForm";
+import { allowedFields, EditForm } from "./EditForm";
 import { JobList } from "./JobList";
 
 interface OptionType {
@@ -40,6 +40,7 @@ interface UploadState {
     readonly copyState: "success" | "error" | "pending" | "none";
     readonly copySeries?: OptionType;
     readonly uploadProgress: number;
+    readonly missingFields: string[];
 }
 
 function isMetadata(
@@ -61,7 +62,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             metadata: undefined,
             uploadProgress: 0,
             presenterFileWarning: false,
-            captionFileWarning: false
+            captionFileWarning: false,
+            missingFields: []
         };
     }
 
@@ -138,13 +140,31 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
+    missingRequiredFields(metadata: MetadataResult): string[] {
+        const missingMetadataFields = metadata.edited.fields
+            .filter((field) => allowedFields.includes(field.id) && field.required)
+            .filter((field) => Array.isArray(field.value) ? field.value.length === 0 : field.value === "")
+            .map((field) => this.props.t(field.label));
+        const missingPresenterFile = this.state.eventId === undefined && this.state.presenterFile === undefined
+            ? [this.props.t("LTI.VIDEOFILE")]
+            : [];
+        return [...missingPresenterFile, ...missingMetadataFields];
+    }
+
     onSubmit() {
         if (!isMetadata(this.state.metadata))
             return;
-        if (this.state.eventId === undefined && this.state.presenterFile === undefined)
+        const missingFields = this.missingRequiredFields(this.state.metadata);
+        if (missingFields.length > 0) {
+            this.setState({
+                ...this.state,
+                missingFields
+            });
             return;
+        }
         this.setState({
             ...this.state,
+            missingFields: [],
             uploadState: "pending"
         });
         console.log("onSubmit, seriesId: " + this.state.metadata.seriesId);
@@ -194,7 +214,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             ...this.state,
             captionFile: newFile,
             captionFormat: 'vtt',
-            captionFileWarning: !this.looksLikeVttFile(newFile)
+            captionFileWarning: !this.looksLikeVttFile(newFile),
+            missingFields: []
         });
     }
 
@@ -210,7 +231,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         this.setState({
             ...this.state,
             presenterFile: newFile,
-            presenterFileWarning: !looksLikeVideo
+            presenterFileWarning: !looksLikeVideo,
+            missingFields: []
         });
     }
 
@@ -222,7 +244,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             metadata: {
                 ...this.state.metadata,
                 edited: newData
-            }
+            },
+            missingFields: []
         });
     }
 
@@ -289,6 +312,9 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             {this.state.copyState === "error" && <div className="alert alert-danger">
                 {this.props.t("LTI.COPY_FAILURE")}<br />
                 <div className="text-muted">{this.props.t("LTI.COPY_FAILURE_DESCRIPTION")}</div>
+            </div>}
+            {this.state.missingFields.length > 0 && <div className="alert alert-danger">
+                {this.props.t("LTI.MISSING_REQUIRED_FIELDS", { fields: this.state.missingFields.join(", ") })}
             </div>}
             <EditForm
                 withUpload={this.state.eventId === undefined}
