@@ -471,15 +471,34 @@ public class AgentImpl implements Agent {
       }
     }
 
-    boolean supportLocalPausedStart = getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_STARTPAUSED);
+    boolean supportLocalCapture = getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_CAPABLE);
+    boolean localAutoStart =
+        supportLocalCapture && getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_AUTOSTART);
     boolean supportStreaming = getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_CAPABLE);
-    boolean supportStreamingPaused =
-        supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_STARTPAUSED);
+    boolean streamAutoStart =
+        supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_AUTOSTART);
 
-    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, supportLocalPausedStart ? BOOLEAN_ON : BOOLEAN_OFF);
+    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, supportLocalCapture ? BOOLEAN_ON : BOOLEAN_OFF);
+    if (supportLocalCapture) {
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_AUTOSTART, localAutoStart
+          ? BOOLEAN_ON
+          : BOOLEAN_OFF);
+    }
     capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, supportStreaming ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportStreaming) {
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, supportStreamingPaused ? BOOLEAN_ON : BOOLEAN_OFF);
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_AUTOSTART, streamAutoStart
+          ? BOOLEAN_ON
+          : BOOLEAN_OFF);
+    }
+    if (!supportLocalCapture && !supportStreaming) {
+      // This is *deliberately* IllegalArgumentException.
+      // All other cases are a configuration error which yields an agent which may or may not do what you want
+      // *This* case is a completely broken agent that can't be trusted to record locally *OR* stream to the network
+      // thus, we throw this exception and catch it in the endpoint so we can return a 400.
+      // Earlier approaches here used a custom exception class, except that this method gets called from inside
+      // functional code that can't have thrown exception.  Given that this is the sole case where we actually require
+      // an exception, I'm doing it this way.
+      throw new IllegalArgumentException("Invalid agent configuration: Supports neither streaming nor local capture");
     }
 
     if (configuration.containsKey(CaptureParameters.CAPTURE_STREAM_CONFIGURATION)) {
