@@ -118,8 +118,12 @@ public final class WorkflowPropertiesUtil {
       assetManager.takeSnapshot(DEFAULT_OWNER, simplifiedMediaPackage);
     }
 
-    // Store all properties
+    // Store all properties. Entries with a null value are skipped: Value.mk(null) would otherwise persist a
+    // Property row with every value column null, which then throws on every later read of that property.
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
+      if (entry.getValue() == null) {
+        continue;
+      }
       final PropertyId propertyId = PropertyId
               .mk(mediaPackage.getIdentifier().toString(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
       final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
