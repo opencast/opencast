@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A representation of the capture client's current state (MH-730). This is not an enum because we wish to preserve
+ * A representation of the capture client's current state. This is not an enum because we wish to preserve
  * inter-version compatibility (eg, a version 2 agent talking to a version 1 core)
  */
 public interface AgentState {
@@ -42,6 +42,9 @@ public interface AgentState {
   /** Constant <code>UPLOADING="uploading"</code> */
   String UPLOADING = "uploading";
 
+  /** Constant <code>CAPTURING_AND_UPLOADING="capturing_and_uploading"</code> for use when a CA is doing both */
+  String CAPTURING_AND_UPLOADING = "capturing_and_uploading";
+
   /** Constant <code>UNKNOWN="unknown"</code> */
   String UNKNOWN = "unknown";
 
@@ -52,7 +55,8 @@ public interface AgentState {
   String ERROR = "error";
 
   /** The collection of all known states. TODO: Remove this when the states are replaced with enums */
-  List<String> KNOWN_STATES = Arrays.asList(IDLE, SHUTTING_DOWN, CAPTURING, UPLOADING, ERROR, UNKNOWN, OFFLINE);
+  List<String> KNOWN_STATES = Arrays.asList(IDLE, SHUTTING_DOWN, CAPTURING,
+      CAPTURING_AND_UPLOADING, UPLOADING, ERROR, UNKNOWN, OFFLINE);
 
   String TRANSLATION_PREFIX = "AGENTS.STATUS.";
 
