@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
@@ -156,8 +154,11 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
 
       logger.info("Retraction operations complete, republishing updated mediapackage");
 
-      if (!isPublishable(mediaPackage)) {
-        throw new WorkflowOperationException("Media package does not meet criteria for publication");
+      List<String> publicationCriteriaViolations =
+              EngagePublicationSupport.getPublicationCriteriaViolations(mediaPackage);
+      if (!publicationCriteriaViolations.isEmpty()) {
+        throw new WorkflowOperationException("Media package does not meet criteria for publication: "
+                + String.join(", ", publicationCriteriaViolations));
       }
 
       // Adding media package to the search index
@@ -183,23 +184,6 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
         throw new WorkflowOperationException(e);
       }
     }
-  }
-
-  /** Media package must meet these criteria in order to be published. */
-  //TODO: Move this into some kind of abstract parent class since this is also used in
-  //PublishEngageWorkflowOperationHandler
-  private boolean isPublishable(MediaPackage mp) {
-    boolean hasTitle = !isBlank(mp.getTitle());
-    if (!hasTitle) {
-      logger.warn("Media package does not meet criteria for publication: There is no title");
-    }
-
-    boolean hasTracks = mp.hasTracks();
-    if (!hasTracks) {
-      logger.warn("Media package does not meet criteria for publication: There are no tracks");
-    }
-
-    return hasTitle && hasTracks;
   }
 
   @Reference(target = "(distribution.channel=download)")
