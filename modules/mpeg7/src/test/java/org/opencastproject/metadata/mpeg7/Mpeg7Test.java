@@ -106,6 +106,10 @@ public class Mpeg7Test {
     FileOutputStream out = new FileOutputStream(mpeg7TempFile);
     IOUtils.copy(in, out);
 
+    // Check that the mpeg7 prefix is bound to the same namespace as the default one
+    String serialized = FileUtils.readFileToString(mpeg7TempFile, "UTF-8");
+    assertTrue(serialized.contains("xmlns:mpeg7=\"urn:mpeg:mpeg7:schema:2001\""));
+
     // Re-read the saved catalog and test for its content
     Mpeg7Catalog mpeg7NewFromDisk = new Mpeg7CatalogImpl(mpeg7TempFile.toURI().toURL().openStream());
 
