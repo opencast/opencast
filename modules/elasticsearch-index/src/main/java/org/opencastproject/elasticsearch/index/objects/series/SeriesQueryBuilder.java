@@ -147,6 +147,15 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       and(SeriesIndexSchema.CREATED_DATE_TIME, query.getCreatedFrom(), query.getCreatedTo());
     }
 
+    // filter by extended metadata
+    for (String type: query.getExtendedMetadata().keySet()) {
+      for (String name: query.getExtendedMetadata().get(type).keySet()) {
+        for (String value: query.getExtendedMetadata().get(type).get(name)) {
+          and(SeriesIndexSchema.EXTENDED_METADATA_PREFIX.concat(type + "_" + name), value);
+        }
+      }
+    }
+
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {

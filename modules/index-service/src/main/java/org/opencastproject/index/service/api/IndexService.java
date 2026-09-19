@@ -355,6 +355,11 @@ public interface IndexService {
   SeriesCatalogUIAdapter getCommonSeriesCatalogUIAdapter();
 
   /**
+   * @return the extended {@link SeriesCatalogUIAdapter}
+   */
+  List<SeriesCatalogUIAdapter> getExtendedSeriesCatalogUIAdapters();
+
+  /**
    * @return A {@link List} of {@link SeriesCatalogUIAdapter} that provide the metadata to the front end.
    */
   List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters();
