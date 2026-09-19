@@ -33,7 +33,7 @@
     "@asicupv/paella-opencast-plugins": "^2.0.0",
     "@asicupv/paella-slide-plugins": "^2.5.0",
     "@asicupv/paella-video-plugins": "^2.3.0",
-    "@asicupv/paella-webgl-plugins": "^2.3.0",
+    "@asicupv/paella-webgl-plugins": "^2.4.2",
     "@asicupv/paella-zoom-plugin": "^2.4.0"
   }
 }
