@@ -629,6 +629,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   public void updated(Dictionary properties) throws ConfigurationException {
     logger.info("Updating service registry properties");
 
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
     maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
     errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
     String maxAttempts = StringUtils.trimToNull((String) properties.get(MAX_ATTEMPTS_CONFIG_KEY));
