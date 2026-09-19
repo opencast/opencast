@@ -67,7 +67,7 @@ public class WebVTTParser {
 
   public WebVTTSubtitle parse(InputStream is) throws IOException, SubtitleParsingException {
     // Wrap input stream into Apache Commons IO BOMInputStream
-    BOMInputStream bomIn = new BOMInputStream(is, false);
+    BOMInputStream bomIn = BOMInputStream.builder().setInputStream(is).setInclude(false).get();
 
     // Create subtitle object
     WebVTTSubtitle subtitle = new WebVTTSubtitle();

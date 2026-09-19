@@ -957,7 +957,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           HttpGet getExtendedMetadata = new HttpGet(seriesElement.getURI());
           response = httpClient.execute(getExtendedMetadata);
           in = response.getEntity().getContent();
-          data = IOUtils.readFully(in, (int) response.getEntity().getContentLength());
+          data = IOUtils.toByteArray(in, (int) response.getEntity().getContentLength());
         } catch (Exception e) {
           throw new IngestException("Unable to read series " + catalogType + " metadata catalog for series "
               + seriesId + ".", e);
