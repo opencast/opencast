@@ -78,7 +78,10 @@ public final class AccessControlUtil {
    * @return whether this action should be allowed
    * @throws IllegalArgumentException
    *           if any of the arguments are null
+   * @deprecated use {@link AuthorizationService#hasPermission(AccessControlList, String)} instead, which checks
+   *             against the current user rather than an explicitly passed one
    */
+  @Deprecated
   public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action) {
     return isAuthorized(acl, user, org, action, null);
   }
@@ -109,7 +112,10 @@ public final class AccessControlUtil {
    * @return whether this action should be allowed
    * @throws IllegalArgumentException
    *           if any of the arguments are null
+   * @deprecated use {@link AuthorizationService#hasPermissionForMediaPackage(AccessControlList, String, String)}
+   *             instead, which checks against the current user rather than an explicitly passed one
    */
+  @Deprecated
   public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action,
       String mediaPackageId) {
     if (action == null || user == null || acl == null || org == null) {

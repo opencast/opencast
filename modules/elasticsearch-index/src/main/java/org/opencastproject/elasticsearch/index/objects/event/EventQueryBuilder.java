@@ -22,13 +22,13 @@
 package org.opencastproject.elasticsearch.index.objects.event;
 
 import static org.opencastproject.elasticsearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
 import org.opencastproject.elasticsearch.impl.AbstractElasticsearchQueryBuilder;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Action
     if (query.getActions() != null && query.getActions().length > 0) {
       User user = query.getUser();
-      if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
+      if (!SecurityUtil.isAdmin(user, user.getOrganization())) {
         for (Role role : user.getRoles()) {
           for (String action : query.getActions()) {
             and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());

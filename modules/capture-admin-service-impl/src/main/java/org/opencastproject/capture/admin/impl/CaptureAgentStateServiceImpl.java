@@ -34,9 +34,9 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.function.ThrowingFunction;
@@ -390,7 +390,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
 
-    String orgAdmin = org.getAdminRole();
     Set<Role> roles = user.getRoles();
 
     List<AgentImpl> agents = db.exec(namedQuery.findAll(
@@ -400,7 +399,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     ));
 
     // Filter the results in memory if this user is not an administrator
-    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdmin)) {
+    if (!SecurityUtil.isAdmin(user, org)) {
       for (Iterator<AgentImpl> iter = agents.iterator(); iter.hasNext();) {
         AgentImpl agent = iter.next();
         Set<String> schedulerRoles = agent.getSchedulerRoles();

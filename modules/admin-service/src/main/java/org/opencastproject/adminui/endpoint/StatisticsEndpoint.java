@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -36,6 +35,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
@@ -360,13 +360,12 @@ public class StatisticsEndpoint {
   private void checkOrganizationAccess(final String orgId) throws UnauthorizedException {
     final User currentUser = securityService.getUser();
     final Organization currentOrg = securityService.getOrganization();
-    final String currentOrgAdminRole = currentOrg.getAdminRole();
     final String currentOrgId = currentOrg.getId();
 
     final boolean userIsInOrg = currentOrgId.equals(orgId);
 
-    boolean userIsAdmin = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-        || (currentUser.hasRole(currentOrgAdminRole) && userIsInOrg);
+    boolean userIsAdmin = SecurityUtil.isGlobalAdmin(currentUser)
+        || (userIsInOrg && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg));
 
     boolean userIsAuthorized = currentUser.hasRole(STATISTICS_ORGANIZATION_UI_ROLE) && userIsInOrg;
 

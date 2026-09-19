@@ -21,7 +21,6 @@
 
 package org.opencastproject.external.endpoint;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -38,6 +37,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
@@ -401,11 +401,10 @@ public class StatisticsEndpoint {
   private void checkOrganizationAccess(final String orgId) throws UnauthorizedException {
     final User currentUser = securityService.getUser();
     final Organization currentOrg = securityService.getOrganization();
-    final String currentOrgAdminRole = currentOrg.getAdminRole();
     final String currentOrgId = currentOrg.getId();
 
-    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(orgId));
+    boolean authorized = SecurityUtil.isGlobalAdmin(currentUser)
+            || (currentOrgId.equals(orgId) && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg));
 
     if (!authorized) {
       throw new UnauthorizedException(currentUser, "read");
