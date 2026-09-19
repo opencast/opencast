@@ -9,6 +9,63 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Proposal to replace SpringSecurity and OSGi with Quarkus
+Proposed by Waldemar Smirnow <smirnow@elan-ev.de>, passed on [END OF PROPOSAL]
+
+```no-highlight
+We currently face the following problem: Java EE is being replaced by the newer Jakarta EE standard. To move with the times we should also replace Java EE with Jakarta EE in Opencast.
+Apart from staying up to date we have a more concrete problem: CXF uses Jakarta EE starting from version 4, which does not support OSGi and for update SpringSecurity to version 6 or higher at least Jakarta EE 9 is required. This is not a new problem. Several senior Opencast developers have already worked on that issue and it was possible to update to SpringSecurity 5 [1], however we are in need of a long term solution.
+Since it has already been proposed to search for a solution that might not include SpringSecurity [2] Waldemar has done a lot of research and comparison and landed on Quarkus [3] as a good framework to switch to, when we have to switch frameworks anyway.
+Quarkus as possible framework for Opencast has already been discussed in the architecture meeting, there has been a workshop [4] from Waldemar which introduces some Quarkus basics and on this years Summit the general attitude towards Quarkus seemed positive.
+
+Why Quarkus:
+
+Quarkus comes with a lot of build-in features and well maintained extensions, which means that we do not have to take care of dependency management when using the provided Quarkus extensions. An example would be Quarkus Security and the Quarkus OIDC extension, that can be used instead of SpringSecurity.
+Furthermore Quarkus is really developer friendly. It has a detailed and good documentation with a lot of small example projects, quick startup times and small footprints. The dev mode offers hot reloads of code changes and automatically starts dependencies (e.g. databases) as docker containers.
+Quarkus is a cloud-ready framework, meaning that we have the option to think about a microservice architecture in future, which would be interesting for topics like high availability or message queues. (However doing this is not part of this proposal.)
+With Quarkus we can keep the multi-module project structure.
+
+What does it mean to change the Opencast framework:
+
+Changing the framework to Quarkus would mean that we do no longer use OSGi including Karaf, CXF, PaxWeb, etc.
+We would switch from Java EE to Jakarta EE. This is work we have to do once, after that we can also switch to other Jakarta EE based frameworks in future if we do not want to keep Quarkus.
+Furthermore we propose to no longer use SpringSecurity but replace it with Quarkus security. (-> see controversial changes)
+
+Controversial Changes:
+
+1. Quarkus does not support as many authentication methods as SpringSecurity does, meaning that we have to cut down on our possible authentication methods. Quarkus supports OIDC, basic and form-based auth and JWT. The consequences are that:
+   1. we have to drop digest (consequences for capture agents -> see open questions)
+   2. we have to drop CAS or invest time in the future to implement it (implementation is NOT intended to be PART OF THIS PROJECT)
+   3. we have to reevaluate whether we want to invest the time to integrate LDAP (-> see open questions)
+   4. Shibboleth will still work with a middleware that translates login requests to OIDC
+2. Hot-loading configuration changes without restarting Opencast might no longer be possible (-> see open questions)
+3. Updating to LTI 1.3 since the older LTI versions do not support OIDC, which requires LTI Consumer (e.g. LMS Opencast-Plugin) updates.
+4. The possible file types for custom configuration files would be reduced to property files or YAML files.
+5. Changing the Logger to a Quarkus build-in or supported Logger (e.g. JBoss Logging).
+6. How multi-tenancy in Quarkus with OIDC will work still needs to be tested. OIDC and Quarkus support multi-tenancy, but without tests there might be a chance that we can no longer support multi-tenancy (-> see open questions)
+
+Open Questions / Things that still need to be tested:
+
+1. Is there an way to reload configurations in Quarkus without restarting the service? Immediate configuration change that is currently possible in Opencast  seems not to be supported by Quarkus. An alternative way could be to reload configuration via a command similar to a service reload.
+2. How does LTI 1.3 works with OIDC and how to deal with LTI authentication in Quarkus?
+3. Do we want to invest the time to integrate LDAP and if so what for: authentication and/or user provider?
+4. How to implement multi-tenancy with OIDC in Quarkus?
+5. Will capture agents still work without digest?
+6. Which authentication methods do we want to use/combine where and when?
+
+There already is a repository [5] in which we started to document the required changes and try keep track of the open questions and answers.
+If you have specific knowledge concerning open questions / controversial changes or if we did not mention an important topic in this proposal we would be happy for your contribution.
+
+Greetings,
+Waldemar, Carolina
+
+[1]: https://github.com/opencast/opencast/pull/7371
+[2]: https://github.com/opencast/opencast/issues/6991
+[3]: https://quarkus.io
+[4]: https://explore.opencast.org/webinars/v/D2c05bkb7EJ
+[5]: https://github.com/opencast/opencast-quarkus
+```
+
 ### Deprecate Paella 7 in OC 20
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Dec 2, 2025
 ```no-highlight
