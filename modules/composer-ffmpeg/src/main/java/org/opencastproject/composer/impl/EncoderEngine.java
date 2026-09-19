@@ -32,6 +32,7 @@ import org.opencastproject.util.IoSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -444,20 +445,20 @@ public class EncoderEngine implements AutoCloseable {
     }
 
     // Others go to trace logging
-    if (StringUtils.startsWithAny(message.toLowerCase(),
+    if (Strings.CS.startsWithAny(message.toLowerCase(),
           "ffmpeg version", "configuration", "lib", "size=", "frame=", "built with")) {
       logger.trace(message);
 
     // Handle output files
-    } else if (StringUtils.startsWith(message, "Output #")) {
+    } else if (Strings.CS.startsWith(message, "Output #")) {
       logger.debug(message);
       Matcher matcher = outputPattern.matcher(message);
       if (matcher.find()) {
         String type = matcher.group(1);
         String outputPath = matcher.group(2);
-        if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
-                && !StringUtils.equals("/dev/null", outputPath)
-                && !StringUtils.startsWith("pipe:", outputPath)) {
+        if (!Strings.CS.equals("NUL", outputPath) && !Strings.CS.equals("/dev/null", outputPath)
+                && !Strings.CS.equals("/dev/null", outputPath)
+                && !Strings.CS.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           if (!type.startsWith("hls")) {
             logger.info("Identified output file {}", outputFile);
@@ -465,13 +466,13 @@ public class EncoderEngine implements AutoCloseable {
           }
         }
       }
-    } else if (StringUtils.startsWith(message, "[hls @ ")) {
+    } else if (Strings.CS.startsWith(message, "[hls @ ")) {
       logger.debug(message);
       Matcher matcher = outputPatternHLS.matcher(message);
       if (matcher.find()) {
         final String outputPath = Objects.toString(matcher.group(1), matcher.group(2));
-        if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
-                && !StringUtils.startsWith("pipe:", outputPath)) {
+        if (!Strings.CS.equals("NUL", outputPath) && !Strings.CS.equals("/dev/null", outputPath)
+                && !Strings.CS.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           // HLS generates the filenames based on a template with %v and %d replaced
           // HLS writes into the same manifest file to add each segment
@@ -483,7 +484,7 @@ public class EncoderEngine implements AutoCloseable {
       }
 
     // Some to debug
-    } else if (StringUtils.startsWithAny(message.toLowerCase(),
+    } else if (Strings.CS.startsWithAny(message.toLowerCase(),
         "artist", "compatible_brands", "copyright", "creation_time", "description", "composer", "date", "duration",
         "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
         "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ ",

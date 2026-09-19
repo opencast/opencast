@@ -48,6 +48,7 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.osgi.service.cm.ConfigurationException;
@@ -205,8 +206,8 @@ public class YouTubeV3PublicationServiceImpl
           //
           tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
           defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
-          makeVideosPrivate = StringUtils
-                  .containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
+          makeVideosPrivate = Strings.CI
+                  .contains(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
           defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
         } else {
           logger.warn("Client information file does not exist: " + path);
