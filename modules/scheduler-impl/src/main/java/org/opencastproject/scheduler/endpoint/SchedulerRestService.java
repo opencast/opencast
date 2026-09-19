@@ -641,15 +641,17 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified "
               + "since last request"),
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar "
-              + "is in the body")
+              + "is in the body"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "The cutoff parameter is "
+              + "not a valid number")
       }
   )
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
-          @QueryParam("cutoff") Long cutoff, @Context HttpServletRequest request) {
+          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) {
     Date endDate = null;
-    if (cutoff != null) {
+    if (StringUtils.isNotBlank(cutoff)) {
       try {
-        endDate = new Date(cutoff);
+        endDate = new Date(Long.parseLong(cutoff));
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }
