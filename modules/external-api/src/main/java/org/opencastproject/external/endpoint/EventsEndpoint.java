@@ -130,10 +130,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -201,7 +201,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     description = "The events endpoint provides resources and operations related to the events")
 @Component(
     immediate = true,
-    service = { EventsEndpoint.class,ManagedService.class },
+    service = { EventsEndpoint.class },
     property = {
         "service.description=External API - Events Endpoint",
         "opencast.service.type=org.opencastproject.external.events",
@@ -209,7 +209,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     }
 )
 @JaxrsResource
-public class EventsEndpoint implements ManagedService {
+public class EventsEndpoint {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
@@ -371,19 +371,21 @@ public class EventsEndpoint implements ManagedService {
     return new ArrayList<>(cachedCatalogUIAdapters);
   }
 
-  /** OSGi activation method */
   @Activate
-  void activate(ComponentContext cc) {
-    logger.info("Activating External API - Events Endpoint");
-
+  void activate(ComponentContext cc) throws ConfigurationException {
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
             RestConstants.SERVICE_PATH_PROPERTY);
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
+
+    updated(cc.getProperties());
   }
 
-  /** OSGi callback if properties file is present */
-  @Override
+  @Modified
+  void modified(ComponentContext cc) throws ConfigurationException {
+    updated(cc.getProperties());
+  }
+
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Ensure properties is not null
     if (properties == null) {

@@ -27,6 +27,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.Role.Target;
 import org.opencastproject.security.api.RoleProvider;
@@ -34,7 +35,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.userdirectory.brightspace.client.BrightspaceClient;
 import org.opencastproject.userdirectory.brightspace.client.BrightspaceClientException;
+import org.opencastproject.userdirectory.brightspace.client.BrightspaceClientImpl;
 import org.opencastproject.userdirectory.brightspace.client.api.BrightspaceUser;
+import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -42,24 +45,65 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.osgi.framework.Constants;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Component(
+    immediate = true,
+    configurationPid = "org.opencastproject.userdirectory.brightspace",
+    configurationPolicy = ConfigurationPolicy.REQUIRE,
+    service = { UserProvider.class, RoleProvider.class },
+    property = {
+        "service.description=Provides Brightspace user directory instances"
+    }
+)
 public class BrightspaceUserProviderInstance implements UserProvider, RoleProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderInstance.class);
 
   private static final String LTI_LEARNER_ROLE = "Learner";
   private static final String LTI_INSTRUCTOR_ROLE = "Instructor";
+
+  private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.brightspace.org";
+  private static final String BRIGHTSPACE_USER_ID = "org.opencastproject.userdirectory.brightspace.systemuser.id";
+  private static final String BRIGHTSPACE_USER_KEY = "org.opencastproject.userdirectory.brightspace.systemuser.key";
+  private static final String BRIGHTSPACE_URL = "org.opencastproject.userdirectory.brightspace.url";
+  private static final String BRIGHTSPACE_APP_ID = "org.opencastproject.userdirectory.brightspace.application.id";
+  private static final String BRIGHTSPACE_APP_KEY = "org.opencastproject.userdirectory.brightspace.application.key";
+
+  private static final String CACHE_SIZE_KEY = "org.opencastproject.userdirectory.brightspace.cache.size";
+  private static final String CACHE_EXPIRATION_KEY = "org.opencastproject.userdirectory.brightspace.cache.expiration";
+  private static final int DEFAULT_CACHE_SIZE_VALUE = 1000;
+  private static final int DEFAULT_CACHE_EXPIRATION_VALUE = 60;
+
+  /** The keys to look up which roles in Brightspace should be considered as instructor roles */
+  private static final String BRIGHTSPACE_INSTRUCTOR_ROLES_KEY =
+                                "org.opencastproject.userdirectory.brightspace.instructor.roles";
+  private static final String DEFAULT_BRIGHTSPACE_INSTRUCTOR_ROLES = "teacher,ta";
+  /** The keys to look up which users should be ignored */
+  private static final String IGNORED_USERNAMES_KEY = "org.opencastproject.userdirectory.brightspace.ignored.usernames";
+  private static final String DEFAULT_IGNORED_USERNAMES = "admin,anonymous";
 
   private String pid;
   private BrightspaceClient client;
@@ -68,35 +112,77 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   private Object nullToken = new Object();
   private AtomicLong loadUserRequests;
   private AtomicLong brightspaceWebServiceRequests;
-  private final Set<String> instructorRoles;
-  private final Set<String> ignoredUsernames;
+  private Set<String> instructorRoles;
+  private Set<String> ignoredUsernames;
 
-  /**
-   * Constructs a Brighspace user provider with the needed settings
-   *
-   * @param pid             The PID of this service.
-   * @param client          The Brightspace rest service client.
-   * @param organization    The organisation.
-   * @param cacheSize       The number of users to cache.
-   * @param cacheExpiration The number of minutes to cache users.
-   */
-  public BrightspaceUserProviderInstance(
-      String pid,
-      BrightspaceClient client,
-      Organization organization,
-      int cacheSize,
-      int cacheExpiration,
-      Set instructorRoles,
-      Set ignoredUsernames
-  ) {
+  /** The organization directory service */
+  private OrganizationDirectoryService orgDirectory;
 
-    this.pid = pid;
-    this.client = client;
-    this.organization = organization;
-    this.instructorRoles = instructorRoles;
-    this.ignoredUsernames = ignoredUsernames;
+  /** OSGi DI */
+  @Reference
+  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
+    this.orgDirectory = orgDirectory;
+  }
 
-    logger.info("Creating new BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
+    pid = (String) properties.get(Constants.SERVICE_PID);
+
+    String organizationId = (String) properties.get(ORGANIZATION_KEY);
+    String urlStr = (String) properties.get(BRIGHTSPACE_URL);
+    String systemUserId = (String) properties.get(BRIGHTSPACE_USER_ID);
+    String systemUserKey = (String) properties.get(BRIGHTSPACE_USER_KEY);
+    final String applicationId = (String) properties.get(BRIGHTSPACE_APP_ID);
+    final String applicationKey = (String) properties.get(BRIGHTSPACE_APP_KEY);
+
+    int cacheSize;
+    String cacheSizeStr = (String) properties.get(CACHE_SIZE_KEY);
+    if (StringUtils.isBlank(cacheSizeStr)) {
+      cacheSize = DEFAULT_CACHE_SIZE_VALUE;
+    } else {
+      cacheSize = NumberUtils.toInt(cacheSizeStr);
+    }
+
+    int cacheExpiration;
+    String cacheExpirationStr = (String) properties.get(CACHE_EXPIRATION_KEY);
+    if (StringUtils.isBlank(cacheExpirationStr)) {
+      cacheExpiration = DEFAULT_CACHE_EXPIRATION_VALUE;
+    } else {
+      cacheExpiration = NumberUtils.toInt(cacheExpirationStr);
+    }
+
+    String rolesStr = (String) properties.get(BRIGHTSPACE_INSTRUCTOR_ROLES_KEY);
+    if (StringUtils.isBlank(rolesStr)) {
+      rolesStr = DEFAULT_BRIGHTSPACE_INSTRUCTOR_ROLES;
+    }
+    instructorRoles = parsePropertyLineAsSet(rolesStr);
+    logger.debug("Brightspace instructor roles: {}", instructorRoles);
+
+    String ignoredUsersStr = (String) properties.get(IGNORED_USERNAMES_KEY);
+    if (StringUtils.isBlank(ignoredUsersStr)) {
+      ignoredUsersStr = DEFAULT_IGNORED_USERNAMES;
+    }
+    ignoredUsernames = parsePropertyLineAsSet(ignoredUsersStr);
+    logger.debug("Ignored users: {}", ignoredUsernames);
+
+    validateUrl(urlStr);
+    validateConfigurationKey(ORGANIZATION_KEY, organizationId);
+    validateConfigurationKey(BRIGHTSPACE_USER_ID, systemUserId);
+    validateConfigurationKey(BRIGHTSPACE_USER_KEY, systemUserKey);
+    validateConfigurationKey(BRIGHTSPACE_APP_ID, applicationId);
+    validateConfigurationKey(BRIGHTSPACE_APP_KEY, applicationKey);
+
+    try {
+      organization = orgDirectory.getOrganization(organizationId);
+    } catch (NotFoundException nfe) {
+      logger.warn("Organization {} not found!", organizationId);
+      throw new ConfigurationException(ORGANIZATION_KEY, "not found");
+    }
+
+    client = new BrightspaceClientImpl(urlStr, applicationId, applicationKey, systemUserId, systemUserKey);
+
+    logger.info("Configured BrightspaceUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={}, "
                   + "InstructorRoles={}, ignoredUserNames={})", pid, client.getURL(), cacheSize, cacheExpiration,
                   instructorRoles, ignoredUsernames);
 
@@ -108,6 +194,33 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
                 return user == null ? nullToken : user;
               }
             });
+  }
+
+  private void validateConfigurationKey(String key, String value) throws ConfigurationException {
+    if (StringUtils.isBlank(value)) {
+      throw new ConfigurationException(key, "is not set");
+    }
+  }
+
+  private void validateUrl(String urlStr) throws ConfigurationException {
+    if (StringUtils.isBlank(urlStr)) {
+      throw new ConfigurationException(BRIGHTSPACE_URL, "is not set");
+    } else {
+      try {
+        new URI(urlStr);
+      } catch (URISyntaxException e) {
+        throw new ConfigurationException(BRIGHTSPACE_URL, "not a URL");
+      }
+    }
+  }
+
+  private Set<String> parsePropertyLineAsSet(String configLine) {
+    Set<String> set = new HashSet<>();
+    String[] configs = configLine.split(",");
+    for (String config: configs) {
+      set.add(config.trim());
+    }
+    return set;
   }
 
   /**

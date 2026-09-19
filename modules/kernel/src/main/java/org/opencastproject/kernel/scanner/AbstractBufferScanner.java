@@ -28,7 +28,7 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 public abstract class AbstractBufferScanner extends AbstractScanner {
   private static final Logger logger = LoggerFactory.getLogger(AbstractBufferScanner.class);
@@ -41,7 +41,7 @@ public abstract class AbstractBufferScanner extends AbstractScanner {
 
   protected long buffer = -1;
 
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     String cronExpression;
     boolean enabled;
 

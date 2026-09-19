@@ -61,8 +61,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,7 +141,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
 
     service = new SpeechToTextWorkflowSchedulerQuartz();
 
-    Dictionary<String, Object> props = new Hashtable<String, Object>();
+    Map<String, Object> props = new HashMap<>();
     props.put(SpeechToTextWorkflowSchedulerQuartz.PARAM_KEY_ENABLED, "true");
     props.put(SpeechToTextWorkflowSchedulerQuartz.PARAM_KEY_CRON_EXPR, "0 0 0 1 1 ? 2200"); // Never execute
     props.put(SpeechToTextWorkflowSchedulerQuartz.WORKFLOW, WORKFLOW_DEF);
@@ -155,8 +154,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     service.setWorkflowService(wfService);
     service.bindServiceRegistry(serviceRegistry);
     service.bindSecurityService(securityService);
-    service.activate(cc);
-    service.updated(props);
+    service.updated(cc, props);
   }
 
   @Test
