@@ -66,7 +66,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Publishes media to a YouTube play list.
@@ -139,6 +142,11 @@ public class YouTubeV3PublicationServiceImpl
 
   private boolean enabled = false;
 
+  private boolean transferAudioLanguage;
+  private boolean transferMetadataLanguage;
+
+  private Map<String, Pattern> languagePatterns;
+
   /**
    * The default playlist to publish to, in case there is not enough information in the mediapackage to find a playlist
    */
@@ -203,6 +211,13 @@ public class YouTubeV3PublicationServiceImpl
           //
           youTubeService.initialize(clientCredentials);
           //
+          String languageTarget = YouTubeUtils.get(properties, YouTubeKey.languageTarget, false);
+          transferAudioLanguage = "audio".equals(languageTarget) || "both".equals(languageTarget);
+          transferMetadataLanguage = "metadata".equals(languageTarget) || "both".equals(languageTarget);
+          languagePatterns = YouTubeUtils.getAll(properties, YouTubeKey.languagePatterns).entrySet().stream()
+                  .collect(Collectors.toMap(
+                          Map.Entry::getKey,
+                          e -> Pattern.compile(e.getValue())));
           tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
           defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
           makeVideosPrivate = StringUtils
@@ -274,12 +289,20 @@ public class YouTubeV3PublicationServiceImpl
       final YouTubePublicationAdapter c = new YouTubePublicationAdapter(mediaPackage, workspace);
       final File file = workspace.get(element.getURI());
       final String episodeName = c.getEpisodeName();
+      final String episodeLanguage = c.getEpisodeLanguage();
+      final String language = episodeLanguage == null ? null : languagePatterns.entrySet().stream()
+          .filter(e -> e.getValue().matcher(c.getEpisodeLanguage()).matches())
+          .findAny()
+          .map(Map.Entry::getKey)
+          .orElse(null);
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
       final VideoUpload videoUpload = new VideoUpload(
           truncateTitleToMaxFieldLength(episodeName, false),
-          c.getEpisodeDescription(), privacyStatus,
-          file, operationProgressListener, tags);
+          c.getEpisodeDescription(),
+          transferMetadataLanguage ? language : null,
+          transferAudioLanguage ? language : null,
+          privacyStatus, file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
       final int timeoutMinutes = 60;
       final long startUploadMilliseconds = new Date().getTime();

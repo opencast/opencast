@@ -32,6 +32,8 @@ public enum YouTubeKey {
   dataStore,
   keywords,
   defaultPlaylist,
+  languageTarget,
+  languagePatterns,
   makeVideosPrivate,
   maxFieldLength;
 }
