@@ -804,11 +804,14 @@ public class SeriesEndpoint {
 
     DublinCoreMetadataCollection collection = optCollection.get();
 
+    JSONParser parser = new JSONParser();
     for (String key : updatedFields.keySet()) {
-      MetadataField field = collection.getOutputFields().get(key);
+      boolean isSubjects = "subjects".equals(key);
+      MetadataField field = collection.getOutputFields().get(
+              isSubjects ? DublinCore.PROPERTY_SUBJECT.getLocalName() : key);
       if (field == null) {
         return ApiResponseBuilder.notFound(
-                "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.", key,
+                "Cannot find a metadata field with id '%s' from series with id '%s' and the metadata type '%s'.", key,
                 id, type);
       } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
         return R.badRequest(String.format(
@@ -816,7 +819,13 @@ public class SeriesEndpoint {
                 key, type));
       }
       collection.removeField(field);
-      collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      if (isSubjects) {
+        JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
+        collection.addField(
+                MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+      } else {
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      }
     }
 
     metadataList.add(adapter, collection);
