@@ -44,7 +44,6 @@ import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.api.services.youtube.model.Playlist;
-import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 
 import org.apache.commons.lang3.StringUtils;
@@ -302,7 +301,7 @@ public class YouTubeV3PublicationServiceImpl
       }
       youTubeService.addPlaylistItem(playlist.getId(), video.getId());
       // Create new publication element
-      final URL url = new URL("http://www.youtube.com/watch?v=" + video.getId());
+      final URL url = new URL("http://www.youtube.com/watch?v=" + video.getId() + "&list=" + playlist.getId());
       return PublicationImpl.publication(
           UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
@@ -355,10 +354,9 @@ public class YouTubeV3PublicationServiceImpl
     if (youtube == null) {
       return null;
     }
-    final YouTubePublicationAdapter contextStrategy = new YouTubePublicationAdapter(mediaPackage, workspace);
-    final String episodeName = contextStrategy.getEpisodeName();
     try {
-      retract(mediaPackage.getSeriesTitle(), episodeName);
+      final java.net.URI uri = youtube.getURI();
+      retract(uri.toString());
     } catch (final Exception e) {
       logger.error("Failure retracting YouTube media {}", e.getMessage());
       throw new PublicationException("YouTube media retract failed on job: "
@@ -367,17 +365,41 @@ public class YouTubeV3PublicationServiceImpl
     return youtube;
   }
 
-  private void retract(final String seriesTitle, final String episodeName) throws Exception {
-    final List<SearchResult> items = youTubeService.searchMyVideos(
-        truncateTitleToMaxFieldLength(episodeName, false), null, 1).getItems();
-    if (!items.isEmpty()) {
-      final String videoId = items.get(0).getId().getVideoId();
-      if (seriesTitle != null) {
-        final Playlist playlist = youTubeService.getMyPlaylistByTitle(truncateTitleToMaxFieldLength(seriesTitle, true));
-        youTubeService.removeVideoFromPlaylist(playlist.getId(), videoId);
-      }
-      youTubeService.removeMyVideo(videoId);
+  private void retract(final String watchUrl) throws Exception {
+    if (watchUrl == null) {
+      throw new IllegalArgumentException("watchUrl must be specified");
     }
+    String videoId = null;
+    String playlistId = null;
+    try {
+      final java.net.URI uri = java.net.URI.create(watchUrl);
+      final String query = uri.getQuery();
+      if (query != null) {
+        for (String param : query.split("&")) {
+          String[] pair = param.split("=", 2);
+          if (pair.length == 2) {
+            if ("v".equals(pair[0])) {
+              videoId = pair[1];
+            } else if ("list".equals(pair[0])) {
+              playlistId = pair[1];
+            }
+          }
+        }
+      }
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Invalid YouTube watch URL: " + watchUrl, e);
+    }
+    if (videoId == null) {
+      throw new IllegalArgumentException("YouTube video ID not found in URL: " + watchUrl);
+    }
+    if (playlistId != null) {
+      try {
+        youTubeService.removeVideoFromPlaylist(playlistId, videoId);
+      } catch (Exception e) {
+        // Non-fatal: continue with video removal
+      }
+    }
+    youTubeService.removeMyVideo(videoId);
   }
 
   /**
@@ -535,5 +557,4 @@ public class YouTubeV3PublicationServiceImpl
       }
     }
   }
-
 }
