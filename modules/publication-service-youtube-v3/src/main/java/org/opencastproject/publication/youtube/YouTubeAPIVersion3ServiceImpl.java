@@ -71,6 +71,7 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   public Video addVideoToMyChannel(final VideoUpload videoUpload) throws IOException {
     final Video videoObjectDefiningMetadata = new Video();
     final VideoStatus status = new VideoStatus();
+    status.setLicense(videoUpload.getLicense().name());
     status.setPrivacyStatus(videoUpload.getPrivacyStatus());
     videoObjectDefiningMetadata.setStatus(status);
     // Metadata lives in VideoSnippet
