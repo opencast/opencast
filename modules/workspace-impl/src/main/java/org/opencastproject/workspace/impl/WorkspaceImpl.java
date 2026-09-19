@@ -23,7 +23,6 @@ package org.opencastproject.workspace.impl;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.IoSupport.locked;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
@@ -84,6 +83,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -903,7 +903,7 @@ public final class WorkspaceImpl implements Workspace {
           .fold(
               chuck(),
               status -> {
-                if (ne(status, expectedStatus)) {
+                if (!Objects.equals(status, expectedStatus)) {
                   final String msg = String.format(errorMsg, uri.toString());
                   logger.warn(msg);
                   chuck(new IOException(msg));

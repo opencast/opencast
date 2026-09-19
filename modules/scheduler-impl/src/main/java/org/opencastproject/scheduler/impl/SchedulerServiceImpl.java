@@ -23,7 +23,6 @@ package org.opencastproject.scheduler.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.requireTrue;
@@ -133,6 +132,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
@@ -732,7 +732,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (mediaPackageOpt.isPresent()) {
         MediaPackage mediaPackage = mediaPackageOpt.get();
         // Check for series change
-        if (ne(archivedMediaPackage.getSeries(), mediaPackage.getSeries())) {
+        if (!Objects.equals(archivedMediaPackage.getSeries(), mediaPackage.getSeries())) {
           propertiesChanged = true;
           seriesId = Optional.ofNullable(mediaPackage.getSeries());
         }

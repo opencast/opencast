@@ -23,7 +23,8 @@
 package org.opencastproject.util.data;
 
 import static org.opencastproject.util.EqualsUtil.eqClasses;
-import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /** A 3-tuple. */
 public final class Tuple3<A, B, C> {
@@ -64,7 +65,7 @@ public final class Tuple3<A, B, C> {
 
   @Override
   public int hashCode() {
-    return hash(a, b, c);
+    return Objects.hash(a, b, c);
   }
 
   public static <A, B, C> Tuple3<A, B, C> tuple3(A a, B b, C c) {

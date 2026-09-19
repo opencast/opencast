@@ -22,8 +22,8 @@
 package org.opencastproject.composer.layout;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /** The offset between the anchor points of two rectangular shapes. */
 public final class AnchorOffset {
@@ -72,13 +72,13 @@ public final class AnchorOffset {
   }
 
   private boolean eqFields(AnchorOffset that) {
-    return eq(offset, that.offset) && eq(referenceAnchor, that.referenceAnchor)
-            && eq(referringAnchor, that.referringAnchor);
+    return Objects.equals(offset, that.offset) && Objects.equals(referenceAnchor, that.referenceAnchor)
+            && Objects.equals(referringAnchor, that.referringAnchor);
   }
 
   @Override
   public int hashCode() {
-    return hash(offset, referenceAnchor, referringAnchor);
+    return Objects.hash(offset, referenceAnchor, referringAnchor);
   }
 
   @Override
