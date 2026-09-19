@@ -25,7 +25,6 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.util.FileSupport.link;
 import static org.opencastproject.util.IoSupport.file;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 import org.opencastproject.assetmanager.api.storage.AssetStore;
@@ -50,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public abstract class AbstractFileSystemAssetStore implements AssetStore {
@@ -163,7 +163,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
       FileUtils.deleteDirectory(dir);
       // also delete the media package directory if all versions have been deleted
       boolean mpDirDeleted = FileSupport.deleteHierarchyIfEmpty(
-              file(path(rootPath, sel.getOrganizationId())), dir.getParentFile());
+              file(rootPath, sel.getOrganizationId()), dir.getParentFile());
       if (mpDirDeleted) {
         onDeleteMediaPackage(sel.getOrganizationId(), sel.getMediaPackageId());
       }
@@ -183,7 +183,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    * @return the directory file
    */
   private File getDeletionSelectorDir(String rootPath, DeletionSelector sel) {
-    final String basePath = path(rootPath, sel.getOrganizationId(), sel.getMediaPackageId());
+    final String basePath = Paths.get(rootPath, sel.getOrganizationId(), sel.getMediaPackageId()).toString();
     if (sel.getVersion().isPresent()) {
       return file(basePath, sel.getVersion().get().toString());
     }

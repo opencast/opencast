@@ -27,7 +27,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.FileSupport.deleteHierarchyIfEmpty;
 import static org.opencastproject.util.FileSupport.isParent;
-import static org.opencastproject.util.PathSupport.path;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -38,6 +37,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
@@ -113,10 +113,10 @@ public class FileSupportTest {
 
   @Test
   public void testIsParent() throws Exception {
-    final File a = new File(path("one", "two", "three"));
-    final File b = new File(path("one", "two"));
-    final File c = new File(path("one", "..", "one", ".", "two", "."));
-    final File d = new File(path("two", "three"));
+    final File a = Paths.get("one", "two", "three").toFile();
+    final File b = Paths.get("one", "two").toFile();
+    final File c = Paths.get("one", "..", "one", ".", "two", ".").toFile();
+    final File d = Paths.get("two", "three").toFile();
     assertTrue(isParent(b, a));
     assertTrue(isParent(c, a));
     assertFalse(isParent(d, a));
