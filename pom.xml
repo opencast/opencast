@@ -56,7 +56,6 @@
     <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
     <org.osgi.service.component.annotations.version>1.5.1</org.osgi.service.component.annotations.version>
     <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
-    <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
     <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
@@ -71,7 +70,6 @@
          sync; the suffixed version is the ServiceMix rebuild of the same upstream release. -->
     <spring-security-ldap.version>5.8.6</spring-security-ldap.version>
     <spring-security-ldap-servicemix.version>5.8.6_1</spring-security-ldap-servicemix.version>
-    <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>
     <module>modules/admin-service</module>
@@ -944,12 +942,6 @@
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.service.log</artifactId>
-        <version>${org.osgi.service.log.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
         <artifactId>org.osgi.service.component</artifactId>
         <version>${org.osgi.service.component.version}</version>
         <scope>provided</scope>
@@ -998,12 +990,6 @@
         <artifactId>org.apache.felix.fileinstall</artifactId>
         <version>3.7.4</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.apache.felix.metatype</artifactId>
-        <version>1.0.4</version>
-        <scope>provided</scope>
-      </dependency>
       <!-- JSRs -->
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
@@ -1039,11 +1025,6 @@
         <groupId>com.sun.mail</groupId>
         <artifactId>jakarta.mail</artifactId>
         <version>${jakarta.mail.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.inject</groupId>
-        <artifactId>javax.inject</artifactId>
-        <version>1</version>
       </dependency>
       <dependency>
         <groupId>jakarta.ws.rs</groupId>
@@ -1110,22 +1091,12 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
         <artifactId>spring-expression</artifactId>
         <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>${spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context-support</artifactId>
         <version>${spring.version}</version>
       </dependency>
       <dependency>
@@ -1167,16 +1138,6 @@
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-ldap</artifactId>
         <version>${spring-security-ldap.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.santuario</groupId>
-        <artifactId>xmlsec</artifactId>
-        <version>${xmlsec.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opensaml</groupId>
-        <artifactId>opensaml</artifactId>
-        <version>2.6.4</version>
       </dependency>
       <dependency>
         <groupId>org.jasig.cas.client</groupId>
