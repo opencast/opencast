@@ -20,6 +20,11 @@ operations:
   # Cut the video according the SMIL file
 
   # Perform cutting according to the edit decision list.
+  #
+  # The editor operation below replaces the SMIL catalog given as target-smil-flavor with its own,
+  # rewritten copy. Since smil/cutting is the canonical edit decision list maintained by the admin UI
+  # editor, it must not be consumed that way, so the cutting is performed on a disposable working copy
+  # (smil/tmp) instead, leaving smil/cutting untouched in the media package.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   - id: clone
     exception-handler-workflow: partial-error
