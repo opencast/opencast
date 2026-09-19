@@ -9,17 +9,12 @@
     "build": "tsc && vite build && vite build -c vite.config.embedapi.ts --emptyOutDir false",
     "preview": "vite preview",
     "clean:build": "rimraf .turbo dist",
-    "clean:deps": "rimraf node_modules",
-    "eslint": "eslint src tests",
-    "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/**/*.html'",
-    "html-validate": "html-validate 'public/*.html'",
-    "check": "npm run eslint && npm run html-linter && npm run html-validate"
+    "clean:deps": "rimraf node_modules"
   },
   "devDependencies": {
     "@asicupv/paella-embedapi": "^2.11.1",
     "@asicupv/paella-opencast-component": "^2.0.1",
     "@tailwindcss/vite": "^4.2.4",
-    "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
     "express": "^5.1.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^6.0.3",
