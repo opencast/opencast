@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@asicupv/paella-embedapi": "^2.11.1",
-    "@asicupv/paella-opencast-component": "^2.0.1",
+    "@asicupv/paella-opencast-component": "^2.0.5",
     "@tailwindcss/vite": "^4.2.4",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
     "express": "^5.1.0",
