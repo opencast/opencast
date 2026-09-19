@@ -77,7 +77,7 @@ public class SeriesWorkflowOperationHandlerTest {
     URI uri = getClass().getResource("/dublincore.xml").toURI();
     File file = new File(uri);
 
-    seriesCatalog = DublinCores.mkOpencast().getCatalog();
+    seriesCatalog = DublinCores.mkOpencastEpisode().getCatalog();
     seriesCatalog.set(DublinCore.PROPERTY_TITLE, "Series 1");
 
     SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
