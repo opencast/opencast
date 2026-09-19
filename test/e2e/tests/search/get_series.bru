@@ -1,0 +1,64 @@
+meta {
+  name: get_series
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{searchBaseUrl}}/search/series.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains json
+}
+
+tests {
+  test("Search series list should have correct JAXB Jettison properties", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.offset).to.be.a('number');
+    expect(body.limit).to.be.a('number');
+    expect(body.total).to.be.a('number');
+    expect(body.result).to.be.an('array');
+
+    const getArray = (val) => {
+      if (val === undefined || val === null) return [];
+      return Array.isArray(val) ? val : [val];
+    };
+
+    body.result.forEach(item => {
+      expect(item.org).to.be.a('string');
+      
+      if (item.dc) {
+        expect(item.dc).to.be.an('object');
+        
+        const identifiers = getArray(item.dc.identifier);
+        identifiers.forEach(id => expect(id).to.be.a('string'));
+        
+        const titles = getArray(item.dc.title);
+        titles.forEach(t => expect(t).to.be.a('string'));
+
+        if (item.dc.creator) {
+          const creators = getArray(item.dc.creator);
+          creators.forEach(c => expect(c).to.be.a('string'));
+        }
+
+        if (item.dc.contributor) {
+          const contributors = getArray(item.dc.contributor);
+          contributors.forEach(c => expect(c).to.be.a('string'));
+        }
+      }
+      
+      if (item.searchable_acl) {
+        expect(item.searchable_acl).to.be.an('object');
+        const readRoles = getArray(item.searchable_acl.read);
+        readRoles.forEach(r => expect(r).to.be.a('string'));
+        const writeRoles = getArray(item.searchable_acl.write);
+        writeRoles.forEach(w => expect(w).to.be.a('string'));
+      }
+    });
+  });
+}

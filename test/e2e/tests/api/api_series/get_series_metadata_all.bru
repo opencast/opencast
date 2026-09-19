@@ -1,0 +1,39 @@
+meta {
+  name: get_series_metadata_all
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/series/:seriesId/metadata
+  body: none
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Series metadata catalogs should have correct types", function() {
+    if (res.status === 200) {
+      const catalogs = res.getBody();
+      expect(catalogs).to.be.an('array');
+      catalogs.forEach(function(cat) {
+        expect(cat.flavor).to.be.a('string');
+        expect(cat.fields).to.be.an('array');
+        cat.fields.forEach(function(field) {
+          expect(field.id).to.be.a('string');
+          if (field.label !== undefined) expect(field.label).to.be.a('string');
+          expect(field.type).to.be.a('string');
+          if (field.readOnly !== undefined) expect(field.readOnly).to.be.a('boolean');
+          if (field.required !== undefined) expect(field.required).to.be.a('boolean');
+        });
+      });
+    }
+  });
+}

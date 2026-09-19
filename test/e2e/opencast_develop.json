@@ -1,0 +1,26 @@
+{
+  "name": "Opencast-Develop",
+  "variables": [
+    {
+      "name": "baseUrl",
+      "value": "https://develop.opencast.org",
+      "enabled": true,
+      "secret": false,
+      "type": "text"
+    },
+    {
+      "name": "username",
+      "value": "admin",
+      "enabled": true,
+      "secret": false,
+      "type": "text"
+    },
+    {
+      "name": "password",
+      "value": "opencast",
+      "enabled": true,
+      "secret": true,
+      "type": "text"
+    }
+  ]
+}
