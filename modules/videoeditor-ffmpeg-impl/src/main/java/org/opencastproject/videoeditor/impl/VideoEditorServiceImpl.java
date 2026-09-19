@@ -59,6 +59,11 @@ import org.opencastproject.videoeditor.api.VideoEditorService;
 import org.opencastproject.videoeditor.ffmpeg.FFmpegEdit;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,8 +80,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -318,6 +325,9 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
           outputFileExtension = properties.getProperty(VideoEditorProperties.WEBVTT_EXTENSION, ".vtt");
         }
+        if (VideoEditorProperties.INTERACTIVE_ELEMENT_EXTENSION.equals(extension)) {
+          outputFileExtension = properties.getProperty(VideoEditorProperties.INTERACTIVE_ELEMENT_EXTENSION, ".json");
+        }
       }
       outputFileExtension = properties.getProperty(VideoEditorProperties.OUTPUT_FILE_EXTENSION, outputFileExtension);
 
@@ -359,6 +369,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         // remove very short cuts that will look bad
         List<VideoClip> cleanclips = sortSegments(refElements, segmentsMinDuration, segmentsMinCutDuration);
         String extension = FilenameUtils.getExtension(sourceTrackUri);
+        // Cut subtitles
         if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
           // Parse
           WebVTTParser parser = new WebVTTParser();
@@ -410,6 +421,42 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
             WebVTTWriter writer = new WebVTTWriter();
             writer.write(subtitle, fos);
           }
+        // Cut interactive elements
+        } else if (VideoEditorProperties.INTERACTIVE_ELEMENT_EXTENSION.equals(extension)) {
+          Gson gson = new Gson();
+          FileInputStream fis = new FileInputStream(sourceFile);
+          InputStreamReader reader = new InputStreamReader(fis, "UTF-8");
+          JsonArray array = JsonParser.parseReader(reader).getAsJsonArray();
+
+          // Edit
+          JsonArray cutArray = new JsonArray();
+          double removedTime = 0;
+          for (int i = 0; i < cleanclips.size(); i++) {
+            if (i == 0) {
+              removedTime = removedTime
+                  + cleanclips.get(i).getStartInMilliseconds();
+            } else {
+              removedTime = removedTime
+                  + cleanclips.get(i).getStartInMilliseconds()
+                  - cleanclips.get(i - 1).getEndInMilliseconds();
+            }
+            for (int j = 0; j < array.size(); j++) {
+              JsonObject obj = array.get(j).getAsJsonObject();
+              if (obj.has("start")) {
+                long oldStart = obj.get("start").getAsLong();
+                if ((cleanclips.get(i).getStartInMilliseconds()) <= oldStart
+                    && (cleanclips.get(i).getEndInMilliseconds()) >= oldStart) {
+                  obj.addProperty("start", oldStart + removedTime);
+                  cutArray.add(obj);
+                }
+              }
+            }
+          }
+
+          // Write
+          FileWriter writer = new FileWriter(outputPath);
+          gson.toJson(cutArray, writer);
+          writer.close();
         } else {
           throw new ProcessFailedException("The video editor does not support the following file: " + sourceTrackUri);
         }
@@ -444,6 +491,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       if (refElements.size() > 0) {
         String extension = FilenameUtils.getExtension(sourceTrackUri);
         if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
+          editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(),
+              sourceTrackFlavor.getSubtype() + "+" + SINK_FLAVOR_SUBTYPE));
+        }
+        if (VideoEditorProperties.INTERACTIVE_ELEMENT_EXTENSION.equals(extension)) {
           editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(),
               sourceTrackFlavor.getSubtype() + "+" + SINK_FLAVOR_SUBTYPE));
         }
