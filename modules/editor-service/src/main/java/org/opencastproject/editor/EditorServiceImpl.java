@@ -1185,22 +1185,17 @@ public class EditorServiceImpl implements EditorService {
     }
 
     try {
+      index.updateMediaPackageMetadata(mediaPackage, editingData.getMetadataJSON());
+    } catch (IllegalArgumentException e) {
+      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
+    }
+
+    try {
       assetManager.takeSnapshot(mediaPackage);
     } catch (AssetManagerException e) {
       logger.error("Error while adding the updated media package ({}) to the archive",
               mediaPackage.getIdentifier(), e);
       throw new IOException(e);
-    }
-
-    // Update Metadata
-    try {
-      index.updateAllEventMetadata(mediaPackageId, editingData.getMetadataJSON(), searchIndex);
-    } catch (SearchIndexException | IndexServiceException | IllegalArgumentException e) {
-      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
-    } catch (NotFoundException e) {
-      errorExit("Event not found.", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
-    } catch (UnauthorizedException e) {
-      errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {

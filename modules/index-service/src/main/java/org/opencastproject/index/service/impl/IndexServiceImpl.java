@@ -1252,6 +1252,18 @@ public class IndexServiceImpl implements IndexService {
           final String id, final String metadataJSON, final ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
+    return updateEventMetadata(id, parseMetadataListFromJson(metadataJSON), index);
+  }
+
+  @Override
+  public MetadataList updateMediaPackageMetadata(final MediaPackage mediaPackage, final String metadataJSON)
+          throws IllegalArgumentException {
+    final MetadataList metadataList = parseMetadataListFromJson(metadataJSON);
+    updateMediaPackageMetadata(mediaPackage, metadataList);
+    return metadataList;
+  }
+
+  private MetadataList parseMetadataListFromJson(final String metadataJSON) throws IllegalArgumentException {
     final MetadataList metadataList;
     try {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
@@ -1259,7 +1271,7 @@ public class IndexServiceImpl implements IndexService {
     } catch (final org.json.simple.parser.ParseException e) {
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
-    return updateEventMetadata(id, metadataList, index);
+    return metadataList;
   }
 
   @Override
