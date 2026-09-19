@@ -35,6 +35,7 @@ import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
 import org.opencastproject.editor.api.LockData;
 import org.opencastproject.editor.api.SegmentData;
+import org.opencastproject.editor.api.ThumbnailTime;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
 import org.opencastproject.editor.api.WorkflowData;
@@ -638,6 +639,28 @@ public class EditorServiceImpl implements EditorService {
               getThumbnailSubtype());
       String uri = track.getThumbnailURI();
 
+      // If thumbnail times, add workflow properties and be done
+      var time = track.getThumbnailTime();
+      if (time != null) {
+        // Remove old thumbnails
+        Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
+
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_set", "true");
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_time", time.getTime());
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_flavor", time.getFlavorType() + "/source");
+        continue;
+      } else {
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_set", "false");
+      }
+
       // If no uri, what do?
       if (uri == null || uri.isEmpty()) {
         continue;
@@ -979,6 +1002,25 @@ public class EditorServiceImpl implements EditorService {
             .map(property -> tuple(property.getA()[1], property.getA()[2]))
             .collect(Collectors.toSet());
 
+    Map<String, ThumbnailTime> thumbnailTimes = new HashMap<>();
+    latestWfProperties.forEach((key, value) -> {
+      String[] parts = key.split("_");
+      if (parts.length == 4
+          && "thumbnail".equals(parts[1])
+          && "time".equals(parts[2])
+          && ("time".equals(parts[3]) || "flavor".equals(parts[3]))
+      ) {
+
+        ThumbnailTime tt = thumbnailTimes.computeIfAbsent(parts[0], k -> new ThumbnailTime());
+
+        if (parts.length == 4 && "time".equals(parts[3])) {
+          tt.setTime(value);
+        } else if (parts.length == 4 && "flavor".equals(parts[3])) {
+          tt.setFlavorType(value.split("/")[0]);
+        }
+      }
+    });
+
     List<Track> trackList = Arrays.stream(internalPub.getTracks()).filter(this::elementHasPreviewTag)
             .collect(Collectors.toList());
     if (trackList.isEmpty()) {
@@ -1060,7 +1102,7 @@ public class EditorServiceImpl implements EditorService {
       }
 
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-          track.getIdentifier(), thumbnailURI, priority);
+          track.getIdentifier(), thumbnailURI, priority, thumbnailTimes.get(track.getFlavor().getType()));
     }).collect(Collectors.toList());
 
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
