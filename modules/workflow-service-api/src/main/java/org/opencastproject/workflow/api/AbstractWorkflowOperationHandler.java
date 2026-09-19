@@ -325,16 +325,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   }
 
   /**
-   * Get a configuration option.
-   *
-   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or
-   *             {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
-   */
-  protected Optional<String> getCfg(WorkflowInstance wi, String key) {
-    return Optional.ofNullable(wi.getCurrentOperation().getConfiguration(key));
-  }
-
-  /**
    * Get a mandatory configuration key. Values are returned trimmed.
    *
    * @throws WorkflowOperationException
