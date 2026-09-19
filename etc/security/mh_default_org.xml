@@ -387,6 +387,10 @@
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="permitAll" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="permitAll" />
 
+    <!-- Enable access to basic statistics -->
+    <sec:intercept-url pattern="/basicstatistics/clientPush" method="POST" access="permitAll" />
+    <sec:intercept-url pattern="/basicstatistics/trustedPush" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+
     <!-- Enable access to the redirect routes -->
     <sec:intercept-url pattern="/redirect/**" access="permitAll" />
 
@@ -811,7 +815,7 @@
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
     <!-- Set either `jwksUrl` or `secret` to enable this login handler -->
-    <!-- <property name="jwksUrl" value="https://replace-me.invalid/.well-known/jwks.json" /> -->
+     <property name="jwksUrl" value="https://replace-me.invalid/.well-known/jwks.json" />
     <!-- <property name="secret" value="***" /> -->
     <property name="expectedAlgorithms">
       <!-- The signing algorithms expected for the JWT signature -->
