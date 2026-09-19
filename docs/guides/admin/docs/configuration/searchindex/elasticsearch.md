@@ -1,25 +1,21 @@
 OpenSearch Configuration
 ========================
 
-> Opencast still works with older versions of Elasticsearch.
-> If you use Elasticsearch, please make sure to get the correct version.
-
 OpenSearch powers the external API as well as the administrative user interface of Opencast.
 
 
 Version
 -------
 
-Opencast requires specific versions of OpenSearch/Elasticsearch.
+Opencast requires a specific version of OpenSearch.
 Please make sure to install the correct version:
 
-- OpenSearch 1.x
-- Elasticsearch 7.10.2
+- OpenSearch 3.x
 
 Additional Plug-ins
 -------------------
 
-Opencast needs the `analysis-icu` plugin for OpenSearch/Elasticsearch.
+Opencast needs the `analysis-icu` plugin for OpenSearch.
 **You might have already installed it if you installed Opencast from the package repositories.**
 
 To manually install the ICU plugin, run the following:
@@ -49,7 +45,7 @@ more complicated since you want to require authentication and TLS.
 
 <!-- While this links to the RPM guide, the steps are identical for other installation types: -->
 To set-up HTTP Basic authentication and TLS within OpenSearch, follow the [Set up OpenSearch in your environment
-](https://opensearch.org/docs/1.3/install-and-configure/install-opensearch/rpm/#step-3-set-up-opensearch-in-your-environment)
+](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/rpm/#step-3-set-up-opensearch-in-your-environment)
 guide from OpenSearch.
 
 Alternatively, use a reverse proxy like Nginx or Caddy to terminate TLS and require HTTP Basic authentication.
@@ -96,3 +92,30 @@ By default, no retry will be attempted.
 
 The `retry.delay.on.startup` defines how long Opencast will wait between retry attempts
 when the connection to the index fails on startup. The default is 10 seconds.
+
+
+Query Insights Diagnostics
+---------------------------
+
+OpenSearch ships a built-in Query Insights feature that records the most expensive search requests it handles (by
+latency, CPU, and memory) into rolling daily indices named `top_queries-<date>-<random>`. It is enabled by default
+on a stock OpenSearch installation and is unrelated to Opencast, which neither reads from nor writes to these
+indices. Left enabled, a new index is created every day and, by default, retained for 7 days
+(`search.insights.top_queries.exporter.delete_after_days`) before being cleaned up automatically.
+
+If you'd rather not have OpenSearch collect this diagnostic data at all, you can disable it with:
+
+```sh
+curl -X PUT "$OPENSEARCH_HOST/_cluster/settings" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "persistent": {
+      "search.insights.top_queries.latency.enabled": false,
+      "search.insights.top_queries.cpu.enabled": false,
+      "search.insights.top_queries.memory.enabled": false
+    }
+  }'
+```
+
+This is a persistent cluster setting, so it only needs to be applied once and survives OpenSearch restarts. To
+re-enable it later (for example, while investigating a performance issue), set those same keys back to `true`.
