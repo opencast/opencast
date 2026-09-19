@@ -136,18 +136,29 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
 
     // Text
     if (text != null) {
-      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
-      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION, 1.2f);
-      // Search-as-you-type generates useful subfields for autocompletion, we should use it
-      // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
-      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
-      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
-      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
-      additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
-      queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
-      queryBuilder.operator(Operator.AND);
-      if (fuzzy) {
-        queryBuilder.fuzziness(Fuzziness.AUTO);
+      String exactPhrase = getExactPhrase(text);
+      MultiMatchQueryBuilder queryBuilder;
+      if (exactPhrase != null) {
+        // The user wrapped the whole search text in double quotes: search for an exact phrase instead of
+        // fuzzy-matching individual terms, so e.g. "12345" does not also match "12346".
+        queryBuilder = QueryBuilders.multiMatchQuery(exactPhrase);
+        queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION, 1.2f);
+        additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
+        queryBuilder.type(MultiMatchQueryBuilder.Type.PHRASE);
+      } else {
+        queryBuilder = QueryBuilders.multiMatchQuery(text);
+        queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION, 1.2f);
+        // Search-as-you-type generates useful subfields for autocompletion, we should use it
+        // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
+        queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
+        queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
+        queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
+        additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
+        queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
+        queryBuilder.operator(Operator.AND);
+        if (fuzzy) {
+          queryBuilder.fuzziness(Fuzziness.AUTO);
+        }
       }
       booleanQuery.minimumShouldMatch(1);
       booleanQuery.should(queryBuilder);
@@ -176,6 +187,23 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
       this.queryBuilder = booleanQuery;
     }
 
+  }
+
+  /**
+   * Returns the text wrapped by <code>text</code> if the whole string is wrapped in double quotes, indicating that
+   * the user wants an exact phrase match, or <code>null</code> if it isn't.
+   *
+   * @param text
+   *          the raw search text
+   * @return the quoted phrase without the surrounding quotes, or <code>null</code>
+   */
+  private String getExactPhrase(String text) {
+    String trimmed = text.trim();
+    if (trimmed.length() < 2 || !trimmed.startsWith("\"") || !trimmed.endsWith("\"")) {
+      return null;
+    }
+    String phrase = trimmed.substring(1, trimmed.length() - 1).trim();
+    return phrase.isEmpty() ? null : phrase;
   }
 
   /**
