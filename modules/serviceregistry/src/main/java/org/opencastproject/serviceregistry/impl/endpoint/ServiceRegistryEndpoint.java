@@ -781,10 +781,11 @@ public class ServiceRegistryEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(
       name = "childrenjobsasxml",
-      description = "Returns all children from a job as XML.",
-      returnDescription = "A list of children jobs as XML",
+      description = "Returns all descendants (children, their children and so on) of a job as XML.",
+      returnDescription = "A list of descendant jobs as XML",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier")
+          @RestParameter(name = "id", isRequired = true, type = Type.STRING,
+              description = "The ancestor job identifier")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Jobs found.")
@@ -798,17 +799,18 @@ public class ServiceRegistryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "childrenjobsasjson",
-      description = "Returns all children from a job as JSON.",
-      returnDescription = "A list of children jobs as JSON",
+      description = "Returns all descendants (children, their children and so on) of a job as JSON.",
+      returnDescription = "A list of descendant jobs as JSON",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier")
+          @RestParameter(name = "id", isRequired = true, type = Type.STRING,
+              description = "The ancestor job identifier")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Jobs found.")
       })
   public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) {
     try {
-      return new JaxbJobList(serviceRegistry.getChildJobs(id));
+      return new JaxbJobList(serviceRegistry.getDescendantJobs(id));
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

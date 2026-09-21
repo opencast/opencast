@@ -228,9 +228,6 @@ public abstract class AbstractIncidentService implements IncidentService {
     List<Job> childJobs = getServiceRegistry().getChildJobs(jobId);
     List<IncidentTree> incidentResults = new ArrayList<>();
     for (Job childJob : childJobs) {
-      if (childJob.getParentJobId() != jobId) {
-        continue;
-      }
       List<Incident> incidentsForJob = getIncidentsOfJob(childJob.getId());
       IncidentTree incidentTree = new IncidentTreeImpl(incidentsForJob, getChildIncidents(childJob.getId()));
       if (hasIncidents(List.of(incidentTree))) {

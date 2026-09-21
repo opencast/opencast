@@ -131,7 +131,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
           operationInstanceJob.setArguments(Collections.emptyList());
           serviceRegistry.updateJob(operationInstanceJob);
 
-          List<Job> jobs = serviceRegistry.getChildJobs(operationInstanceId);
+          List<Job> jobs = serviceRegistry.getDescendantJobs(operationInstanceId);
           for (Job job : jobs) {
             if (job.getStatus() == Job.Status.FINISHED) {
               logger.debug("Deleting job arguments: {}", job.getArguments());

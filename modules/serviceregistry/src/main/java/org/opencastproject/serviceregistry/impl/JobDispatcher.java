@@ -421,7 +421,7 @@ public class JobDispatcher {
           // same time if there is processing capacity available.
           boolean parentHasRunningChildren = false;
           if (parentJob != null) {
-            for (Job child : serviceRegistry.getChildJobs(parentJob.getId())) {
+            for (Job child : serviceRegistry.getDescendantJobs(parentJob.getId())) {
               if (Job.Status.RUNNING.equals(child.getStatus())) {
                 parentHasRunningChildren = true;
                 break;
