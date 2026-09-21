@@ -305,6 +305,7 @@ public class JpaJob {
     newJob.operation = job.getOperation();
     newJob.arguments = job.getArguments();
     newJob.status = job.getStatus().ordinal();
+    newJob.failureReason = job.getFailureReason();
     newJob.parentJobId = job.getParentJobId();
     newJob.rootJobId = job.getRootJobId();
     newJob.dispatchable = job.isDispatchable();
