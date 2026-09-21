@@ -100,7 +100,8 @@ public class YouTubeV3PublicationServiceImplTest {
         .loadFromXml(xml);
     //
     expect(youTubeService.getMyPlaylistByTitle(mediaPackage.getTitle())).andReturn(null).once();
-    expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null, mediaPackage.getSeries()))
+    expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null,
+      YouTubeAPIVersion3Service.PrivacyStatus.PUBLIC, mediaPackage.getSeries()))
       .andReturn(new Playlist()).once();
     expect(youTubeService.addVideoToMyChannel(anyObject(VideoUpload.class))).andReturn(new Video()).once();
     expect(youTubeService.addPlaylistItem(anyObject(String.class), anyObject(String.class)))
