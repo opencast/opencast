@@ -1,71 +1,58 @@
 Load Configuration
 ===================
 
-This guide will help you to set up the load configuration settings which are strongly recommended for each Opencast
-installation.  These settings control how many jobs are running on your various hardware nodes.  These settings can be
-left at their defaults initially, but as your installation grows you will likely wish to fine-tune these to get the best
-performance you can out of your hardware.
+This guide will help you to set up the load configuration, which is strongly recommended for each Opencast
+installation. These settings control how many jobs run on each of your nodes. You can leave them at their defaults
+initially, but as your installation grows you will likely want to fine-tune them to get the best performance out of your
+hardware.
 
 Background: What is a load value
 --------------------------------
 
-Every job obviously imposes a certain amount of load on its processing system, the question is how can we quantify this?
-The settings this document will walk you through are estimates of the load placed on your system(s) by each job type.
-This means that every individual instance of that job type will count for a certain amount of load, and Opencast will
-refuse to process more than a certain configurable amount of load at any given time on a given node.  These loads are
-tracked on a per-node basis, so a job running on one node imposes no load on another.
+Every job puts a certain load on the system that processes it. The settings in this guide are estimates of that load
+for each job type. Every instance of a job type counts for its configured load, and Opencast refuses to process more
+than a configurable amount of load on a node at any given time. Loads are tracked per node, so a job running on one node
+imposes no load on another.
 
-As an example, say we have a worker with 8 cores.  With Opencast 1.x all jobs, even expensive jobs like encoding, had an
-effective load value of 1.0.  This meant that Opencast would schedule up to 8 encodes on worker 1! Obviously this is not
-ideal, since most encoding jobs consume multiple cores.  Since Opencast 2.1 you can now specify on an encoding profile
-level how much load is imposed on a node.  Likewise, all other jobs (video segmentation, publishing, etc) also now have
-configurable loads.
+Jobs differ greatly in cost. On a worker with 8 cores, for example, you do not want 8 encodes at once, since most
+encoding jobs use multiple cores. That is why each job type and each encoding profile has its own configurable load.
 
-Job loads can be any floating point value between 0.0, and Java's MAXFLOAT.  Fractional loads are supported, since many
-of the jobs that Opencast spawns as a regular part of its workflows are very small.  There is no sanity checking for the
-configured loads, aside from assuring they are not negative.  This means that improperly set load values can cause
-deadlocks!  Fortunately, this is easy to fix.  See Troubleshooting for more details.
+A job load can be any floating point value between 0.0 and Java's MAXFLOAT. Fractional loads are supported since many
+jobs are very small. The only check is that loads are not negative, so improperly set load values can cause deadlocks.
+This is easy to fix, see [Troubleshooting](#troubleshooting).
 
 Step 1: Determine your load values
 ----------------------------------
-<!-- _This entire page has much too much text and should be edited down where possible -->
-This is a very subjective process, but is arguably the most important: How much load does each job and encoding profile
-add to your system? We have tried our best to set useful loads for each job, however these are only estimates.  If your
-installation has, for example, hardware assisted encoding then your encoding jobs may be very inexpensive.  In general,
-it is safe to assume that the first load value from the output of `uptime` is a good estimate of the load imposed by a
-job.
+This is a subjective process, but arguably the most important one: how much load does each job and encoding profile add
+to your system? We have set useful defaults, but they are only estimates. With hardware-assisted encoding, for example,
+your encoding jobs may be very cheap. In general, the first load value from the output of `uptime` is a good estimate of
+the load a job imposes.
 
-Note: These job loads are specific for each *node* in the cluster.  This means that for any given job, each node can
-have a different load value associated.  For instance, if worker A has no job load specified for its encoding profiles,
-and worker B has job loads specified then any encoding jobs created by A will have the default load (1.5), and jobs
-created by B will have a different, presumably higher load.  There are edge cases where this may be useful, but in
-most cases this will only cause confusion.  It is therefore highly recommended that these settings be put into your
-configuration management system, and be applied on a cluster level to ensure consistency across all nodes.
+Note: Job loads are specific to each *node*. If worker A sets no job load for its encoding profiles and worker B does,
+encoding jobs created by A get the default load (1.5) and jobs created by B a different, presumably higher one. This can
+be useful in rare cases but mostly just causes confusion. We therefore highly recommend putting these settings into your
+configuration management system and applying them cluster-wide to keep all nodes consistent.
 
 Step 2: Setting the load values for system jobs
 -----------------------------------------------
 
-Each Opencast instance has its own maximum load.  By default this is set to the number of CPU cores present in the
-system.  If you wish to change this, set the `org.opencastproject.server.maxload` key in config.properties to the
-maximum load you want this node to accept.  Keep in mind that exceeding the number of CPU cores present in the system is
-not recommended.
+Each Opencast instance has its own maximum load, which defaults to the number of CPU cores in the system. To change it,
+set the `org.opencastproject.server.maxload` key in `custom.properties` to the maximum load this node should accept.
+Exceeding the number of CPU cores is not recommended.
 
-The load values for the non-encoding jobs are set in the configuration files in the `etc` directory.  Search this
-directory for files that contain the string `job.load` to find the relevant configuration keys.  These
-configuration keys control the load for each job type.  For example, the `job.load.download.distribute` configuration
-key controls the load placed on the system when a download distribution job is running.
+The load values for non-encoding jobs are set in the configuration files in the `etc` directory. Search it for files
+containing the string `job.load` to find the relevant keys, one for each job type. For example, the
+`job.load.download.distribute` key controls the load placed on the system by a download distribution job.
 
-Note: Ingest jobs are a special case in Opencast.  Because of their immediate nature there is no way to limit the number
-of running jobs.  However, these jobs will block other jobs from running on the ingest/admin nodes if enough ingests
-running concurrently.
+Note: Ingest jobs are a special case. Because they start immediately, the number of running ingest jobs cannot be
+limited. If enough ingests run concurrently, though, they block other jobs from running on the ingest/admin nodes.
 
 Step 3: Setting the load values for encoding profiles
 -----------------------------------------------------
 
-Each encoding profile can have a load value associated with it.  By default, we have not set any, which means that the
-default value of 1.5 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
-For example, the composite encoding profile is prefixed with `profile.composite.http`.  If we want to set a different
-job load than the default, we would create the `profile.composite.http.jobload` key, and set it to an appropriate job value.
+Each encoding profile can have its own load. By default none is set, so the default of 1.5 is used. To set one, add a
+`.jobload` key to the profile. For the composite profile, which is prefixed with `profile.composite.http`, this is the
+key `profile.composite.http.jobload`, set to the load you want.
 
 Step 4: Restart Opencast
 --------------------------
@@ -77,13 +64,10 @@ Troubleshooting
 
 ### Help, my system has deadlocked, or there are jobs which are always queued even if the system is otherwise idle
 
-
-This can be caused by setting a job weight that exceeds the maximum load for *all* services of a given type.  For
-example, if you have a single worker with 8 cores and set an encoding job to have a jobload of 9.  Fortunately, there is
-a simple resolution to this issue.  Jobs which have already been created do *not* update their load values, even after
-restarting Opencast.  To resolve a deadlock caused by job loads follow these instructions.  First determine the queued
-job's ID from the admin UI.  This will be an integer greater than zero.  We will call this $jobid.  Once you have the
-job ID, follow these steps:
+This can be caused by a job load that exceeds the maximum load of *all* services of a given type, for example a job load
+of 9 for an encoding job when you have a single worker with 8 cores. Jobs that already exist do *not* update their load
+values, even after restarting Opencast. To resolve the deadlock, first determine the queued job's ID (an integer greater
+than zero) from the admin UI. We will call it `$jobid`. Then follow these steps:
 
 * Stop Opencast
 * Log into your database
