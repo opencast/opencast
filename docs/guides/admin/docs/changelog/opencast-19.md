@@ -1,6 +1,27 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.9 (2026-08-22)
+- [[#8053](https://github.com/opencast/opencast/pull/8053)] -
+  19.9 changelog
+- [[#7943](https://github.com/opencast/opencast/pull/7943)] -
+  Add logging to aid debugging of videosegmenter issues
+- [[#7933](https://github.com/opencast/opencast/pull/7933)] -
+  Log media package merging at debug level
+- [[#7899](https://github.com/opencast/opencast/pull/7899)] -
+  Match capture device keys by prefix, not substring
+- [[#7898](https://github.com/opencast/opencast/pull/7898)] -
+  Resolve wildcard timeline previews target flavor per track
+- [[#7895](https://github.com/opencast/opencast/pull/7895)] -
+  Add the anonymous role to every user
+- [[#7878](https://github.com/opencast/opencast/pull/7878)] -
+  Fix 500 error on GET /api/groups for API versions < 1.6.0
+- [[#7869](https://github.com/opencast/opencast/pull/7869)] -
+  Fix intermittent SchedulerServiceImplTest failures
+- [[#7786](https://github.com/opencast/opencast/pull/7786)] -
+  Adopter registration backend fixes
+
+
 ## Opencast 19.8 (2026-08-12)
 - [[#7912](https://github.com/opencast/opencast/pull/7912)] -
   19.8 changelog
