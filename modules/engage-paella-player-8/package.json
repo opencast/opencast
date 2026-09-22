@@ -30,7 +30,7 @@
     "@asicupv/paella-basic-plugins": "^2.5.0",
     "@asicupv/paella-extra-plugins": "^2.7.0",
     "@asicupv/paella-opencast-core": "^2.0.0",
-    "@asicupv/paella-opencast-plugins": "^2.0.0",
+    "@asicupv/paella-opencast-plugins": "^2.0.6",
     "@asicupv/paella-slide-plugins": "^2.5.0",
     "@asicupv/paella-video-plugins": "^2.3.0",
     "@asicupv/paella-webgl-plugins": "^2.3.0",
