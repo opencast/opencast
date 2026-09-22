@@ -472,21 +472,21 @@ public class AgentImpl implements Agent {
     }
 
     boolean supportLocalCapture = getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_CAPABLE);
-    boolean localAutoStart =
-        supportLocalCapture && getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_AUTOSTART);
+    boolean supportLocalStartPaused =
+        supportLocalCapture && getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED);
     boolean supportStreaming = getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_CAPABLE);
-    boolean streamAutoStart =
-        supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_AUTOSTART);
+    boolean supportStreamStartPaused =
+        supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED);
 
     capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, supportLocalCapture ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportLocalCapture) {
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_AUTOSTART, localAutoStart
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, supportLocalStartPaused
           ? BOOLEAN_ON
           : BOOLEAN_OFF);
     }
     capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, supportStreaming ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportStreaming) {
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_AUTOSTART, streamAutoStart
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, supportStreamStartPaused
           ? BOOLEAN_ON
           : BOOLEAN_OFF);
     }

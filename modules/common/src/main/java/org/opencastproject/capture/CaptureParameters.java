@@ -57,8 +57,20 @@ public interface CaptureParameters {
   String CAPTURE_LOCAL_CAPABLE = "capture.local.capable";
 
   /**
+   * A binary flag indicating that the device can start recording in a paused state.  This would prime any local
+   * encoding pipelines, but *not* start actually storing data locally until a manual, vendor specific start signal
+   * (ie, button press, or some other vendor specific input) occurs.
+   * <br/>
+   * This key is used by the agent to indicate to Opencast whether it supports starting in a paused state (1), or not (0)
+   */
+  String CAPTURE_LOCAL_CANSTARTPAUSED = "capture.local.canstartpaused";
+
+  /**
    * A binary flag indicating that the device should start recording locally at the beginning of the event, or wait for
    * a manual, vendor specific start (ie, button press, or some other vendor specific input).
+   * <br/>
+   * This key is used by the scheduling system to indicate to the agent whether it should start in a paused state (0),
+   * or start capturing immediately (1).
    */
   String CAPTURE_LOCAL_AUTOSTART = "capture.local.autostart";
 
@@ -66,8 +78,20 @@ public interface CaptureParameters {
   String CAPTURE_STREAM_CAPABLE = "capture.stream.capable";
 
   /**
+   * A binary flag indicating that the device can start streaming in a paused state.  This would prime any local
+   * encoding pipelines, and output a but *not* start actually storing data locally until a manual, vendor specific start signal
+   * (ie, button press, or some other vendor specific input) occurs.
+   * <br/>
+   * This key is used by the agent to indicate to Opencast whether it supports starting in a paused state (1), or not (0)
+   */
+  String CAPTURE_STREAM_CANSTARTPAUSED = "capture.stream.canstartpaused";
+
+  /**
    * A binary flag indicating that the device should start streaming its capture at the beginning of the event, or wait
    * for a manual, vendor specific start (ie, button press, or some other vendor specific input).
+   * <br/>
+   * This key is used by the scheduling system to indicate to the agent whether it should start in a paused state (0),
+   * or start capturing immediately (1).
    */
   String CAPTURE_STREAM_AUTOSTART = "capture.stream.autostart";
 
