@@ -1,5 +1,10 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.9
+
+This version contains minor updates for the admin, editor, and studio submodules, along with the usual collection of
+bug fixes.
+
 ## Opencast 19.8
 
 This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of
