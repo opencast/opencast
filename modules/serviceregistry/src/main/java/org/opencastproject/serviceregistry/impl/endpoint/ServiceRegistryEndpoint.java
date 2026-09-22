@@ -449,7 +449,7 @@ public class ServiceRegistryEndpoint {
   @RestQuery(
       name = "health",
       description = "Checks the status of the registered services",
-      returnDescription = "Returns NO_CONTENT if services are in a proper state",
+      returnDescription = "Returns a count of healthy, warning and error services",
       restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING,
               description = "The service type identifier"),
@@ -473,7 +473,7 @@ public class ServiceRegistryEndpoint {
   @RestQuery(
       name = "health",
       description = "Checks the status of the registered services",
-      returnDescription = "Returns NO_CONTENT if services are in a proper state",
+      returnDescription = "Returns a count of healthy, warning and error services",
       restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING,
               description = "The service type identifier"),
