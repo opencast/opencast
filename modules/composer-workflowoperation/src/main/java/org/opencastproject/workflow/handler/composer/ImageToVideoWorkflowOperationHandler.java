@@ -130,10 +130,10 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     final ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavors = tagsAndFlavors.getTargetFlavors();
     final Optional<MediaPackageElementFlavor> targetFlavor = Optional.ofNullable(targetFlavors.get(0));
-    final double duration = getCfg(wi, OPT_DURATION)
+    final double duration = getOptConfig(wi, OPT_DURATION)
         .flatMap(Strings::toDouble)
         .orElseThrow(() -> new WorkflowOperationException(OPT_DURATION + " is missing or malformed"));
-    final String profile = getCfg(wi, OPT_PROFILE)
+    final String profile = getOptConfig(wi, OPT_PROFILE)
         .orElseThrow(() -> new WorkflowOperationException(OPT_PROFILE + " is missing or malformed"));
 
     // run image to video jobs
