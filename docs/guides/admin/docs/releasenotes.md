@@ -1,5 +1,10 @@
 # Opencast 20: Release Notes
 
+## Opencast 20.4
+
+This version contains addition updates for the admin and editor submodules, along with the usual collection of
+bug fixes.
+
 ## Opencast 20.3
 
 This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of

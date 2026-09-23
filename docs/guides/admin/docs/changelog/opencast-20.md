@@ -1,6 +1,49 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.4 (2026-09-23)
+- [[#7958](https://github.com/opencast/opencast/pull/7958)] -
+  Add "hasUser" to UserAndRoleDirectoryServiceImpl.findRoles([...])
+- [[#7956](https://github.com/opencast/opencast/pull/7956)] -
+  Limit queries to RoleProviders a bit in findRoles()
+- [[#7955](https://github.com/opencast/opencast/pull/7955)] -
+  Deduplicate roles before pagination in findRoles()
+- [[#7900](https://github.com/opencast/opencast/pull/7900)] -
+  Validate target flavors, not target tags, for `targetFlavors=atLeastOne`
+- [[#7871](https://github.com/opencast/opencast/pull/7871)] -
+  Docs: resolve remaining thumbnail-config TODOs from #7835
+- [[#7843](https://github.com/opencast/opencast/pull/7843)] -
+  Respect overwrite parameter for track streams in inspect WOH
+
+### Admin Interface
+
+- [[#1672](https://github.com/opencast/admin-interface/pull/1672)] -
+  Reset sort when searching
+- [[#1671](https://github.com/opencast/admin-interface/pull/1671)] -
+  Just show active chevron for sorted table column
+- [[#1663](https://github.com/opencast/admin-interface/pull/1663)] -
+  Title tooltip in dropdowns
+- [[#1662](https://github.com/opencast/admin-interface/pull/1662)] -
+  Render overflowing dropdown options with ellipsis
+- [[#1661](https://github.com/opencast/admin-interface/pull/1661)] -
+  Add minwidth to acl dropdown table
+- [[#1659](https://github.com/opencast/admin-interface/pull/1659)] -
+  Notify user if series theme could not be saved
+- [[#1658](https://github.com/opencast/admin-interface/pull/1658)] -
+  Avoid sorting formik in place in scheduling tab
+- [[#1657](https://github.com/opencast/admin-interface/pull/1657)] -
+  Remove some debug logging statements
+- [[#1656](https://github.com/opencast/admin-interface/pull/1656)] -
+  Fix `<td> <td>` nesting
+- [[#1655](https://github.com/opencast/admin-interface/pull/1655)] -
+  Minor dropdown fixes
+- [[#1653](https://github.com/opencast/admin-interface/pull/1653)] -
+  Type acl default config keys
+
+### Editor
+- [[#1717](https://github.com/opencast/editor/pull/1717)] -
+  Prevent user from making video too short
+
 ## Opencast 20.3 (2026-08-26)
 
 - [[#7875](https://github.com/opencast/opencast/pull/7875)] -
