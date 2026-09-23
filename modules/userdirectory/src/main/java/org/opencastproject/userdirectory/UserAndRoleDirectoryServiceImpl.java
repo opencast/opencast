@@ -62,6 +62,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -381,6 +382,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
     roles.addAll(derivedRoles);
 
+    // Every user has the anonymous role: being logged in does not stop you from also being part of
+    // the anonymous audience. It is already granted to the Spring authorities in
+    // loadUserByUsername(), so without adding it here the roles of a User would disagree with the
+    // authorities actually being evaluated, and it would be missing from /info/me.json.
+    roles.add(new JaxbRole(user.getOrganization().getAnonymousRole(),
+            JaxbOrganization.fromOrganization(user.getOrganization()), "", Role.Type.SYSTEM));
+
     // Create and return the final user
     JaxbUser mergedUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
             user.getProvider(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
@@ -498,7 +506,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   }
 
   @Override
-  public List<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+  public List<Role> findRoles(String query, Role.Target target, int offset, int limit, Boolean hasUser) {
     if (query == null) {
       throw new IllegalArgumentException("Query must be set");
     }
@@ -507,19 +515,47 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
     }
 
-    // Find all roles from the role providers
-    final List<Role> roles = new ArrayList<>();
+    // Instead of getting all roles from all providers, limit the providers by "limit" and "offset" if possible.
+    // Intended to reduce computing time for low offset + limit requests.
+    // This optimization cannot be applied when filtering by "hasUser", since that filter is applied after fetching
+    // from the providers: trimming the provider results to offset+limit beforehand could discard roles that would have
+    // passed the filter, leaving fewer than "limit" results even though more were available.
+    final int providerLimit = limit > 0 && hasUser == null
+        ? (int) Math.min((long) offset + limit, Integer.MAX_VALUE) : 0;
+
+    // Multiple providers can return the same role (e.g.built-in system roles), so deduplicate them using a
+    // LinkedHashSet, before limit is applied.
+    final Set<Role> roles = new LinkedHashSet<>();
     for (RoleProvider roleProvider : roleProviders) {
       final String providerOrgId = roleProvider.getOrganization();
       if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
-        roleProvider.findRoles(query, target, 0, 0).forEachRemaining(roles::add);
+        roleProvider.findRoles(query, target, 0, providerLimit, hasUser).forEachRemaining(roles::add);
       }
     }
-    Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName)).skip(offset);
+    Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName));
+    // Filter by whether or not the role resolves to an actual user account, before offset/limit are applied, so
+    // that a page of `limit` results is not silently shortened by roles excluded after the fact.
+    if (hasUser != null) {
+      stream = stream.filter(role -> hasUser.equals(roleHasUser(role)));
+    }
+    stream = stream.skip(offset);
     if (limit > 0) {
       return stream.limit(limit).collect(Collectors.toList());
     }
     return stream.collect(Collectors.toList());
+  }
+
+  /**
+   * Determines whether the given role corresponds to an actual user account, i.e. whether
+   * {@link #loadUser(String)} returns a non-null user for the role's name with the configured user role prefix
+   * stripped off.
+   *
+   * @param role
+   *          the role to check
+   * @return <code>true</code> if the role resolves to a user account, <code>false</code> otherwise
+   */
+  private boolean roleHasUser(Role role) {
+    return loadUser(role.getName().replaceFirst(UserIdRoleProvider.getUserRolePrefix(), "")) != null;
   }
 
   @Override

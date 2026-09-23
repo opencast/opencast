@@ -311,12 +311,11 @@ public class AgentImpl implements Agent {
       for (String name : friendlyNames) {
         String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
         // If the key looks like a device prefix + the name, copy it
-        if (key.contains(check)) {
+        if (key.startsWith(check)) {
           String property = configuration.getProperty(key);
           if (property == null) {
-            log.error("Unable to expand variable in value for key {}, returning null!", key);
-            capabilitiesProperties = null;
-            return;
+            log.warn("Capture agent '{}': ignoring capability key '{}' because its value is null", this.name, key);
+            continue;
           }
           capabilitiesProperties.setProperty(key, property);
           propertyCounts.put(name, propertyCounts.get(name) + 1);

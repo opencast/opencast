@@ -253,7 +253,11 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
   }
 
   public Adopter get() throws AdopterRegistrationException {
-    return db.exec(namedQuery.findOpt("Adopter.findAll", Adopter.class)).orElse(null);
+    Adopter a = db.exec(namedQuery.findOpt("Adopter.findAll", Adopter.class)).orElse(null);
+    if (a != null && a.getTermsVersionAgreed() != Adopter.getLatestTermsOfUse()) {
+      a.setAgreedToPolicy(false);
+    }
+    return a;
   }
 
   /**
@@ -288,6 +292,7 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
         sender.deleteStatistics(sd.jsonify());
         sender.deleteGeneralData(gd.jsonify());
         markForDeletion();
+        delete();
       } catch (IOException e) {
         logger.warn("Error occurred while deleting registration data, will retry", e);
       }
@@ -336,13 +341,12 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
     }
   }
 
-  public String getRegistrationDataAsString() throws Exception {
+  public String getStatsDataAsString() throws Exception {
     Adopter adopter = get();
     if (null == adopter) {
       adopter = new Adopter();
     }
     Map<String, Object> map = new LinkedHashMap<>();
-    map.put("general", new GeneralData(adopter));
     map.put("statistics", collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()));
     db.exec(em -> {
       TypedQuery<AdopterRegistrationExtra> q =

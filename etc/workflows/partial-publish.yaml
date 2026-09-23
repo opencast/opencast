@@ -113,7 +113,7 @@ operations:
     exception-handler-workflow: partial-error
     description: Creating timeline preview images
     configurations:
-      - source-flavor: '*/trimmed'
+      - source-flavors: presenter/trimmed,presentation/trimmed
       - target-flavor: '*/timeline+preview'
       - target-tags: engage-download
       - image-count: 100

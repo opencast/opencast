@@ -393,7 +393,7 @@ Thumbnail Type | Description
 To fully support the thumbnail feature, your workflows should take care of creating the different types of thumbnails
 and be consistent to the Admin UI thumbnail configuration (see [Thumbnail Configuration](admin-ui/thumbnails.md))
 
-### XML Workflow Definitions
+## XML Workflow Definitions
 
 As an alternative to YAML workflow configuration files, it is possible to use XML files with the following structure.
 

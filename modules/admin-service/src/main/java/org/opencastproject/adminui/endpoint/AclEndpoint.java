@@ -80,11 +80,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -274,24 +272,29 @@ public class AclEndpoint {
       returnDescription = "Returns a JSON representation of the roles with the given parameters under the "
           + "current user's organization.",
       restParameters = {
-          @RestParameter(name = "query", isRequired = false, description = "The query.", type = STRING),
+          @RestParameter(name = "query", isRequired = false,
+              description = "Only return roles whose name contains this string (case-insensitive).", type = STRING),
           @RestParameter(name = "target", isRequired = false, description = "The target of the roles.",
               type = STRING),
           @RestParameter(name = "limit", defaultValue = "100",
               description = "The maximum number of items to return per page.", isRequired = false,
               type = RestParameter.Type.STRING),
           @RestParameter(name = "offset", defaultValue = "0", description = "The page number.", isRequired = false,
-              type = RestParameter.Type.STRING)
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "hasUser", isRequired = false,
+              description = "If set, only returns roles that do (true) or do not (false) correspond to an actual "
+                  + "user account. If omitted, roles are not filtered by this criterion.",
+              type = RestParameter.Type.BOOLEAN)
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "The list of roles.")
       })
   public Response getRoles(@QueryParam("query") String query, @QueryParam("target") String target,
-      @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+      @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("hasUser") Boolean hasUser) {
 
     String roleQuery = "%";
     if (StringUtils.isNotBlank(query)) {
-      roleQuery = query.trim() + "%";
+      roleQuery = "%" + query.trim() + "%";
     }
 
     Role.Target roleTarget = Role.Target.ALL;
@@ -304,18 +307,20 @@ public class AclEndpoint {
       }
     }
 
-    List<Role> roles = roleDirectoryService.findRoles(roleQuery, roleTarget, offset, limit);
-    Set<Role> uniqueRoles = new LinkedHashSet<>(roles);
+    List<Role> roles = roleDirectoryService.findRoles(roleQuery, roleTarget, offset, limit, hasUser);
 
     JSONArray jsonRoles = new JSONArray();
-    for (Role role: uniqueRoles) {
+    for (Role role: roles) {
       JSONObject jsonRole = new JSONObject();
       jsonRole.put("name", role.getName());
       jsonRole.put("type", role.getType().toString());
       jsonRole.put("description", role.getDescription());
       jsonRole.put("organization", role.getOrganizationId());
       jsonRole.put("isSanitize", isSanitize());
-      if (!isSanitize()) {
+      // If the caller already asked findRoles() to only return roles without a user (hasUser=false), every role
+      // here is guaranteed to have none -- skip the redundant loadUser() lookup, which findRoles() already paid
+      // for once per role, and which is never cache-backed for misses (see UserAndRoleDirectoryServiceImpl#loadUser).
+      if (!isSanitize() && !Boolean.FALSE.equals(hasUser)) {
         boolean isUserRole = role.getName().startsWith(getUserRolePrefix());
         User user = userDirectoryService.loadUser(role.getName().replaceFirst(getUserRolePrefix(), ""));
         if (user != null) {

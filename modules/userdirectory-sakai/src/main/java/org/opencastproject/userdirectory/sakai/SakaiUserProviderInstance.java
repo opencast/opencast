@@ -61,7 +61,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -84,12 +83,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /** The organization */
   private Organization organization = null;
-
-  /** Total number of requests made to load users */
-  private AtomicLong requests = null;
-
-  /** The number of requests made to Sakai */
-  private AtomicLong sakaiLoads = null;
 
   /** A cache of users, which lightens the load on Sakai */
   private LoadingCache<String, Object> cache = null;
@@ -204,7 +197,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       userPattern = null;
     }
 
-    requests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
       if (user == nullToken) {
@@ -246,9 +238,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
     logger.debug("In loadUserFromSakai, currently processing user : {}", userName);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-
-    // update cache statistics
-    sakaiLoads.incrementAndGet();
 
     Thread currentThread = Thread.currentThread();
     ClassLoader originalClassloader = currentThread.getContextClassLoader();

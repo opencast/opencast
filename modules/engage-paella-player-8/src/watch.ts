@@ -23,7 +23,7 @@ import '@asicupv/paella-zoom-plugin/paella-zoom-plugin.css';
 // import '@asicupv/paella-webgl-plugins/paella-webgl-plugins.css';
 // import '@asicupv/paella-video-plugins/paella-video-plugins.css';
 import '@asicupv/paella-extra-plugins/paella-extra-plugins.css';
-import '@asicupv/paella-ai-plugins/paella-ai-plugins.css';
+// import '@asicupv/paella-ai-plugins/paella-ai-plugins.css';
 import '@asicupv/paella-opencast-core/paella-opencast-core.css';
 import defaultDictionaries from './i18n/all';
 

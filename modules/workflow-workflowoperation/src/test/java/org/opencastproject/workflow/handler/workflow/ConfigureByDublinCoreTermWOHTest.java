@@ -77,7 +77,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   @Test
   public void testMatchPresentDCTerm() throws Exception {
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "publisher");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}publisher");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "University of Opencast");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
     operation.setConfiguration("newConfigProperty", "true");
@@ -92,7 +92,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   @Test
   public void testMatchPresentDCTermOverwriteProperty() throws Exception {
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "publisher");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}publisher");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "University of Opencast");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
     operation.setConfiguration("oldConfigProperty", "bar");
@@ -108,7 +108,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   public void testMatchDefaultDCTerm() throws Exception {
     // Match == Default Value
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DEFAULT_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
@@ -125,7 +125,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   public void testMisMatchDefaultDCTerm() throws Exception {
     // Match != Default Value
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DEFAULT_VALUE_PROPERTY, "Cairo");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
@@ -141,7 +141,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   public void testMissingNoDefaultDCTerm() throws Exception {
     // No Default Value
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
     operation.setConfiguration("newConfigProperty", "true");
@@ -157,7 +157,7 @@ public class ConfigureByDublinCoreTermWOHTest {
     // No Match or Default Value
     // without dcterm or default the match should always fail
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
 
     WorkflowOperationResult result = operationHandler.start(instance, null);

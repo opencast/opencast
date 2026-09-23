@@ -560,7 +560,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         break;
       case atLeastOne:
         targetFlavorList = getFlavors(operation, TARGET_FLAVORS, TARGET_FLAVOR);
-        if (targetTagList.isEmpty()) {
+        if (targetFlavorList.isEmpty()) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVORS + "' or '" + TARGET_FLAVOR
               + "' must be set");
         }
