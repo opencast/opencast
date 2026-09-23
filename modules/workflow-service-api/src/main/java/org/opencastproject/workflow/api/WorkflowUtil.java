@@ -34,18 +34,6 @@ public final class WorkflowUtil {
    *          The workflow state to check.
    * @return True if the workflow is currently active, not stopped or failed.
    */
-  @Deprecated
-  public static boolean isActive(WorkflowState workflowState) {
-    return !workflowState.isTerminated();
-  }
-
-  /**
-   * Checks to see whether a given workflow state is active.
-   *
-   * @param workflowState
-   *          The workflow state to check.
-   * @return True if the workflow is currently active, not stopped or failed.
-   */
   public static boolean isActive(String workflowState) {
     if (workflowState == null || workflowState.isBlank()) {
       return false;

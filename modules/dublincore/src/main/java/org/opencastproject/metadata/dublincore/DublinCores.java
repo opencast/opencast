@@ -92,23 +92,6 @@ public final class DublinCores {
    * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier} and the
    *   {@link DublinCore#PROPERTY_IDENTIFIER identifier} property is not set.
    * </ul>
-   *
-   * @deprecated use {@link #mkOpencastEpisode()} instead
-   */
-  @Nonnull
-  @Deprecated
-  public static Episode mkOpencast() {
-    return mkOpencastEpisode();
-  }
-
-  /**
-   * Create a new Opencast DublinCore metadata catalog for episodes.
-   * <ul>
-   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
-   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
-   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier} and the
-   *   {@link DublinCore#PROPERTY_IDENTIFIER identifier} property is not set.
-   * </ul>
    */
   @Nonnull
   public static Episode mkOpencastEpisode() {
