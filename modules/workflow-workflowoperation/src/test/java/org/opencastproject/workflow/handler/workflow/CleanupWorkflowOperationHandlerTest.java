@@ -40,7 +40,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -320,7 +320,7 @@ public class CleanupWorkflowOperationHandlerTest {
       }
       HttpUriRequest req = (HttpUriRequest) arg;
       uriStore.add(req.getURI());
-      boolean result = StringUtils.startsWith(req.getURI().toString(), matchBaseUri.toString());
+      boolean result = Strings.CS.startsWith(req.getURI().toString(), matchBaseUri.toString());
       return result;
     }
 

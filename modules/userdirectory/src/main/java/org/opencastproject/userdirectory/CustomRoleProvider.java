@@ -31,6 +31,7 @@ import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -153,7 +154,7 @@ public class CustomRoleProvider implements RoleProvider {
 
     // Match the custom regular expression first if this is an ACL role query
     if ((target == Role.Target.ACL) && (rolematch != null)) {
-      String exactQuery = StringUtils.removeEnd(query, "%");
+      String exactQuery = Strings.CS.removeEnd(query, "%");
       Matcher m = rolematch.matcher(exactQuery);
       if (m.matches()) {
         return Collections
