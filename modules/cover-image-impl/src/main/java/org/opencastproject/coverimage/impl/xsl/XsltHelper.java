@@ -21,7 +21,7 @@
 package org.opencastproject.coverimage.impl.xsl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 /** Helper class to use within the XSLT transformation */
 public final class XsltHelper {
