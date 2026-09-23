@@ -49,6 +49,7 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.CronExpression;
 import org.quartz.JobDetail;
@@ -127,6 +128,12 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
   protected void activate(ComponentContext cc) {
     logger.info("Activating!");
     super.activate(cc);
+  }
+
+  @Override
+  @Deactivate
+  public void deactivate() {
+    super.deactivate();
   }
 
   public SpeechToTextWorkflowSchedulerQuartz() {
