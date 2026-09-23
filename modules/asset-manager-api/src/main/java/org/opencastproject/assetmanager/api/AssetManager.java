@@ -115,7 +115,7 @@ public interface AssetManager {
    * @return Snapshot
    *    returns the latest snapshot for each given mediaPackageId
    */
-  List<Snapshot> getLatestSnapshots(Collection mediaPackageIds);
+  List<Snapshot> getLatestSnapshots(Collection<String> mediaPackageIds);
 
   /**
    * Check if any snapshot with the given media package identifier exists.

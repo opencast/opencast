@@ -512,10 +512,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           ids.add(id);
         }
         //Select the list of ids which already exist.  Hint: this needs to be zero
-        List<Snapshot> snapshots = assetManager.getLatestSnapshots(ids);
+        //Note: this must be a plain existence check, not a permission-filtered lookup like
+        //getLatestSnapshots, since a colliding id the current user cannot read would otherwise go undetected
+        boolean anyIdExists = ids.stream().anyMatch(id -> assetManager.snapshotExists(id.toString()));
 
         //If there is conflict, clear the list and start over
-        if (snapshots.size() > 0) {
+        if (anyIdExists) {
           ids.clear();
         }
       }
