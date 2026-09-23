@@ -545,7 +545,7 @@ public class Database {
     });
   }
 
-  public List<Snapshot> getLatestSnapshotsByMediaPackageIds(Collection mediaPackageIds, String orgId) {
+  public List<Snapshot> getLatestSnapshotsByMediaPackageIds(Collection<String> mediaPackageIds, String orgId) {
     if (mediaPackageIds.isEmpty()) {
       return Collections.emptyList();
     }

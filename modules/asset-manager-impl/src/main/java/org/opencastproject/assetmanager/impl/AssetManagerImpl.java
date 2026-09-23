@@ -318,7 +318,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public List<Snapshot> getLatestSnapshots(Collection mediaPackageIds) {
+  public List<Snapshot> getLatestSnapshots(Collection<String> mediaPackageIds) {
     String orgId = securityService.getOrganization().getId();
     switch (isAdmin()) {
       case GLOBAL:
