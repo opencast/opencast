@@ -63,7 +63,7 @@
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
     <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
-    <rest-assured.version>4.4.0</rest-assured.version>
+    <rest-assured.version>6.0.1</rest-assured.version>
     <spotless.version>3.9.0</spotless.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
