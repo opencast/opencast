@@ -40,7 +40,10 @@ public class QueryCache implements PreparsedDocumentProvider {
       .maximumSize(2048)
       .build();
 
+  // getDocument is deprecated in favor of getDocumentAsync, but PreparsedDocumentProvider still
+  // declares it abstract, so implementations must still provide it.
   @Override
+  @SuppressWarnings("deprecation")
   public PreparsedDocumentEntry getDocument(ExecutionInput executionInput,
       Function<ExecutionInput, PreparsedDocumentEntry> parseAndValidateFunction) {
     try {
