@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
@@ -143,6 +144,6 @@ public class MicrosoftAzureStorageClientTest {
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
     Assert.assertNotNull(blobUrl);
-    azureStorageClient.deleteFile(new URL(blobUrl));
+    azureStorageClient.deleteFile(URI.create(blobUrl).toURL());
   }
 }

@@ -51,6 +51,7 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -331,7 +332,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     try {
       // This webservice does not require authentication
-      URL url = new URL(sakaiUrl + "/direct/user/" + userId + "/exists");
+      URL url = URI.create(sakaiUrl + "/direct/user/" + userId + "/exists").toURL();
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -372,7 +373,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     try {
       // This webservice does not require authentication
-      URL url = new URL(sakaiUrl + "/direct/site/" + siteId + "/exists");
+      URL url = URI.create(sakaiUrl + "/direct/site/" + siteId + "/exists").toURL();
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -393,7 +394,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
     logger.debug("getRolesFromSakai(" + userId + ")");
     try {
 
-      URL url = new URL(sakaiUrl + "/direct/membership/fastroles/" + userId + ".xml" + "?__auth=basic");
+      URL url = URI.create(sakaiUrl + "/direct/membership/fastroles/" + userId + ".xml" + "?__auth=basic").toURL();
       String encoded = Base64.encodeBase64String((sakaiUsername + ":" + sakaiPassword).getBytes("utf8"));
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -455,7 +456,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     try {
 
-      URL url = new URL(sakaiUrl + "/direct/user/" + eid + ".xml" + "?__auth=basic");
+      URL url = URI.create(sakaiUrl + "/direct/user/" + eid + ".xml" + "?__auth=basic").toURL();
       logger.debug("Sakai URL: " + sakaiUrl);
       String encoded = Base64.encodeBase64String((sakaiUsername + ":" + sakaiPassword).getBytes("utf8"));
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
