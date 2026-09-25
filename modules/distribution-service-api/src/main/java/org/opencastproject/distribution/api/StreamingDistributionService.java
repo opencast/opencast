@@ -24,7 +24,6 @@ package org.opencastproject.distribution.api;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageException;
 
 import java.util.List;
 import java.util.Set;
@@ -42,7 +41,7 @@ public interface StreamingDistributionService extends DistributionService {
   boolean publishToStreaming();
 
   Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-          throws DistributionException, MediaPackageException;
+          throws DistributionException;
 
   Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException;
