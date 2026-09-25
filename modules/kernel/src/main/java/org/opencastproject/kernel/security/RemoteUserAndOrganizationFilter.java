@@ -21,7 +21,6 @@
 
 package org.opencastproject.kernel.security;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_SUDO_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_SYSTEM_ROLES;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
@@ -128,7 +127,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
       if (StringUtils.isNotBlank(organizationHeader) && !organizationHeader.equals(originalOrganization.getId())) {
 
         // Organization switching is only allowed if the request is coming in with the global admin role enabled
-        if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+        if (!SecurityUtil.isGlobalAdmin(originalUser)) {
           logger.warn("An unauthorized request is trying to switch from organization '{}' to '{}'",
                   originalOrganization.getId(), organizationHeader);
           ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -179,7 +178,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
             return;
           }
 
-          if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+          if (!SecurityUtil.isGlobalAdmin(originalUser)) {
             // if the original user did not have system privileges, the target user must not gain those, either.
             for (String systemRole : GLOBAL_SYSTEM_ROLES) {
               if (requestedUser.hasRole(systemRole)) {
@@ -191,8 +190,8 @@ public class RemoteUserAndOrganizationFilter implements Filter {
             }
 
             // make sure the user does not gain organization administrator privileges
-            String organizationAdminRole = requestedOrganization.getAdminRole();
-            if (!originalUser.hasRole(organizationAdminRole) && requestedUser.hasRole(organizationAdminRole)) {
+            if (!SecurityUtil.isOrganizationAdmin(originalUser, requestedOrganization)
+                && SecurityUtil.isOrganizationAdmin(requestedUser, requestedOrganization)) {
               logger.warn("An unauthorized request is trying to switch to an admin user, from '{}' to '{}'",
                       originalUser.getUsername(), userHeader);
               ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -223,7 +222,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
         Collection<String> requestedRoles = Arrays.asList(StringUtils.split(rolesHeader, ","));
 
-        if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+        if (!SecurityUtil.isGlobalAdmin(originalUser)) {
           // Role switching is only allowed to non-system roles
           for (String systemRole : GLOBAL_SYSTEM_ROLES) {
             if (requestedRoles.contains(systemRole)) {
@@ -236,7 +235,8 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
           // Role switching is only allowed to non-organization administrator roles
           String organizationAdminRole = requestedOrganization.getAdminRole();
-          if (!originalUser.hasRole(organizationAdminRole) && requestedRoles.contains(organizationAdminRole)) {
+          if (!SecurityUtil.isOrganizationAdmin(originalUser, requestedOrganization)
+              && requestedRoles.contains(organizationAdminRole)) {
             logger.warn("An unauthorized request by user '{}' is trying to gain admin role '{}'",
                     originalUser.getUsername(), organizationAdminRole);
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
