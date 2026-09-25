@@ -1213,10 +1213,8 @@ security-aai
 
 security-cas-client-wrapper
   GroupId                                ArtifactId                                       Licenses
-  org.apache.santuario                   xmlsec                                           Apache License, Version 2.0
   org.apache.velocity                    velocity                                         The Apache Software License, Version 2.0
   org.jasig.cas.client                   cas-client-core                                  Apache License Version 2.0
-  org.opensaml                           opensaml                                         Apache 2
   org.owasp.esapi                        esapi                                            BSD-Creative Commons 3.0 BY-SA
 
 
