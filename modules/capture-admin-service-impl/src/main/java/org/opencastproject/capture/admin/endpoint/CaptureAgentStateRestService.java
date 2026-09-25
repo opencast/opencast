@@ -460,7 +460,8 @@ public class CaptureAgentStateRestService {
   @Path("recordings/{id}")
   @RestQuery(
       name = "setRecordingState",
-      description = "Set the status of a given recording, registering it if it is new",
+      description = "Set the status of an existing recording. The recording must correspond to a scheduled "
+        + "event; unknown identifiers return 404.",
       pathParameters = {
         @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING)
       },
