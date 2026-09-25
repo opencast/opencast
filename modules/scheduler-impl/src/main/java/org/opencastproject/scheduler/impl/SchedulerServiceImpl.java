@@ -96,8 +96,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
@@ -120,6 +118,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -474,13 +473,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
-          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Optional<String> schedulingSource)
+  public Map<String, Period<ZonedDateTime>> addMultipleEvents(RRule<ZonedDateTime> rRule, Date start, Date end,
+          Long duration, TimeZone tz, String captureAgentId, Set<String> userIds, MediaPackage templateMp,
+          Map<String, String> wfProperties, Map<String, String> caMetadata, Optional<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     // input Rrule is UTC. Needs to be adjusted to tz
     Util.adjustRrule(rRule, start, tz);
-    List<Period> periods = Util.calculatePeriods(start, end, duration, rRule, tz);
+    List<Period<ZonedDateTime>> periods = Util.calculatePeriods(start, end, duration, rRule, tz);
     if (periods.isEmpty()) {
       return Collections.emptyMap();
     }
@@ -488,8 +487,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             schedulingSource);
   }
 
-  private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
-          Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
+  private Map<String, Period<ZonedDateTime>> addMultipleEventInternal(List<Period<ZonedDateTime>> periods,
+          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
           Map<String, String> caMetadata, Optional<String> schedulingSource) throws SchedulerException {
     notNull(periods, "periods");
     requireTrue(periods.size() > 0, "periods");
@@ -500,7 +499,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(caMetadata, "caMetadata");
     notNull(schedulingSource, "schedulingSource");
 
-    Map<String, Period> scheduledEvents = new ConcurrentHashMap<>();
+    Map<String, Period<ZonedDateTime>> scheduledEvents = new ConcurrentHashMap<>();
 
     try {
       LinkedList<Id> ids = new LinkedList<>();
@@ -535,8 +534,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       periods.parallelStream().forEach(event -> SecurityUtil.runAs(securityService, org, user, () -> {
         final int currentCounter = periods.indexOf(event);
         MediaPackage mediaPackage = (MediaPackage) templateMp.clone();
-        Date startDate = new Date(event.getStart().getTime());
-        Date endDate = new Date(event.getEnd().getTime());
+        Date startDate = Date.from(event.getStart().toInstant());
+        Date endDate = Date.from(event.getEnd().toInstant());
         Id id = ids.get(currentCounter);
 
         //Get, or make, the DC catalog
@@ -573,9 +572,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String mediaPackageId = mediaPackage.getIdentifier().toString();
         //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTime(event.getStart());
+        cal.setTime(Date.from(event.getStart().toInstant()));
         Date startDateTime = cal.getTime();
-        cal.setTime(event.getEnd());
+        cal.setTime(Date.from(event.getEnd().toInstant()));
         Date endDateTime = cal.getTime();
         // Load dublincore and acl for update
         Optional<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
@@ -1072,8 +1071,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public List<MediaPackage> findConflictingEvents(String captureAgentId, RRule rrule, Date start, Date end,
-          long duration, TimeZone tz) throws SchedulerException {
+  public List<MediaPackage> findConflictingEvents(String captureAgentId, RRule<ZonedDateTime> rrule, Date start,
+          Date end, long duration, TimeZone tz) throws SchedulerException {
     notEmpty(captureAgentId, "captureAgentId");
     notNull(rrule, "rrule");
     notNull(start, "start");
@@ -1081,7 +1080,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(tz, "timeZone");
 
     Util.adjustRrule(rrule, start, tz);
-    final List<Period> periods =  Util.calculatePeriods(start, end, duration, rrule, tz);
+    final List<Period<ZonedDateTime>> periods =  Util.calculatePeriods(start, end, duration, rrule, tz);
 
     if (periods.isEmpty()) {
       return Collections.emptyList();
@@ -1090,11 +1089,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return findConflictingEvents(periods, captureAgentId, tz);
   }
 
-  private boolean checkPeriodOverlap(final List<Period> periods) {
-    final List<Period> sortedPeriods = new ArrayList<>(periods);
+  private boolean checkPeriodOverlap(final List<Period<ZonedDateTime>> periods) {
+    final List<Period<ZonedDateTime>> sortedPeriods = new ArrayList<>(periods);
     sortedPeriods.sort(Comparator.comparing(Period::getStart));
-    Period prior = periods.get(0);
-    for (Period current : periods.subList(1, periods.size())) {
+    Period<ZonedDateTime> prior = periods.get(0);
+    for (Period<ZonedDateTime> current : periods.subList(1, periods.size())) {
       if (current.getStart().compareTo(prior.getEnd()) < 0) {
         return true;
       }
@@ -1103,8 +1102,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return false;
   }
 
-  private List<MediaPackage> findConflictingEvents(List<Period> periods, String captureAgentId, TimeZone tz)
-          throws SchedulerException {
+  private List<MediaPackage> findConflictingEvents(List<Period<ZonedDateTime>> periods, String captureAgentId,
+          TimeZone tz) throws SchedulerException {
     notEmpty(captureAgentId, "captureAgentId");
     notNull(periods, "periods");
     requireTrue(periods.size() > 0, "periods");
@@ -1117,14 +1116,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     try {
-      TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-
       Set<MediaPackage> events = new HashSet<>();
 
-      for (Period event : periods) {
-        event.setTimeZone(registry.getTimeZone(tz.getID()));
-        final Date startDate = event.getStart();
-        final Date endDate = event.getEnd();
+      for (Period<ZonedDateTime> event : periods) {
+        final Date startDate = Date.from(event.getStart().toInstant());
+        final Date endDate = Date.from(event.getEnd().toInstant());
 
         events.addAll(findConflictingEvents(captureAgentId, startDate, endDate));
       }

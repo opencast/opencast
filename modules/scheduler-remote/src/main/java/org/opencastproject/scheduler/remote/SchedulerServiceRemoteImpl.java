@@ -73,6 +73,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -161,9 +162,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
-          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Optional<String> schedulingSource)
+  public Map<String, Period<ZonedDateTime>> addMultipleEvents(RRule<ZonedDateTime> rRule, Date start, Date end,
+          Long duration, TimeZone tz, String captureAgentId, Set<String> userIds, MediaPackage templateMp,
+          Map<String, String> wfProperties, Map<String, String> caMetadata, Optional<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     HttpPost post = new HttpPost("/");
     logger.debug("Start adding a new events through remote Schedule Service");
@@ -682,8 +683,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public List<MediaPackage> findConflictingEvents(String captureAgentId, RRule rrule, Date startDate, Date endDate,
-          long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException {
+  public List<MediaPackage> findConflictingEvents(String captureAgentId, RRule<ZonedDateTime> rrule, Date startDate,
+          Date endDate, long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException {
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
     queryStringParams.add(new BasicNameValuePair("agent", captureAgentId));
     queryStringParams.add(new BasicNameValuePair("rrule", rrule.getRecur().toString()));
