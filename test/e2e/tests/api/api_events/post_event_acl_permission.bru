@@ -1,0 +1,24 @@
+meta {
+  name: post_event_acl_permission
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/api/events/:eventId/acl/:action
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+  action: write
+}
+
+body:form-urlencoded {
+  role: ROLE_STUDENT
+}
+
+assert {
+  res.status: eq 204
+}

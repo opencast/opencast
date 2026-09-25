@@ -1,0 +1,31 @@
+meta {
+  name: put_event_scheduling
+  type: http
+  seq: 18
+}
+
+put {
+  url: {{baseUrl}}/api/events/:eventId/scheduling
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  eventId: {{scheduledEventId}}
+}
+
+body:form-urlencoded {
+  scheduling: {"agent_id":"bruno-sched-agent","start":"{{schedStart2}}","end":"{{schedEnd2}}","inputs":["default"]}
+}
+
+script:pre-request {
+  // Shift the capture window one day after the originally scheduled slot
+  const start = new Date(new Date(bru.getVar('schedStart')).getTime() + 86400000);
+  const end = new Date(start.getTime() + 3600000);
+  bru.setVar('schedStart2', start.toISOString().replace('.000Z', 'Z'));
+  bru.setVar('schedEnd2', end.toISOString().replace('.000Z', 'Z'));
+}
+
+assert {
+  res.status: eq 204
+}

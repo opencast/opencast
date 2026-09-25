@@ -1,0 +1,28 @@
+meta {
+  name: post_url_invalid
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/security/sign
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  url: https://develop.opencast.org/
+  valid-until: invalid-timestamp-format
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Signing with a malformed valid-until date should be rejected", function() {
+    // Currently fails: Opencast returns 500 ('UTC date string is malformed')
+    // instead of the documented 400 for an invalid datetime value.
+    expect(res.status).to.equal(400);
+  });
+}

@@ -1,0 +1,23 @@
+meta {
+  name: delete_recording
+  type: http
+  seq: 21
+}
+
+delete {
+  url: {{baseUrl}}/capture-admin/recordings/{{recordingMpId}}
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Delete recording status should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include(bru.getVar('recordingMpId') + " removed");
+  });
+}
