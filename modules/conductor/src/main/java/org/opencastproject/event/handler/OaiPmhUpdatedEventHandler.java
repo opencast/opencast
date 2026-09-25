@@ -41,24 +41,23 @@ import org.opencastproject.security.util.SecurityUtil;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 @Component(
     immediate = true,
     service = {
-        ManagedService.class,
         OaiPmhUpdatedEventHandler.class
     },
     property = {
@@ -66,7 +65,7 @@ import java.util.Set;
         "service.pid=org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
     }
 )
-public class OaiPmhUpdatedEventHandler implements ManagedService {
+public class OaiPmhUpdatedEventHandler {
 
   /** The logger */
   protected static final Logger logger = LoggerFactory.getLogger(OaiPmhUpdatedEventHandler.class);
@@ -100,25 +99,17 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
   /** The asset manager */
   protected AssetManager assetManager = null;
 
-  /**
-   * OSGI callback for component activation.
-   *
-   * @param bundleContext
-   *          the OSGI bundle context
-   */
   @Activate
-  protected void activate(BundleContext bundleContext) {
+  @Modified
+  protected void updated(BundleContext bundleContext, Map<String, Object> properties) throws ConfigurationException {
     this.systemAccount = bundleContext.getProperty("org.opencastproject.security.digest.user");
-  }
 
-  @Override
-  public void updated(Dictionary<String, ?> dictionary) throws ConfigurationException {
-    final Optional<Boolean> propagateEpisode = getOptCfgAsBoolean(dictionary, CFG_PROPAGATE_EPISODE);
+    final Optional<Boolean> propagateEpisode = getOptCfgAsBoolean(properties, CFG_PROPAGATE_EPISODE);
     if (propagateEpisode.isPresent()) {
       this.propagateEpisode = propagateEpisode.get();
     }
 
-    final Optional<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
+    final Optional<String> flavorsRaw = getOptCfg(properties, CFG_FLAVORS);
     if (flavorsRaw.isPresent()) {
       final String[] flavorStrings = flavorsRaw.get().split("\\s*,\\s*");
       this.flavors = new HashSet<>(Arrays.asList(flavorStrings));
@@ -126,7 +117,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       this.flavors = new HashSet<>();
     }
 
-    final Optional<String> tagsRaw = getOptCfg(dictionary, CFG_TAGS);
+    final Optional<String> tagsRaw = getOptCfg(properties, CFG_TAGS);
     if (tagsRaw.isPresent()) {
       final String[] tags = tagsRaw.get().split("\\s*,\\s*");
       this.tags = new HashSet<>(Arrays.asList(tags));

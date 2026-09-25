@@ -36,11 +36,11 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -48,18 +48,17 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Component(
     immediate = true,
-    service = ManagedService.class,
     property = {
         "service.description=Workflow Cleanup Scanner Service"
     }
 )
-public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implements ManagedService {
+public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner {
   private static final String SCANNER_NAME = "Workflow Cleanup Scanner";
 
   /** The logging facility */
@@ -105,12 +104,6 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
     }
   }
 
-  @Activate
-  @Override
-  public void activate(ComponentContext cc) {
-    super.activate(cc);
-  }
-
   @Deactivate
   @Override
   public void deactivate() {
@@ -137,8 +130,10 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
     return TRIGGER_NAME;
   }
 
-  @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void updated(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
+    super.activate(cc);
     boolean enabled = false;
     String cronExpression;
     unschedule();
