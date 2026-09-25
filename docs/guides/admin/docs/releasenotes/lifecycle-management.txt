@@ -1,0 +1,4 @@
+Adds LifeCycle Management modules to Opencast. These allow users to create "policies",
+which will periodically check if any entities fit their "filter" criteria, and if they
+do perform predefined "actions" on them. The goal is to allows users to automate
+administrative tasks that are specific to their use case.
