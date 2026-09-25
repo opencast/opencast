@@ -1,0 +1,14 @@
+Fixed incorrect field type for custom ACL actions in the search service index
+==============================================================================
+
+The `opencast_search` index mapping only declared the `read` and `write` sub-fields of
+`searchable_acl` explicitly as `keyword`. Any other ACL action (e.g. a custom action like
+`annotate`, configured via the `ACL.ACTIONS` list provider) fell back to dynamic mapping and was
+stored as `text` instead, which could cause fuzzy matching instead of exact matching when filtering
+by role. A `dynamic_templates` entry was added so that any field under `searchable_acl` is always
+mapped as `keyword`.
+
+This is an index mapping change. Existing installations need to delete the `opencast_search` index
+and trigger a search index rebuild for the fix to take effect on existing data.
+
+See https://github.com/opencast/opencast/issues/5925
