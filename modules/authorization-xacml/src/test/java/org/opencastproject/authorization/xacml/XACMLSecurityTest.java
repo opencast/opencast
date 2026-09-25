@@ -31,6 +31,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -70,6 +71,8 @@ public class XACMLSecurityTest {
   // Override the behavior of the security service to use the current user and roles defined here
   protected SecurityService securityService = null;
 
+  protected SeriesService seriesService = null;
+
   protected XACMLAuthorizationService authzService = null;
 
   @Rule
@@ -83,6 +86,10 @@ public class XACMLSecurityTest {
     securityService = EasyMock.createMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andAnswer(
             () -> new JaxbUser(currentUser, "test", organization, currentRoles)).anyTimes();
+
+    // Mock series service
+    seriesService = EasyMock.createMock(SeriesService.class);
+    EasyMock.expect(seriesService.getSeriesAccessControl(EasyMock.anyString())).andReturn(null).anyTimes();
 
     // Mock workspace
     Workspace workspace = EasyMock.createMock(Workspace.class);
@@ -114,9 +121,10 @@ public class XACMLSecurityTest {
             () -> new FileInputStream(uri.getValue().getPath())).anyTimes();
     workspace.delete(EasyMock.anyObject(URI.class));
     EasyMock.expectLastCall().anyTimes();
-    EasyMock.replay(securityService, workspace);
+    EasyMock.replay(securityService, seriesService, workspace);
     authzService.setWorkspace(workspace);
     authzService.setSecurityService(securityService);
+    authzService.setSeriesService(seriesService);
   }
 
   @Test
