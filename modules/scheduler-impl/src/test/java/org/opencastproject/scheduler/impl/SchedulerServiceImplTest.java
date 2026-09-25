@@ -127,11 +127,11 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
@@ -1088,7 +1088,7 @@ public class SchedulerServiceImplTest {
     try {
       String icalString = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
       cal = calBuilder.build(IOUtils.toInputStream(icalString, "UTF-8"));
-      ComponentList vevents = cal.getComponents(VEVENT);
+      List<CalendarComponent> vevents = cal.getComponents(VEVENT);
       for (int i = 0; i < vevents.size(); i++) {
         PropertyList attachments = ((VEvent) vevents.get(i)).getProperties(Property.ATTACH);
         for (int j = 0; j < attachments.size(); j++) {
