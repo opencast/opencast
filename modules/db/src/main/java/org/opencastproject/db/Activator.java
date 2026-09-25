@@ -49,7 +49,7 @@ public class Activator implements BundleActivator {
   private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
   /** The default max idle time for the connection pool */
-  private static final int DEFAULT_MAX_IDLE_TIME = 3600;
+  private static final int DEFAULT_MAX_IDLE_TIME = 1800;
 
   private String rootDir;
   private ServiceRegistration<?> datasourceRegistration;
