@@ -22,7 +22,6 @@
 package org.opencastproject.series.impl.persistence;
 
 import static org.opencastproject.db.Queries.namedQuery;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -40,6 +39,7 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.Series;
 import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
@@ -384,7 +384,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
     // Make sure the user is actually an administrator of sorts
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
+    if (!SecurityUtil.isAdmin(user, user.getOrganization())) {
       throw new UnauthorizedException(user, getClass().getName() + ".getModifiedInRangeForAdministrativeRead");
     }
 
