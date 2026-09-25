@@ -100,6 +100,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -509,6 +510,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
+    UploadInputStream upload = new UploadInputStream(zipStream);
     Set<String> collectionFilenames = new HashSet<>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
@@ -520,7 +522,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Create the working file target collection for this ingest operation
       String wfrCollectionId = Long.toString(job.getId());
 
-      zis = new ZipArchiveInputStream(zipStream);
+      zis = new ZipArchiveInputStream(upload);
       ZipArchiveEntry entry;
       MediaPackage mp = null;
       Map<String, URI> uris = new HashMap<>();
@@ -619,6 +621,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
       throw e;
     } catch (Exception e) {
+      if (upload.readFailed) {
+        job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      }
       if (e instanceof IngestException) {
         throw (IngestException) e;
       }
@@ -752,7 +757,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         final int length = Math.max(0, FILENAME_LENGTH_MAX - extension.length());
         fileName = fileName.substring(0, length) + extension;
       }
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -819,7 +824,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding partial track {} from input stream on mediapackage {}", elementId, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       job.setStatus(Job.Status.FINISHED);
@@ -1038,7 +1043,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       final String elementId = UUID.randomUUID().toString();
       final String mediaPackageId = mediaPackage.getIdentifier().toString();
       logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackageId);
-      final URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      final URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
 
       final boolean isJSON;
       try (InputStream inputStream = workingFileRepository.get(mediaPackageId, elementId)) {
@@ -1140,7 +1145,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from input stream on mediapackage {}", elementId, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -1769,10 +1774,44 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return contentDisposition.getParameter("filename");
   }
 
+  /**
+   * Stores the content of an upload in the working file repository.
+   *
+   * If reading the upload fails, the client is to blame, e.g. because it closed the connection. That is no reason to
+   * consider this service unhealthy, so the job is marked as failed because of its data.
+   */
+  private URI addUploadToRepo(Job job, MediaPackage mp, String elementId, String filename, InputStream upload)
+          throws IOException {
+    UploadInputStream in = new UploadInputStream(upload);
+    try {
+      return addContentToRepo(mp, elementId, filename, in);
+    } catch (IOException e) {
+      if (in.readFailed) {
+        job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      }
+      throw e;
+    }
+  }
+
   private URI addContentToRepo(MediaPackage mp, String elementId, String filename, InputStream file)
           throws IOException {
     ProgressInputStream progressInputStream = new ProgressInputStream(file);
     return workingFileRepository.put(mp.getIdentifier().toString(), elementId, filename, progressInputStream);
+  }
+
+  /** An upload stream which remembers whether reading from it failed, as opposed to processing what was read. */
+  private static final class UploadInputStream extends ProxyInputStream {
+    private volatile boolean readFailed = false;
+
+    UploadInputStream(InputStream in) {
+      super(in);
+    }
+
+    @Override
+    protected void handleIOException(IOException e) throws IOException {
+      readFailed = true;
+      throw e;
+    }
   }
 
   private MediaPackage addContentToMediaPackage(MediaPackage mp, String elementId, URI uri,
