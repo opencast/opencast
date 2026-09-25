@@ -149,10 +149,11 @@ public final class WorkflowConditionInterpreter {
         throw new IllegalArgumentException("line " + line + ":" + charPositionInLine + " " + msg);
       }
     };
+    l.addErrorListener(listener);
     final WorkflowConditionParser p = new WorkflowConditionParser(new CommonTokenStream(l));
     p.removeErrorListeners();
     p.addErrorListener(listener);
-    ParseTree tree = p.booleanExpression();
+    ParseTree tree = p.parse().booleanExpression();
     return new WorkflowConditionBooleanInterpreter().visit(tree);
   }
 
