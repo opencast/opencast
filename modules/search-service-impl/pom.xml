@@ -136,6 +136,17 @@
     </dependency>
     <dependency>
       <groupId>org.opensearch</groupId>
+      <artifactId>opensearch-core</artifactId>
+      <version>${opensearch.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.opensearch</groupId>
       <artifactId>opensearch-x-content</artifactId>
       <version>${opensearch.version}</version>
     </dependency>
