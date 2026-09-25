@@ -53,7 +53,6 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.themes.list.ThemesListQuery;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -82,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -770,7 +770,7 @@ public class ThemesEndpoint {
    *           If there was an error while persisting or deleting one of the files.
    */
   private void updateReferencedFile(String original, String updated) throws NotFoundException, IOException {
-    if (EqualsUtil.ne(original, updated)) {
+    if (!Objects.equals(original, updated)) {
       if (isNotBlank(original)) {
         staticFileService.deleteFile(original);
       }
