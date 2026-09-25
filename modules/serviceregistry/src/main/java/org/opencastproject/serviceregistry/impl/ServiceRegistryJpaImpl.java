@@ -561,7 +561,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   private ThrowingConsumer<EntityManager, Exception> deleteChildJobsQuery(long jobId) {
     return em -> {
-      List<Job> childJobs = getChildJobs(jobId);
+      List<Job> childJobs = getDescendantJobs(jobId);
       if (childJobs.isEmpty()) {
         logger.trace("No child jobs of job '{}' found to delete.", jobId);
         return;
@@ -1485,6 +1485,27 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public List<Job> getChildJobs(long id) throws ServiceRegistryException {
     try {
+      return db.exec(namedQuery.findAll(
+              "Job.children",
+              JpaJob.class,
+              Pair.of("id", id)
+          )).stream()
+          .map(this::setJobUri)
+          .map(JpaJob::toJob)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getDescendantJobs(long)
+   */
+  @Override
+  public List<Job> getDescendantJobs(long id) throws ServiceRegistryException {
+    try {
       List<JpaJob> jobs = db.exec(namedQuery.findAll(
           "Job.root.children",
           JpaJob.class,
@@ -1492,7 +1513,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       ));
 
       if (jobs.size() == 0) {
-        jobs = db.exec(getChildrenQuery(id));
+        jobs = db.exec(getDescendantsQuery(id));
       }
 
       return jobs.stream()
@@ -1504,7 +1525,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
-  private Function<EntityManager, List<JpaJob>> getChildrenQuery(long id) {
+  private Function<EntityManager, List<JpaJob>> getDescendantsQuery(long id) {
     return em -> {
       TypedQuery<JpaJob> query = em
           .createNamedQuery("Job.children", JpaJob.class)
@@ -1514,7 +1535,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       List<JpaJob> result = new ArrayList<>(childJobs);
       childJobs.stream()
-          .map(j -> getChildrenQuery(j.getId()).apply(em))
+          .map(j -> getDescendantsQuery(j.getId()).apply(em))
           .forEach(result::addAll);
 
       return result;
