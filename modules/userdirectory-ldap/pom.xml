@@ -92,6 +92,8 @@
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
+            <!-- needed by tests to mock JpaGroupRoleProvider, whose activate method takes a ComponentContext -->
+            <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.component</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.springframework.ldap:org.springframework.ldap</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
           <ignoredUsedUndeclaredDependencies>
