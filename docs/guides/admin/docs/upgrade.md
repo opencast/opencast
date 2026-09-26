@@ -9,7 +9,7 @@ In case you need to upgrade older versions of Opencast, please refer to the docu
 3. Replace Opencast with the new version
 4. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 5. Upgrade the database using [the upgrade script (if needed)](#database-upgrade)
-6. Start Opencast
+6. Start Opencast and [check that it is working](configuration/basic.md#checking-that-opencast-is-working)
 7. [Rebuild the index (if needed)](#index-rebuild)
 
 ## Configuration Changes
