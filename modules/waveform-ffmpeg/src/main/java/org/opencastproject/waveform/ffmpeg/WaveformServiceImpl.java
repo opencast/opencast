@@ -351,6 +351,9 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     String[] command = new String[] {
         binary,
         "-nostats", "-nostdin", "-hide_banner",
+        // A leftover file at this path can only be from a prior run of this same job; without -y, some ffmpeg
+        // versions exit 0 without overwriting it, so Opencast would upload the stale image as if it succeeded.
+        "-y",
         "-i", mediaFile.getAbsolutePath(),
         "-lavfi", createWaveformFilter(width, height, color),
         "-frames:v", "1",
