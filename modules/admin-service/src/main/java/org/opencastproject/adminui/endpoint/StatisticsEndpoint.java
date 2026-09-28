@@ -299,7 +299,7 @@ public class StatisticsEndpoint {
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (SearchIndexException e) {
-      return RestUtil.R.serverError();
+      return e.isBadRequest() ? RestUtil.R.badRequest(e.getMessage()) : RestUtil.R.serverError();
     } catch (NotFoundException e) {
       return RestUtil.R.notFound(resourceId);
     } catch (UnauthorizedException e) {

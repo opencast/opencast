@@ -32,7 +32,9 @@ import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
@@ -64,6 +66,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
@@ -677,6 +680,25 @@ public class AbstractEventEndpointTest {
 
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
+  }
+
+  @Test
+  public void testGetEventsReturnsBadRequestForMalformedQuery() throws Exception {
+    ElasticsearchIndex badRequestIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    EasyMock.expect(badRequestIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class)))
+            .andThrow(new SearchIndexException("Error querying event index",
+                    new IllegalStateException("simulated malformed query"), true));
+    EasyMock.replay(badRequestIndex);
+
+    TestEventEndpoint endpoint = new TestEventEndpoint() {
+      @Override
+      public ElasticsearchIndex getIndex() {
+        return badRequestIndex;
+      }
+    };
+
+    Response response = endpoint.getEvents(null, null, null, null, null, null, null, null);
+    Assert.assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
   }
 
   @BeforeClass
