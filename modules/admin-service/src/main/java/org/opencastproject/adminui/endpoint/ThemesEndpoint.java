@@ -304,6 +304,11 @@ public class ThemesEndpoint {
       try {
         results = searchIndex.getByQuery(query);
       } catch (SearchIndexException e) {
+        if (e.isBadRequest()) {
+          logger.warn("The admin UI Search Index rejected the query for series with theme '{}': {}", themeId,
+                  e.getMessage());
+          return RestUtil.R.badRequest(e.getMessage());
+        }
         logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId,
                 e);
         return RestUtil.R.serverError();
@@ -603,6 +608,11 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("The admin UI Search Index rejected the query for series with theme '{}': {}", themeId,
+                e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId, e);
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
