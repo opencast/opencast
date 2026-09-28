@@ -1188,6 +1188,10 @@ public class SeriesEndpoint {
 
       themeId = series.get().getTheme();
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("Unable to get series {}: {}", seriesId, e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.error("Unable to get series {}", seriesId, e);
       throw new WebApplicationException(e);
     }
@@ -1529,6 +1533,10 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       events = searchIndex.getByQuery(query);
       elementsCount += events.getHitCount();
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("Could not perform search query: {}", e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
@@ -1567,6 +1575,10 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       SearchResult<Event> result = searchIndex.getByQuery(query);
       elementsCount = result.getHitCount();
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("Could not perform search query: {}", e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }

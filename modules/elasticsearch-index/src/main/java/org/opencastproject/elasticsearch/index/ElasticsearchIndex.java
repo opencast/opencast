@@ -44,9 +44,11 @@ import org.opencastproject.security.util.SecurityUtil;
 import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.opensearch.OpenSearchStatusException;
 import org.opensearch.action.DocWriteResponse;
 import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.search.SearchRequest;
+import org.opensearch.core.rest.RestStatus;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.osgi.service.component.annotations.Activate;
@@ -599,7 +601,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
         }
       }, maxRetryAttempts, retryWaitingPeriod);
     } catch (Throwable t) {
-      throw new SearchIndexException("Error querying event index", t);
+      throw new SearchIndexException("Error querying event index", t, isBadRequest(t));
     }
   }
 
@@ -644,7 +646,16 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
         }
       }, maxRetryAttempts, retryWaitingPeriod);
     } catch (Throwable t) {
-      throw new SearchIndexException("Error querying series index", t);
+      throw new SearchIndexException("Error querying series index", t, isBadRequest(t));
     }
+  }
+
+  /**
+   * Whether the given failure means the query itself was rejected as malformed, rather than indicating an
+   * operational problem such as a missing index or an unreachable search service.
+   */
+  private static boolean isBadRequest(Throwable t) {
+    return t instanceof OpenSearchStatusException
+            && ((OpenSearchStatusException) t).status() == RestStatus.BAD_REQUEST;
   }
 }

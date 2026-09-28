@@ -88,6 +88,11 @@
       <version>${opensearch.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opensearch</groupId>
+      <artifactId>opensearch-core</artifactId>
+      <version>${opensearch.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
       <scope>compile</scope>
