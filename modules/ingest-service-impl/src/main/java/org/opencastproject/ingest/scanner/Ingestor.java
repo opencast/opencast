@@ -557,7 +557,7 @@ public class Ingestor implements Runnable {
   }
 
   public String myInfo() {
-    return format("[%x thread=%x]", hashCode(), Thread.currentThread().getId());
+    return format("[%x thread=%x]", hashCode(), Thread.currentThread().threadId());
   }
 
   class JsonFFprobe {

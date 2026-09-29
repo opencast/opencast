@@ -67,6 +67,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketWebsiteConfiguration;
 import com.amazonaws.services.s3.model.SetBucketWebsiteConfigurationRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -74,6 +75,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
@@ -296,7 +298,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
       // AWS presigned URL
       String presignedUrlConfigValue = OsgiUtil.getComponentContextProperty(cc, AWS_S3_PRESIGNED_URL_CONFIG, "false");
-      presignedUrl = StringUtils.equalsIgnoreCase("true", presignedUrlConfigValue);
+      presignedUrl = Strings.CI.equals("true", presignedUrlConfigValue);
       logger.info("AWS use presigned URL: {}", presignedUrl);
 
       // AWS presigned URL expiration time in millis
@@ -360,7 +362,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
               .withClientConfiguration(clientConfiguration)
               .withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
 
-      s3TransferManager = new TransferManager(s3);
+      s3TransferManager = TransferManagerBuilder.standard().withS3Client(s3).build();
 
       // Create AWS S3 bucket if not there yet
       createAWSBucket();

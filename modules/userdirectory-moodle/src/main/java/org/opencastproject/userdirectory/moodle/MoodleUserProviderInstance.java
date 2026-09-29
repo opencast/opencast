@@ -51,7 +51,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 
 /**
@@ -132,16 +131,6 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
    * A token to store in the miss cache.
    */
   private Object nullToken = new Object();
-
-  /**
-   * The total number of requests made to load users.
-   */
-  private AtomicLong loadUserRequests;
-
-  /**
-   * The number of requests made to Moodle.
-   */
-  private AtomicLong moodleWebServiceRequests;
 
   /** If usernames requested from Moodle shall be converted to lowercase */
   private final boolean lowercaseUsername;
@@ -228,7 +217,6 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
    */
   @Override
   public User loadUser(String userName) {
-    loadUserRequests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
       if (user == nullToken) {
@@ -465,9 +453,6 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
     }
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-
-    // update cache statistics
-    moodleWebServiceRequests.incrementAndGet();
 
     Thread currentThread = Thread.currentThread();
     ClassLoader originalClassloader = currentThread.getContextClassLoader();

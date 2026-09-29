@@ -40,7 +40,6 @@ import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.google.api.services.youtube.model.PlaylistSnippet;
 import com.google.api.services.youtube.model.PlaylistStatus;
 import com.google.api.services.youtube.model.ResourceId;
-import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.api.services.youtube.model.VideoSnippet;
@@ -99,17 +98,16 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
-  public Playlist createPlaylist(final String title, final String description, final String... tags)
-          throws IOException {
+  public Playlist createPlaylist(final String title, final String description, PrivacyStatus privacyStatus,
+          final String... tags) throws IOException {
     final PlaylistSnippet playlistSnippet = new PlaylistSnippet();
     playlistSnippet.setTitle(title);
     playlistSnippet.setDescription(description);
     if (tags.length > 0) {
       playlistSnippet.setTags(Arrays.asList(tags));
     }
-    // Playlists are always public. The videos therein might be private.
     final PlaylistStatus playlistStatus = new PlaylistStatus();
-    playlistStatus.setPrivacyStatus("public");
+    playlistStatus.setPrivacyStatus(privacyStatus.name().toLowerCase());
 
     // Create playlist with metadata and status.
     final Playlist youTubePlaylist = new Playlist();
@@ -161,21 +159,6 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   public void removeMyPlaylist(final String playlistId) throws IOException {
     final YouTube.Playlists.Delete deleteRequest = youTube.playlists().delete(playlistId);
     execute(deleteRequest);
-  }
-
-  @Override
-  public SearchListResponse searchMyVideos(final String queryTerm, final String pageToken, final long maxResults)
-          throws IOException {
-    final YouTube.Search.List search = youTube.search().list("id,snippet");
-    if (pageToken != null) {
-      search.set("pageToken", pageToken);
-    }
-    search.setQ(queryTerm);
-    search.setType("video");
-    search.setForMine(true);
-    search.setMaxResults(maxResults);
-    search.setFields("items(id,kind,snippet),nextPageToken,pageInfo,prevPageToken,tokenPagination");
-    return execute(search);
   }
 
   @Override

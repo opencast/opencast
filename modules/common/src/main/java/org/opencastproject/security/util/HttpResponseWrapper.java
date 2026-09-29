@@ -160,11 +160,17 @@ public final class HttpResponseWrapper implements HttpResponse {
     return response.headerIterator(s);
   }
 
-  @Override public HttpParams getParams() {
+  // getParams/setParams are deprecated on HttpMessage itself, but this class implements the full
+  // HttpResponse interface and must still provide them.
+  @Override
+  @SuppressWarnings("deprecation")
+  public HttpParams getParams() {
     return response.getParams();
   }
 
-  @Override public void setParams(HttpParams httpParams) {
+  @Override
+  @SuppressWarnings("deprecation")
+  public void setParams(HttpParams httpParams) {
     response.setParams(httpParams);
   }
 }

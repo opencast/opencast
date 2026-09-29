@@ -463,7 +463,7 @@ public class LtiServiceImpl implements LtiService {
     metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), metadataCollection);
 
     final String wfState = event.getWorkflowState();
-    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+    if (wfState != null && WorkflowUtil.isActive(wfState)) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
     return new Gson().toJson(MetadataJson.listToJson(metadataList, true, false));

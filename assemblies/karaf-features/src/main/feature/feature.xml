@@ -49,6 +49,7 @@
     <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
     <bundle>mvn:org.apache.commons/commons-collections4/${commons-collections.version}</bundle>
+    <bundle>mvn:org.apache.commons/commons-text/${commons-text.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-csv/${commons-csv.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>

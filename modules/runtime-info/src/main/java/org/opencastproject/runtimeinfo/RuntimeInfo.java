@@ -56,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -168,11 +170,24 @@ public class RuntimeInfo {
     return bundleContext.getAllServiceReferences(Servlet.class.getName(), "(&(alias=*)(classpath=*))");
   }
 
+  private static URL buildUrl(String scheme, String host, int port, String path) throws MalformedURLException {
+    try {
+      return new URI(scheme, null, host, port, path, null, null).toURL();
+    } catch (URISyntaxException e) {
+      throw new MalformedURLException(scheme + "://" + host + ":" + port + path + " is not a valid URL");
+    }
+  }
+
   @Activate
   public void activate(ComponentContext cc) throws MalformedURLException {
     logger.debug("start()");
     this.bundleContext = cc.getBundleContext();
-    serverUrl = new URL(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY));
+    String serverUrlProperty = bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY);
+    try {
+      serverUrl = URI.create(serverUrlProperty).toURL();
+    } catch (IllegalArgumentException e) {
+      throw new MalformedURLException(serverUrlProperty + " is not a valid URL");
+    }
   }
 
   @GET
@@ -206,8 +221,8 @@ public class RuntimeInfo {
     final String orgEngageBaseUrl = organization.getProperties().get(ENGAGE_URL_PROPERTY);
     if (StringUtils.isNotBlank(orgEngageBaseUrl)) {
       try {
-        targetEngageBaseUrl = new URL(orgEngageBaseUrl);
-      } catch (MalformedURLException e) {
+        targetEngageBaseUrl = URI.create(orgEngageBaseUrl).toURL();
+      } catch (MalformedURLException | IllegalArgumentException e) {
         logger.warn("Engage url '{}' of organization '{}' is malformed", orgEngageBaseUrl, organization.getId());
       }
     }
@@ -217,7 +232,7 @@ public class RuntimeInfo {
           "Using 'org.opencastproject.server.url' as a fallback for the non-existing organization "
               + "level key '{}' for the components.json response",
           ENGAGE_URL_PROPERTY);
-      targetEngageBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
+      targetEngageBaseUrl = buildUrl(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
     }
 
     // Create the admin target URL
@@ -225,8 +240,8 @@ public class RuntimeInfo {
     final String orgAdminBaseUrl = organization.getProperties().get(ADMIN_URL_PROPERTY);
     if (StringUtils.isNotBlank(orgAdminBaseUrl)) {
       try {
-        targetAdminBaseUrl = new URL(orgAdminBaseUrl);
-      } catch (MalformedURLException e) {
+        targetAdminBaseUrl = URI.create(orgAdminBaseUrl).toURL();
+      } catch (MalformedURLException | IllegalArgumentException e) {
         logger.warn("Admin url '{}' of organization '{}' is malformed", orgAdminBaseUrl, organization.getId());
       }
     }
@@ -236,7 +251,7 @@ public class RuntimeInfo {
           "Using 'org.opencastproject.server.url' as a fallback for the non-existing "
               + "organization level key '{}' for the components.json response",
           ADMIN_URL_PROPERTY);
-      targetAdminBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
+      targetAdminBaseUrl = buildUrl(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
     }
 
     Map<String, Object> json = new HashMap<>();
@@ -536,7 +551,7 @@ public class RuntimeInfo {
       endpoint.put("description", (String) servletRef.getProperty(Constants.SERVICE_DESCRIPTION));
       endpoint.put("version", servletRef.getBundle().getVersion().toString());
       endpoint.put("type", (String) servletRef.getProperty(RestConstants.SERVICE_TYPE_PROPERTY));
-      URL url = new URL(request.getScheme(), request.getServerName(), request.getServerPort(), servletContextPath);
+      URL url = buildUrl(request.getScheme(), request.getServerName(), request.getServerPort(), servletContextPath);
       endpoint.put("path", servletContextPath);
       endpoint.put("docs", UrlSupport.concat(url.toExternalForm(), "/docs")); // This is a Opencast convention
       result.add(endpoint);

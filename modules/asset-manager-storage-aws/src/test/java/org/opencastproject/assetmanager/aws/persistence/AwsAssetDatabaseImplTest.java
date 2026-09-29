@@ -26,7 +26,6 @@ import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.VersionImpl;
-import org.opencastproject.util.PathSupport;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DataSources;
@@ -41,6 +40,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeSet;
@@ -64,7 +64,7 @@ public class AwsAssetDatabaseImplTest {
   @Before
   public void setUp() throws Exception {
     long currentTime = System.currentTimeMillis();
-    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
+    storage = Paths.get("target", "db" + currentTime + ".h2.db").toString();
 
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     cc = EasyMock.createNiceMock(ComponentContext.class);

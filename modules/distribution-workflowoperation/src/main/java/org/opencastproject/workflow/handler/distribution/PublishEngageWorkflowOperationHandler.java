@@ -88,6 +88,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -247,11 +248,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
     String republishStrategy = StringUtils.trimToEmpty(
-            StringUtils.defaultString(op.getConfiguration(STRATEGY), PUBLISH_STRATEGY_DEFAULT));
+            Objects.toString(op.getConfiguration(STRATEGY), PUBLISH_STRATEGY_DEFAULT));
     String mergeForceFlavorsStr = StringUtils.trimToEmpty(
-            StringUtils.defaultString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
+            Objects.toString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
     String addForceFlavorsStr = StringUtils.trimToEmpty(
-            StringUtils.defaultString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
+            Objects.toString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
 
 
     boolean checkAvailability = Optional.ofNullable(op.getConfiguration(CHECK_AVAILABILITY))
@@ -434,7 +435,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         Organization organization = organizationDirectoryService.getOrganization(workflowInstance.getOrganizationId());
         engageUrlString = StringUtils.trimToNull(organization.getProperties().get(ENGAGE_URL_PROPERTY));
         if (engageUrlString != null) {
-          engageBaseUrl = new URL(engageUrlString);
+          try {
+            engageBaseUrl = URI.create(engageUrlString).toURL();
+          } catch (IllegalArgumentException e) {
+            throw new MalformedURLException(engageUrlString + " is not a valid URL");
+          }
         } else {
           engageBaseUrl = serverUrl;
           logger.info(
@@ -718,27 +723,27 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
     for (MediaPackageElement element : publishedMp.elements()) {
       String type = element.getElementType().toString().toLowerCase();
-      boolean elementHasFlavorThatAlreadyExists = updatedMp.getElementsByFlavor(element.getFlavor()).length > 0;
+      MediaPackageElement[] existingElements = updatedMp.getElementsByFlavor(element.getFlavor());
+      boolean elementHasFlavorThatAlreadyExists = existingElements.length > 0;
       boolean elementHasForceMergeFlavor = mergeForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
       boolean elementHasForceAddFlavor = addForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
 
       if (elementHasForceAddFlavor) {
-        logger.info("Adding {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        logger.debug("Adding {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
         continue;
       }
       if (!elementHasFlavorThatAlreadyExists) {
         if (elementHasForceMergeFlavor) {
-          logger.info("Forcing removal of {} {} due to the absence of a new element with flavor {}",
+          logger.debug("Forcing removal of {} {} due to the absence of a new element with flavor {}",
                   type, element.getIdentifier(), element.getFlavor().toString());
           continue;
         }
-        logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        logger.debug("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
-        logger.info("Overwriting existing {} '{}' with '{}' in the updated mediapackage",
-                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier());
-
+        logger.debug("Overwriting existing {} '{}' with '{}' in the updated mediapackage",
+                type, element.getIdentifier(), existingElements[0].getIdentifier());
       }
     }
 

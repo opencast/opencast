@@ -46,6 +46,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -163,7 +164,7 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     final String sourceTagPrefix = "source-tag-";
     final String sourceTagsPrefix = "source-tags-";
     for (String flavorConfKey : operation.getConfigurationKeys().stream().filter(
-        confKey -> StringUtils.startsWith(confKey, sourceFlavorPrefix) || StringUtils.startsWith(confKey,
+        confKey -> Strings.CS.startsWith(confKey, sourceFlavorPrefix) || Strings.CS.startsWith(confKey,
             sourceFlavorsPrefix)).collect(Collectors.toSet())) {
       elementSelector = new TrackSelector();
       for (String srcFlavor : StringUtils.split(operation.getConfiguration(flavorConfKey), ",")) {
@@ -171,8 +172,8 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       }
       String srcType = StringUtils.split(flavorConfKey, "-", 3)[2];
       for (String srcTag : operation.getConfigurationKeys().stream().filter(
-          confKey -> StringUtils.equals(confKey, sourceTagPrefix + srcType)
-              || StringUtils.equals(confKey, sourceTagsPrefix + srcType)).collect(Collectors.toSet())) {
+          confKey -> Strings.CS.equals(confKey, sourceTagPrefix + srcType)
+              || Strings.CS.equals(confKey, sourceTagsPrefix + srcType)).collect(Collectors.toSet())) {
         asList(StringUtils.trimToNull(srcTag)).stream().filter(Objects::nonNull).forEach(elementSelector::addTag);
       }
       srcTracks = elementSelector.select(mediaPackage, false);
@@ -186,7 +187,7 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     }
     // Handle tags-only inputs
     for (String tagConfKey : operation.getConfigurationKeys().stream().filter(
-        confKey -> StringUtils.startsWith(confKey, sourceTagPrefix) || StringUtils.startsWith(confKey,
+        confKey -> Strings.CS.startsWith(confKey, sourceTagPrefix) || Strings.CS.startsWith(confKey,
             sourceTagsPrefix)).collect(Collectors.toSet())) {
       String srcType = StringUtils.split(tagConfKey, "-", 3)[2];
       if (inputTracks.containsKey(srcType)) {

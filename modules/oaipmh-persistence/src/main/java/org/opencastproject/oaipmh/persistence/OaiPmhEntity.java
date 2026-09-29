@@ -23,7 +23,7 @@ package org.opencastproject.oaipmh.persistence;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -247,7 +247,7 @@ public class OaiPmhEntity {
     // as we do not expect to many media package elements per media package, we can filter them in java
     List<OaiPmhElementEntity> filteredElements = new ArrayList<>();
     for (OaiPmhElementEntity element : mediaPackageElements) {
-      if (StringUtils.equals(elementType, element.getElementType())) {
+      if (Strings.CS.equals(elementType, element.getElementType())) {
         filteredElements.add(element);
       }
     }

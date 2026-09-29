@@ -64,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -568,7 +569,8 @@ public class JobDispatcher {
             job.setStatus(Job.Status.FAILED);
             job = serviceRegistry.updateJob(job); // will open a tx
             logger.debug("Service {} refused to accept {}", registration, job);
-            throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
+            throw new UndispatchableJobException(
+                IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
           } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
             logger.debug("Service {} is not yet reachable", registration);
             continue;

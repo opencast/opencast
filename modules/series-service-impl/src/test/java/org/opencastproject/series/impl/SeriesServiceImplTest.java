@@ -49,7 +49,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.impl.persistence.SeriesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -63,6 +62,7 @@ import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -111,7 +111,7 @@ public class SeriesServiceImplTest {
     seriesDatabase.setSecurityService(securityService);
     seriesDatabase.activate(null);
 
-    root = PathSupport.concat("target", Long.toString(currentTime));
+    root = Paths.get("target", Long.toString(currentTime)).toString();
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
 
@@ -227,8 +227,8 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality1() {
-    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
-    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog a = DublinCores.mkOpencastEpisode().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencastEpisode().getCatalog();
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertFalse(DublinCoreUtil.equals(a, b));
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
@@ -249,8 +249,8 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality2() {
-    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
-    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog a = DublinCores.mkOpencastEpisode().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencastEpisode().getCatalog();
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");

@@ -51,7 +51,9 @@ import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,7 +63,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -84,12 +85,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /** The organization */
   private Organization organization = null;
-
-  /** Total number of requests made to load users */
-  private AtomicLong requests = null;
-
-  /** The number of requests made to Sakai */
-  private AtomicLong sakaiLoads = null;
 
   /** A cache of users, which lightens the load on Sakai */
   private LoadingCache<String, Object> cache = null;
@@ -204,7 +199,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       userPattern = null;
     }
 
-    requests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
       if (user == nullToken) {
@@ -246,9 +240,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
     logger.debug("In loadUserFromSakai, currently processing user : {}", userName);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-
-    // update cache statistics
-    sakaiLoads.incrementAndGet();
 
     Thread currentThread = Thread.currentThread();
     ClassLoader originalClassloader = currentThread.getContextClassLoader();
@@ -341,7 +332,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     try {
       // This webservice does not require authentication
-      URL url = new URL(sakaiUrl + "/direct/user/" + userId + "/exists");
+      URL url = URI.create(sakaiUrl + "/direct/user/" + userId + "/exists").toURL();
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -382,7 +373,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     try {
       // This webservice does not require authentication
-      URL url = new URL(sakaiUrl + "/direct/site/" + siteId + "/exists");
+      URL url = URI.create(sakaiUrl + "/direct/site/" + siteId + "/exists").toURL();
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -403,7 +394,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
     logger.debug("getRolesFromSakai(" + userId + ")");
     try {
 
-      URL url = new URL(sakaiUrl + "/direct/membership/fastroles/" + userId + ".xml" + "?__auth=basic");
+      URL url = URI.create(sakaiUrl + "/direct/membership/fastroles/" + userId + ".xml" + "?__auth=basic").toURL();
       String encoded = Base64.encodeBase64String((sakaiUsername + ":" + sakaiPassword).getBytes("utf8"));
 
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -412,7 +403,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       connection.setRequestProperty("Authorization", "Basic " + encoded);
       connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
-      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()));
+      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()), StandardCharsets.UTF_8);
       logger.debug(xml);
 
       DocumentBuilder parser = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -465,7 +456,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     try {
 
-      URL url = new URL(sakaiUrl + "/direct/user/" + eid + ".xml" + "?__auth=basic");
+      URL url = URI.create(sakaiUrl + "/direct/user/" + eid + ".xml" + "?__auth=basic").toURL();
       logger.debug("Sakai URL: " + sakaiUrl);
       String encoded = Base64.encodeBase64String((sakaiUsername + ":" + sakaiPassword).getBytes("utf8"));
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -474,7 +465,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       connection.setRequestProperty("Authorization", "Basic " + encoded);
       connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
-      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()));
+      String xml = IOUtils.toString(new BufferedInputStream(connection.getInputStream()), StandardCharsets.UTF_8);
       logger.debug(xml);
 
       // Parse the document

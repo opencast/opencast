@@ -59,6 +59,7 @@ import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.BasicHttpContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -576,7 +577,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
           throws TrustedHttpClientException {
     HttpRequestBase digestRequest;
     try {
-      digestRequest = (HttpRequestBase) httpUriRequest.getClass().newInstance();
+      digestRequest = (HttpRequestBase) httpUriRequest.getClass().getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalStateException("Can not create a new " + httpUriRequest.getClass().getName());
     }
@@ -595,7 +596,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
 
       // Add the authentication header
       try {
-        httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest));
+        httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest, new BasicHttpContext()));
       } catch (Exception e) {
         // close the http connection(s)
         try {

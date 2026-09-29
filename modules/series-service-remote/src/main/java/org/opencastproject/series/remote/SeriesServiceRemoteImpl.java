@@ -390,7 +390,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        int count = Integer.parseInt(IOUtils.toString(response.getEntity().getContent()));
+        int count = Integer.parseInt(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
         logger.info("Successfully get series dublin core catalog list from the remote series index");
         return count;
       }
@@ -582,7 +582,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         final int statusCode = response.getStatusLine().getStatusCode();
         switch (statusCode) {
           case SC_OK:
-            JSONArray elementArray = (JSONArray) parser.parse(IOUtils.toString(response.getEntity().getContent()));
+            JSONArray elementArray = (JSONArray) parser.parse(
+                IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
             Map<String, byte[]> elements = new HashMap<>();
             for (int i = 0; i < elementArray.length(); i++) {
               final String type = elementArray.getString(i);

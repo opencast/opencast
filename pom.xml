@@ -23,7 +23,8 @@
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.6.0</commons-fileupload.version>
     <commons-io.version>2.21.0</commons-io.version>
-    <commons-lang3.version>3.18.0</commons-lang3.version>
+    <commons-lang3.version>3.20.0</commons-lang3.version>
+    <commons-text.version>1.15.0</commons-text.version>
     <cxf.version>3.6.4</cxf.version>
     <eclipselink.version>2.7.15</eclipselink.version>
     <eclipselink.asm.version>9.7.1</eclipselink.asm.version>
@@ -62,7 +63,7 @@
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
     <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
-    <rest-assured.version>4.4.0</rest-assured.version>
+    <rest-assured.version>6.0.1</rest-assured.version>
     <spotless.version>3.9.0</spotless.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
@@ -367,7 +368,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.6.3</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -1260,6 +1261,11 @@
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${commons-text.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
         <artifactId>commons-csv</artifactId>
         <version>${commons-csv.version}</version>
       </dependency>
@@ -1484,7 +1490,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.6.0</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
