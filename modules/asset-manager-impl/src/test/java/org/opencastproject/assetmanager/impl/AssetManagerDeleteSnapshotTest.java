@@ -39,10 +39,10 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[0], "agent-1"));
     am.setProperty(p.agent(mp[1], "agent-2"));
     am.setProperty(p.agent(mp[2], "agent-2"));
-    assertTotals(mpCount * versionCount, mpCount * versionCount, 3);
+    assertTotals(mpCount * versionCount, mpCount * versionCount, 9);
     assertStoreSize(mpCount * versionCount * 2);
     assertEquals(versionCount, am.deleteSnapshots(mp[0]));
-    assertTotals((mpCount - 1) * versionCount, (mpCount - 1) * versionCount, 3);
+    assertTotals((mpCount - 1) * versionCount, (mpCount - 1) * versionCount, 9);
     assertStoreSize((mpCount - 1) * versionCount * 2);
   }
 
@@ -55,14 +55,14 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[0], "agent-1"));
     am.setProperty(p.agent(mp[1], "agent-2"));
     am.setProperty(p.agent(mp[2], "agent-2"));
-    assertTotals(6, 6, 3);
+    assertTotals(6, 6, 9);
     assertStoreSize(6 * 2);
     assertEquals(
         "Two snapshots should be deleted",
         2,
         am.deleteSnapshots(mp[0])
     );
-    assertTotals(4, 4, 3);
+    assertTotals(4, 4, 9);
     assertStoreSize(4 * 2);
   }
 
@@ -78,10 +78,10 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[0], "agent-1"));
     am.setProperty(p.agent(mp[1], "agent-2"));
     am.setProperty(p.agent(mp[2], "agent-2"));
-    assertTotals(mpCount * versionCount, mpCount * versionCount, 3);
+    assertTotals(mpCount * versionCount, mpCount * versionCount, 9);
     assertStoreSize(mpCount * versionCount * 2);
     assertEquals(versionCount - 1, am.deleteAllButLatestSnapshot(mp[0]));
-    assertTotals((mpCount - 1) * versionCount + 1, 11, 3);
+    assertTotals((mpCount - 1) * versionCount + 1, 11, 9);
     assertStoreSize(((mpCount - 1) * versionCount * 2) + 2);
   }
 }
