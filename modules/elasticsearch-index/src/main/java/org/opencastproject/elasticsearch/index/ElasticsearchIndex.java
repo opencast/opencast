@@ -44,9 +44,9 @@ import org.opencastproject.security.util.SecurityUtil;
 import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.search.SearchRequest;
+import org.opensearch.action.DocWriteResponse;
+import org.opensearch.action.delete.DeleteResponse;
+import org.opensearch.action.search.SearchRequest;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.osgi.service.component.annotations.Activate;
@@ -217,7 +217,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param user
    *          The user
    * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
+   *          How often to retry query in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    * @return the event (optional)
@@ -274,7 +274,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param user
    *          The user
    * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
+   *          How often to retry query in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    * @return the series (optional)
@@ -575,7 +575,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param query
    *          The query to use to retrieve the events that match the query
    * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
+   *          How often to retry query in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    * @return {@link SearchResult} collection of {@link Event} from a query.
@@ -620,7 +620,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @param query
    *          The query to use to retrieve the series that match the query
    * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
+   *          How often to retry query in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    *
