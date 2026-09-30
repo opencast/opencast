@@ -13,15 +13,52 @@ An API module defining the core AssetManager functions, properties and the query
 * `asset-manager-impl`
 The default implementation of the AssetManager as an OSGi service, containing the storage API for pluggable asset stores.
 * `asset-manager-storage-fs`
-The default  implementation of the AssetStore. Depends on asset-manager-impl.
-* `asset-manager-util`
-Additional functionality for the AssetManager providing utilities such as starting workflows on archived snapshots, etc.
+An implementation of the AssetStore that archives to the local filesystem. Depends on asset-manager-impl.
+* `asset-manager-storage-aws`
+An implementation of the AssetStore that archives to an S3 bucket, with its own small database mapping stored assets
+to S3 objects. Depends on asset-manager-impl.
+* `asset-manager-static-file-authorization`
+Authorizes direct, static access to archived files by checking the requesting user's roles against the ACL a
+snapshot's elements were archived with, stored as properties.
 * `asset-manager-workflowoperation`
-A workflow operation handler to take media package snapshots of a media package from inside a running workflow.
+Workflow operation handlers to take a snapshot, move it between stores, delete it, or select a specific version,
+all from inside a running workflow.
+* `shared-filesystem-utils`
+Utilities that build on the AssetManager, such as starting a workflow on the latest archived snapshot of each of a
+given list of episodes.
 
 ### High Level View
 
-TODO Describes components and how they relate.
+The AssetManager is a facade (`AssetManager`, implemented by the OSGi service `AssetManagerImpl`) in front of two
+separate concerns: a database, and one or more [asset stores](#assetstore) that hold media package elements'
+actual bytes. An element's content always goes to an asset store, never the database — but the database is not
+just bookkeeping about the stores, either: each snapshot's full media package manifest is kept as XML directly in a
+database column (`SnapshotDto.mediaPackageXml`), duplicating the `manifest.xml` archived separately to the asset
+store, and [properties](#working-with-properties) are typed values stored entirely in the database, with no asset
+store involved at all. For elements themselves, what the database consistently tracks is which snapshot each one
+belongs to, its checksum, and which store currently holds it — tracking that makes it possible to move a snapshot
+between stores without the `AssetManager` API consumer ever needing to know where a given version's bytes actually
+live. Running more than one store side by side is a real, supported deployment: alongside the default local
+filesystem store, `asset-manager-storage-aws` can archive to S3, and the admin guide's [move storage workflow
+operation](https://docs.opencast.org/stable/admin/#workflowoperationhandlers/move-storage-woh/) is built specifically
+to move snapshots to that kind of colder storage — the admin guide's own example is moving the raw input media there
+once initial processing is done.
+
+Taking a [snapshot](#taking-snapshots) with `takeSnapshot()` walks a media package's elements and, for each one,
+asks the [workspace](filesystem.md#the-workspace) for the bytes and hands them to the local `AssetStore`
+(`getLocalAssetStore().put()`) under a `StoragePath` keyed by organization, media package ID, version, and element
+ID — the same archiving path [filesystem.md](filesystem.md#from-workspace-to-the-archive) already describes for the
+filesystem-backed store. Before writing fresh content, though, `AssetManagerImpl` checks the database for an asset
+with the same checksum already archived anywhere in that store; if one exists, it copies (hard-links, where the
+store supports it) rather than storing the bytes again. This is a second, independent form of deduplication from
+the workspace's hard-linking: it applies across the whole archive and all episodes, not just within one node's
+local cache.
+
+Every snapshot is versioned and immutable — a version, once archived, is never rewritten, only superseded by a new
+one or deleted outright. Read and write access to a media package's snapshots is checked on every operation
+(`isAuthorized()`) against the media package's [access control list](#security); that same ACL is also copied into
+the episode's properties at snapshot time, which lets other components — the [static file authorization
+module](#modules) among them — check access without going through the full `AssetManager` API.
 
 ### Classes
 
