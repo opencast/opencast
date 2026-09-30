@@ -124,7 +124,41 @@ The asset manager uses four tables
 
 ### Security
 
-TODO
+Every `AssetManager` read or write method checks `isAuthorized(mediaPackageId, action)` first, where `action` is
+either `READ_ACTION` or `WRITE_ACTION`. What that check does depends on the caller:
+
+* A global administrator is always granted access.
+* An organization administrator is granted access as long as a snapshot for that media package exists in their own
+  organization — no further per-episode check.
+* Any other user must first belong to the same organization, and then either hold the synthetic role
+  `ROLE_EPISODE_<mediaPackageId>_<ACTION>` — the same scoped-access mechanism used elsewhere in Opencast to grant
+  access without an actual ACL role, for example to a signed URL's session — or have a role that matches one of the
+  media package's archived ACL entries.
+
+The *active ACL* of a media package is whichever access control list currently applies to it: its own episode-level
+XACML attachment if it has one, else its series' XACML attachment, else the organization's global default. It is
+resolved fresh, on demand, via `AuthorizationService.getActiveAcl()`, and it can change over time — for instance
+when an editor changes an event's access rights.
+
+The ACL check against an archived snapshot's roles does not resolve the active ACL this way. Instead,
+`takeSnapshot()` resolves it once, at the moment the snapshot is taken, and copies each of its entries into a
+property under the `org.opencastproject.assetmanager.security` namespace, keyed by `"<role> | <action>"`. From then
+on, that snapshot's authorization check reads only this stored copy — it is never re-resolved or kept in sync with
+the active ACL afterward. If the active ACL changes later, only snapshots taken after that change reflect it; older
+snapshots keep the access rules that were active when *they* were archived. This also lets other components check
+access without going through the `AssetManager` API at all: [`asset-manager-static-file-authorization`](#modules)
+queries these stored properties directly to gate static file access.
+
+`AssetManagerImpl`'s check reads that stored copy. The general-purpose `AuthorizationService.hasPermission()`
+implements the same episode-role-then-ACL pattern, but does not read a stored copy at all — it resolves the active
+ACL fresh on every call instead. The two are separate, duplicate implementations of the same logic against two
+different sources of truth, and the code carries its own acknowledgment that unifying them is not safe to do
+casually.
+
+One thing the ACL check above does *not* cover: `takeSnapshot()` still tags every snapshot with an owner
+(`Snapshot.getOwner()`), but that ownership is no longer enforced as an access boundary anywhere. Deleting a
+snapshot (`deleteSnapshots()`, `deleteAllButLatestSnapshot()`) checks only `isAuthorized(mpId, WRITE_ACTION)` — any
+user with write access to the media package can delete any of its snapshots, regardless of who owns them.
 
 
 Usage
