@@ -16,13 +16,13 @@ A *job* moves through a small set of states (`INSTANTIATED`, `QUEUED`, `DISPATCH
 `FINISHED`, `FAILED`, `CANCELLED`, `DELETED`, `WAITING`). Dispatching is only concerned with jobs in `QUEUED` or
 `RESTART`; everything else is either not ready yet or already spoken for.
 
-Every job also carries a *load*, a float describing how much of a node's capacity it is expected to consume. Job
-producers (workflow operation handlers and other services that create jobs) look up their own load value per
-operation via `LoadUtil.getConfiguredLoadValue()`, which reads a service-specific configuration key — for example
-`job.load.inspect` for the media inspection service — falling back to a default if it is not set. A node's own
-capacity is its *max load*, configured per host via `org.opencastproject.server.maxload` in `custom.properties` and
-defaulting to the number of CPU cores. Dispatching is, at its core, an attempt to keep the sum of running jobs' loads
-on any one node under that node's max load.
+Every job also carries a [load](https://docs.opencast.org/stable/admin/#configuration/load/), a float describing how
+much of a node's capacity it is expected to consume. Job producers (workflow operation handlers and other services
+that create jobs) look up their own load value per operation via `LoadUtil.getConfiguredLoadValue()`, which reads a
+service-specific configuration key — for example `job.load.inspect` for the media inspection service — falling back
+to a default if it is not set. A node's own capacity is its *max load*, configured per host via
+`org.opencastproject.server.maxload` in `custom.properties` and defaulting to the number of CPU threads. Dispatching
+is, at its core, an attempt to keep the sum of running jobs' loads on any one node under that node's max load.
 
 
 The Dispatch Loop
@@ -97,9 +97,12 @@ not right now — a different, less-busy node might take it immediately. "Job lo
 property of the job on *this* node specifically, independent of anything running at the moment. It only comes up on
 the single most capable node the dispatcher could find for this job type, since the dispatcher already filters out
 every other candidate once it sees the job's load exceeds the best one available — so if that node declines too, no
-node in the cluster is configured to take this job at once. Whether it declines depends on
+node in the cluster is configured to take this job at all. Whether it declines depends on
 `org.opencastproject.job.load.acceptexceeding`, a per-node configuration option that defaults to enabled: if enabled,
-the node accepts the job anyway, with a warning logged; if disabled, it declines like the too-busy case.
+the node accepts the job anyway, with a warning logged; if disabled, it declines like the too-busy case, and the job
+stays `QUEUED` forever unless a node capable of running it comes online. This is a deadlock — see the admin guide's
+[load configuration troubleshooting](https://docs.opencast.org/stable/admin/#configuration/load/#troubleshooting)
+section.
 
 Both decline paths behave the same either way: the dispatcher moves on to the next candidate, and a
 `405 Method Not Allowed` response (the service isn't reachable yet) is treated the same way. `412 Precondition
