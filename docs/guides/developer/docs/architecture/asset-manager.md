@@ -62,7 +62,37 @@ module](#modules) among them — check access without going through the full `As
 
 ### Classes
 
-TODO Most important classes and how they relate
+* `AssetManager` / `AssetManagerImpl`
+  The facade described [above](#high-level-view); the entry point for every AssetManager operation.
+* `Snapshot` / `SnapshotImpl`
+  One archived, immutable version of a media package: its `Version`, organization, owner, `Availability`, the ID of
+  the asset store holding it, and the media package itself. At archive time, each element's URI is rewritten to a
+  storage-neutral `urn:matterhorn:...` identifier rather than a live URL, since the snapshot's storage location can
+  change later; `HttpAssetProvider` rewrites these back into real, fetchable URLs whenever a snapshot is retrieved
+  through the API.
+* `Asset` / `AssetImpl`
+  One archived media package element's content: its checksum, MIME type, size, `Availability`, and the ID of the
+  asset store holding it. A snapshot owns many assets, one per element.
+* `AssetId`
+  Identifies an asset as the triple {`Version`, media package ID, media package element ID}, used at the
+  `AssetManager` API level, for example by `getAsset()`. Distinct from `StoragePath` below.
+* `StoragePath`
+  The coordinate an `AssetStore` actually keys a stored element's location by: {organization ID, media package ID,
+  `Version`, element ID}. It carries the organization ID that `AssetId` leaves out, since a store can be shared
+  across organizations even though `AssetId` values are already unique without it.
+* `Version` / `VersionImpl`
+  An ordered, comparable version number, unique per media package. Claimed via `Database.claimVersion()`, which
+  increments the last-claimed value for that media package ID or starts at `VersionImpl.FIRST` for a new episode.
+* `Property` / `PropertyId` / `Value`
+  A typed key-value pair scoped to an episode by `PropertyId`'s {media package ID, namespace, name}, not to a single
+  snapshot. Covered in detail under [Working with Properties](#working-with-properties) below.
+* `AssetStore` / `RemoteAssetStore`
+  The pluggable storage interface described under [AssetStore](#assetstore); `RemoteAssetStore` is the sub-interface
+  additional, non-local stores implement so more than one can be bound at once, as [described
+  above](#high-level-view).
+* `Database`
+  The persistence layer, in `asset-manager-impl`'s `persistence` package. Its DTOs (`SnapshotDto`, `AssetDto`,
+  `PropertyDto`, `VersionClaimDto`) map onto the four tables described under [Database](#database) below.
 
 Default Implementation
 ----------------------
