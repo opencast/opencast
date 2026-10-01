@@ -9,6 +9,43 @@ The following requirements have to be met:
 - It needs to be a Log4J appender
 - The used bundle needs to be a fragment-bundle
 
+Log Rotation
+------------
+
+By default, `opencast.log` is written by a plain `File` appender that never rotates or truncates it on its own, so
+it grows without bound for as long as Opencast keeps running. How to handle that is deliberately left to the
+administrator, since the right approach — rotate by size, by time, how many old logs to keep, whether to compress
+them — depends on the deployment, and Opencast does not assume one by default.
+
+Installing from certain packages pre-configures this for you: the [RPM
+packaging](https://github.com/opencast/opencast-rpmbuild) ships an `/etc/logrotate.d` entry that rotates Opencast's
+logs weekly, keeping 52 compressed rotations. Other installation methods have no such rotation configured and need
+one of the approaches below.
+
+To enable size-based rotation, replace the `File` appender with a `RollingRandomAccessFile` one in
+`etc/org.ops4j.pax.logging.cfg`:
+
+```
+# Rolling file appender. Rotates once opencast.log exceeds the configured size.
+log4j2.appender.out.type = RollingRandomAccessFile
+log4j2.appender.out.name = File
+log4j2.appender.out.fileName = ${karaf.data}/log/opencast.log
+log4j2.appender.out.filePattern = ${karaf.data}/log/opencast.log.%i
+log4j2.appender.out.append = true
+log4j2.appender.out.layout.type = PatternLayout
+log4j2.appender.out.layout.pattern = ${log4j2.pattern}
+log4j2.appender.out.policies.type = Policies
+log4j2.appender.out.policies.size.type = SizeBasedTriggeringPolicy
+log4j2.appender.out.policies.size.size = 50MB
+```
+
+`policies.size.size` is the threshold at which `opencast.log` is rotated to `opencast.log.1` (and so on); adjust it
+to fit the deployment. Log4j2 also supports capping how many rotated files are kept (via a `DefaultRolloverStrategy`
+and its `max` setting), time-based rotation (`TimeBasedTriggeringPolicy`), and combining multiple policies — see
+[Log4j2's own `RollingFile` appender
+documentation](https://logging.apache.org/log4j/2.x/manual/appenders.html#RollingFileAppender) for the full set of
+options.
+
 Graylog
 -------
 
