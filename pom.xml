@@ -25,7 +25,7 @@
     <commons-io.version>2.22.0</commons-io.version>
     <commons-lang3.version>3.20.0</commons-lang3.version>
     <commons-text.version>1.15.0</commons-text.version>
-    <cxf.version>3.6.12</cxf.version>
+    <cxf.version>4.2.3</cxf.version>
     <eclipselink.version>2.7.15</eclipselink.version>
     <eclipselink.asm.version>9.7.1</eclipselink.asm.version>
     <elasticsearch.version>7.10.2</elasticsearch.version>
