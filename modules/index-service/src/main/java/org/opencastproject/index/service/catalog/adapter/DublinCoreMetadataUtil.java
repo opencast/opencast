@@ -71,16 +71,20 @@ public final class DublinCoreMetadataUtil {
    */
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, DublinCoreMetadataCollection metadata) {
     for (MetadataField field : metadata.getOutputFields().values()) {
-      // Check this regardless of whether the field was actually touched by the caller: an untouched required
-      // field can still be blank, e.g. because it uses its default value or was never submitted at all.
-      if (field.isRequired() && isBlankValue(field.getValue())) {
+      final String namespace = field.getNamespace() == null ? DublinCore.TERMS_NS_URI : field.getNamespace();
+      final EName ename = new EName(namespace, field.getInputID());
+
+      // A required field may legitimately be blank in the collection: callers may submit a partial update, in
+      // which case untouched fields carry their blank default value rather than the stored one. What must not
+      // happen is that the catalog ends up without the field, so reject a blank value only when the caller
+      // explicitly submitted it, or when the catalog does not already carry one.
+      if (field.isRequired() && isBlankValue(field.getValue())
+              && (field.isUpdated() || StringUtils.isBlank(dc.getFirst(ename)))) {
         throw new IllegalArgumentException(String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
       }
       if (field.isUpdated() && field.getValue() != null) {
-        final String namespace = field.getNamespace() == null ? DublinCore.TERMS_NS_URI : field.getNamespace();
-        final EName ename = new EName(namespace, field.getInputID());
         if (field.getType() == MetadataField.Type.START_DATE) {
           setStartDate(dc, field, ename);
         } else if (field.getType() == MetadataField.Type.DURATION) {
