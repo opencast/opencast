@@ -71,9 +71,7 @@ public final class DublinCoreMetadataUtil {
    */
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, DublinCoreMetadataCollection metadata) {
     for (MetadataField field : metadata.getOutputFields().values()) {
-      // Check this regardless of whether the field was actually touched by the caller: an untouched required
-      // field can still be blank, e.g. because it uses its default value or was never submitted at all.
-      if (field.isRequired() && isBlankValue(field.getValue())) {
+      if (field.isUpdated() && field.isRequired() && isBlankValue(field.getValue())) {
         throw new IllegalArgumentException(String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
@@ -97,6 +95,29 @@ public final class DublinCoreMetadataUtil {
         } else {
           dc.set(ename, field.getValue().toString());
         }
+      }
+    }
+  }
+
+  /**
+   * Validates that every required field in <code>metadata</code> has a non-blank value, regardless of whether it
+   * was actually touched by the caller. Intended to be called explicitly at creation time, where a required field
+   * left at its (blank) default must be rejected; {@link #updateDublincoreCatalog(DublinCoreCatalog,
+   * DublinCoreMetadataCollection)} only validates fields the caller actually touched, since on an update, an
+   * untouched required field being blank reflects a pre-existing state the caller did not create and is not
+   * trying to change.
+   *
+   * @param metadata
+   *          the fields to validate
+   * @throws IllegalArgumentException
+   *           if a required field's value is blank
+   */
+  public static void validateRequiredFieldsPresent(DublinCoreMetadataCollection metadata) {
+    for (MetadataField field : metadata.getOutputFields().values()) {
+      if (field.isRequired() && isBlankValue(field.getValue())) {
+        throw new IllegalArgumentException(String.format(
+                "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+                field.getInputID(), field.getType()));
       }
     }
   }
