@@ -120,20 +120,31 @@ public class Database {
 
 
   /**
-   * Claim a new version for media package <code>mpId</code>.
+   * Claim a new version for media package <code>mpId</code>, atomically: concurrent callers are serialized by
+   * the database's own row-level locking.
    */
   public VersionImpl claimVersion(final String mpId) {
-    return db.execTx(em -> {
-      final Optional<VersionClaimDto> lastOpt = VersionClaimDto.findLastQuery(mpId).apply(em);
-      if (lastOpt.isPresent()) {
-        final VersionImpl claim = VersionImpl.next(lastOpt.get().getLastClaimed());
-        VersionClaimDto.updateQuery(mpId, claim.value()).apply(em);
-        return claim;
-      } else {
-        final VersionImpl first = VersionImpl.FIRST;
-        em.persist(VersionClaimDto.mk(mpId, first.value()));
-        return first;
+    return tryClaimByIncrement(mpId).orElseGet(() -> {
+      try {
+        db.execTx(em -> {
+          em.persist(VersionClaimDto.mk(mpId, VersionImpl.FIRST.value()));
+        });
+        return VersionImpl.FIRST;
+      } catch (Exception e) {
+        // Lost the race to create the first row -- another caller got there first. Its row now exists,
+        // so claiming by increment will succeed.
+        return tryClaimByIncrement(mpId)
+                .orElseThrow(() -> new IllegalStateException("Unable to claim a version for media package " + mpId));
       }
+    });
+  }
+
+  private Optional<VersionImpl> tryClaimByIncrement(final String mpId) {
+    return db.execTx(em -> {
+      if (VersionClaimDto.incrementQuery(mpId).apply(em) == 0) {
+        return Optional.empty();
+      }
+      return VersionClaimDto.findLastQuery(mpId).apply(em).map(dto -> new VersionImpl(dto.getLastClaimed()));
     });
   }
 
