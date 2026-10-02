@@ -239,6 +239,7 @@
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-rasterizer</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-util</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:xmlgraphics-commons</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>xml-apis:xml-apis</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>xml-apis:xml-apis-ext</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.mozilla:rhino</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
