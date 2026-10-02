@@ -878,6 +878,7 @@ public class IndexServiceImpl implements IndexService {
       // instead of silently creating an event without them.
       eventMetadata = getCommonEventCatalogUIAdapter().getRawFields();
     }
+    DublinCoreMetadataUtil.validateRequiredFieldsPresent(eventMetadata);
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
@@ -1872,6 +1873,7 @@ public class IndexServiceImpl implements IndexService {
       // instead of silently creating a series without them.
       seriesMetadata = getCommonSeriesCatalogUIAdapter().getRawFields();
     }
+    DublinCoreMetadataUtil.validateRequiredFieldsPresent(seriesMetadata);
     DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
 
     AccessControlList acl;
@@ -1939,6 +1941,7 @@ public class IndexServiceImpl implements IndexService {
     DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(
         MediaPackageElements.SERIES.toString());
     if (seriesMetadata != null) {
+      DublinCoreMetadataUtil.validateRequiredFieldsPresent(seriesMetadata);
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 
