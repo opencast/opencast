@@ -42,8 +42,10 @@
           "configuration",
           "documentation",
           "packaging",
-          "javascript"
-        ]
+          "javascript",
+          "refactoring"
+        ],
+        "exclude_labels": ["dependencies"]
       },
       {
         "title": "### Dependencies",
