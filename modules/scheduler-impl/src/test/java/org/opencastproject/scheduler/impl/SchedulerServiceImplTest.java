@@ -127,13 +127,10 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.codec.binary.Base64;
@@ -159,6 +156,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -714,7 +712,7 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testAddMultipleEventsEmptyRange() throws Exception {
-    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
+    final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
     final Date end = start;
     final Long duration = 6900000L;
@@ -731,7 +729,7 @@ public class SchedulerServiceImplTest {
     final Map<String, String> wfProperties = this.wfProperties;
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Optional<String> schedulingSource = Optional.empty();
-    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+    final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
         rrule,
         start,
         end,
@@ -749,7 +747,7 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testAddMultipleEvents() throws Exception {
-    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
+    final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
     final Date end = new Date(1570953300000L); // 2019-10-13T07:55:00Z
     final Long duration = 6900000L;
@@ -767,7 +765,7 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Optional<String> schedulingSource = Optional.empty();
     assertEquals("mod0", schedSvc.getScheduleLastModified(captureAgentId));
-    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+    final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
         rrule,
         start,
         end,
@@ -781,15 +779,15 @@ public class SchedulerServiceImplTest {
         schedulingSource
     );
 
+    final ZoneId zoneId = tz.toZoneId();
     final int expectedEventCount = rrule.getRecur().getDates(
-        new net.fortuna.ical4j.model.Date(start),
-        new net.fortuna.ical4j.model.Date(end),
-        Value.DATE
+        start.toInstant().atZone(zoneId),
+        end.toInstant().atZone(zoneId)
     ).size();
     assertEquals(expectedEventCount, scheduled.keySet().size());
     final String randomMpId = scheduled.keySet().stream().findAny()
         .orElseThrow(() -> new RuntimeException("This should never happen"));
-    final Period period = scheduled.get(randomMpId);
+    final Period<ZonedDateTime> period = scheduled.get(randomMpId);
     final MediaPackage mediaPackage = schedSvc.getMediaPackage(randomMpId);
     final DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(randomMpId);
     final TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(randomMpId);
@@ -797,8 +795,8 @@ public class SchedulerServiceImplTest {
     assertTrue(eventLoaded.getFirst(PROPERTY_TITLE).startsWith(dublinCoreCatalog.getFirst(PROPERTY_TITLE)));
     assertEquals(randomMpId, technicalMetadata.getEventId());
     assertEquals(captureAgentId, technicalMetadata.getAgentId());
-    assertEquals(new Date(period.getStart().getTime()), technicalMetadata.getStartDate());
-    assertEquals(new Date(period.getEnd().getTime()), technicalMetadata.getEndDate());
+    assertEquals(Date.from(period.getStart().toInstant()), technicalMetadata.getStartDate());
+    assertEquals(Date.from(period.getEnd().toInstant()), technicalMetadata.getEndDate());
     assertEquals(userIds, technicalMetadata.getPresenters());
     assertTrue(technicalMetadata.getRecording().isEmpty());
     assertTrue(technicalMetadata.getCaptureAgentConfiguration().size() >= caProperties.size());
@@ -811,7 +809,7 @@ public class SchedulerServiceImplTest {
   @Test(expected = SchedulerException.class)
   public void testAddMultipleEventsConflict() throws Exception {
     for (int i = 0; i < 2; i++) {
-      final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
+      final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
       final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
       final Date end = new Date(1570953300000L); // 2019-10-13T07:55:00Z
       final Long duration = 6900000L;
@@ -826,7 +824,7 @@ public class SchedulerServiceImplTest {
       final Map<String, String> wfProperties = this.wfProperties;
       final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
       final Optional<String> schedulingSource = Optional.empty();
-      final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+      final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
           rrule,
           start,
           end,
@@ -923,7 +921,7 @@ public class SchedulerServiceImplTest {
     {
       ZonedDateTime startZdt = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC);
       List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
+              new RRule<>("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
                   + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
@@ -932,7 +930,7 @@ public class SchedulerServiceImplTest {
       // No events are contained in the RRule and date range:
       // 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
       List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
+              new RRule<>("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
               new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
       assertEquals(0, conflicts.size());
     }
@@ -1088,12 +1086,13 @@ public class SchedulerServiceImplTest {
     try {
       String icalString = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
       cal = calBuilder.build(IOUtils.toInputStream(icalString, "UTF-8"));
-      ComponentList vevents = cal.getComponents(VEVENT);
+      List<VEvent> vevents = cal.getComponents(VEVENT);
       for (int i = 0; i < vevents.size(); i++) {
-        PropertyList attachments = ((VEvent) vevents.get(i)).getProperties(Property.ATTACH);
+        List<Property> attachments = vevents.get(i).getProperties(Property.ATTACH);
         for (int j = 0; j < attachments.size(); j++) {
-          String attached = ((Property) attachments.get(j)).getValue();
-          String filename = ((Property) attachments.get(j)).getParameter("X-APPLE-FILENAME").getValue();
+          String attached = attachments.get(j).getValue();
+          String filename = attachments.get(j).getParameter("X-APPLE-FILENAME")
+                  .map(Parameter::getValue).orElse(null);
           attached = new String(Base64.decodeBase64(attached));
           if ("org.opencastproject.capture.agent.properties".equals(filename)) {
             Assert.assertTrue(attached.contains("capture.device.id=testdevice"));
@@ -1532,12 +1531,10 @@ public class SchedulerServiceImplTest {
     final String cs = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
     final Calendar cal = new CalendarBuilder().build(new StringReader(cs));
     assertEquals("number of entries", 1, cal.getComponents().size());
-    for (Object co : cal.getComponents()) {
-      final Component c = (Component) co;
-      assertEquals("SUMMARY property should contain the DC title", title, c.getProperty(Property.SUMMARY).getValue());
-      final List<Property> attachments = c.getProperties(Property.ATTACH).stream()
-          .map(obj -> (Property) obj)
-          .collect(Collectors.toList());
+    for (Component c : cal.getComponents()) {
+      final String summary = c.<Property>getProperty(Property.SUMMARY).map(Property::getValue).orElse(null);
+      assertEquals("SUMMARY property should contain the DC title", title, summary);
+      final List<Property> attachments = c.getProperties(Property.ATTACH);
       // episode dublin core
       final List<DublinCoreCatalog> dcsIcal = attachments.stream()
           .filter(p -> byParamNameAndValue(p,"X-APPLE-FILENAME", "episode.xml"))
@@ -1556,8 +1553,8 @@ public class SchedulerServiceImplTest {
   }
 
   private Boolean byParamNameAndValue(Property p, final String name, final String value) {
-    final Parameter param = p.getParameter(name);
-    return param != null && param.getValue().equals(value);
+    final Optional<Parameter> param = p.getParameter(name);
+    return param.isPresent() && param.get().getValue().equals(value);
   }
 
   private static DublinCoreCatalog parseDc(String s) {

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -60,7 +61,7 @@ public class UtilTests {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     // JST
     start = Calendar.getInstance(jst);
@@ -257,29 +258,25 @@ public class UtilTests {
    */
   private void doDSTChangeOverTest(TimeZone tz, Calendar start, Calendar end, String days, long durationMillis,
           int expectedHour, int expectedCount) throws ParseException {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
-    simpleDateFormat.setTimeZone(tz);
     logger.debug("= start ======================================================");
-    List<Period> periods = generatePeriods(tz, start, end, days, durationMillis);
+    List<Period<ZonedDateTime>> periods = generatePeriods(tz, start, end, days, durationMillis);
     logger.debug("Expecting {} got {}", expectedCount, periods.size());
     assertEquals(expectedCount, periods.size());
-    for (Period d : periods) {
-      //logger.debug("Retrieved period start {} end {}", d.getStart().toString(),  d.getEnd().toString());
-      Calendar cal = Calendar.getInstance(d.getStart().getTimeZone());
-      cal.setTimeInMillis(d.getStart().getTime());
+    for (Period<ZonedDateTime> d : periods) {
+      ZonedDateTime dStart = d.getStart();
       logger.debug("Date {} Instance {}, calendar hour {} (expected {}), zone {}",
-          d.getStart().toString(),
-          simpleDateFormat.format(cal.getTime()),
-          cal.get(Calendar.HOUR_OF_DAY),
+          dStart,
+          dStart,
+          dStart.getHour(),
           expectedHour,
           tz.getID());
-      assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
+      assertEquals(expectedHour, dStart.getHour());
     }
     logger.debug("= end ======================================================");
   }
 
-  private List<Period> generatePeriods(TimeZone tz, Calendar startTz, Calendar endTz, String days, Long duration)
-          throws ParseException {
+  private List<Period<ZonedDateTime>> generatePeriods(TimeZone tz, Calendar startTz, Calendar endTz, String days,
+          Long duration) throws ParseException {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
     simpleDateFormat.setTimeZone(tz);
 
@@ -296,7 +293,7 @@ public class UtilTests {
         simpleDateFormat.format(endTz.getTime()), tz.getID(),
         TimeZone.getDefault().getID());
     logger.debug(rRuleStr);
-    return Util.calculatePeriods(startTz, endTz, duration, new Recur(rRuleStr), tz);
+    return Util.calculatePeriods(startTz, endTz, duration, new Recur<>(rRuleStr), tz);
   }
 
   private String generateRule(String days, int hour, int minute) {

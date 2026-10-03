@@ -153,6 +153,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -940,7 +941,7 @@ public class IndexServiceImpl implements IndexService {
     org.joda.time.DateTime end = null;
     long duration = 0L;
     Properties caProperties = new Properties();
-    RRule rRule = null;
+    RRule<ZonedDateTime> rRule = null;
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       Properties configuration;
@@ -982,7 +983,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
-      rRule = new RRule((String) sourceMetadata.get("rrule"));
+      rRule = new RRule<>((String) sourceMetadata.get("rrule"));
     }
 
     Map<String, String> configuration = new HashMap<>();
@@ -1025,9 +1026,9 @@ public class IndexServiceImpl implements IndexService {
         }
         return mediaPackage.getIdentifier().toString();
       case SCHEDULE_MULTIPLE:
-        final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(),
-            duration, tz, captureAgentId, presenterUsernames, eventHttpServletRequest.getMediaPackage().get(),
-            configuration, (Map) caProperties, Optional.empty());
+        final Map<String, Period<ZonedDateTime>> scheduled = schedulerService.addMultipleEvents(rRule,
+            start.toDate(), end.toDate(), duration, tz, captureAgentId, presenterUsernames,
+            eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Optional.empty());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
         throw new IllegalArgumentException("Unknown source type: " + type);
