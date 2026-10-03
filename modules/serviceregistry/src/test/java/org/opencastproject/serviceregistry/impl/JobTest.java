@@ -226,6 +226,34 @@ public class JobTest {
     Job rootJob = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
     Job job = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, rootJob);
     Job job1 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job);
+    Job job2 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job1);
+    Job job3 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job);
+    Job job4 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job3);
+
+    // Only direct children are returned, not the children of children
+    final List<Job> rootChildren = serviceRegistry.getChildJobs(rootJob.getId());
+    assertEquals(1, rootChildren.size());
+    assertTrue(rootChildren.stream().anyMatch(matchesId(job)));
+
+    final List<Job> jobChildren = serviceRegistry.getChildJobs(job.getId());
+    assertEquals(2, jobChildren.size());
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job1)));
+    assertTrue(jobChildren.stream().anyMatch(matchesId(job3)));
+
+    final List<Job> job1Children = serviceRegistry.getChildJobs(job1.getId());
+    assertEquals(1, job1Children.size());
+    assertTrue(job1Children.stream().anyMatch(matchesId(job2)));
+
+    // Leaf jobs have no children
+    assertEquals(0, serviceRegistry.getChildJobs(job2.getId()).size());
+    assertEquals(0, serviceRegistry.getChildJobs(job4.getId()).size());
+  }
+
+  @Test
+  public void testGetDescendantJobs() throws Exception {
+    Job rootJob = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    Job job = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, rootJob);
+    Job job1 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job);
     Job job3 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job);
     Job job4 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job3);
     Job job2 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job1);
@@ -237,24 +265,24 @@ public class JobTest {
     job4 = serviceRegistry.updateJob(job4);
     job5 = serviceRegistry.updateJob(job5);
 
-    // Search children by root job
-    final List<Job> rootChildren = serviceRegistry.getChildJobs(rootJob.getId());
-    assertEquals(6, rootChildren.size());
-    assertTrue(rootChildren.stream().anyMatch(matchesId(job)));
-    assertTrue(rootChildren.stream().anyMatch(matchesId(job1)));
-    assertTrue(rootChildren.stream().anyMatch(matchesId(job2)));
-    assertTrue(rootChildren.stream().anyMatch(matchesId(job3)));
-    assertTrue(rootChildren.stream().anyMatch(matchesId(job4)));
-    assertTrue(rootChildren.stream().anyMatch(matchesId(job5)));
+    // Search descendants by root job
+    final List<Job> rootDescendants = serviceRegistry.getDescendantJobs(rootJob.getId());
+    assertEquals(6, rootDescendants.size());
+    assertTrue(rootDescendants.stream().anyMatch(matchesId(job)));
+    assertTrue(rootDescendants.stream().anyMatch(matchesId(job1)));
+    assertTrue(rootDescendants.stream().anyMatch(matchesId(job2)));
+    assertTrue(rootDescendants.stream().anyMatch(matchesId(job3)));
+    assertTrue(rootDescendants.stream().anyMatch(matchesId(job4)));
+    assertTrue(rootDescendants.stream().anyMatch(matchesId(job5)));
 
-    // Search children
-    final List<Job> jobChildren = serviceRegistry.getChildJobs(job.getId());
-    assertEquals(5, jobChildren.size());
-    assertTrue(jobChildren.stream().anyMatch(matchesId(job1)));
-    assertTrue(jobChildren.stream().anyMatch(matchesId(job2)));
-    assertTrue(jobChildren.stream().anyMatch(matchesId(job3)));
-    assertTrue(jobChildren.stream().anyMatch(matchesId(job4)));
-    assertTrue(jobChildren.stream().anyMatch(matchesId(job5)));
+    // Search descendants
+    final List<Job> jobDescendants = serviceRegistry.getDescendantJobs(job.getId());
+    assertEquals(5, jobDescendants.size());
+    assertTrue(jobDescendants.stream().anyMatch(matchesId(job1)));
+    assertTrue(jobDescendants.stream().anyMatch(matchesId(job2)));
+    assertTrue(jobDescendants.stream().anyMatch(matchesId(job3)));
+    assertTrue(jobDescendants.stream().anyMatch(matchesId(job4)));
+    assertTrue(jobDescendants.stream().anyMatch(matchesId(job5)));
   }
 
   private static Predicate<Job> matchesId(final Job j) {

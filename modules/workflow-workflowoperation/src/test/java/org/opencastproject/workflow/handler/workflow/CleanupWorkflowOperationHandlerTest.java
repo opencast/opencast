@@ -90,7 +90,7 @@ public class CleanupWorkflowOperationHandlerTest {
     currentJob.setArguments((List<String>) EasyMock.anyObject());
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(currentJob).anyTimes();
     EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(currentJob).anyTimes();
-    EasyMock.expect(serviceRegistry.getChildJobs(EasyMock.anyLong())).andReturn(new ArrayList<Job>()).anyTimes();
+    EasyMock.expect(serviceRegistry.getDescendantJobs(EasyMock.anyLong())).andReturn(new ArrayList<Job>()).anyTimes();
     EasyMock.replay(serviceRegistry, currentJob);
     cleanupWOH.setServiceRegistry(serviceRegistry);
 
