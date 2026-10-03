@@ -212,11 +212,15 @@ public class IndexRebuildService implements BundleActivator {
     setRebuildState(service, IndexRebuildService.State.RUNNING);
     DenyAclCollector.start();
     try {
+      indexProducer.clear();
       indexProducer.repopulate(dataType);
       setRebuildState(service, IndexRebuildService.State.OK);
     } catch (IndexRebuildException e) {
       setRebuildState(service, IndexRebuildService.State.ERROR);
       throw e;
+    } catch (IOException e) {
+      setRebuildState(service, IndexRebuildService.State.ERROR);
+      throw new IndexRebuildException("Could not clear the " + service + " index before rebuilding it", e);
     } finally {
       reportDeniedAcls(service);
       DenyAclCollector.stop();

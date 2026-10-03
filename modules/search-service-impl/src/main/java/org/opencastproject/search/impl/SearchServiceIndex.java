@@ -66,9 +66,11 @@ import com.google.gson.JsonElement;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -201,6 +203,22 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     this.esIndex = esIndex;
   }
 
+  @Override
+  public void clear() throws IOException {
+    try {
+      final DeleteIndexRequest request = new DeleteIndexRequest(INDEX_NAME);
+      final AcknowledgedResponse response = esIndex.getClient().indices().delete(request, RequestOptions.DEFAULT);
+      if (!response.isAcknowledged()) {
+        logger.error("Index '{}' could not be deleted", INDEX_NAME);
+      }
+    } catch (ElasticsearchStatusException e) {
+      if (e.status() != RestStatus.NOT_FOUND) {
+        throw e;
+      }
+      logger.info("Cannot clear non-existing index '{}'", INDEX_NAME);
+    }
+    createIndex();
+  }
 
   public SearchResponse search(SearchSourceBuilder searchSource) throws SearchException {
     SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
