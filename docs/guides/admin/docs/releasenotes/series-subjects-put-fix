@@ -1,0 +1,3 @@
+Fixed the External API's `PUT /api/series/{id}/metadata` endpoint rejecting the `subjects` field with a
+`404 Not Found` error. This was caused by a mismatch between the field id returned by `GET` (`subjects`)
+and the id expected by `PUT` (`subject`) for series metadata. [#3491](https://github.com/opencast/opencast/issues/3491)
