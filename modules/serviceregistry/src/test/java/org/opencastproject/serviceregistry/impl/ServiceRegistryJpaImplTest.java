@@ -505,6 +505,19 @@ public class ServiceRegistryJpaImplTest {
   }
 
   @Test
+  public void testDataFailureDoesNotChangeServiceState() throws Exception {
+    serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);
+
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
+    job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+    job.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job);
+
+    ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.NORMAL, service.getServiceState());
+  }
+
+  @Test
   public void testErrorState() throws Exception {
     // set max attempts to 1
     Dictionary<String, String> properties = new Hashtable<>();
