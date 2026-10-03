@@ -2533,13 +2533,26 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
-   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger
-   * the capacity.
+   * Comparator that will sort service registrations by ascending load factor (jobLoad/maxLoad, i.e. by descending
+   * capacity, see {@link SystemLoad.NodeLoad#getLoadFactor()}), preferring the node with the higher maximum load in
+   * case two nodes have about the same load factor.
+   *
+   * The load factor is rounded to a fixed grid ({@link #LOAD_FACTOR_BUCKET_SIZE}) before comparing it, rather than
+   * comparing the raw values with an epsilon ("is the difference small enough to be considered a tie"). Do not go
+   * back to an epsilon check: whether two elements are "close enough" to be a tie is then not guaranteed to agree
+   * between every pair, which makes a comparator fail to be transitive and can make {@code Collections.sort}/
+   * {@code List.sort} throw "Comparison method violates its general contract!" once enough services are being
+   * compared (see <a href="https://github.com/opencast/opencast/issues/2745">#2745</a>). Rounding to a fixed grid
+   * turns the tie check into a plain equality check on the rounded value, which every pair of elements agrees on.
    */
-  private class LoadComparator implements Comparator<ServiceRegistration> {
+  class LoadComparator implements Comparator<ServiceRegistration> {
+
+    /** The size of the grid the load factor is rounded to before comparing it, see the class comment. */
+    private static final float LOAD_FACTOR_BUCKET_SIZE = 0.01f;
 
     protected SystemLoad loadByHost = null;
+
+    private final Comparator<ServiceRegistration> comparator;
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
@@ -2549,22 +2562,25 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      */
     LoadComparator(SystemLoad loadByHost) {
       this.loadByHost = loadByHost;
+      // The node with the lowest (rounded) load factor should be first. Among nodes with the same rounded load
+      // factor, the node with the highest maximum load should be first.
+      this.comparator = Comparator
+          .<ServiceRegistration>comparingDouble(service -> loadFactorBucket(nodeOf(service)))
+          .thenComparing(Comparator.<ServiceRegistration>comparingDouble(service -> nodeOf(service).getMaxLoad())
+              .reversed());
+    }
+
+    private NodeLoad nodeOf(ServiceRegistration service) {
+      return loadByHost.get(service.getHost());
+    }
+
+    private double loadFactorBucket(NodeLoad node) {
+      return Math.round(node.getLoadFactor() / LOAD_FACTOR_BUCKET_SIZE);
     }
 
     @Override
     public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
-      String hostA = serviceA.getHost();
-      String hostB = serviceB.getHost();
-      NodeLoad nodeA = loadByHost.get(hostA);
-      NodeLoad nodeB = loadByHost.get(hostB);
-      // If the load factors are about the same, sort based on maximum load
-      if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
-        // NOTE: The sort order below is *reversed* from what you'd expect
-        // When we're comparing the load factors we want the node with the lowest factor to be first
-        // When we're comparing the maximum load value, we want the node with the highest max to be first
-        return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
-      }
-      return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+      return comparator.compare(serviceA, serviceB);
     }
   }
 
@@ -2574,8 +2590,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * the capacity.
    * This Comparator will prefer encoding workers, if none are defined in the configuration file it will act like
    * the LoadComparator.
+   *
+   * Every pair of services not decided by the encoding worker preference below must be compared with
+   * {@link LoadComparator#compare}, the exact same rule used everywhere else. Do not compare some pairs (e.g. an
+   * encoding worker over {@link #encodingThreshold} against a non-encoding worker) with a separate, differently
+   * grained rule instead, such as a raw comparison of the load factor: that breaks transitivity, see
+   * <a href="https://github.com/opencast/opencast/issues/2745">#2745</a>.
    */
-  private class LoadComparatorEncoding extends LoadComparator implements Comparator<ServiceRegistration> {
+  class LoadComparatorEncoding extends LoadComparator implements Comparator<ServiceRegistration> {
 
     /**
      * Creates a new comparator which is using the given map of host names and loads.
@@ -2590,21 +2612,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
       String hostA = serviceA.getHost();
       String hostB = serviceB.getHost();
-      NodeLoad nodeA = loadByHost.get(hostA);
-      NodeLoad nodeB = loadByHost.get(hostB);
 
       if (encodingWorkers != null) {
         if (encodingWorkers.contains(hostA) && !encodingWorkers.contains(hostB)) {
-          if (nodeA.getLoadFactor() <= encodingThreshold) {
+          if (loadByHost.get(hostA).getLoadFactor() <= encodingThreshold) {
             return -1;
           }
-          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+          return super.compare(serviceA, serviceB);
         }
         if (encodingWorkers.contains(hostB) && !encodingWorkers.contains(hostA)) {
-          if (nodeB.getLoadFactor() <= encodingThreshold) {
+          if (loadByHost.get(hostB).getLoadFactor() <= encodingThreshold) {
             return 1;
           }
-          return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+          return super.compare(serviceA, serviceB);
         }
       }
       return super.compare(serviceA, serviceB);
