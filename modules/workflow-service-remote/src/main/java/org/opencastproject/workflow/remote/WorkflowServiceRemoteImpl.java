@@ -247,7 +247,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-          Map<String, String> properties) throws WorkflowDatabaseException {
+          Map<String, String> properties) throws WorkflowDatabaseException, UnauthorizedException {
     try {
       return start(workflowDefinition, mediaPackage, null, properties);
     } catch (NotFoundException e) {
@@ -282,7 +282,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-          Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException, NotFoundException {
+          Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException, NotFoundException,
+          UnauthorizedException {
     HttpPost post = new HttpPost("/start");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
@@ -300,16 +301,18 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     } catch (Exception e) {
       throw new IllegalStateException("Unable to assemble a remote workflow request", e);
     }
-    HttpResponse response = getResponse(post, SC_NOT_FOUND, SC_OK);
+    HttpResponse response = getResponse(post, SC_NOT_FOUND, SC_OK, SC_UNAUTHORIZED);
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Workflow instance " + parentWorkflowId + " does not exist.");
+        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+          throw new UnauthorizedException("You do not have permission to start this workflow");
         } else {
           return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
         }
       }
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new WorkflowDatabaseException("Unable to build a workflow from xml", e);
@@ -327,7 +330,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage)
-          throws WorkflowDatabaseException {
+          throws WorkflowDatabaseException, UnauthorizedException {
     try {
       return start(workflowDefinition, mediaPackage, null, null);
     } catch (NotFoundException e) {

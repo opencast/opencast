@@ -21,13 +21,13 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryListener;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowIdentifier;
@@ -259,7 +259,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
   }
 
   private boolean userCanAccessWorkflowDefinition(final User user, final WorkflowDefinition wd) {
-    return wd.getRoles().isEmpty() || user.hasRole(GLOBAL_ADMIN_ROLE) || wd.getRoles().stream()
+    return wd.getRoles().isEmpty() || SecurityUtil.isGlobalAdmin(user) || wd.getRoles().stream()
             .anyMatch(user::hasRole);
   }
 

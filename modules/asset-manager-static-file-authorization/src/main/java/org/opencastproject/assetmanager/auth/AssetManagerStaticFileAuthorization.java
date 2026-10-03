@@ -21,12 +21,12 @@
 
 package org.opencastproject.assetmanager.auth;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
+import org.opencastproject.assetmanager.api.AssetManagerSecurityUtils;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
@@ -108,7 +108,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
   public boolean verifyUrlAccess(final String path) {
     // Always allow access for admin
     final User user = securityService.getUser();
-    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    if (SecurityUtil.isGlobalAdmin(user)) {
       logger.debug("Allow access for admin `{}`", user);
       return true;
     }
@@ -145,7 +145,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
     final List<String> roles = user.getRoles().parallelStream()
         .map(Role::getName)
         .filter(roleFilter)
-        .map((role) -> role + " | read")
+        .map((role) -> AssetManagerSecurityUtils.mkPropertyName(role, "read"))
         .collect(Collectors.toList());  // ["ROLE_XY | read", ...]
 
     StringBuilder properties = new StringBuilder("property_name = ?");
@@ -159,7 +159,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
         + "and (" + properties + ")";
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     Query q = entityManager.createNativeQuery(sql);
-    q.setParameter(1, "org.opencastproject.assetmanager.security");
+    q.setParameter(1, AssetManagerSecurityUtils.SECURITY_NAMESPACE);
     q.setParameter(2, m.group(2));
     for (int i = 0; i < roles.size(); i++) {
       q.setParameter(i + 3, roles.get(i));
@@ -184,8 +184,6 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
   /**
    * Filter for removing user interface roles from access control
    */
-  private final java.util.function.Predicate<String> roleFilter = (name) -> (
-      includeAPIRoles || !name.startsWith("ROLE_API_"))
-      && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
-      && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
+  private final java.util.function.Predicate<String> roleFilter = (name) ->
+      AssetManagerSecurityUtils.isRoleAllowed(name, includeAPIRoles, includeCARoles, includeUIRoles);
 }
