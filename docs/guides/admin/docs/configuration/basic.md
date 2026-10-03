@@ -103,5 +103,10 @@ sudo -u opencast rm /path/to/data/folder/test
 Finish Installation
 -------------------
 
-If you came here as part of an installation, please head back to the installation guide you used for notes on how to run
-Opencast as a service.
+If you came here as part of an installation, please head back to the section on starting Opencast in the installation
+guide you used:
+
+- [Debian, Ubuntu](../installation/debs.md#start-opencast)
+- [Red Hat Enterprise Linux and derivatives](../installation/rpm-el.md#start-opencast)
+- [Source install on Linux](../installation/source-linux.md#running-opencast)
+- [Source install on macOS](../installation/source-macosx.md#running-opencast)
