@@ -112,4 +112,24 @@ public class WorkflowConditionInterpreterTest {
   public void interpretDecimalEquality() {
     assertTrue(WorkflowConditionInterpreter.interpret("5.0 == 5"));
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void interpretLowerCaseAndFails() {
+    WorkflowConditionInterpreter.interpret("true and false");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void interpretLowerCaseOrFails() {
+    WorkflowConditionInterpreter.interpret("true or false");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void interpretLowerCaseNotFails() {
+    WorkflowConditionInterpreter.interpret("not true");
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void interpretTrailingGarbageFails() {
+    WorkflowConditionInterpreter.interpret("true true");
+  }
 }

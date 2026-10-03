@@ -320,6 +320,10 @@ operation should be executed. This so-called execution condition is a boolean ex
     <bool-literal> ::= "true" | "false"
     <atom> ::= <number> | <string>
 
+Note that `AND`, `OR`, `NOT`, `true` and `false` are case-sensitive keywords: they must be written exactly as shown
+above (`AND`/`OR`/`NOT` in upper-case, `true`/`false` in lower-case). Any other casing, such as `and` or `TRUE`, is
+not recognized and causes the condition to be rejected as invalid.
+
 As the formal description above explains, such boolean expressions may contain…
 
 - …the boolean constants `true` and `false`.
