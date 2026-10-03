@@ -64,13 +64,16 @@ public class EditingData {
   private final List<Subtitle> subtitles;
   private final List<Subtitle> chapters;
   private final Boolean local;
+  private final List<CommentData> comments;
+  private final List<String> commentReasons;
 
   private final String metadataJSON;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
           List<String> waveformURIs, List<Subtitle> subtitles, List<Subtitle> chapters, Boolean local,
-          Boolean lockingActive, Integer lockRefresh, User user, String metadataJSON) {
+          Boolean lockingActive, Integer lockRefresh, User user, String metadataJSON,
+          List<CommentData> comments, List<String> commentReasons) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -88,6 +91,8 @@ public class EditingData {
     this.lockUUID = UUID.randomUUID().toString();
     this.lockUser = user.getUsername();
     this.metadataJSON = metadataJSON;
+    this.comments = comments;
+    this.commentReasons = commentReasons;
   }
 
   public static EditingData parse(String json) {
@@ -129,6 +134,14 @@ public class EditingData {
 
   public String getMetadataJSON() {
     return metadataJSON;
+  }
+
+  public List<CommentData> getComments() {
+    return comments;
+  }
+
+  public List<String> getCommentReasons() {
+    return commentReasons;
   }
 
   public String toString() {
