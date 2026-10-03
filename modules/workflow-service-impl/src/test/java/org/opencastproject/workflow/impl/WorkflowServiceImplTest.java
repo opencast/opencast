@@ -50,6 +50,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
@@ -191,6 +192,16 @@ public class WorkflowServiceImplTest {
     AuthorizationService authzService = createNiceMock(AuthorizationService.class);
     expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    EasyMock.expect(authzService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
+        .andReturn(true).anyTimes();
+    EasyMock.expect(authzService.hasPermission(
+            (MediaPackage) EasyMock.anyObject(),
+            (User) EasyMock.anyObject(),
+            (Organization) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject()
+        ))
+        .andReturn(true).anyTimes();
     replay(authzService);
     service.setAuthorizationService(authzService);
 

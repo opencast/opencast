@@ -23,6 +23,7 @@ package org.opencastproject.authorization.xacml;
 
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.Tuple.tuple;
 
@@ -36,6 +37,7 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -312,43 +314,100 @@ public class XACMLAuthorizationService implements AuthorizationService {
   }
 
   public boolean hasPermission(final MediaPackage mp, final String action) {
-    AccessControlList acl = getActiveAcl(mp).getA();
+    User user = securityService.getUser();
+    Organization org = securityService.getOrganization();
 
-    // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
-    final User user = securityService.getUser();
-    var episodeRole = getEpisodeRoleId(mp.getIdentifier().toString(), action);
-    logger.debug("Checking for role: {}", episodeRole);
-    var allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
-
-    return allowed || hasPermission(acl, action);
+    return hasPermission(mp, user, org, action);
   }
 
   @Override
   public boolean hasPermission(AccessControlList acl, final String action) {
     final User user = securityService.getUser();
+    Organization org = securityService.getOrganization();
+
+    return hasPermission(acl, user, org, action);
+  }
+
+  public boolean hasPermission(final MediaPackage mp, User user, Organization org, String action) {
+    return hasPermission(mp, user, org, action, null);
+  }
+
+  public boolean hasPermission(AccessControlList acl, User user, Organization org, String action) {
+    return hasPermission(acl, user, org, action, null);
+  }
+
+  public boolean hasPermissionPerformance(AccessControlList acl, User user, Organization org, String action,
+      String mediaPackageId) {
+    // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
+    var episodeRole = getEpisodeRoleId(mediaPackageId, action);
+    logger.debug("Checking for role: {}", episodeRole);
+    var allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
+
+    return allowed || hasPermission(acl, user, org, action, null);
+  }
+
+  public boolean hasPermission(
+      final MediaPackage mp,
+      User user,
+      Organization org,
+      String action,
+      String entityOrgId
+  ) {
+    // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
+    var episodeRole = getEpisodeRoleId(mp.getIdentifier().toString(), action);
+    logger.debug("Checking for role: {}", episodeRole);
+    var allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
+
+    AccessControlList acl = getActiveAcl(mp).getA();
+    return allowed || hasPermission(acl, user, org, action, entityOrgId);
+  }
+
+  public boolean hasPermission(
+      AccessControlList acl,
+      User user,
+      Organization org,
+      String action,
+      String entityOrgId
+  ) {
+    // Check for the global admin role
+    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // If it does not belong to the user organization, no access
+    if (entityOrgId != null && !org.getId().equals(entityOrgId)) {
+      return false;
+    }
+
+    // Check for the local admin role
+    if (user.hasRole(org.getAdminRole())) {
+      return true;
+    }
+
     var allowed = false;
 
     // Check ACL
     for (AccessControlEntry entry: acl.getEntries()) {
       // ignore entries for other actions
-      if (!entry.getAction().equals(action)) {
-        continue;
-      }
-      for (Role role : user.getRoles()) {
-        if (entry.getRole().equals(role.getName())) {
-          // immediately abort on matching deny rules
-          // (never allow if a deny rule matches, even if another allow rule matches)
-          if (!entry.isAllow()) {
-            logger.debug("Access explicitly denied for role({}), action({})", role.getName(), action);
-            return false;
+      if (entry.getAction().equals(action)) {
+        for (Role role : user.getRoles()) {
+          if (entry.getRole().equals(role.getName())) {
+            // immediately abort on matching deny rules
+            // (never allow if a deny rule matches, even if another allow rule matches)
+            if (!entry.isAllow()) {
+              logger.debug("Access explicitly denied for role({}), action({})", role.getName(), action);
+              return false;
+            }
+            allowed = true;
           }
-          allowed = true;
         }
       }
     }
-    logger.debug("XACML file allowed access");
+    logger.debug("ACL allowed access");
     return allowed;
   }
+
+
 
   /**
    * Sets the workspace to use for retrieving XACML policies
