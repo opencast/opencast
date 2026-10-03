@@ -29,7 +29,7 @@
     <eclipselink.version>2.7.15</eclipselink.version>
     <eclipselink.asm.version>9.7.1</eclipselink.asm.version>
     <elasticsearch.version>7.10.2</elasticsearch.version>
-    <failureaccess.version>1.0.2</failureaccess.version>
+    <failureaccess.version>1.0.3</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
     <graphql.version>21.5</graphql.version>
     <graphql-annotations.version>21.5</graphql-annotations.version>
