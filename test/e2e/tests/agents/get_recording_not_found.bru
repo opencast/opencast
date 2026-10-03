@@ -1,0 +1,21 @@
+meta {
+  name: get_recording_not_found
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/recordings/{{recordingMpId}}.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("GET recording status before update should return 404", function() {
+    expect(res.status).to.equal(404);
+  });
+}

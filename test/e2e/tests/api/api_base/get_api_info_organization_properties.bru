@@ -1,0 +1,25 @@
+meta {
+  name: get_api_info_organization_properties
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/info/organization/properties
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Organization properties should be key-value strings", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    for (const key in body) {
+      expect(body[key]).to.be.a('string');
+    }
+  });
+}

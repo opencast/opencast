@@ -1,0 +1,25 @@
+meta {
+  name: get_api_info_me_roles
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/info/me/roles
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Response should be an array of roles", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    body.forEach(function(role) {
+      expect(role).to.be.a('string');
+    });
+  });
+}

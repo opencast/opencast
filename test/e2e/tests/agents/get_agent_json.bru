@@ -1,0 +1,26 @@
+meta {
+  name: get_agent_json
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/agents/test-agent-bruno.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get capture agent details in JSON should return valid details", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body['agent-state-update']).to.be.an('object');
+    expect(body['agent-state-update'].name).to.equal('test-agent-bruno');
+    expect(body['agent-state-update'].state).to.equal('offline');
+    expect(body['agent-state-update'].url).to.equal('127.0.0.1');
+  });
+}
