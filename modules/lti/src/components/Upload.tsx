@@ -13,7 +13,7 @@ import {
     collectionToPairs
 } from "../OpencastRest";
 import { parsedQueryString } from "../utils";
-import { EditForm } from "./EditForm";
+import { allowedFields, EditForm } from "./EditForm";
 import { JobList } from "./JobList";
 
 interface OptionType {
@@ -32,12 +32,15 @@ interface UploadState {
     readonly uploadState: "success" | "error" | "pending" | "none";
     readonly metadata: MetadataResult | "error" | undefined;
     readonly presenterFile?: Blob;
+    readonly presenterFileWarning: boolean;
     readonly captionFile?: Blob;
+    readonly captionFileWarning: boolean;
     readonly captionFormat?: string;
     readonly captionLanguage?: string;
     readonly copyState: "success" | "error" | "pending" | "none";
     readonly copySeries?: OptionType;
     readonly uploadProgress: number;
+    readonly missingFields: string[];
 }
 
 function isMetadata(
@@ -57,7 +60,10 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             uploadState: "none",
             copyState: "none",
             metadata: undefined,
-            uploadProgress: 0
+            uploadProgress: 0,
+            presenterFileWarning: false,
+            captionFileWarning: false,
+            missingFields: []
         };
     }
 
@@ -134,13 +140,31 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
+    missingRequiredFields(metadata: MetadataResult): string[] {
+        const missingMetadataFields = metadata.edited.fields
+            .filter((field) => allowedFields.includes(field.id) && field.required)
+            .filter((field) => Array.isArray(field.value) ? field.value.length === 0 : field.value === "")
+            .map((field) => this.props.t(field.label));
+        const missingPresenterFile = this.state.eventId === undefined && this.state.presenterFile === undefined
+            ? [this.props.t("LTI.VIDEOFILE")]
+            : [];
+        return [...missingPresenterFile, ...missingMetadataFields];
+    }
+
     onSubmit() {
         if (!isMetadata(this.state.metadata))
             return;
-        if (this.state.eventId === undefined && this.state.presenterFile === undefined)
+        const missingFields = this.missingRequiredFields(this.state.metadata);
+        if (missingFields.length > 0) {
+            this.setState({
+                ...this.state,
+                missingFields
+            });
             return;
+        }
         this.setState({
             ...this.state,
+            missingFields: [],
             uploadState: "pending"
         });
         console.log("onSubmit, seriesId: " + this.state.metadata.seriesId);
@@ -177,34 +201,21 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
+    looksLikeVttFile(file: Blob): boolean {
+        if (file.type === "text/vtt")
+            return true;
+        if (!(file instanceof File) || file.name === "")
+            return false;
+        return file.name.substring(file.name.lastIndexOf(".") + 1).toLowerCase() === "vtt";
+    }
+
     onCaptionFileChange(newFile: Blob | File) {
-        let captionFormat: string | undefined = undefined
-        if(newFile.type === 'text/vtt') {
-            captionFormat = 'vtt';
-        } else {
-            if(newFile instanceof File){
-                captionFormat = newFile.name !== '' ? newFile.name.substring(newFile.name.lastIndexOf('.') + 1) : undefined;
-                if(captionFormat === 'dfxp') {
-                    const fileReader = new FileReader();
-                    fileReader.onloadend = (e) =>
-                    {
-                        if(e.target?.result !== null && typeof e.target?.result === 'string'){
-                            const parser = new DOMParser();
-                            const xml = parser.parseFromString(e.target.result, 'text/xml');
-                            const lang = xml.querySelector('tt')?.getAttribute('xml:lang');
-                            if(lang !== null && lang !== undefined) {
-                                this.onCaptionLanguageChange(lang);
-                            }
-                        }
-                    }
-                    fileReader.readAsText(newFile);
-                }
-            }
-        }
         this.setState({
             ...this.state,
             captionFile: newFile,
-            captionFormat: captionFormat
+            captionFormat: 'vtt',
+            captionFileWarning: !this.looksLikeVttFile(newFile),
+            missingFields: []
         });
     }
 
@@ -216,9 +227,12 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
     }
 
     onPresenterFileChange(newFile: Blob) {
+        const looksLikeVideo = newFile.type === '' || newFile.type.startsWith('video/');
         this.setState({
             ...this.state,
-            presenterFile: newFile
+            presenterFile: newFile,
+            presenterFileWarning: !looksLikeVideo,
+            missingFields: []
         });
     }
 
@@ -230,7 +244,8 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             metadata: {
                 ...this.state.metadata,
                 edited: newData
-            }
+            },
+            missingFields: []
         });
     }
 
@@ -298,6 +313,9 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                 {this.props.t("LTI.COPY_FAILURE")}<br />
                 <div className="text-muted">{this.props.t("LTI.COPY_FAILURE_DESCRIPTION")}</div>
             </div>}
+            {this.state.missingFields.length > 0 && <div className="alert alert-danger">
+                {this.props.t("LTI.MISSING_REQUIRED_FIELDS", { fields: this.state.missingFields.join(", ") })}
+            </div>}
             <EditForm
                 withUpload={this.state.eventId === undefined}
                 data={this.state.metadata.edited}
@@ -308,7 +326,9 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                 captionFormat={this.state.captionFormat}
                 onSubmit={this.onSubmit.bind(this)}
                 hasSubmit={this.state.metadata.edited.locked === undefined}
-                pending={this.state.uploadState === "pending"} />
+                pending={this.state.uploadState === "pending"}
+                presenterFileWarning={this.state.presenterFileWarning}
+                captionFileWarning={this.state.captionFileWarning} />
             {this.state.eventId !== undefined && this.state.metadata.edited.locked === undefined &&
                 <>
                     <h2>{this.props.t("LTI.COPY_TO_SERIES")}</h2>
