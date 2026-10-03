@@ -26,7 +26,6 @@ import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.Jsons.Val;
@@ -36,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -356,7 +356,7 @@ public final class EventComment {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(text, creationDate, modificationDate, author, reason, resolvedStatus);
+    return Objects.hash(text, creationDate, modificationDate, author, reason, resolvedStatus);
   }
 
   @Override

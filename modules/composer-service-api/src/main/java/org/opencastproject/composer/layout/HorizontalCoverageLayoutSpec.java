@@ -21,10 +21,9 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import org.opencastproject.util.RequireUtil;
+
+import java.util.Objects;
 
 /**
  * This layout specification describes how to position a shape and how much of the underlying width of the canvas it
@@ -65,11 +64,11 @@ public final class HorizontalCoverageLayoutSpec {
   }
 
   private boolean eqFields(HorizontalCoverageLayoutSpec that) {
-    return eq(anchorOffset, that.anchorOffset) && horizontalCoverage == that.horizontalCoverage;
+    return Objects.equals(anchorOffset, that.anchorOffset) && horizontalCoverage == that.horizontalCoverage;
   }
 
   @Override
   public int hashCode() {
-    return hash(anchorOffset, horizontalCoverage);
+    return Objects.hash(anchorOffset, horizontalCoverage);
   }
 }

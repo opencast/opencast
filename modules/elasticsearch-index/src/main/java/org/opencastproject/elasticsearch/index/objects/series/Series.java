@@ -23,7 +23,6 @@ package org.opencastproject.elasticsearch.index.objects.series;
 
 import org.opencastproject.elasticsearch.index.objects.IndexObject;
 import org.opencastproject.util.DateTimeSupport.UtcTimestampAdapter;
-import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.jaxb.ExtendedMetadataAdapter;
@@ -46,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -213,7 +213,7 @@ public class Series implements IndexObject {
    *          the title
    */
   public void setTitle(String title) {
-    if (EqualsUtil.eq(this.title, title)) {
+    if (Objects.equals(this.title, title)) {
       return;
     }
 

@@ -23,9 +23,9 @@ package org.opencastproject.security.impl.jpa;
 
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -318,7 +318,7 @@ public final class JpaGroup implements Group {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(id, organization);
+    return Objects.hash(id, organization);
   }
 
   @Override
