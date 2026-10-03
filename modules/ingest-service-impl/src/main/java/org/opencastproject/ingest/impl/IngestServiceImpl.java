@@ -24,7 +24,6 @@ package org.opencastproject.ingest.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 
@@ -2071,7 +2070,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     // Verify user is a CA by checking roles and captureAgentId
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
+    if (!SecurityUtil.isGlobalAdmin(user) && !user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
       logger.info("User '{}' is missing capture agent roles, won't apply CASeries", user.getUsername());
       return mp;
     }

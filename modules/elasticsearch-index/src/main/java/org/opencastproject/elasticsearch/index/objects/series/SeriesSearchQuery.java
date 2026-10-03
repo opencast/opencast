@@ -20,7 +20,6 @@
  */
 package org.opencastproject.elasticsearch.index.objects.series;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
@@ -28,6 +27,7 @@ import org.opencastproject.elasticsearch.impl.IndexSchema;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.apache.commons.lang3.StringUtils;
@@ -98,7 +98,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
     this.organization = organization;
     this.user = user;
     this.actions.add(Permissions.Action.READ.toString());
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    if (!SecurityUtil.isGlobalAdmin(user)) {
       if (!user.getOrganization().getId().equals(organization)) {
         throw new IllegalStateException("User's organization must match search organization");
       }
