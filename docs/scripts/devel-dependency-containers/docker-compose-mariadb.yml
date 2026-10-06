@@ -17,7 +17,7 @@ services:
       - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
       - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
   mariadb:
-    image: docker.io/library/mariadb:10
+    image: docker.io/library/mariadb:11
     ports:
       - 127.0.0.1:3306:3306
     environment:
