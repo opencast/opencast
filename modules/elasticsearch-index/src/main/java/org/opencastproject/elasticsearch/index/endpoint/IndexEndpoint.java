@@ -125,6 +125,7 @@ public class IndexEndpoint {
       try {
         logger.info("Clear the index");
         elasticsearchIndex.clear();
+        indexRebuildService.getIndexProducer(Service.Search).clear();
         return R.ok();
       } catch (Throwable t) {
         logger.error("Clearing the index failed", t);
