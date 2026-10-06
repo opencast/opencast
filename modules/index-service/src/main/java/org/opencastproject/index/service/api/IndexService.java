@@ -231,6 +231,25 @@ public interface IndexService {
           UnauthorizedException;
 
   /**
+   * Apply metadata to an already loaded media package without persisting it.
+   *
+   * Unlike {@link #updateAllEventMetadata(String, String, ElasticsearchIndex)}, this does not look up the event
+   * or take an AssetManager snapshot itself. It is meant for callers that make further changes to the same media
+   * package (e.g. adding a thumbnail) and want to persist everything together in a single snapshot afterwards,
+   * instead of the media package changes and the metadata changes each triggering their own snapshot.
+   *
+   * @param mediaPackage
+   *          The media package to apply the metadata to.
+   * @param metadataJSON
+   *          The metadata to update in json format.
+   * @return A metadata list of the updated fields.
+   * @throws IllegalArgumentException
+   *           Thrown if the metadata was not formatted correctly.
+   */
+  MetadataList updateMediaPackageMetadata(MediaPackage mediaPackage, String metadataJSON)
+          throws IllegalArgumentException;
+
+  /**
    * Remove catalogs from the event with the given flavor.
    *
    * @param event
