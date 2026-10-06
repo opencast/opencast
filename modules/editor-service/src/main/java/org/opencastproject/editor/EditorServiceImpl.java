@@ -35,6 +35,7 @@ import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
 import org.opencastproject.editor.api.LockData;
 import org.opencastproject.editor.api.SegmentData;
+import org.opencastproject.editor.api.ThumbnailTime;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
 import org.opencastproject.editor.api.WorkflowData;
@@ -81,7 +82,6 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
-import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
@@ -317,7 +317,7 @@ public class EditorServiceImpl implements EditorService {
 
     // SMIL catalog flavor
     smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(
-            StringUtils.defaultString((String) properties.get(OPT_SMIL_CATALOG_FLAVOR), DEFAULT_SMIL_CATALOG_FLAVOR));
+            Objects.toString(properties.get(OPT_SMIL_CATALOG_FLAVOR), DEFAULT_SMIL_CATALOG_FLAVOR));
     logger.debug("Smil catalog flavor configuration set to '{}'", smilCatalogFlavor);
 
     // SMIL catalog tags
@@ -330,7 +330,7 @@ public class EditorServiceImpl implements EditorService {
 
     // SMIL silence flavor
     smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(
-            StringUtils.defaultString((String) properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
+            Objects.toString(properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
     logger.debug("Smil silence flavor configuration set to '{}'", smilSilenceFlavor);
 
     // Preview Video subtype
@@ -340,12 +340,12 @@ public class EditorServiceImpl implements EditorService {
 
     // Flavor for captions
     captionsFlavor = MediaPackageElementFlavor.parseFlavor(
-            StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
+            Objects.toString(properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
     logger.debug("Caption flavor set to '{}'", captionsFlavor);
 
     // Flavor for chapters
     chapterFlavor = MediaPackageElementFlavor.parseFlavor(
-        StringUtils.defaultString((String) properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
+        Objects.toString(properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
     logger.debug("Chapter flavor set to '{}'", chapterFlavor);
 
     thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
@@ -637,6 +637,28 @@ public class EditorServiceImpl implements EditorService {
       MediaPackageElementFlavor flavor = new MediaPackageElementFlavor(track.getFlavor().getType(),
               getThumbnailSubtype());
       String uri = track.getThumbnailURI();
+
+      // If thumbnail times, add workflow properties and be done
+      var time = track.getThumbnailTime();
+      if (time != null) {
+        // Remove old thumbnails
+        Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
+
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_set", "true");
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_time", time.getTime());
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_flavor", time.getFlavorType() + "/source");
+        continue;
+      } else {
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_set", "false");
+      }
 
       // If no uri, what do?
       if (uri == null || uri.isEmpty()) {
@@ -979,6 +1001,25 @@ public class EditorServiceImpl implements EditorService {
             .map(property -> tuple(property.getA()[1], property.getA()[2]))
             .collect(Collectors.toSet());
 
+    Map<String, ThumbnailTime> thumbnailTimes = new HashMap<>();
+    latestWfProperties.forEach((key, value) -> {
+      String[] parts = key.split("_");
+      if (parts.length == 4
+          && "thumbnail".equals(parts[1])
+          && "time".equals(parts[2])
+          && ("time".equals(parts[3]) || "flavor".equals(parts[3]))
+      ) {
+
+        ThumbnailTime tt = thumbnailTimes.computeIfAbsent(parts[0], k -> new ThumbnailTime());
+
+        if (parts.length == 4 && "time".equals(parts[3])) {
+          tt.setTime(value);
+        } else if (parts.length == 4 && "flavor".equals(parts[3])) {
+          tt.setFlavorType(value.split("/")[0]);
+        }
+      }
+    });
+
     List<Track> trackList = Arrays.stream(internalPub.getTracks()).filter(this::elementHasPreviewTag)
             .collect(Collectors.toList());
     if (trackList.isEmpty()) {
@@ -1060,7 +1101,7 @@ public class EditorServiceImpl implements EditorService {
       }
 
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-          track.getIdentifier(), thumbnailURI, priority);
+          track.getIdentifier(), thumbnailURI, priority, thumbnailTimes.get(track.getFlavor().getType()));
     }).collect(Collectors.toList());
 
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
@@ -1242,7 +1283,7 @@ public class EditorServiceImpl implements EditorService {
     metadataList.add(index.getCommonEventCatalogUIAdapter(), metadataCollection);
 
     final String wfState = event.getWorkflowState();
-    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+    if (wfState != null && WorkflowUtil.isActive(wfState)) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
 

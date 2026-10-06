@@ -31,7 +31,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.util.SmartIterator;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -108,7 +108,7 @@ public class ServicesListProvider implements ResourceListProvider {
 
     for (ServiceRegistration serviceRegistration : serviceRegistrations) {
       if (servicesQuery.getHostname().isPresent()
-              && !StringUtils.equals(servicesQuery.getHostname().get(), serviceRegistration.getHost())) {
+              && !Strings.CS.equals(servicesQuery.getHostname().get(), serviceRegistration.getHost())) {
         continue;
       }
 

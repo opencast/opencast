@@ -26,7 +26,6 @@ import org.opencastproject.oaipmh.matterhorn.MatterhornMetadataProvider;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.util.ResumptionTokenStore;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.data.Collections;
 
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -56,7 +55,7 @@ public class DefaultRepository extends OaiPmhRepository {
   private String adminEmail;
   private final ResumptionTokenStore tokenStore = ResumptionTokenStore.create();
   private final List<MetadataProvider> metadataProviders =
-          Collections.list(new MatterhornMetadataProvider(), new MatterhornInlinedMetadataProvider());
+          List.of(new MatterhornMetadataProvider(), new MatterhornInlinedMetadataProvider());
 
   /** OSGi DI */
   @Reference

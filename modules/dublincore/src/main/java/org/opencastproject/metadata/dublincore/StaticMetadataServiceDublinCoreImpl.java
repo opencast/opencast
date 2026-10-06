@@ -40,7 +40,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SUBJEC
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
-import static org.opencastproject.util.data.Collections.head;
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -167,7 +166,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
       start = created;
     }
     final Optional<String> language = Optional.ofNullable(episode.getFirst(PROPERTY_LANGUAGE));
-    final Optional<Long> extent = head(episode.get(PROPERTY_EXTENT))
+    final Optional<Long> extent = episode.get(PROPERTY_EXTENT).stream().findFirst()
         .map(a -> {
           Long duration = EncodingSchemeUtils.decodeDuration(a);
           if (duration == null) {
@@ -179,7 +178,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
     final Optional<String> isPartOf = Optional.ofNullable(episode.getFirst(PROPERTY_IS_PART_OF));
     final Optional<String> replaces = Optional.ofNullable(episode.getFirst(PROPERTY_REPLACES));
-    final Optional<Interval> available = head(episode.get(PROPERTY_AVAILABLE))
+    final Optional<Interval> available = episode.get(PROPERTY_AVAILABLE).stream().findFirst()
         .flatMap(v -> {
           DCMIPeriod p = EncodingSchemeUtils.decodePeriod(v);
           if (p == null) {

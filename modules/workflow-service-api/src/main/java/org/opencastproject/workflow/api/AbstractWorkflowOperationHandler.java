@@ -36,6 +36,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -325,16 +326,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   }
 
   /**
-   * Get a configuration option.
-   *
-   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or
-   *             {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
-   */
-  protected Optional<String> getCfg(WorkflowInstance wi, String key) {
-    return Optional.ofNullable(wi.getCurrentOperation().getConfiguration(key));
-  }
-
-  /**
    * Get a mandatory configuration key. Values are returned trimmed.
    *
    * @throws WorkflowOperationException
@@ -560,7 +551,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         break;
       case atLeastOne:
         targetFlavorList = getFlavors(operation, TARGET_FLAVORS, TARGET_FLAVOR);
-        if (targetTagList.isEmpty()) {
+        if (targetFlavorList.isEmpty()) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVORS + "' or '" + TARGET_FLAVOR
               + "' must be set");
         }
@@ -583,7 +574,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     List<String> removeTags = new ArrayList();
 
     for (String targetTag : tags) {
-      if (!StringUtils.startsWithAny(targetTag, plus, minus)) {
+      if (!Strings.CS.startsWithAny(targetTag, plus, minus)) {
         if (addTags.size() > 0
             || removeTags.size() > 0) {
           logger.warn("You may not mix override tags and tag changes. "
@@ -591,9 +582,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
               + "The tag {} is not prefixed with '{}' or '{}'.", overrideTags, targetTag, plus, minus);
         }
         overrideTags.add(targetTag);
-      } else if (StringUtils.startsWith(targetTag, plus)) {
+      } else if (Strings.CS.startsWith(targetTag, plus)) {
         addTags.add(StringUtils.substring(targetTag, 1));
-      } else if (StringUtils.startsWith(targetTag, minus)) {
+      } else if (Strings.CS.startsWith(targetTag, minus)) {
         removeTags.add(StringUtils.substring(targetTag, 1));
       }
     }

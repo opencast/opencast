@@ -361,4 +361,3 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
 
   }
 }
-

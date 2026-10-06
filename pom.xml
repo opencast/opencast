@@ -22,10 +22,10 @@
     <commons-compress.version>1.27.1</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.6.0</commons-fileupload.version>
-    <commons-io.version>2.21.0</commons-io.version>
-    <commons-lang3.version>3.18.0</commons-lang3.version>
-    <commons-text.version>1.14.0</commons-text.version>
-    <cxf.version>3.6.4</cxf.version>
+    <commons-io.version>2.22.0</commons-io.version>
+    <commons-lang3.version>3.20.0</commons-lang3.version>
+    <commons-text.version>1.15.0</commons-text.version>
+    <cxf.version>3.6.12</cxf.version>
     <eclipselink.version>2.7.15</eclipselink.version>
     <eclipselink.asm.version>9.7.1</eclipselink.asm.version>
     <elasticsearch.version>7.10.2</elasticsearch.version>
@@ -36,20 +36,23 @@
     <graphql-java-extended-scalars.version>21.0</graphql-java-extended-scalars.version>
     <gson.version>2.13.2</gson.version>
     <guava.version>33.3.1-jre</guava.version>
+    <failureaccess.version>1.0.2</failureaccess.version>
+    <hamcrest-json.version>0.2</hamcrest-json.version>
     <httpcomponents-httpclient.version>4.5.14</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
-    <jackson.version>2.17.2</jackson.version>
-    <jakarta.mail.version>1.6.7</jakarta.mail.version>
+    <jackson.version>2.22.2</jackson.version>
+    <jackson.annotations.version>2.22</jackson.annotations.version>
+    <jakarta.mail.version>1.6.8</jakarta.mail.version>
     <java.release>21</java.release>
     <jakarta.activation.version>1.2.1</jakarta.activation.version>
     <jakarta.annotation.version>1.3.5</jakarta.annotation.version>
     <jakarta.xml-bind.version>2.3.3</jakarta.xml-bind.version>
     <jersey.version>2.29.1</jersey.version>
-    <jettison.version>1.5.4</jettison.version>
+    <jettison.version>1.5.7</jettison.version>
     <joda-time.version>2.14.0</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <junit5.version>6.0.1</junit5.version>
-    <karaf.version>4.4.7</karaf.version>
+    <karaf.version>4.4.12</karaf.version>
     <lucene.version>8.7.0</lucene.version>
     <node.version>v24.15.0</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
@@ -63,7 +66,8 @@
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
     <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
-    <rest-assured.version>4.4.0</rest-assured.version>
+    <rest-assured.version>6.0.1</rest-assured.version>
+    <spotless.version>3.9.0</spotless.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
     <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
@@ -367,7 +371,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.6.3</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -423,6 +427,57 @@
             <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
           </systemPropertyVariables>
         </configuration>
+      </plugin>
+      <!-- Automatically fix the mechanical part of the style rules, above all the import order.
+
+           This runs in the `initialize` phase, i.e. deliberately before the checkstyle plugin below
+           which is bound to `validate`, so that a build repairs the imports instead of failing on
+           them.  Use `-Dspotless.apply.skip=true` to keep a build from modifying sources (release
+           builds, CI). -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless.version}</version>
+        <configuration>
+          <java>
+            <includes>
+              <include>src/**/*.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/generated-sources/**</exclude>
+              <exclude>**/org/apache/commons/**</exclude>
+              <exclude>**/org/w3c/**</exclude>
+              <!-- Spotless parses imports line by line and cannot deal with a single import
+                   statement wrapped over two lines.  It would drop the continuation line and hence
+                   the whole import.  This is the only file in the repository doing that, since
+                   these static imports do not fit into 120 characters on one line. -->
+              <exclude>**/DuplicateEventWorkflowOperationHandlerTest.java</exclude>
+            </excludes>
+            <!-- Mirrors the checkstyle `ImportOrder` rule: all static imports in one block at the
+                 top, then the group prefixes, then a catch-all group (the trailing comma) for
+                 everything matching none of them.  Sorting is plain, case-sensitive and
+                 lexicographic, like checkstyle's. -->
+            <importOrder>
+              <order>\#,org.opencastproject,com,net,org,java,javax,</order>
+            </importOrder>
+            <removeUnusedImports/>
+            <endWithNewline/>
+            <!-- Deliberately no `licenseHeader` and no `trimTrailingWhitespace`: both are enforced by
+                 checkstyle in a laxer form than spotless would impose (the license header may have a
+                 blank line before `package`, and trailing whitespace is tolerated inside comments),
+                 so letting spotless normalise them would rewrite nearly every file in the repository
+                 for no gain. -->
+          </java>
+        </configuration>
+        <executions>
+          <execution>
+            <id>spotless-apply</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>apply</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <!-- Ensure that the source code matches the style rules -->
       <plugin>
@@ -659,6 +714,11 @@
           <version>3.6.0</version>
         </plugin>
         <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless.version}</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>3.1.0</version>
@@ -757,7 +817,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.6.2</version>
         </plugin>
-        <!--<plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>3.8.1</version>
@@ -772,7 +832,7 @@
               </configuration>
             </execution>
           </executions>
-        </plugin>-->
+        </plugin>
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-services-maven-plugin</artifactId>
@@ -1118,6 +1178,11 @@
         <version>${xmlsec.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.owasp.esapi</groupId>
+        <artifactId>esapi</artifactId>
+        <version>2.7.0.0</version>
+      </dependency>
+      <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml</artifactId>
         <version>2.6.4</version>
@@ -1126,11 +1191,6 @@
         <groupId>org.jasig.cas.client</groupId>
         <artifactId>cas-client-core</artifactId>
         <version>3.6.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
-        <version>3.1_7</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
@@ -1225,7 +1285,7 @@
       <dependency>
         <groupId>io.swagger.core.v3</groupId>
         <artifactId>swagger-annotations</artifactId>
-        <version>2.2.48</version>
+        <version>2.2.52</version>
       </dependency>
       <!-- influx -->
       <dependency>
@@ -1250,6 +1310,12 @@
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
         <version>${rest-assured.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>uk.co.datumedge</groupId>
+        <artifactId>hamcrest-json</artifactId>
+        <version>${hamcrest-json.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1310,7 +1376,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson.annotations.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -1322,15 +1388,38 @@
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
       </dependency>
+      <!--
+        Managed although no module declares it: the Elasticsearch client (elasticsearch-x-content)
+        pulls this in transitively at 2.10.4. Managing it here lifts that to ${jackson.version} so it
+        matches the bundle installed by assemblies/karaf-features/src/main/feature/feature.xml.
+        Do not remove; the version would silently fall back to the Elasticsearch one.
+      -->
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-cbor</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <!-- Same as cbor above: also supplied transitively at 2.10.4 by elasticsearch-x-content. -->
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-xml</artifactId>
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-jaxb-annotations</artifactId>
         <version>${jackson.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -1438,7 +1527,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.6.0</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>

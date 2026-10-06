@@ -151,6 +151,9 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
+            <!-- no compile time reference, but the tests mock SeriesCatalogUIAdapter, and creating
+                 that proxy loads every type in its method signatures, including ResourceListQuery -->
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-api</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

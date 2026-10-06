@@ -18,38 +18,25 @@
  * the License.
  *
  */
+package org.opencastproject.editor.api;
 
-package org.opencastproject.util.data.functions;
+public class ThumbnailTime {
+  private String time;
+  private String flavorType;
 
-import org.opencastproject.util.EqualsUtil;
-
-import java.util.function.Function;
-
-/** Boolean functions. */
-public final class Booleans {
-  private Booleans() {
+  public String getTime() {
+    return time;
   }
 
-  public static <A> Function<A, Boolean> eq(final A a) {
-    return x -> EqualsUtil.eq(x, a);
+  public void setTime(String time) {
+    this.time = time;
   }
 
-  public static <A extends Comparable<A>> Function<A, Boolean> lt(final A a) {
-    return x -> x.compareTo(a) < 0;
+  public String getFlavorType() {
+    return flavorType;
   }
 
-  public static <A extends Comparable<A>> Function<A, Boolean> gt(final A a) {
-    return x -> x.compareTo(a) > 0;
+  public void setFlavorType(String flavorType) {
+    this.flavorType = flavorType;
   }
-
-  /** A function that always returns true. */
-  public static <A> Function<A, Boolean> yes() {
-    return a -> true;
-  }
-
-  public static <A> Function<A, Boolean> not(Function<A, Boolean> f) {
-    return a -> !f.apply(a);
-  }
-
-  public static final Function<Boolean, Boolean> not = a -> !a;
 }

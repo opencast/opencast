@@ -2040,4 +2040,3 @@ public class SchedulerRestService {
     return jsonObj.toJSONString();
   }
 }
-

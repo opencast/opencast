@@ -306,7 +306,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     // FFmpeg command for cropping video
     logger.info("String for startCropping command: {}", crop);
     String croppedOutputPath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
-        .concat(RandomStringUtils.randomAlphanumeric(8) + targetExtension);
+        .concat(RandomStringUtils.secure().nextAlphanumeric(8) + targetExtension);
     String[] cropCommand = new String[] {
         binary,
         "-i", mediaFile.getAbsolutePath(),

@@ -37,7 +37,6 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -181,7 +180,7 @@ public class ComposerRestServiceTest {
   public void testConcat() throws Exception {
     Dimension dimension = new Dimension(640, 480);
     Track videoTrack = (Track) MediaPackageElementParser.getFromXml(generateVideoTrack());
-    String sourceTracks = MediaPackageElementParser.getArrayAsXml(Collections.list(videoTrack, videoTrack));
+    String sourceTracks = MediaPackageElementParser.getArrayAsXml(List.of(videoTrack, videoTrack));
     Response response = restService.concat(sourceTracks, profileId, Serializer.json(dimension).toJson(), "25", "false");
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     Assert.assertNotNull("Concat rest endpoint should send a job in response", response.getEntity());

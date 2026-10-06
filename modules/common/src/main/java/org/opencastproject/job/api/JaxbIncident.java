@@ -21,8 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Collections.nullToNil;
-
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jaxb.UtcTimestampAdapter;
@@ -99,11 +97,11 @@ public final class JaxbIncident {
   }
 
   public Incident toIncident() {
-    List<Tuple<String, String>> mappedDetails = nullToNil(details).stream()
+    List<Tuple<String, String>> mappedDetails = (details != null ? details : List.<JaxbIncidentDetail>of()).stream()
         .map(JaxbIncidentDetail::toDetail)
         .collect(Collectors.toList());
 
-    Map<String, String> paramMap = nullToNil(descriptionParameters).stream()
+    Map<String, String> paramMap = (descriptionParameters != null ? descriptionParameters : List.<Param>of()).stream()
         .collect(Collectors.toMap(
             Param::getName,
             Param::getValue

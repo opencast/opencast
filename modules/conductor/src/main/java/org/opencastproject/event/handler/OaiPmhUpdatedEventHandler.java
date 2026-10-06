@@ -38,7 +38,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.data.Collections;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -49,6 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -121,7 +121,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     final Optional<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
     if (flavorsRaw.isPresent()) {
       final String[] flavorStrings = flavorsRaw.get().split("\\s*,\\s*");
-      this.flavors = Collections.set(flavorStrings);
+      this.flavors = new HashSet<>(Arrays.asList(flavorStrings));
     } else {
       this.flavors = new HashSet<>();
     }
@@ -129,7 +129,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     final Optional<String> tagsRaw = getOptCfg(dictionary, CFG_TAGS);
     if (tagsRaw.isPresent()) {
       final String[] tags = tagsRaw.get().split("\\s*,\\s*");
-      this.tags = Collections.set(tags);
+      this.tags = new HashSet<>(Arrays.asList(tags));
     } else {
       this.tags = new HashSet<>();
     }

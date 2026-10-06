@@ -278,7 +278,7 @@ these methods. The most commonly used are:
     - `${INGEST-ENDPOINT}/addTrack`
     - `${INGEST-ENDPOINT}/ingest`
 
-Please make sure that the event's UID is passed on as `workfloeInstanceId` to the final call to `/ingest/ingest` to
+Please make sure that the event's UID is passed on as `workflowInstanceId` to the final call to `/ingest/ingest` to
 match the scheduled event to the media being uploaded.
 
 If possible, please follow these additional rules about recording files:

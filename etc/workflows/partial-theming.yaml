@@ -27,6 +27,14 @@ operations:
 
   - id: tag
     if: NOT ${theme_active}
+    description: If no shifting was necessary, mark the trimmed captions as shifted
+    configurations:
+      - source-flavors: captions/trimmed
+      - target-flavor: captions/shifted
+      - copy: false
+
+  - id: tag
+    if: NOT ${theme_active}
     description: If no shifting was necessary, mark the trimmed chapters as shifted
     configurations:
       - source-flavors: chapters/trimmed

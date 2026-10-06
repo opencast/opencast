@@ -17,6 +17,7 @@
     <class>org.opencastproject.security.impl.jpa.JpaUserReference</class>
     <class>org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl</class>
     <class>org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl</class>
+    <class>org.opencastproject.serviceregistry.impl.jpa.DispatchLockJpaImpl</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables"/>

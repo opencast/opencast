@@ -27,7 +27,6 @@ import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.PlaylistListResponse;
-import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 
 import java.io.IOException;
@@ -43,16 +42,6 @@ public interface YouTubeAPIVersion3Service {
    * @throws IOException when configuration files not found.
    */
   void initialize(ClientCredentials credentials) throws IOException;
-
-  /**
-   * Search for videos on predefined channel.
-   * @param queryTerm may not be {@code null}
-   * @param pageToken may not be {@code null}
-   * @param maxResults may not be {@code null}
-   * @return zero or more results. Will not be {@code null}.
-   * @throws IOException when search fails.
-   */
-  SearchListResponse searchMyVideos(String queryTerm, String pageToken, long maxResults) throws IOException;
 
   /**
    * Get video by id.
@@ -110,9 +99,11 @@ public interface YouTubeAPIVersion3Service {
    * Creates YouTube Playlist and adds it to the authorized account.
    * @param title may not be {@code null}
    * @param description may not be {@code null}
+   * @param privacyStatus may not be {@code null}
    * @param tags zero or more tags to be applied to playlist on YouTube.
    */
-  Playlist createPlaylist(String title, String description, String... tags) throws IOException;
+  Playlist createPlaylist(String title, String description, PrivacyStatus privacyStatus, String... tags)
+          throws IOException;
 
   /**
    * Remove a previously uploaded video from YouTube.
@@ -136,4 +127,10 @@ public interface YouTubeAPIVersion3Service {
    */
   void removeMyPlaylist(String playlistId) throws IOException;
 
+  /** Valid values for YouTube privacy statuses */
+  enum PrivacyStatus {
+    PUBLIC,
+    PRIVATE,
+    UNLISTED
+  }
 }

@@ -1089,6 +1089,9 @@ public class SeriesEndpoint {
       JsonObject json = new JsonObject();
       json.addProperty("identifier", safeString(seriesId));
       return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)), json);
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to create series with metadata '{}'", metadataParam, e);
+      return R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}'",
               metadataParam, aclParam, themeIdParam, e);

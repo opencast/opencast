@@ -123,6 +123,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
@@ -400,12 +401,12 @@ public class EventsEndpoint implements ManagedService {
 
     // Read preview subtype configuration
     // Default to DEFAULT_PREVIEW_SUBTYPE
-    previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    previewSubtype = Objects.toString(properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
 
-    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    retractWorkflowId = Objects.toString(properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
     logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 
@@ -2557,7 +2558,7 @@ public class EventsEndpoint implements ManagedService {
               tags = List.of(StringUtils.split(tagsString, ','));
               // find lang tag if exists
               for (String tag : tags) {
-                if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+                if (Strings.CS.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
                   // lang tag is set
                   langTag = StringUtils.trimToEmpty(tag);
                   break;

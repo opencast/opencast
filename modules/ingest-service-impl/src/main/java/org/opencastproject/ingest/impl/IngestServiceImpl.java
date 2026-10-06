@@ -532,7 +532,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Indicates if zip has a root folder or not, initialized as true
       boolean hasRootFolder = true;
       // While there are entries write them to a collection
-      while ((entry = zis.getNextZipEntry()) != null) {
+      while ((entry = zis.getNextEntry()) != null) {
         try {
           if (entry.isDirectory() || entry.getName().contains("__MACOSX")) {
             continue;
@@ -957,7 +957,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           HttpGet getExtendedMetadata = new HttpGet(seriesElement.getURI());
           response = httpClient.execute(getExtendedMetadata);
           in = response.getEntity().getContent();
-          data = IOUtils.readFully(in, (int) response.getEntity().getContentLength());
+          data = IOUtils.toByteArray(in, (int) response.getEntity().getContentLength());
         } catch (Exception e) {
           throw new IngestException("Unable to read series " + catalogType + " metadata catalog for series "
               + seriesId + ".", e);

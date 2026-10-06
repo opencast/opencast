@@ -30,7 +30,6 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -47,6 +46,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -104,8 +104,7 @@ public class AbstractFileSystemAssetStoreTest {
     rootDirectories.set(repo, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
     repo.setupCache();
 
-    sampleElemDir = new File(
-            PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString() }));
+    sampleElemDir = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString()).toFile();
     FileUtils.forceMkdir(sampleElemDir);
 
     FileUtils.copyFile(asset, new File(sampleElemDir, MP_ELEM_ID + XML_EXTENSTION));
@@ -121,7 +120,7 @@ public class AbstractFileSystemAssetStoreTest {
     StoragePath storagePath = new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID);
     repo.put(storagePath, Source.mk(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
 
-    File file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_1.toString() }));
+    File file = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID, VERSION_1.toString()).toFile();
     assertTrue(file + " should be a directory", file.isDirectory());
     assertTrue(file.listFiles().length == 1);
 
@@ -145,12 +144,12 @@ public class AbstractFileSystemAssetStoreTest {
     StoragePath to = new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID);
     assertTrue(repo.copy(from, to));
 
-    File srcFile = new File(PathSupport.concat(new String[] {
+    File srcFile = Paths.get(
         tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString(), MP_ELEM_ID + XML_EXTENSTION
-    }));
-    File copyFile = new File(PathSupport.concat(new String[] {
+    ).toFile();
+    File copyFile = Paths.get(
         tmpRoot.toString(), ORG_ID, MP_ID, VERSION_1.toString(), MP_ELEM_ID + XML_EXTENSTION
-    }));
+    ).toFile();
     assertTrue(srcFile.exists());
     assertTrue(copyFile.exists());
 
@@ -207,13 +206,13 @@ public class AbstractFileSystemAssetStoreTest {
     assertTrue(repo.delete(versionSelector));
     assertFalse(sampleElemDir.exists());
 
-    File file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString() }));
+    File file = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString()).toFile();
     assertFalse(file.exists());
 
-    file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID }));
+    file = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID).toFile();
     assertFalse(file.exists());
 
-    file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID }));
+    file = Paths.get(tmpRoot.toString(), ORG_ID).toFile();
     assertTrue(file.exists());
   }
 
@@ -223,7 +222,7 @@ public class AbstractFileSystemAssetStoreTest {
     assertTrue(repo.delete(noneVersionSelector));
     assertFalse(sampleElemDir.exists());
 
-    File file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID }));
+    File file = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID).toFile();
     assertFalse(file.exists());
   }
 
@@ -255,7 +254,7 @@ public class AbstractFileSystemAssetStoreTest {
     assertTrue(store.delete(DeletionSelector.deleteAll(ORG_ID, MP_ID)));
     assertFalse(sampleElemDir.exists());
 
-    File file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID }));
+    File file = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID).toFile();
     assertFalse(file.exists());
   }
 

@@ -21,12 +21,12 @@
 
 package org.opencastproject.util;
 
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Prelude;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -108,7 +108,9 @@ public final class Jsons {
 
     public Obj append(Obj o) {
       if (!ZERO_OBJ.equals(o)) {
-        return new Obj(Collections.<Prop, List>concat(props, o.getProps()));
+        final List<Prop> merged = new ArrayList<>(props);
+        merged.addAll(o.getProps());
+        return new Obj(merged);
       } else {
         return o;
       }

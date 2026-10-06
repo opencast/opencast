@@ -22,6 +22,7 @@
 package org.opencastproject.transcription.microsoft.azure.model;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.net.URI;
 import java.util.List;
@@ -66,9 +67,9 @@ public class MicrosoftAzureSpeechTranscription {
     }
     URI selfUriPath = URI.create(URI.create(self).getPath());
     String speechServiceEndpointPath = "/speechtotext/v3.1/transcriptions/";
-    if (StringUtils.startsWithIgnoreCase(selfUriPath.getPath(), speechServiceEndpointPath)) {
+    if (Strings.CI.startsWith(selfUriPath.getPath(), speechServiceEndpointPath)) {
       String id = StringUtils.substringAfter(selfUriPath.getPath(), speechServiceEndpointPath);
-      if (!StringUtils.contains(id, "/")) {
+      if (!Strings.CS.contains(id, "/")) {
         return id;
       }
       return StringUtils.substringBefore(id, "/");
@@ -77,14 +78,14 @@ public class MicrosoftAzureSpeechTranscription {
   }
 
   public boolean isFailed() {
-    return StringUtils.equalsIgnoreCase("Failed", status);
+    return Strings.CI.equals("Failed", status);
   }
 
   public boolean isRunning() {
-    return StringUtils.equalsIgnoreCase("Running", status);
+    return Strings.CI.equals("Running", status);
   }
 
   public boolean isSucceeded() {
-    return StringUtils.equalsIgnoreCase("Succeeded", status);
+    return Strings.CI.equals("Succeeded", status);
   }
 }

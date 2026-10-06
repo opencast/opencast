@@ -34,7 +34,7 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -81,19 +81,19 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
     var wfProperties = result.getProperties();
 
     Assert.assertTrue("Workflowproperty 'dublincore_episode_exists' must be set to 'true'.",
-        StringUtils.equals("true", wfProperties.get("dublincore_episode_exists")));
+        Strings.CS.equals("true", wfProperties.get("dublincore_episode_exists")));
     Assert.assertTrue("Workflowproperty 'dublincore_episode_type' must be set to 'Catalog'.",
-        StringUtils.equals("Catalog", wfProperties.get("dublincore_episode_type")));
+        Strings.CS.equals("Catalog", wfProperties.get("dublincore_episode_type")));
 
     Assert.assertTrue("Workflowproperty 'security_episode+xacml_exists' must be set to 'true'.",
-        StringUtils.equals("true", wfProperties.get("security_episode+xacml_exists")));
+        Strings.CS.equals("true", wfProperties.get("security_episode+xacml_exists")));
     Assert.assertTrue("Workflowproperty 'security_episode+xacml_type' must be set to 'Attachment'.",
-        StringUtils.equals("Attachment", wfProperties.get("security_episode+xacml_type")));
+        Strings.CS.equals("Attachment", wfProperties.get("security_episode+xacml_type")));
 
     Assert.assertTrue("Workflowproperty 'presenter_source_exists' must be set to 'true'.",
-        StringUtils.equals("true", wfProperties.get("presenter_source_exists")));
+        Strings.CS.equals("true", wfProperties.get("presenter_source_exists")));
     Assert.assertTrue("Workflowproperty 'presenter_source_type' must be set to 'Track'.",
-        StringUtils.equals("Track", wfProperties.get("presenter_source_type")));
+        Strings.CS.equals("Track", wfProperties.get("presenter_source_type")));
 
     Assert.assertFalse("Workflowproperty 'foo_bar_exists' must not exists.",
         wfProperties.containsKey("foo_bar_exists"));
@@ -118,9 +118,9 @@ public class AnalyzeMediapackageWorkflowOperationHandlerTest {
     var wfProperties = result.getProperties();
 
     Assert.assertTrue("Workflowproperty 'presenter_source_exists' must be set to 'true'.",
-        StringUtils.equals("true", wfProperties.get("presenter_source_exists")));
+        Strings.CS.equals("true", wfProperties.get("presenter_source_exists")));
     Assert.assertTrue("Workflowproperty 'presenter_source_type' must be set to 'Track'.",
-        StringUtils.equals("Track", wfProperties.get("presenter_source_type")));
+        Strings.CS.equals("Track", wfProperties.get("presenter_source_type")));
 
     Assert.assertFalse("Workflowproperty 'dublincore_episode_exists' must not exists.",
         wfProperties.containsKey("dublincore_episode_exists"));

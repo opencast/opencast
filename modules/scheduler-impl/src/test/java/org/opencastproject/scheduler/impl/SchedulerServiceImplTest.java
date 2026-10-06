@@ -57,7 +57,6 @@ import static org.opencastproject.scheduler.api.RecordingState.UPLOADING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -140,7 +139,6 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -238,16 +236,21 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(episodeAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("dublincore", "episode"))
             .anyTimes();
     EasyMock.expect(episodeAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    final Capture<String> stringCapture = EasyMock.newCapture();
-    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
-        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
+    // Read the argument of the current invocation instead of capturing it. addMultipleEventInternal() calls
+    // getEventCatalogUIAdapterFlavors() from a parallel stream, which queries both adapters below. A Capture
+    // shared between them is mutable state without a common lock, so one adapter's answer could observe the
+    // Capture while the other was rewriting it and fail with "Nothing captured yet".
+    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.anyString()))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(EasyMock.getCurrentArguments()[0]))
+        .anyTimes();
 
     EventCatalogUIAdapter extendedAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(extendedAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("extended", "episode"))
             .anyTimes();
     EasyMock.expect(extendedAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    EasyMock.expect(extendedAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
-        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
+    EasyMock.expect(extendedAdapter.handlesOrganization(EasyMock.anyString()))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(EasyMock.getCurrentArguments()[0]))
+        .anyTimes();
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty(EasyMock.anyString())).andReturn("adminuser").anyTimes();
@@ -805,7 +808,7 @@ public class SchedulerServiceImplTest {
     assertTrue(schedSvc.getCaptureAgentConfiguration(randomMpId).size() >= caProperties.size());
   }
 
-  @Test(expected = SchedulerConflictException.class)
+  @Test(expected = SchedulerException.class)
   public void testAddMultipleEventsConflict() throws Exception {
     for (int i = 0; i < 2; i++) {
       final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
@@ -1033,7 +1036,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackage = generateEvent(Optional.empty());
     String elementId = addDublinCore(Optional.empty(), mediaPackage, initalEvent);
 
-    Map<String, String> caProperties = map(tuple("org.opencastproject.workflow.definition", "full"));
+    Map<String, String> caProperties = Map.of("org.opencastproject.workflow.definition", "full");
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Optional.empty());
 

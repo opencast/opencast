@@ -70,7 +70,6 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.UnknownFileTypeException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -81,6 +80,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -114,6 +114,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -269,7 +270,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
-    ffmpegBinary = StringUtils.defaultString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
+    ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
             FFMPEG_BINARY_DEFAULT);
     logger.debug("ffmpeg binary: {}", ffmpegBinary);
     logger.info("Activating composer service");
@@ -422,7 +423,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Handle lang:<LOCALE> tags
     tracks.entrySet().stream()
         .map(e -> new Tuple<>(e.getKey(), Arrays.stream(e.getValue().getTags())
-            .filter(t -> StringUtils.startsWith(t, "lang:"))
+            .filter(t -> Strings.CS.startsWith(t, "lang:"))
             .map(t -> StringUtils.substring(t, 5))
             .filter(StringUtils::isNotBlank)
             .findFirst()))
@@ -709,7 +710,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   @Override
   public Job mux(Track videoTrack, Track audioTrack, String profileId) throws EncoderException, MediaPackageException {
-    return mux(Collections.map(Tuple.tuple("video", videoTrack), Tuple.tuple("audio", audioTrack)), profileId);
+    return mux(Map.of("video", videoTrack, "audio", audioTrack), profileId);
   }
 
   /**
@@ -1541,7 +1542,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       switch (op) {
         case Encode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
-          serialized = serializeOrEmpty(encode(job, Collections.map(tuple("video", firstTrack)), encodingProfile));
+          serialized = serializeOrEmpty(encode(job, Map.of("video", firstTrack), encodingProfile));
           break;
         case ParallelEncode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
@@ -1792,16 +1793,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     if (profile == null) {
       final String msg = format("Profile %s is unknown", profileId);
       logger.error(msg);
-      incident().recordFailure(job, PROFILE_NOT_FOUND, Collections.map(tuple("profile", profileId)));
+      incident().recordFailure(job, PROFILE_NOT_FOUND, Map.of("profile", profileId));
       throw new EncoderException(msg);
     }
     return profile;
   }
 
   private Map<String, String> getWorkspaceMediapackageParams(String description, MediaPackageElement element) {
-    return Collections.map(tuple("description", description),
-            tuple("type", element.getElementType().toString()),
-            tuple("url", element.getURI().toString()));
+    return Map.of("description", description,
+            "type", element.getElementType().toString(),
+            "url", element.getURI().toString());
   }
 
   private Map<String, String> getWorkspaceCollectionParams(String description, String collectionId, URI url) {

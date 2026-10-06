@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.handler.composer;
 
-import static org.opencastproject.util.data.Collections.list;
-
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -478,7 +476,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
               "Multiple layout doesn't contain the required layouts for (lower, upper, optional watermark)");
         }
 
-        List<HorizontalCoverageLayoutSpec> multipleLayouts = list(
+        List<HorizontalCoverageLayoutSpec> multipleLayouts = List.of(
                 Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0])),
                 Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[1])));
 

@@ -30,6 +30,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -96,7 +97,7 @@ public class ServersListProvider implements ResourceListProvider {
           throws ListProviderException {
     Map<String, String> list = new HashMap<String, String>();
 
-    if (StringUtils.equalsIgnoreCase(LIST_STATUS, listName)) {
+    if (Strings.CI.equals(LIST_STATUS, listName)) {
       list.put(SERVER_STATUS_ONLINE, SERVER_STATUS_LABEL_ONLINE);
       list.put(SERVER_STATUS_OFFLINE, SERVER_STATUS_LABEL_OFFLINE);
       list.put(SERVER_STATUS_MAINTENANCE, SERVER_STATUS_LABEL_MAINTENANCE);
@@ -127,11 +128,11 @@ public class ServersListProvider implements ResourceListProvider {
       String vHostname = server.getBaseUrl();
       String vNodeName = server.getNodeName();
 
-      if (fHostname.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fHostname.get()), vHostname)) {
+      if (fHostname.isPresent() && !Strings.CI.equals(StringUtils.trimToEmpty(fHostname.get()), vHostname)) {
         continue;
       }
 
-      if (fNodeName.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fNodeName.get()), vNodeName)) {
+      if (fNodeName.isPresent() && !Strings.CI.equals(StringUtils.trimToEmpty(fNodeName.get()), vNodeName)) {
         continue;
       }
 
@@ -187,7 +188,7 @@ public class ServersListProvider implements ResourceListProvider {
 
   @Override
   public boolean isTranslatable(String listName) {
-    return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
+    return Strings.CI.equals(LIST_STATUS, listName);
   }
 
   @Override

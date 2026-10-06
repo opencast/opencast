@@ -21,7 +21,6 @@
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.ofChannel;
-import static org.opencastproject.util.data.Collections.list;
 
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
@@ -58,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -192,7 +192,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       }
       streamingElements = streamingElementSelector.select(mediaPackage, false);
     } else {
-      streamingElements = list();
+      streamingElements = List.of();
     }
 
     try {

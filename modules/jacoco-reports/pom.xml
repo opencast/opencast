@@ -1159,7 +1159,7 @@
         <!-- use this to generate a code coverage report: -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.15</version>
         <configuration>
           <skip>${maven.test.skip}</skip>
         </configuration>

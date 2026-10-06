@@ -23,6 +23,7 @@ package org.opencastproject.elasticsearch.index.objects.series;
 
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.impl.SearchMetadataCollection;
+import org.opencastproject.elasticsearch.index.rebuild.DenyAclCollector;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -128,7 +129,7 @@ public final class SeriesIndexUtils {
 
     if (StringUtils.trimToNull(series.getAccessPolicy()) != null) {
       metadata.addField(SeriesIndexSchema.ACCESS_POLICY, series.getAccessPolicy());
-      addAuthorization(metadata, series.getAccessPolicy());
+      addAuthorization(metadata, series.getAccessPolicy(), series.getIdentifier());
     }
     if (series.getTheme() != null) {
       metadata.addField(SeriesIndexSchema.THEME, series.getTheme());
@@ -163,8 +164,10 @@ public final class SeriesIndexUtils {
    *          the input document
    * @param aclString
    *          the access control list string
+   * @param seriesId
+   *          the identifier of the series being indexed
    */
-  private static void addAuthorization(SearchMetadataCollection doc, String aclString) {
+  private static void addAuthorization(SearchMetadataCollection doc, String aclString, String seriesId) {
     Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
@@ -175,7 +178,10 @@ public final class SeriesIndexUtils {
     AccessControlList acl = AccessControlParser.parseAclSilent(aclString);
     for (AccessControlEntry entry : acl.getEntries()) {
       if (!entry.isAllow()) {
-        logger.info("Series index does not support denial via ACL, ignoring {}", entry);
+        // The index cannot express denial, so the entry is dropped. Record the series rather than
+        // logging here: during a rebuild this fires once per deny entry per series, which floods
+        // the log. IndexRebuildService reports the collected series once the rebuild finishes.
+        DenyAclCollector.record(seriesId);
         continue;
       }
       List<String> actionPermissions = permissions.get(entry.getAction());

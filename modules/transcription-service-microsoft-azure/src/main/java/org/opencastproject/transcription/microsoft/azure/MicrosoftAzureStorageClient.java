@@ -23,6 +23,7 @@ package org.opencastproject.transcription.microsoft.azure;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -40,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -71,7 +74,7 @@ public class MicrosoftAzureStorageClient {
           throws MicrosoftAzureStorageClientException, IOException, MicrosoftAzureNotAllowedException {
     try {
       Map<String, String> containerProperties = getContainerProperties(azureContainerName);
-      return containerProperties.containsKey("x-ms-blob-public-access") && StringUtils.equalsIgnoreCase("unlocked",
+      return containerProperties.containsKey("x-ms-blob-public-access") && Strings.CI.equals("unlocked",
           containerProperties.getOrDefault("x-ms-lease-status", "INVALID"));
     } catch (MicrosoftAzureNotFoundException ex) {
       return false;
@@ -147,7 +150,12 @@ public class MicrosoftAzureStorageClient {
     String containerUrl = getContainerUrl(azureContainerName);
     String blobPath = Paths.get(StringUtils.trimToEmpty(azureBlobPath), StringUtils.trimToEmpty(azureBlobName))
         .normalize().toString();
-    URL blobUrl = new URL(containerUrl + "/" + blobPath);
+    URL blobUrl;
+    try {
+      blobUrl = URI.create(containerUrl + "/" + blobPath).toURL();
+    } catch (IllegalArgumentException e) {
+      throw new MalformedURLException(containerUrl + "/" + blobPath + " is not a valid URL");
+    }
     int blockSize = 100000000; // 100MB
     String sasToken = azureAuthorization.generateServiceSasToken("w", null, null, blobUrl.getPath(), "b");
     try (FileInputStream trackStream = new FileInputStream(trackFile)) {

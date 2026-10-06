@@ -23,7 +23,6 @@ package org.opencastproject.oaipmh.server;
 import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 import org.opencastproject.oaipmh.util.XmlGen;
@@ -32,6 +31,7 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -76,7 +77,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
 
   private SecurityService securityService;
 
-  private final Map<String, OaiPmhRepository> repositories = map();
+  private final Map<String, OaiPmhRepository> repositories = new HashMap<>();
 
   private ComponentContext componentContext;
 
@@ -257,7 +258,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    *          the base path of the OAI-PMH server, e.g. /oaipmh
    */
   public static Optional<String> repositoryId(HttpServletRequest req, String mountPoint) {
-    String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint)
+    String[] parts = Strings.CS.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint)
         .split("/");
 
     return Arrays.stream(parts)

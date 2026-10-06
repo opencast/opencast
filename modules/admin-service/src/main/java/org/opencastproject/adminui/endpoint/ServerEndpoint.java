@@ -39,6 +39,7 @@ import org.opencastproject.util.requests.SortCriterion.Order;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -223,7 +224,7 @@ public class ServerEndpoint {
         continue;
       }
 
-      if (!StringUtils.equalsIgnoreCase(filters.getOrDefault(KEY_NODE_NAME, server.nodeName), server.nodeName)) {
+      if (!Strings.CI.equals(filters.getOrDefault(KEY_NODE_NAME, server.nodeName), server.nodeName)) {
         continue;
       }
 
@@ -241,7 +242,7 @@ public class ServerEndpoint {
       }
 
       final String text = filters.getOrDefault(KEY_TEXT_FILTER, "");
-      if (Stream.of(server.hostname, server.nodeName).noneMatch(v -> StringUtils.containsIgnoreCase(v, text))) {
+      if (Stream.of(server.hostname, server.nodeName).noneMatch(v -> Strings.CI.contains(v, text))) {
         continue;
       }
 

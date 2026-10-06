@@ -22,8 +22,6 @@
 
 package org.opencastproject.publication.youtube.auth;
 
-import org.opencastproject.util.data.Collections;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -58,7 +56,7 @@ public final class ClientCredentials {
   }
 
   public List<String> getScopes() {
-    return Collections.list("https://www.googleapis.com/auth/youtube",
+    return List.of("https://www.googleapis.com/auth/youtube",
         "https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.readonly");
   }
 

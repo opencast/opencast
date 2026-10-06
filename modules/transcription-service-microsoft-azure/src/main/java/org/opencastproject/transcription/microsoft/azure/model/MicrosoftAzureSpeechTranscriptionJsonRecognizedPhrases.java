@@ -22,6 +22,7 @@
 package org.opencastproject.transcription.microsoft.azure.model;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -131,7 +132,7 @@ public class MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrases {
         result.add(StringUtils.trimToEmpty(StringUtils.substring(text, start, textLength)));
         break;
       }
-      int end = StringUtils.lastIndexOf(text, " ", start + maxCueLength);
+      int end = Strings.CS.lastIndexOf(text, " ", start + maxCueLength);
       if (start >= end) {
         end = Math.min(textLength, start + maxCueLength);
       }

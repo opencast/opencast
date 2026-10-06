@@ -24,7 +24,6 @@ package org.opencastproject.kernel.security;
 import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.DIGEST_AUTH;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER;
-import static org.opencastproject.util.data.Collections.set;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -60,6 +59,7 @@ import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.BasicHttpContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -73,6 +73,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -576,7 +577,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
           throws TrustedHttpClientException {
     HttpRequestBase digestRequest;
     try {
-      digestRequest = (HttpRequestBase) httpUriRequest.getClass().newInstance();
+      digestRequest = (HttpRequestBase) httpUriRequest.getClass().getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalStateException("Can not create a new " + httpUriRequest.getClass().getName());
     }
@@ -595,7 +596,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
 
       // Add the authentication header
       try {
-        httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest));
+        httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest, new BasicHttpContext()));
       } catch (Exception e) {
         // close the http connection(s)
         try {
@@ -693,7 +694,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
     // A simple hash map is sufficient here.
     // No need to deal with soft references or an LRU map since the number of organizations
     // will be quite low.
-    private final Set<String> hosts = set();
+    private final Set<String> hosts = new HashSet<>();
     private final long refreshInterval;
     private long lastRefresh;
 

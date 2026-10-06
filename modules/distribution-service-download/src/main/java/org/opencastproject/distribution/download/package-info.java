@@ -26,4 +26,3 @@
 package org.opencastproject.distribution.download;
 
 import javax.xml.bind.annotation.XmlNsForm;
-

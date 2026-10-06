@@ -49,7 +49,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,12 +67,6 @@ public class LdapUserProviderInstance implements UserProvider {
 
   /** The organization id */
   private Organization organization = null;
-
-  /** Total number of requests made to load users */
-  private AtomicLong requests = null;
-
-  /** The number of requests made to ldap */
-  private AtomicLong ldapLoads = null;
 
   /** A cache of users, which lightens the load on the LDAP server */
   private LoadingCache<String, Object> cache = null;
@@ -200,7 +193,6 @@ public class LdapUserProviderInstance implements UserProvider {
   @Override
   public User loadUser(String userName) {
     logger.debug("LdapUserProvider is loading user " + userName);
-    requests.incrementAndGet();
     try {
       // use #getUnchecked since the loader does not throw any checked exceptions
       Object user = cache.getUnchecked(userName);
@@ -226,7 +218,6 @@ public class LdapUserProviderInstance implements UserProvider {
     if (delegate == null || cache == null) {
       throw new IllegalStateException("The LDAP user detail service has not yet been configured");
     }
-    ldapLoads.incrementAndGet();
     UserDetails userDetails = null;
 
     Thread currentThread = Thread.currentThread();

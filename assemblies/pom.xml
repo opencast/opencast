@@ -9,6 +9,8 @@
   </parent>
   <properties>
     <checkstyle.skip>true</checkstyle.skip>
+    <spotless.apply.skip>true</spotless.apply.skip>
+    <spotless.check.skip>true</spotless.check.skip>
     <opencast.basedir>${project.basedir}/..</opencast.basedir>
     <packaging.definition>${opencast.basedir}/assemblies/package.xml</packaging.definition>
   </properties>
@@ -143,7 +145,6 @@
                 <target>
                   <ant antfile="../resources/build.xml">
                     <target name="basic configuration"/>
-                    <target name="job dispatching"/>
                     <target name="developer mode"/>
                   </ant>
                 </target>

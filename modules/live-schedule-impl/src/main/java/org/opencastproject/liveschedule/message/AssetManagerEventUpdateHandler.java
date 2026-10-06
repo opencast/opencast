@@ -56,7 +56,7 @@ public class AssetManagerEventUpdateHandler extends UpdateHandler implements Ass
 
     try {
       logger.debug("Asset Manager message handler START for mp {} event type {} in thread {}", mpId, item.getType(),
-              Thread.currentThread().getId());
+              Thread.currentThread().threadId());
 
       switch (item.getType()) {
         case Update:
@@ -92,7 +92,7 @@ public class AssetManagerEventUpdateHandler extends UpdateHandler implements Ass
       logger.warn("Exception occurred for mp {}, event type {}", mpId, item.getType(), e);
     } finally {
       logger.debug("Asset Manager message handler END for mp {} event type {} in thread {}", mpId, item.getType(),
-              Thread.currentThread().getId());
+              Thread.currentThread().threadId());
     }
   }
 

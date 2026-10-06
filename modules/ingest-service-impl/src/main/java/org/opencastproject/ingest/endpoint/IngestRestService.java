@@ -45,6 +45,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.OpencastMetadataCodec;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -177,6 +178,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           "isRequiredBy", "issued", "isVersionOf", "language", "license", "mediator", "medium", "modified",
           "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
           "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
+
+  /**
+   * Dublin Core Terms which are interpreted as a single date further down the line and therefore need to be
+   * parsable as one. Note that "temporal" is deliberately absent: it carries a DCMI period
+   * (start=...; end=...;), not a plain date, and is decoded with decodeMandatoryPeriod elsewhere.
+   */
+  private static final List<String> DATE_DCTERMS = Arrays.asList("created", "date");
 
   /** Formatter to for the date into a string */
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat(IngestService.UTC_DATE_FORMAT);
@@ -983,6 +991,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               if ("identifier".equals(fieldName)) {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
+              }
+              /* Reject unparsable dates here rather than letting them fail much later during indexing */
+              if (DATE_DCTERMS.contains(fieldName)) {
+                try {
+                  OpencastMetadataCodec.decodeDate(value);
+                } catch (IllegalArgumentException e) {
+                  return badRequest(String.format("Could not parse date '%s' for field '%s'", value, fieldName), e);
+                }
               }
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();

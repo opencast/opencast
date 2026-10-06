@@ -54,6 +54,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -198,13 +199,13 @@ public class JobEndpoint {
       List<HostRegistration> servers = serviceRegistry.getHostRegistrations();
       for (Job job : serviceRegistry.getActiveJobs()) {
         // filter workflow jobs
-        if (StringUtils.equals(WorkflowService.JOB_TYPE, job.getJobType())
-                && StringUtils.equals("START_WORKFLOW", job.getOperation())) {
+        if (Strings.CS.equals(WorkflowService.JOB_TYPE, job.getJobType())
+                && Strings.CS.equals("START_WORKFLOW", job.getOperation())) {
           continue;
         }
 
         // filter by hostname
-        if (fHostname != null && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fHostname)) {
+        if (fHostname != null && !Strings.CI.equals(job.getProcessingHost(), fHostname)) {
           continue;
         }
 
@@ -212,25 +213,25 @@ public class JobEndpoint {
         vNodeName = server.isPresent() ? server.get().getNodeName() : "";
 
         // filter by node name
-        if (fNodeName != null && (server.isPresent()) && !StringUtils.equalsIgnoreCase(vNodeName, fNodeName)) {
+        if (fNodeName != null && (server.isPresent()) && !Strings.CI.equals(vNodeName, fNodeName)) {
           continue;
         }
 
         // filter by status
-        if (fStatus != null && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fStatus)) {
+        if (fStatus != null && !Strings.CI.equals(job.getStatus().toString(), fStatus)) {
           continue;
         }
 
         // fitler by user free text
         if (fFreeText != null
-            && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fFreeText)
-            && !StringUtils.equalsIgnoreCase(vNodeName, fFreeText)
-            && !StringUtils.equalsIgnoreCase(job.getJobType(), fFreeText)
-            && !StringUtils.equalsIgnoreCase(job.getOperation(), fFreeText)
-            && !StringUtils.equalsIgnoreCase(job.getCreator(), fFreeText)
-            && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fFreeText)
-            && !StringUtils.equalsIgnoreCase(Long.toString(job.getId()), fFreeText)
-            && (job.getRootJobId() != null && !StringUtils.equalsIgnoreCase(Long.toString(job.getRootJobId()),
+            && !Strings.CI.equals(job.getProcessingHost(), fFreeText)
+            && !Strings.CI.equals(vNodeName, fFreeText)
+            && !Strings.CI.equals(job.getJobType(), fFreeText)
+            && !Strings.CI.equals(job.getOperation(), fFreeText)
+            && !Strings.CI.equals(job.getCreator(), fFreeText)
+            && !Strings.CI.equals(job.getStatus().toString(), fFreeText)
+            && !Strings.CI.equals(Long.toString(job.getId()), fFreeText)
+            && (job.getRootJobId() != null && !Strings.CI.equals(Long.toString(job.getRootJobId()),
             fFreeText))) {
           continue;
         }
