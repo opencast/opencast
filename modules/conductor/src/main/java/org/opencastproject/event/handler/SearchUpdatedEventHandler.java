@@ -81,7 +81,7 @@ public class SearchUpdatedEventHandler {
   // config keys
   protected static final String DISTRIBUTION_CHECK_AVAILABILITY = "distribution.check.availability";
 
-  /** Whether to propagate episode meta data changes to OAI-PMH or not */
+  /** Whether to check the availability of distributed files afterward */
   private boolean checkAvailability;
 
   /** The distribution service */
@@ -294,8 +294,10 @@ public class SearchUpdatedEventHandler {
                     "Unable to distribute episode catalog " + episodeCatalog.getIdentifier());
               }
             }
+          } catch (SearchException e) {
+            logger.warn("Unable to find mediapackages for series {} in search: {}", seriesItem, e.getMessage());
           } catch (DistributionException | IOException e) {
-            logger.error("Could remove series {} from search for event {}", seriesId, mp.getIdentifier(), e);
+            logger.error("Could not remove series {} from search for event {}", seriesId, mp.getIdentifier(), e);
             continue;
           }
         }
@@ -318,7 +320,7 @@ public class SearchUpdatedEventHandler {
         }
       }
     } catch (UnauthorizedException e) {
-      logger.error("Unoauthorized for system user - this should never happen!");
+      logger.error("Unauthorized for system user - this should never happen!");
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
