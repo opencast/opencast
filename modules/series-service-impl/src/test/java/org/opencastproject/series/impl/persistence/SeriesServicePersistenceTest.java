@@ -35,6 +35,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -81,12 +82,33 @@ public class SeriesServicePersistenceTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
+    // Mock up an authorization service that evaluates the ACL the same way the real XACML-backed implementation
+    // does (first matching entry for the user's roles wins, with a bypass for the global admin user used
+    // throughout this test), rather than blindly granting access regardless of the ACL passed in.
+    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.hasPermission(EasyMock.anyObject(AccessControlList.class),
+        EasyMock.anyString())).andAnswer(() -> {
+          AccessControlList acl = (AccessControlList) EasyMock.getCurrentArguments()[0];
+          String action = (String) EasyMock.getCurrentArguments()[1];
+          if (user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+            return true;
+          }
+          for (AccessControlEntry entry : acl.getEntries()) {
+            if (entry.getAction().equals(action) && user.hasRole(entry.getRole())) {
+              return entry.isAllow();
+            }
+          }
+          return false;
+        }).anyTimes();
+    EasyMock.replay(authorizationService);
+
     seriesDatabase = new SeriesServiceDatabaseImpl();
     seriesDatabase.setEntityManagerFactory(newEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
     seriesDatabase.setDBSessionFactory(getDbSessionFactory());
     DublinCoreCatalogService dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
     seriesDatabase.setSecurityService(securityService);
+    seriesDatabase.setAuthorizationService(authorizationService);
     seriesDatabase.activate(null);
 
     InputStream in = null;

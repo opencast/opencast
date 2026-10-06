@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILING;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.INSTANTIATED;
@@ -62,10 +61,12 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -499,6 +500,27 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           Long parentWorkflowId, Map<String, String> originalProperties) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException, WorkflowParsingException, IllegalStateException {
     final String mediaPackageId = sourceMediaPackage.getIdentifier().toString();
+
+    // Get the current user
+    User currentUser = securityService.getUser();
+    validUserOrThrow(currentUser);
+
+    // Get the current organization
+    Organization organization = securityService.getOrganization();
+    if (organization == null) {
+      throw new SecurityException("Current organization is unknown");
+    }
+
+    // Check that the current user has the right to start a workflow on this media package, before taking an
+    // AssetManager snapshot or the per-media-package lock below.
+    // Capture agents are allowed through without an explicit ACL entry, mirroring the same carve-out
+    // AssetManagerImpl makes for ingest.
+    if (!SecurityUtil.isAdmin(currentUser, organization)
+            && !currentUser.hasRole(SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE)
+            && !authorizationService.hasPermission(sourceMediaPackage, Permissions.Action.WRITE.toString())) {
+      throw new UnauthorizedException(currentUser, Permissions.Action.WRITE.toString());
+    }
+
     Map<String, String> properties = null;
 
     // WorkflowPropertiesUtil.storeProperties will take a snapshot if there isn't one
@@ -536,16 +558,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                   workflowDefinition.getTitle(),
                   sourceMediaPackage.getIdentifier().toString()));
         }
-      }
-
-      // Get the current user
-      User currentUser = securityService.getUser();
-      validUserOrThrow(currentUser);
-
-      // Get the current organization
-      Organization organization = securityService.getOrganization();
-      if (organization == null) {
-        throw new SecurityException("Current organization is unknown");
       }
 
       WorkflowInstance workflowInstance = new WorkflowInstance(workflowDefinition, sourceMediaPackage,
@@ -1137,7 +1149,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throws UnauthorizedException {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
-    String currentOrgAdminRole = currentOrg.getAdminRole();
     String currentOrgId = currentOrg.getId();
 
     MediaPackage mediapackage = workflow.getMediaPackage();
@@ -1152,8 +1163,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     var creatorName = workflow.getCreatorName();
     var workflowCreator = creatorName == null ? null : userDirectoryService.loadUser(creatorName);
-    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
+    boolean authorized = SecurityUtil.isGlobalAdmin(currentUser)
+            || (currentOrgId.equals(workflowOrgId) && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg))
             || (currentUser.equals(workflowCreator))
             || (authorizationService.hasPermission(mediapackage, action) && currentOrgId.equals(workflowOrgId));
 
@@ -1169,8 +1180,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // asset manager already checks if user is admin, org admin for same org as mp, or has explicit read rights
     // global admins can still get workflow instances if mp is gone from asset manager
     // org admins can't because then we don't know if mp belonged to same org as user
-    return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || mp.isPresent() && currentUser.hasRole(securityService.getOrganization().getAdminRole())
+    return SecurityUtil.isGlobalAdmin(currentUser)
+            || mp.isPresent() && SecurityUtil.isOrganizationAdmin(currentUser, securityService.getOrganization())
             || mp.isPresent() && authorizationService.hasPermission(mp.get(), action);
   }
 
