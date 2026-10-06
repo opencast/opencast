@@ -108,7 +108,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.text.ParseException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -974,10 +974,10 @@ public class SchedulerRestService {
       return RestUtil.R.badRequest("Cannot add event without proper start and end time");
     }
 
-    RRule rrule;
+    RRule<ZonedDateTime> rrule;
     try {
-      rrule = new RRule(rruleString);
-    } catch (ParseException e) {
+      rrule = new RRule<>(rruleString);
+    } catch (IllegalArgumentException e) {
       logger.debug("Could not parse recurrence rule");
       return RestUtil.R.badRequest("Could not parse recurrence rule");
     }
@@ -1927,7 +1927,7 @@ public class SchedulerRestService {
       throw new IllegalArgumentException();
     }
 
-    RRule rule = null;
+    RRule<ZonedDateTime> rule = null;
     if (StringUtils.isNotBlank(rrule)) {
       if (duration == null || StringUtils.isBlank(timezone)) {
         logger.info("Either duration or timezone were not specified");
@@ -1935,7 +1935,7 @@ public class SchedulerRestService {
       }
 
       try {
-        rule = new RRule(rrule);
+        rule = new RRule<>(rrule);
         rule.validate();
       } catch (Exception e) {
         logger.info("Unable to parse rrule {}: {}", rrule, getMessage(e));

@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,7 +83,7 @@ public final class SchedulingUtils {
     private Optional<Long> duration = Optional.empty();
     private Optional<String> agentId = Optional.empty();
     private Optional<String> inputs = Optional.empty();
-    private Optional<RRule> rrule = Optional.empty();
+    private Optional<RRule<ZonedDateTime>> rrule = Optional.empty();
 
     public SchedulingInfo() {
     }
@@ -154,11 +155,11 @@ public final class SchedulingUtils {
       this.inputs = inputs;
     }
 
-    public Optional<RRule> getRrule() {
+    public Optional<RRule<ZonedDateTime>> getRrule() {
       return rrule;
     }
 
-    public void setRrule(Optional<RRule> rrule) {
+    public void setRrule(Optional<RRule<ZonedDateTime>> rrule) {
       this.rrule = rrule;
     }
 
@@ -290,7 +291,7 @@ public final class SchedulingUtils {
       }
       if (isNotBlank(rrule)) {
         try {
-          RRule parsedRrule = new RRule(rrule);
+          RRule<ZonedDateTime> parsedRrule = new RRule<>(rrule);
           parsedRrule.validate();
           schedulingInfo.rrule = Optional.of(parsedRrule);
         } catch (Exception e) {

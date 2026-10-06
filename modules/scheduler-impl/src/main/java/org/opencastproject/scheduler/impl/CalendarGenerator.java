@@ -30,7 +30,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Encoding;
@@ -38,20 +37,22 @@ import net.fortuna.ical4j.model.parameter.FmtType;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Attach;
-import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.LastModified;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RelatedTo;
 import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
+import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,9 +81,9 @@ public class CalendarGenerator {
    */
   public CalendarGenerator(SeriesService seriesService) {
     cal = new Calendar();
-    cal.getProperties().add(new ProdId("Opencast Calendar File 0.5"));
-    cal.getProperties().add(Version.VERSION_2_0);
-    cal.getProperties().add(CalScale.GREGORIAN);
+    cal.add(new ProdId("Opencast Calendar File 0.5"));
+    cal.add(ImmutableVersion.VERSION_2_0);
+    cal.add(ImmutableCalScale.GREGORIAN);
     this.seriesService = seriesService;
   }
 
@@ -127,70 +128,66 @@ public class CalendarGenerator {
 
     logger.debug("Creating iCalendar VEvent from scheduled event '{}'", eventId);
 
-    DateTime startDate = new DateTime(start);
-    DateTime endDate = new DateTime(end);
-    Date marginEndDate = new org.joda.time.DateTime(endDate.getTime()).plusHours(1).toDate();
+    Instant startDate = start.toInstant();
+    Instant endDate = end.toInstant();
+    Date marginEndDate = new org.joda.time.DateTime(endDate.toEpochMilli()).plusHours(1).toDate();
     if (marginEndDate.before(new Date())) {
       logger.debug("Event has already passed more than an hour, skipping!");
       return false;
     }
-    startDate.setUtc(true);
-    endDate.setUtc(true);
     String seriesID = null;
 
     VEvent event = new VEvent(startDate, endDate, catalog.getFirst(DublinCore.PROPERTY_TITLE));
     try {
-      event.getProperties().add(new Uid(eventId));
+      event.add(new Uid(eventId));
 
-      DateTime lastModifiedDate = new DateTime(lastModified);
-      lastModifiedDate.setUtc(true);
-      event.getProperties().add(new LastModified(lastModifiedDate));
+      event.add(new LastModified(lastModified.toInstant()));
 
       if (StringUtils.isNotEmpty(catalog.getFirst(DublinCore.PROPERTY_DESCRIPTION))) {
-        event.getProperties().add(new Description(catalog.getFirst(DublinCore.PROPERTY_DESCRIPTION)));
+        event.add(new Description(catalog.getFirst(DublinCore.PROPERTY_DESCRIPTION)));
       }
-      event.getProperties().add(new Location(agentId));
+      event.add(new Location(agentId));
       if (StringUtils.isNotEmpty(catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF))) {
         seriesID = catalog.getFirst(DublinCore.PROPERTY_IS_PART_OF);
-        event.getProperties().add(new RelatedTo(seriesID));
+        event.add(new RelatedTo(seriesID));
       }
 
-      ParameterList dcParameters = new ParameterList();
-      dcParameters.add(new FmtType("application/xml"));
-      dcParameters.add(Value.BINARY);
-      dcParameters.add(Encoding.BASE64);
-      dcParameters.add(new XParameter("X-APPLE-FILENAME", "episode.xml"));
-      Attach metadataAttachment = new Attach(dcParameters, catalog.toXmlString().getBytes("UTF-8"));
-      event.getProperties().add(metadataAttachment);
+      ParameterList dcParameters = new ParameterList()
+              .add(new FmtType("application/xml"))
+              .add(Value.BINARY)
+              .add(Encoding.BASE64)
+              .add(new XParameter("X-APPLE-FILENAME", "episode.xml"));
+      Attach metadataAttachment = new Attach(dcParameters, ByteBuffer.wrap(catalog.toXmlString().getBytes("UTF-8")));
+      event.add(metadataAttachment);
 
       String seriesDC = getSeriesDublinCoreAsString(seriesID);
       if (seriesDC != null) {
         logger.debug("Attaching series {} information to event {}", seriesID, eventId);
-        ParameterList sDcParameters = new ParameterList();
-        sDcParameters.add(new FmtType("application/xml"));
-        sDcParameters.add(Value.BINARY);
-        sDcParameters.add(Encoding.BASE64);
-        sDcParameters.add(new XParameter("X-APPLE-FILENAME", "series.xml"));
-        Attach seriesAttachment = new Attach(sDcParameters, seriesDC.getBytes("UTF-8"));
-        event.getProperties().add(seriesAttachment);
+        ParameterList sDcParameters = new ParameterList()
+                .add(new FmtType("application/xml"))
+                .add(Value.BINARY)
+                .add(Encoding.BASE64)
+                .add(new XParameter("X-APPLE-FILENAME", "series.xml"));
+        Attach seriesAttachment = new Attach(sDcParameters, ByteBuffer.wrap(seriesDC.getBytes("UTF-8")));
+        event.add(seriesAttachment);
       } else {
         logger.debug("No series provided for event {}.", eventId);
       }
 
-      ParameterList caParameters = new ParameterList();
-      caParameters.add(new FmtType("application/text"));
-      caParameters.add(Value.BINARY);
-      caParameters.add(Encoding.BASE64);
-      caParameters.add(new XParameter("X-APPLE-FILENAME", "org.opencastproject.capture.agent.properties"));
-      Attach agentsAttachment = new Attach(caParameters, captureAgentMetadata.getBytes("UTF-8"));
-      event.getProperties().add(agentsAttachment);
+      ParameterList caParameters = new ParameterList()
+              .add(new FmtType("application/text"))
+              .add(Value.BINARY)
+              .add(Encoding.BASE64)
+              .add(new XParameter("X-APPLE-FILENAME", "org.opencastproject.capture.agent.properties"));
+      Attach agentsAttachment = new Attach(caParameters, ByteBuffer.wrap(captureAgentMetadata.getBytes("UTF-8")));
+      event.add(agentsAttachment);
 
     } catch (Exception e) {
       logger.error("Unable to add event '{}' to recording calendar", eventId, e);
       return false;
     }
 
-    cal.getComponents().add(event);
+    cal.add(event);
 
     logger.debug("new VEvent = {} ", event.toString());
     return true;
