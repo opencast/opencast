@@ -123,6 +123,24 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
   }
 
   /**
+   * Creates the user id role of a user, as listed when searching for roles.
+   *
+   * @param userName
+   *          the username
+   * @param organization
+   *          the organization of the role
+   * @return the user id role
+   */
+  public static Role createUserIdRole(String userName, Organization organization) {
+    return new JaxbRole(
+        getUserIdRole(userName),
+        JaxbOrganization.fromOrganization(organization),
+        "User id role",
+        Role.Type.SYSTEM
+    );
+  }
+
+  /**
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -217,12 +235,7 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       User u = users.next();
       // We exclude the digest user, but then add the global ROLE_USER above
       if (!"system".equals(u.getProvider())) {
-        foundRoles.add(new JaxbRole(
-            getUserIdRole(u.getUsername()),
-            JaxbOrganization.fromOrganization(u.getOrganization()),
-            "User id role",
-            Role.Type.SYSTEM
-        ));
+        foundRoles.add(createUserIdRole(u.getUsername(), u.getOrganization()));
       }
     }
 
