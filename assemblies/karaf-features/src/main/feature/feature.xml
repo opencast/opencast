@@ -700,7 +700,6 @@
 
     <!-- graphql transitive dependencies -->
     <bundle dependency="true">mvn:org.antlr/antlr4-runtime/4.7.2</bundle>
-    <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/${jackson.version}</bundle>
     <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${jackson.version}</bundle>
     <bundle dependency="true">mvn:org.reactivestreams/reactive-streams/1.0.4</bundle>
     <bundle dependency="true">mvn:commons-beanutils/commons-beanutils/1.9.4</bundle>
