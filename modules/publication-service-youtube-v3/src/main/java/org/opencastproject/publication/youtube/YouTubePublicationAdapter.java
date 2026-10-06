@@ -134,7 +134,7 @@ public class YouTubePublicationAdapter {
       description += '\n' + episodeDescription;
     }
 
-    String episodeLicense = dcEpisode.getFirst(DublinCore.PROPERTY_LICENSE);
+    String episodeLicense = getEpisodeLicense();
     if (episodeLicense != null) {
       description += '\n' + episodeLicense;
     }
@@ -149,6 +149,15 @@ public class YouTubePublicationAdapter {
    */
   public String getEpisodeLanguage() {
     return getEpisodeProperty(DublinCore.PROPERTY_LANGUAGE);
+  }
+
+  /**
+   * Gets the license for the episode of the media package
+   *
+   * @return the license of the episode
+   */
+  public String getEpisodeLicense() {
+    return getEpisodeProperty(DublinCore.PROPERTY_LICENSE);
   }
 
   /**

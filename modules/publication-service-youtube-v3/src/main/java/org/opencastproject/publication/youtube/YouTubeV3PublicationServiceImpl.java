@@ -69,6 +69,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -154,6 +155,8 @@ public class YouTubeV3PublicationServiceImpl
    */
   private String defaultPlaylist;
 
+  private Optional<Pattern> ccLicenses;
+
   private boolean makeVideosPrivate;
   private YouTubeAPIVersion3Service.PrivacyStatus playlistPrivacy;
 
@@ -221,6 +224,9 @@ public class YouTubeV3PublicationServiceImpl
                   .collect(Collectors.toMap(
                           Map.Entry::getKey,
                           e -> Pattern.compile(e.getValue())));
+          ccLicenses = Optional.ofNullable(
+                  YouTubeUtils.get(properties, YouTubeKey.ccLicenses, false))
+                  .map(Pattern::compile);
           tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
           defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
           makeVideosPrivate = Strings.CI
@@ -302,12 +308,16 @@ public class YouTubeV3PublicationServiceImpl
           .orElse(null);
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
+      final VideoUpload.License license = ccLicenses.map(
+          p -> p.matcher(c.getEpisodeLicense()).matches()).orElse(false)
+          ? VideoUpload.License.creativeCommon
+          : VideoUpload.License.youtube;
       final VideoUpload videoUpload = new VideoUpload(
           truncateTitleToMaxFieldLength(episodeName, false),
           c.getEpisodeDescription(),
           transferMetadataLanguage ? language : null,
           transferAudioLanguage ? language : null,
-          privacyStatus, file, operationProgressListener, tags);
+          license, privacyStatus, file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
       final int timeoutMinutes = 60;
       final long startUploadMilliseconds = new Date().getTime();
