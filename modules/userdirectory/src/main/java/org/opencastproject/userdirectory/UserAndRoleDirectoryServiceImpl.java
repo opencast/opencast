@@ -63,12 +63,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -513,6 +515,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
     }
 
+    // Searching for user roles is a search for people: match what is shown to identify a user (username, name and
+    // email) and list them in that same order. Only do so if user info is not sanitized, otherwise the name and
+    // email must not be revealed through the search.
+    if (Boolean.TRUE.equals(hasUser) && target != Role.Target.USER && !UserIdRoleProvider.isSanitize()) {
+      return findUserRoles(org, query, offset, limit);
+    }
+
     // Instead of getting all roles from all providers, limit the providers by "limit" and "offset" if possible.
     // Intended to reduce computing time for low offset + limit requests.
     // This optimization cannot be applied when filtering by "hasUser", since that filter is applied after fetching
@@ -541,6 +550,96 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       return stream.limit(limit).collect(Collectors.toList());
     }
     return stream.collect(Collectors.toList());
+  }
+
+  /**
+   * Finds the user id roles of users matching the query, ordered by how the users are displayed.
+   *
+   * The query is matched against username, name and email. The users are sorted by name (case-insensitive, falling
+   * back to the username if the user has no name) and then by username, so that paging through the result with
+   * <code>offset</code> and <code>limit</code> is stable.
+   *
+   * @param org
+   *          the current organization
+   * @param query
+   *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
+   *          characters (including zero characters).
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit. 0 means no limit
+   * @return the user id roles
+   */
+  private List<Role> findUserRoles(Organization org, String query, int offset, int limit) {
+    // The same user may be known to more than one provider, so deduplicate by username.
+    final Map<String, User> users = new LinkedHashMap<>();
+    final Pattern queryPattern = queryToPattern(query);
+    for (UserProvider userProvider : userProviders) {
+      String providerOrgId = userProvider.getOrganization();
+      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
+        userProvider.findUsersByText(query, 0, 0).forEachRemaining(user -> {
+          // The digest user is not a person, the global ROLE_USER stands in for it. Providers that cannot search
+          // (e.g. LDAP, which returns the current user, or those that echo the query back as a user) may return
+          // users that do not match the query, so do not rely on the provider to have filtered.
+          if (!"system".equals(user.getProvider()) && matchesText(user, queryPattern)) {
+            users.putIfAbsent(user.getUsername(), user);
+          }
+        });
+      }
+    }
+
+    // Only keep users that actually exist: some providers return users without verifying them. This is done
+    // lazily, after sorting, so it is only checked for as many users as are needed for the requested page.
+    Stream<User> stream = users.values().stream()
+        .sorted(Comparator.comparing(UserAndRoleDirectoryServiceImpl::displayName, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(User::getUsername))
+        .filter(user -> loadUser(user.getUsername()) != null);
+    stream = stream.skip(offset);
+    if (limit > 0) {
+      stream = stream.limit(limit);
+    }
+    return stream
+        .map(user -> UserIdRoleProvider.createUserIdRole(user.getUsername(), org))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Converts a query with the wildcards "_" (any single character) and "%" (any number of characters, including
+   * zero) into a case-insensitive regular expression.
+   */
+  private static Pattern queryToPattern(String query) {
+    final StringBuilder regex = new StringBuilder();
+    final StringBuilder literal = new StringBuilder();
+    for (char c : query.toCharArray()) {
+      if (c == '%' || c == '_') {
+        if (literal.length() > 0) {
+          regex.append(Pattern.quote(literal.toString()));
+          literal.setLength(0);
+        }
+        regex.append(c == '%' ? ".*" : ".");
+      } else {
+        literal.append(c);
+      }
+    }
+    if (literal.length() > 0) {
+      regex.append(Pattern.quote(literal.toString()));
+    }
+    return Pattern.compile(regex.toString(), Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+  }
+
+  /**
+   * Checks whether the username, name or email of the user matches the pattern.
+   */
+  private static boolean matchesText(User user, Pattern pattern) {
+    return Stream.of(user.getUsername(), user.getName(), user.getEmail())
+        .anyMatch(text -> text != null && pattern.matcher(text).matches());
+  }
+
+  /**
+   * The name a user is listed under: their name, or their username if they have none.
+   */
+  private static String displayName(User user) {
+    return StringUtils.defaultIfBlank(user.getName(), user.getUsername());
   }
 
   /**

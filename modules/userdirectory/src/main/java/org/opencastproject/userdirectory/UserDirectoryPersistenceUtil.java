@@ -479,6 +479,32 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
+   * Returns the users whose username, name or email matches the search query.
+   *
+   * @param orgId
+   *          the organization identifier
+   * @param query
+   *          the query to search. Use the wildcards "_" to match any single character and "%" to match an arbitrary
+   *          number of characters (including zero characters).
+   * @param limit
+   *          the limit
+   * @param offset
+   *          the offset
+   * @return the users list
+   */
+  public static Function<EntityManager, List<JpaUser>> findUsersByTextQuery(String orgId, String query, int limit,
+      int offset) {
+    return em -> {
+      TypedQuery<JpaUser> q = em.createNamedQuery("User.findByTextQuery", JpaUser.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
+      q.setParameter("query", query.toUpperCase());
+      q.setParameter("org", orgId);
+      return q.getResultList();
+    };
+  }
+
+  /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
    *
    * @param orgId,

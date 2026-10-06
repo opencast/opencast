@@ -37,12 +37,16 @@ import org.opencastproject.security.api.UserProvider;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
@@ -302,6 +306,124 @@ public class UserAndRoleDirectoryServiceImplTest {
     // exactly 1 result, not come back short because filtering happened after pagination.
     List<Role> pagedWithoutUser = hasUserDirectory.findRoles("%", Role.Target.ALL, 0, 1, false);
     Assert.assertEquals(1, pagedWithoutUser.size());
+  }
+
+  /**
+   * Sets whether the {@link UserIdRoleProvider} sanitizes user names. This is global state of that class.
+   */
+  private static void setSanitize(boolean sanitize) throws Exception {
+    Dictionary<String, Object> properties = new Hashtable<>();
+    properties.put("sanitize", Boolean.toString(sanitize));
+    new UserIdRoleProvider().updated(properties);
+  }
+
+  @After
+  public void resetSanitize() throws Exception {
+    setSanitize(true);
+  }
+
+  private UserAndRoleDirectoryServiceImpl createDirectoryWithUsers(UserProvider... userProviders) {
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.replay(securityService);
+
+    UserAndRoleDirectoryServiceImpl userDirectory = new UserAndRoleDirectoryServiceImpl();
+    userDirectory.activate(null);
+    userDirectory.setSecurityService(securityService);
+    for (UserProvider userProvider : userProviders) {
+      userDirectory.addUserProvider(userProvider);
+    }
+    return userDirectory;
+  }
+
+  private UserProvider createUserProvider(User... users) {
+    UserProvider userProvider = EasyMock.createNiceMock(UserProvider.class);
+    EasyMock.expect(userProvider.getOrganization()).andReturn(org.getId()).anyTimes();
+    EasyMock.expect(userProvider.findUsersByText(EasyMock.anyString(), EasyMock.eq(0), EasyMock.eq(0)))
+        .andAnswer(() -> Arrays.asList(users).iterator()).anyTimes();
+    for (User user : users) {
+      EasyMock.expect(userProvider.loadUser(user.getUsername())).andReturn(user).anyTimes();
+    }
+    EasyMock.replay(userProvider);
+    return userProvider;
+  }
+
+  @Test
+  public void testFindUserRolesOrderedByName() throws Exception {
+    setSanitize(false);
+
+    // The usernames have nothing in common with the names that are shown for the users
+    User leon = new JaxbUser("1324", null, "Leon Hart", "leon@hart.com", "opencast", org, new HashSet<>());
+    User anna = new JaxbUser("zz99", null, "anna Müller", "am@example.com", "opencast", org, new HashSet<>());
+    User noName = new JaxbUser("bob", null, null, null, "opencast", org, new HashSet<>());
+    User system = new JaxbUser("admin", null, "Administrator", null, "system", org, new HashSet<>());
+
+    // Leon is known to both providers
+    UserAndRoleDirectoryServiceImpl userDirectory = createDirectoryWithUsers(
+        createUserProvider(leon, noName),
+        createUserProvider(leon, anna, system));
+
+    // Ordered by the name shown, not by username or role name, ignoring case. A user without a name is listed
+    // under their username. The digest user is not a person and is left out.
+    List<Role> found = userDirectory.findRoles("%", Role.Target.ACL, 0, 0, true);
+    Assert.assertEquals(3, found.size());
+    Assert.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "zz99", found.get(0).getName());
+    Assert.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "bob", found.get(1).getName());
+    Assert.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "1324", found.get(2).getName());
+
+    // Paging follows that same order
+    found = userDirectory.findRoles("%", Role.Target.ACL, 1, 1, true);
+    Assert.assertEquals(1, found.size());
+    Assert.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "bob", found.get(0).getName());
+  }
+
+  @Test
+  public void testFindUserRolesIgnoresUsersNotMatchingOrNotExisting() throws Exception {
+    setSanitize(false);
+
+    User leon = new JaxbUser("1324", null, "Leon Hart", "leon@hart.com", "opencast", org, new HashSet<>());
+    User other = new JaxbUser("other", null, "Some Body", "sb@example.com", "ldap", org, new HashSet<>());
+    // Providers that cannot search return users regardless of the query...
+    UserProvider searchless = EasyMock.createNiceMock(UserProvider.class);
+    EasyMock.expect(searchless.getOrganization()).andReturn(org.getId()).anyTimes();
+    EasyMock.expect(searchless.findUsersByText(EasyMock.anyString(), EasyMock.anyInt(), EasyMock.anyInt()))
+        .andAnswer(() -> Arrays.asList(other).iterator()).anyTimes();
+    EasyMock.expect(searchless.loadUser("other")).andReturn(other).anyTimes();
+    EasyMock.replay(searchless);
+    // ... or echo the query back as a user that does not exist
+    JaxbUser echoed = new JaxbUser("%leon", "studip", org);
+    UserProvider echoing = EasyMock.createNiceMock(UserProvider.class);
+    EasyMock.expect(echoing.getOrganization()).andReturn(org.getId()).anyTimes();
+    EasyMock.expect(echoing.findUsersByText(EasyMock.anyString(), EasyMock.anyInt(), EasyMock.anyInt()))
+        .andAnswer(() -> Arrays.<User>asList(echoed).iterator()).anyTimes();
+    EasyMock.replay(echoing);
+
+    UserAndRoleDirectoryServiceImpl userDirectory = createDirectoryWithUsers(
+        createUserProvider(leon), searchless, echoing);
+
+    List<Role> found = userDirectory.findRoles("%leon%", Role.Target.ACL, 0, 0, true);
+    Assert.assertEquals(1, found.size());
+    Assert.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "1324", found.get(0).getName());
+
+    // Wildcards and special characters in the query work like in a SQL LIKE
+    Assert.assertEquals(1, userDirectory.findRoles("%@HART.com", Role.Target.ACL, 0, 0, true).size());
+    Assert.assertEquals(1, userDirectory.findRoles("le_n%", Role.Target.ACL, 0, 0, true).size());
+    Assert.assertEquals(0, userDirectory.findRoles("%le.n%", Role.Target.ACL, 0, 0, true).size());
+  }
+
+  @Test
+  public void testFindUserRolesDoesNotSearchUserInfoWhenSanitized() throws Exception {
+    setSanitize(true);
+
+    UserProvider userProvider = EasyMock.createNiceMock(UserProvider.class);
+    EasyMock.expect(userProvider.getOrganization()).andReturn(org.getId()).anyTimes();
+    // Name and email must not be searchable if user info is hidden
+    EasyMock.expect(userProvider.findUsersByText(EasyMock.anyString(), EasyMock.anyInt(), EasyMock.anyInt()))
+        .andThrow(new AssertionError("findUsersByText() must not be called when sanitizing")).anyTimes();
+    EasyMock.replay(userProvider);
+
+    UserAndRoleDirectoryServiceImpl userDirectory = createDirectoryWithUsers(userProvider);
+    userDirectory.findRoles("%leon%", Role.Target.ACL, 0, 0, true);
   }
 
 }

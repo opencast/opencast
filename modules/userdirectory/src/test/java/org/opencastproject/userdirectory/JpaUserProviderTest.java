@@ -378,6 +378,28 @@ public class JpaUserProviderTest {
   }
 
   @Test
+  public void testFindUsersByText() throws UnauthorizedException {
+    JpaUser leon = new JpaUser("1324", "pass1", org1, "Leon Hart", "leon@hart.com", "opencast", true);
+    JpaUser anna = new JpaUser("anna", "pass1", org1, "Anna Mueller", "am@example.com", "opencast", true);
+    JpaUser noInfo = new JpaUser("jx4521", "pass1", org1, null, null, "opencast", true);
+    provider.addUser(leon);
+    provider.addUser(anna);
+    provider.addUser(noInfo);
+
+    // The username does not contain what the user is shown as
+    assertEquals(0, IteratorUtils.toList(provider.findUsers("%lEoN%", 0, 0)).size());
+    assertEquals(leon, provider.findUsersByText("%lEoN%", 0, 0).next());
+    assertEquals(leon, provider.findUsersByText("%@HART.com", 0, 0).next());
+    assertEquals(anna, provider.findUsersByText("%anna%", 0, 0).next());
+    assertEquals(noInfo, provider.findUsersByText("%jx45%", 0, 0).next());
+    assertEquals(0, IteratorUtils.toList(provider.findUsersByText("%nobody%", 0, 0)).size());
+
+    // Matching more than one field of one user does not duplicate the user
+    assertEquals(1, IteratorUtils.toList(provider.findUsersByText("%a%", 0, 0)).stream()
+        .filter(user -> user.getUsername().equals("anna")).count());
+  }
+
+  @Test
   public void testFindRoles() throws UnauthorizedException {
     JpaRole astroRole = new JpaRole("ROLE_ASTRO_105_SPRING_2013_STUDENT", org1, "Astro role");
 
