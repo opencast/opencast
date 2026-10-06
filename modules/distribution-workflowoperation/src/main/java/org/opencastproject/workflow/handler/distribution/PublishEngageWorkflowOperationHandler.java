@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.systems.OpencastConstants.SERVER_URL_PROPERTY;
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
@@ -419,11 +418,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         }
 
         // Check that the media package meets the criteria for publication
-        if (isBlank(mediaPackageForSearch.getTitle())) {
-          throw new WorkflowOperationException("Media package does not meet publication criteria: Missing title");
-        }
-        if (!mediaPackageForSearch.hasTracks()) {
-          throw new WorkflowOperationException("Media package does not meet publication criteria: No tracks selected");
+        List<String> publicationCriteriaViolations =
+                EngagePublicationSupport.getPublicationCriteriaViolations(mediaPackageForSearch);
+        if (!publicationCriteriaViolations.isEmpty()) {
+          throw new WorkflowOperationException("Media package does not meet criteria for publication: "
+                  + String.join(", ", publicationCriteriaViolations));
         }
 
         // Prepare published elements to be added
