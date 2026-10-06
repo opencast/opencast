@@ -14,11 +14,12 @@ jobs:
     steps:
       - name: update room description
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MATRIX_USER: ${{ secrets.MATRIX_BOT_USER }}
           MATRIX_TOKEN: ${{ secrets.MATRIX_BOT_TOKEN }}
           URL_TOPIC: 'https://matrix-client.matrix.org/_matrix/client/r0/rooms/!HBsLKoOIEEOkxAeQvC%3Amatrix.org/state/m.room.topic/'
         run: |
-          TAGS="$(curl https://api.github.com/repos/opencast/opencast/tags | jq -r '.[].name')"
+          TAGS="$(gh api https://api.github.com/repos/opencast/opencast/tags | jq -r '.[].name')"
           MAJOR="$(echo "$TAGS" | sed 's/\..*$//' | sort --version-sort | tail -n1)"
           STABLE="$(echo "$TAGS" | sort --version-sort | tail -n1)"
           LEGACY="$(echo "$TAGS" | grep -v "^${MAJOR}" | sort --version-sort | tail -n1)"
