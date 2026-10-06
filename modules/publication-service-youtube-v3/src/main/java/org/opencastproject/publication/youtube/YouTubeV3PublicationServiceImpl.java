@@ -41,6 +41,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -61,6 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -298,8 +300,15 @@ public class YouTubeV3PublicationServiceImpl
       if (thumbnailId != null) {
         final MediaPackageElement thumbnailElement = mediaPackage.getElementById(thumbnailId);
         if (thumbnailElement != null) {
-          final File thumbnailFile = workspace.get(thumbnailElement.getURI());
-          youTubeService.setThumbnail(video.getId(), thumbnailFile, thumbnailElement.getMimeType().toString());
+          try {
+            final File thumbnailFile = workspace.get(thumbnailElement.getURI());
+            youTubeService.setThumbnail(video.getId(), thumbnailFile, thumbnailElement.getMimeType().toString());
+          } catch (IOException | NotFoundException e) {
+            // The video is already on YouTube at this point. A missing thumbnail should not fail the whole
+            // publication, which would leave the video there without a way to retract it.
+            logger.warn("Failed to set thumbnail {} for video {}: {}", thumbnailElement, video.getId(),
+                e.getMessage());
+          }
         }
       }
 
