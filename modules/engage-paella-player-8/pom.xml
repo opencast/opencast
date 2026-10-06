@@ -102,7 +102,7 @@
               <outputDirectory>${basedir}/target/classes/ui/</outputDirectory>
               <resources>
                 <resource>
-                  <directory>./node_modules/@asicupv/engage-paella-player/dist</directory>
+                  <directory>./node_modules/@asicupv/opencast-engage-paella-player/dist</directory>
                   <includes>
                     <include>**</include>
                   </includes>
