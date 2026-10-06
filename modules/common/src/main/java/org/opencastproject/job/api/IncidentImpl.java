@@ -21,15 +21,13 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import org.opencastproject.util.data.Tuple;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class IncidentImpl implements Incident {
   private final long id;
@@ -109,7 +107,7 @@ public final class IncidentImpl implements Incident {
 
   @Override
   public int hashCode() {
-    return hash(id, jobId, serviceType, processingHost, timestamp, severity, code, details, parameters);
+    return Objects.hash(id, jobId, serviceType, processingHost, timestamp, severity, code, details, parameters);
   }
 
   @Override
@@ -118,14 +116,14 @@ public final class IncidentImpl implements Incident {
   }
 
   private boolean eqFields(Incident that) {
-    return eq(id, that.getId())
-            && eq(jobId, that.getJobId())
-            && eq(serviceType, that.getServiceType())
-            && eq(processingHost, that.getProcessingHost())
-            && eq(timestamp, that.getTimestamp())
-            && eq(severity, that.getSeverity())
-            && eq(code, that.getCode())
-            && eq(details, that.getDetails())
-            && eq(parameters, that.getDescriptionParameters());
+    return Objects.equals(id, that.getId())
+            && Objects.equals(jobId, that.getJobId())
+            && Objects.equals(serviceType, that.getServiceType())
+            && Objects.equals(processingHost, that.getProcessingHost())
+            && Objects.equals(timestamp, that.getTimestamp())
+            && Objects.equals(severity, that.getSeverity())
+            && Objects.equals(code, that.getCode())
+            && Objects.equals(details, that.getDetails())
+            && Objects.equals(parameters, that.getDescriptionParameters());
   }
 }

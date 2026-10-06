@@ -22,7 +22,6 @@
 package org.opencastproject.adopter.registration.dto;
 
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.Date;
 import java.util.Objects;
@@ -208,7 +207,7 @@ public class Adopter {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(adopterKey);
+    return Objects.hash(adopterKey);
   }
 
   @Override

@@ -22,14 +22,13 @@
 package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,7 +109,7 @@ public final class EName implements Serializable, Comparable<EName> {
 
   @Override
   public int hashCode() {
-    return hash(namespaceURI, localName);
+    return Objects.hash(namespaceURI, localName);
   }
 
   @Override
@@ -119,7 +118,7 @@ public final class EName implements Serializable, Comparable<EName> {
   }
 
   private boolean eqFields(EName that) {
-    return eq(localName, that.localName) && eq(namespaceURI, that.namespaceURI);
+    return Objects.equals(localName, that.localName) && Objects.equals(namespaceURI, that.namespaceURI);
   }
 
   /** Return a W3C compliant string representation <code>{namespaceURI}localname</code>. */

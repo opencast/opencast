@@ -21,12 +21,11 @@
 
 package org.opencastproject.security.util;
 
-import static org.opencastproject.util.EqualsUtil.ne;
-
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -39,7 +38,7 @@ public class SecurityContext {
   private final Organization org;
 
   public SecurityContext(SecurityService sec, Organization org, User user) {
-    if (ne(org, user.getOrganization())) {
+    if (!Objects.equals(org, user.getOrganization())) {
       throw new IllegalArgumentException("User is not a member of organization " + org.getId());
     }
     this.sec = sec;

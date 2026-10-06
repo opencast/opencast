@@ -22,11 +22,11 @@
 
 package org.opencastproject.util.data;
 
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Cells.fcell;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -82,7 +82,7 @@ public final class VCell<A> extends Cell<A> {
   /** Set the cell's value. */
   public void set(A a) {
     synchronized (lock) {
-      if (ne(a, this.a)) {
+      if (!Objects.equals(a, this.a)) {
         this.a = a;
         change += 1;
       }
