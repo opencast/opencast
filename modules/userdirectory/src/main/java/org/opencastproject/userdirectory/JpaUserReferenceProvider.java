@@ -224,6 +224,23 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
         .iterator();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.UserProvider#findUsersByText(String, int, int)
+   */
+  @Override
+  public Iterator<User> findUsersByText(String query, int offset, int limit) {
+    if (query == null) {
+      throw new IllegalArgumentException("Query must be set");
+    }
+    String orgId = securityService.getOrganization().getId();
+    return db.exec(findUserReferencesByTextQuery(orgId, query, limit, offset)).stream()
+        .map(ref -> ref.toUser(PROVIDER_NAME))
+        .collect(Collectors.toList())
+        .iterator();
+  }
+
   @Override
   public Iterator<User> findUsers(Collection<String> userNames) {
     String orgId = securityService.getOrganization().getId();
@@ -424,6 +441,26 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
         Pair.of("u", userName),
         Pair.of("org", organizationId)
     );
+  }
+
+  /**
+   * Returns user references whose username, name or email matches the query
+   * @param orgId The organization to search for
+   * @param query The query to search for
+   * @param limit The maximum number of results
+   * @param offset The offset
+   * @return The matching user references
+   */
+  private Function<EntityManager, List<JpaUserReference>> findUserReferencesByTextQuery(String orgId, String query,
+      int limit, int offset) {
+    return em -> {
+      TypedQuery<JpaUserReference> q = em.createNamedQuery("UserReference.findByTextQuery", JpaUserReference.class)
+          .setMaxResults(limit)
+          .setFirstResult(offset);
+      q.setParameter("query", query.toUpperCase());
+      q.setParameter("org", orgId);
+      return q.getResultList();
+    };
   }
 
   /**

@@ -283,7 +283,9 @@ public class AclEndpoint {
               type = RestParameter.Type.STRING),
           @RestParameter(name = "hasUser", isRequired = false,
               description = "If set, only returns roles that do (true) or do not (false) correspond to an actual "
-                  + "user account. If omitted, roles are not filtered by this criterion.",
+                  + "user account. If omitted, roles are not filtered by this criterion. If true, and user names are "
+                  + "not sanitized, the query also matches the name and email of the user, and roles are ordered by "
+                  + "the name of the user.",
               type = RestParameter.Type.BOOLEAN)
       },
       responses = {
