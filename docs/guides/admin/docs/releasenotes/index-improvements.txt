@@ -1,1 +1,3 @@
 - PR #7497 improved the search of the Admin UI and Engage. The index mappings were changed. This requires either an index rebuild in Opencast **or** running the index migration script in `docs/upgrade/20_to_21/update_index.sh`.
+
+Update: The upgrade script was removed, due to the Opensearch upgrade requiring an index rebuild anyway.

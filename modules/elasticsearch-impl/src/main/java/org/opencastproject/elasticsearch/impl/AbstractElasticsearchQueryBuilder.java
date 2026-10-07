@@ -28,19 +28,19 @@ import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
-import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryRewriteContext;
-import org.elasticsearch.index.query.QueryShardContext;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.opensearch.common.unit.Fuzziness;
+import org.opensearch.core.common.io.stream.StreamOutput;
+import org.opensearch.core.xcontent.XContentBuilder;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.MatchAllQueryBuilder;
+import org.opensearch.index.query.MultiMatchQueryBuilder;
+import org.opensearch.index.query.Operator;
+import org.opensearch.index.query.QueryBuilder;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.index.query.QueryRewriteContext;
+import org.opensearch.index.query.QueryShardContext;
+import org.opensearch.index.query.RangeQueryBuilder;
+import org.opensearch.index.query.TermsQueryBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -253,6 +253,11 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
   @Override
   public QueryBuilder boost(float boost) {
     return queryBuilder.boost(boost);
+  }
+
+  @Override
+  public QueryBuilder filter(QueryBuilder filter) {
+    return queryBuilder.filter(filter);
   }
 
   @Override
