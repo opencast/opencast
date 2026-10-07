@@ -32,11 +32,12 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NeedleEye;
 
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -45,16 +46,16 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Component(
     immediate = true,
-    service = ManagedService.class,
     property = {
         "service.description=Cleanup Finished Recordings from the Schedule Scanner"
     }
 )
-public class OldScheduledScanner extends AbstractBufferScanner implements ManagedService {
+public class OldScheduledScanner extends AbstractBufferScanner {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(OldScheduledScanner.class);
@@ -83,9 +84,10 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
   }
 
   @Activate
-  @Override
-  public void activate(ComponentContext cc) {
+  @Modified
+  public void updated(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
+    super.updated(properties);
   }
 
   @Deactivate
