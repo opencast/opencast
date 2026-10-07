@@ -65,6 +65,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   private boolean editOnly = false;
   private String rightsHolder = null;
   private Long theme = null;
+  private Map<String, Map<String, List<String>>> extendedMetadata = new HashMap<>();
   private final Map<String, String> accessControlEntries = new HashMap<>();
 
   private static final Map<String, String> SORT_FIELDS = Map.of(
@@ -558,6 +559,33 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    */
   public String getRightsHolder() {
     return rightsHolder;
+  }
+
+  /**
+   * Selects recording events with the given subject.
+   *
+   * @param type
+   *          the flavor type of the catalog
+   * @param key
+   *          the metadata field key
+   * @param value
+   *           the metadata field value
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery withExtendedMetadata(String type, String key, String value) {
+    this.extendedMetadata.computeIfAbsent(type, h -> new HashMap<>())
+        .computeIfAbsent(key, a -> new ArrayList<>())
+        .add(value);
+    return this;
+  }
+
+  /**
+   * Returns the subject of the recording.
+   *
+   * @return the subject
+   */
+  public Map<String, Map<String, List<String>>> getExtendedMetadata() {
+    return extendedMetadata;
   }
 
   /**
