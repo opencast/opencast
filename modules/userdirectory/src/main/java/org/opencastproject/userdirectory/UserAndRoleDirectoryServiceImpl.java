@@ -530,7 +530,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
         roleProvider.findRoles(query, target, 0, providerLimit, hasUser).forEachRemaining(roles::add);
       }
     }
-    Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName));
+    Stream<Role> stream = roles.stream().sorted(Role.BY_NAME);
     // Filter by whether or not the role resolves to an actual user account, before offset/limit are applied, so
     // that a page of `limit` results is not silently shortened by roles excluded after the fact.
     if (hasUser != null) {

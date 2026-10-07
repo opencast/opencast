@@ -304,4 +304,36 @@ public class UserAndRoleDirectoryServiceImplTest {
     Assert.assertEquals(1, pagedWithoutUser.size());
   }
 
+  @Test
+  public void testFindRolesSortedIgnoringCase() {
+    List<Role> unsorted = new ArrayList<Role>();
+    unsorted.add(new JaxbRole("ROLE_Leon", org));
+    unsorted.add(new JaxbRole("ROLE_anna", org));
+    unsorted.add(new JaxbRole("ROLE_b", org));
+    unsorted.add(new JaxbRole("ROLE_Anna", org));
+
+    RoleProvider roleProvider = EasyMock.createNiceMock(RoleProvider.class);
+    EasyMock.expect(roleProvider.getOrganization()).andReturn(org.getId()).anyTimes();
+    EasyMock.expect(roleProvider.findRoles(EasyMock.eq("%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.anyObject()))
+        .andAnswer(unsorted::iterator).anyTimes();
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.replay(roleProvider, securityService);
+
+    UserAndRoleDirectoryServiceImpl sortDirectory = new UserAndRoleDirectoryServiceImpl();
+    sortDirectory.activate(null);
+    sortDirectory.setSecurityService(securityService);
+    sortDirectory.addRoleProvider(roleProvider);
+
+    // Not "ROLE_Anna, ROLE_Leon, ROLE_anna, ROLE_b", which is what ordering by character code would give
+    List<Role> found = sortDirectory.findRoles("%", Role.Target.ALL, 0, 0, null);
+    Assert.assertEquals(4, found.size());
+    Assert.assertEquals("ROLE_Anna", found.get(0).getName());
+    Assert.assertEquals("ROLE_anna", found.get(1).getName());
+    Assert.assertEquals("ROLE_b", found.get(2).getName());
+    Assert.assertEquals("ROLE_Leon", found.get(3).getName());
+  }
+
 }
