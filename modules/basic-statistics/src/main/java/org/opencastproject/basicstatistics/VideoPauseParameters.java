@@ -21,13 +21,13 @@
 package org.opencastproject.basicstatistics;
 
 public class VideoPauseParameters {
-  private long at; // when the user paused or resumed playback
+  private Long at; // when the user paused or resumed playback
 
-  public long getAt() {
+  public Long getAt() {
     return at;
   }
 
-  public void setAt(long at) {
+  public void setAt(Long at) {
     this.at = at;
   }
 }
