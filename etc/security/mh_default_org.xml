@@ -819,7 +819,7 @@
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
     <!-- Set either `jwksUrl` or `secret` to enable this login handler -->
-     <property name="jwksUrl" value="https://replace-me.invalid/.well-known/jwks.json" />
+    <!-- <property name="jwksUrl" value="https://replace-me.invalid/.well-known/jwks.json" /> -->
     <!-- <property name="secret" value="***" /> -->
     <property name="expectedAlgorithms">
       <!-- The signing algorithms expected for the JWT signature -->
