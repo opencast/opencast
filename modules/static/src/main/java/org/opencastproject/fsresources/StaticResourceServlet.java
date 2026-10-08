@@ -22,8 +22,8 @@
 package org.opencastproject.fsresources;
 
 import org.opencastproject.basicstatistics.BasicStatisticsService;
+import org.opencastproject.basicstatistics.EventPayload;
 import org.opencastproject.basicstatistics.EventType;
-import org.opencastproject.basicstatistics.FetchFileParameters;
 import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.security.api.SecurityService;
@@ -625,21 +625,18 @@ public class StaticResourceServlet extends HttpServlet {
     String mediaPackageId = parts[3];
     String elementId = parts[4];
 
-    FetchFileParameters payload = new FetchFileParameters();
-    payload.setElem(elementId);
-    payload.setFrom(from);
-    payload.setTo(to);
-
-    RawEvent event = new RawEvent();
-    event.setTimestamp(timestamp);
-    event.setItemType(ItemType.VIDEO);
-    event.setItemId(mediaPackageId);
-    event.setEventType(EventType.FETCH_FILE);
-    event.setEventPayload(GSON.toJson(payload));
-
     try {
+      EventPayload payload = new EventPayload.FetchFile(elementId, from, to);
+
+      RawEvent event = new RawEvent();
+      event.setTimestamp(timestamp);
+      event.setItemType(ItemType.VIDEO);
+      event.setItemId(mediaPackageId);
+      event.setEventType(EventType.FETCH_FILE);
+      event.setEventPayload(GSON.toJson(payload));
+
       statisticsService.recordFileFetched(event, request);
-    } catch (UnknownHostException | InternalError e) {
+    } catch (UnknownHostException | InternalError | IllegalArgumentException e) {
       logger.warn("Cannot report statistics to basic statistics service", e);
     }
   }

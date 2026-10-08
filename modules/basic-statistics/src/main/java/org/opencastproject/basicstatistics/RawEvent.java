@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -111,53 +112,38 @@ public class RawEvent {
     this.eventPayload = eventPayload;
   }
 
-  public static boolean payloadValidator(EventType eventType, String eventPayload) {
-    try {
-      switch (eventType) {
-        case PAGE_VISIT -> {
-          PageVisitParameters payload = gson.fromJson(eventPayload, PageVisitParameters.class);
-          if (payload.getUrl() == null) {
-            return false;
-          }
-        }
-        case VIDEO_PLAY -> {
-          if (eventPayload != null) {
-            return false;
-          }
-        }
-        case VIDEO_PAUSE, VIDEO_RESUME -> {
-          VideoPauseParameters payload = gson.fromJson(eventPayload, VideoPauseParameters.class);
-          if (payload.getAt() == null) {
-            return false;
-          }
-        }
-        case VIDEO_SEEK -> {
-          VideoSeekParameters payload = gson.fromJson(eventPayload, VideoSeekParameters.class);
-          if (payload.getTo() == null) {
-            return false;
-          }
-        }
-        case VIDEO_WATCHED -> {
-          VideoWatchedParameters payload = gson.fromJson(eventPayload, VideoWatchedParameters.class);
-          if (payload.getFrom() == null || payload.getTo() == null) {
-            return false;
-          }
-        }
-        case FETCH_FILE -> {
-          FetchFileParameters payload = gson.fromJson(eventPayload, FetchFileParameters.class);
-          if (payload.getElem() == null || payload.getFrom() == null) {
-            return false;
-          }
-        }
-        default -> {
-          return false;
-        }
+  /**
+   * Parse and validate the payload of an event.
+   *
+   * @param eventType the type of the event the payload belongs to
+   * @param eventPayload the payload as stored in the event, i.e. a JSON object or null
+   * @return the payload, or empty if the event type has no payload
+   * @throws IllegalArgumentException if the payload is not valid for the event type
+   */
+  public static Optional<EventPayload> parsePayload(EventType eventType, String eventPayload) {
+    Class<? extends EventPayload> type = eventType.getPayloadType().orElse(null);
+    if (type == null) {
+      if (eventPayload != null) {
+        throw new IllegalArgumentException("unexpected payload");
       }
-    } catch (JsonSyntaxException e) {
-      return false;
+      return Optional.empty();
     }
 
-    return true;
+    try {
+      EventPayload payload = gson.fromJson(eventPayload, type);
+      if (payload == null) {
+        throw new IllegalArgumentException("missing payload");
+      }
+      return Optional.of(payload);
+    } catch (JsonSyntaxException e) {
+      throw new IllegalArgumentException("not a valid JSON object", e);
+    } catch (RuntimeException e) {
+      // Gson wraps exceptions thrown by the record constructors
+      if (e.getCause() instanceof IllegalArgumentException cause) {
+        throw cause;
+      }
+      throw e;
+    }
   }
 
   public String getId() {
