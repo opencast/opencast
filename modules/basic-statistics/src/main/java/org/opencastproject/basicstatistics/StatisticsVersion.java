@@ -30,21 +30,19 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * Records when each version of the statistics system first became active. A new row is only ever appended when
- * the running code's version differs from the most recently recorded one — existing rows are never modified.
+ * the running code's version has not been recorded yet — existing rows are never modified. Versions only ever
+ * increase, and each version is recorded at most once, which the database enforces with a unique constraint.
  *
  * This lets callers determine a "data may be incomplete before this date" threshold: by default, the timestamp
  * of the version-1 row, i.e. when statistics tracking first existed at all.
  */
 @Entity(name = "StatisticsVersion")
-@Table(name = "oc_basic_statistics_version")
+@Table(name = "oc_basic_statistics_version", uniqueConstraints = @UniqueConstraint(columnNames = "stat_version"))
 @NamedQueries({
-    @NamedQuery(
-        name = "StatisticsVersion.findLatest",
-        query = "SELECT v FROM StatisticsVersion v ORDER BY v.activatedAt DESC"
-    ),
     @NamedQuery(
         name = "StatisticsVersion.findByVersion",
         query = "SELECT v FROM StatisticsVersion v WHERE v.version = :version"
