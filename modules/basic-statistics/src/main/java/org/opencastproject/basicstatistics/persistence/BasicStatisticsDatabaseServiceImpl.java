@@ -137,17 +137,35 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   public void ensureVersionRecorded() throws BasicStatisticsDatabaseException {
     try {
       db.execTx(em -> {
-        var query = em.createNamedQuery("StatisticsVersion.findLatest",
-            StatisticsVersion.class);
-        query.setMaxResults(1);
-        List<StatisticsVersion> latest = query.getResultList();
-        if (latest.isEmpty() || latest.get(0).getVersion() != StatisticsVersion.CURRENT_VERSION) {
+        if (!isVersionRecorded(em, StatisticsVersion.CURRENT_VERSION)) {
           em.persist(new StatisticsVersion(StatisticsVersion.CURRENT_VERSION, Instant.now()));
         }
       });
     } catch (Exception e) {
+      // Another node may have recorded this version between our check and our insert. The unique constraint on the
+      // version rejects the second row, which is exactly the outcome we want.
+      try {
+        if (isCurrentVersionRecorded()) {
+          return;
+        }
+      } catch (RuntimeException recheckFailure) {
+        e.addSuppressed(recheckFailure);
+      }
       throw new BasicStatisticsDatabaseException("Could not record statistics version", e);
     }
+  }
+
+  private boolean isCurrentVersionRecorded() {
+    return db.exec(em -> {
+      return isVersionRecorded(em, StatisticsVersion.CURRENT_VERSION);
+    });
+  }
+
+  private static boolean isVersionRecorded(EntityManager em, int version) {
+    var query = em.createNamedQuery("StatisticsVersion.findByVersion", StatisticsVersion.class);
+    query.setParameter("version", version);
+    query.setMaxResults(1);
+    return !query.getResultList().isEmpty();
   }
 
   /**
