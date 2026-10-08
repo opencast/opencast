@@ -130,6 +130,8 @@ await fetch("https://opencast.tld/basicstatistics/trustedPush", {
 The following events and their respective event data (payloads) are defined.
 If no payload is specified, the event data field must be null.
 Otherwise, the field must be a JSON object with the fields specified below.
+All timestamps and byte positions must be non-negative, and a `to` must not be smaller than the `from` it belongs to.
+Events with a missing or invalid payload are rejected.
 
 - `video:play`: user has clicked "play" on a video to start watching. No payload. Note that this represents only the
   first click on the play button. Further clicks are represented by resume. 

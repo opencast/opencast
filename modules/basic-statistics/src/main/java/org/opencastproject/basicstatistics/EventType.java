@@ -36,13 +36,13 @@ import java.util.stream.Collectors;
  * name is a breaking API change.
  */
 public enum EventType {
-  PAGE_VISIT(1, "page-visit"), // a page dedicated to this item was opened.
-  VIDEO_PLAY(2, "video:play"), // user has clicked "play" on a video to start watching
-  VIDEO_PAUSE(3, "video:pause"), // user has paused video playback
-  VIDEO_RESUME(4, "video:resume"), // user has resumed video playback
-  VIDEO_SEEK(5, "video:seek"), // user jumped to somewhere in the video.
-  VIDEO_WATCHED(6, "video:watched"), // the user has fully watched part of the video
-  FETCH_FILE(7, "fetch-file"); // a file was (partially) downloaded
+  PAGE_VISIT(1, "page-visit", EventPayload.PageVisit.class), // a page dedicated to this item was opened.
+  VIDEO_PLAY(2, "video:play", null), // user has clicked "play" on a video to start watching
+  VIDEO_PAUSE(3, "video:pause", EventPayload.VideoPause.class), // user has paused video playback
+  VIDEO_RESUME(4, "video:resume", EventPayload.VideoResume.class), // user has resumed video playback
+  VIDEO_SEEK(5, "video:seek", EventPayload.VideoSeek.class), // user jumped to somewhere in the video.
+  VIDEO_WATCHED(6, "video:watched", EventPayload.VideoWatched.class), // the user has fully watched part of the video
+  FETCH_FILE(7, "fetch-file", EventPayload.FetchFile.class); // a file was (partially) downloaded
 
   private static final Map<Short, EventType> BY_DB_ID = Arrays.stream(values())
       .collect(Collectors.toMap(EventType::getDbId, Function.identity()));
@@ -51,10 +51,12 @@ public enum EventType {
 
   private final short dbId;
   private final String apiName;
+  private final Class<? extends EventPayload> payloadType;
 
-  EventType(int dbId, String apiName) {
+  EventType(int dbId, String apiName, Class<? extends EventPayload> payloadType) {
     this.dbId = (short) dbId;
     this.apiName = apiName;
+    this.payloadType = payloadType;
   }
 
   public short getDbId() {
@@ -63,6 +65,13 @@ public enum EventType {
 
   public String getApiName() {
     return apiName;
+  }
+
+  /**
+   * @return the class of the payload events of this type carry, or empty if they have none
+   */
+  public Optional<Class<? extends EventPayload>> getPayloadType() {
+    return Optional.ofNullable(payloadType);
   }
 
   /**

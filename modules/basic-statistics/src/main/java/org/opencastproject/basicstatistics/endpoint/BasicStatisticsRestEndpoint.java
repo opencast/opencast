@@ -437,8 +437,10 @@ public class BasicStatisticsRestEndpoint {
     if (event.getItemId() == null) {
       return new RejectedEvent(index, "Item id was not specified");
     }
-    if (!RawEvent.payloadValidator(event.getEventType(), event.getEventPayload())) {
-      return new RejectedEvent(index, "Event payload is malformed");
+    try {
+      RawEvent.parsePayload(event.getEventType(), event.getEventPayload());
+    } catch (IllegalArgumentException e) {
+      return new RejectedEvent(index, "Event payload is malformed: " + e.getMessage());
     }
     if (event.getTimestamp().isAfter(now.plus(ALLOWED_CLOCK_SKEW))) {
       return new RejectedEvent(index, "Timestamp is too far in the future.");
