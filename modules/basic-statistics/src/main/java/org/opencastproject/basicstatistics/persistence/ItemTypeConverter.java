@@ -22,31 +22,26 @@ package org.opencastproject.basicstatistics.persistence;
 
 import org.opencastproject.basicstatistics.ItemType;
 
-import java.util.stream.Stream;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
-public class ItemTypeConverter implements AttributeConverter<ItemType, String> {
+public class ItemTypeConverter implements AttributeConverter<ItemType, Short> {
 
   @Override
-  public String convertToDatabaseColumn(ItemType type) {
+  public Short convertToDatabaseColumn(ItemType type) {
     if (type == null) {
       return null;
     }
-    return type.getCode();
+    return type.getDbId();
   }
 
   @Override
-  public ItemType convertToEntityAttribute(String code) {
-    if (code == null) {
+  public ItemType convertToEntityAttribute(Short dbId) {
+    if (dbId == null) {
       return null;
     }
-
-    return Stream.of(ItemType.values())
-        .filter(c -> c.getCode().equals(code))
-        .findFirst()
-        .orElseThrow(IllegalArgumentException::new);
+    return ItemType.fromDbId(dbId)
+        .orElseThrow(() -> new IllegalArgumentException("Unknown item type database ID " + dbId));
   }
 }

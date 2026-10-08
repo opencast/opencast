@@ -39,7 +39,7 @@ await fetch("https://opencast.tld/basicstatistics/clientPush", {
                 timestamp: "2026-04-27T14:56:38.415Z",
                 itemType: "video",
                 itemId: "2ea94d36-e5aa-4069-af43-75515772d2c2",
-                eventType: "VIDEO_PLAY",
+                eventType: "video:play",
                 // eventPayload might be omitted or set to `null` here
             },
             {
@@ -52,7 +52,7 @@ await fetch("https://opencast.tld/basicstatistics/clientPush", {
                 timestamp: "2026-04-27T14:56:57.987Z",
                 itemType: "video",
                 itemId: "2ea94d36-e5aa-4069-af43-75515772d2c2",
-                eventType: "VIDEO_SEEK",
+                eventType: "video:seek",
                 eventPayload: {
                     to: 42856,
                     flux: "compensated", // unknown field
@@ -64,8 +64,8 @@ await fetch("https://opencast.tld/basicstatistics/clientPush", {
 ```
 
 This would result in two events being saved, all with the same session hash:
-- `VIDEO_PLAY` with `null` payload
-- `VIDEO_SEEK` with `{ "to": 42856 }` as payload (the unknown field is ignored)
+- `video:play` with `null` payload
+- `video:seek` with `{ "to": 42856 }` as payload (the unknown field is ignored)
 
 Response:
 
@@ -92,7 +92,7 @@ Apart from authentication and API path, there are the following differences:
     - `addr`: IP address (as string)
     - `ua`: user agent string
 - During input verification:
-    - All `event_types` are allowed (including `FETCH_FILE`)
+    - All `event_types` are allowed (including `fetch-file`)
     - The `timestamp` may be arbitrarily far in the past (i.e. `MAX_CLIENT_PUSH_DELAY` is not used)
 
 **Example**
@@ -113,7 +113,7 @@ await fetch("https://opencast.tld/basicstatistics/trustedPush", {
                 ua: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
                 itemType: "video",
                 itemId: "307c7327-d7e4-47b5-b01d-6779e2422f9f",
-                eventType: "file-fetch",
+                eventType: "fetch-file",
                 eventPayload: {
                     elem: "1f6cca9c-0d4c-4bad-ab82-53b6b0514508",
                     from: 0, 
@@ -131,20 +131,20 @@ The following events and their respective event data (payloads) are defined.
 If no payload is specified, the event data field must be null.
 Otherwise, the field must be a JSON object with the fields specified below.
 
-- `VIDEO_PLAY`: user has clicked "play" on a video to start watching. No payload. Note that this represents only the
+- `video:play`: user has clicked "play" on a video to start watching. No payload. Note that this represents only the
   first click on the play button. Further clicks are represented by resume. 
-- `VIDEO_PAUSE`: user has paused video playback. Payload:
+- `video:pause`: user has paused video playback. Payload:
     - `at` (`video_timestamp`): when the user paused
-- `VIDEO_RESUME`: user has resumed video playback. Payload:
+- `video:resume`: user has resumed video playback. Payload:
     - `at` (`video_timestamp`): where the user resumed playback
-- `VIDEO_SEEK`: user jumped to somewhere in the video. Payload:
+- `video:seek`: user jumped to somewhere in the video. Payload:
     - `to` (`video_timestamp`): time in the video that was jumped to
-- `VIDEO_WATCHED`: the user has fully watched part of the video.
+- `video:watched`: the user has fully watched part of the video.
   The event timestamp is the "end" time when the part has already been watched.
   Payload:
     - `from` (`video_timestamp`)
     - `to` (`video_timestamp`)
-- `FETCH_FILE`: a file was (partially) downloaded.
+- `fetch-file`: a file was (partially) downloaded.
   The event timestamp is the time when the first request was first received.
   Payload:
     - `elem` (string): (file) element ID, which is the path segment after the video ID.
@@ -165,9 +165,9 @@ Frontends should debounce video events to clean user behavior a bit.
 For example, for multiple seek operations in a short amount of time, reporting only the last one is likely a good call (imagine a user trying to jump far forward by pressing the +10s button many times).
 The same is true for pause/resume actions.
 
-To report the `VIDEO_WATCHED` action, frontends have to have their own small logic, and they should try to always report the largest possible range, or in other words: merge adjacent ranges.
-For example, instead of reporting one `VIDEO_WATCHED` event for every second watched, only one event for each consecutive section watched should be reported.
-Of course, we still want to report progress somewhat regularly (to avoid losing these events on page close), so `VIDEO_WATCHED` events of neighboring ranges will still end up in the DB.
+To report the `video:watched` action, frontends have to have their own small logic, and they should try to always report the largest possible range, or in other words: merge adjacent ranges.
+For example, instead of reporting one `video:watched` event for every second watched, only one event for each consecutive section watched should be reported.
+Of course, we still want to report progress somewhat regularly (to avoid losing these events on page close), so `video:watched` events of neighboring ranges will still end up in the DB.
 
 #### Notes for file servers
 Requests for consecutive byte ranges of the same file should be merged already, to reduce the number of events stored.
