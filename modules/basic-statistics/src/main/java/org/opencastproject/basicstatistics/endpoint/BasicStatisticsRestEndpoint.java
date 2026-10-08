@@ -164,9 +164,9 @@ public class BasicStatisticsRestEndpoint {
 
       ClientEventDto dto = new ClientEventDto();
       dto.setTimestamp(event.getTimestamp().toString());
-      dto.setItemType(event.getItemType().toString());
+      dto.setItemType(event.getItemType().getApiName());
       dto.setItemId(event.getItemId());
-      dto.setEventType(event.getEventType().toString());
+      dto.setEventType(event.getEventType().getApiName());
       dto.setEventPayload(event.getEventPayload());
 
       clientEvents.add(dto);
@@ -275,7 +275,8 @@ public class BasicStatisticsRestEndpoint {
         }
         // Additional Validation
         if (event.getEventType().equals(EventType.FETCH_FILE)) {
-          rejected.add(new RejectedEvent(index, "EventType 'FETCH_FILE' is disallowed on clientPush"));
+          rejected.add(new RejectedEvent(index,
+              "EventType '" + EventType.FETCH_FILE.getApiName() + "' is disallowed on clientPush"));
           continue;
         }
         if (event.getTimestamp().isBefore(now.minus(MAX_CLIENT_PUSH_DELAY))) {
@@ -409,19 +410,10 @@ public class BasicStatisticsRestEndpoint {
   }
 
   private RawEvent parseDto(ClientEventDto dto) throws IllegalArgumentException {
-    ItemType itemType;
-    try {
-      itemType = ItemType.valueOf(dto.getItemType());
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Unknown itemType '" + dto.getItemType() + "'");
-    }
-
-    EventType eventType;
-    try {
-      eventType = EventType.valueOf(dto.getEventType());
-    } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Unknown eventType '" + dto.getEventType() + "'");
-    }
+    ItemType itemType = ItemType.fromApiName(dto.getItemType())
+        .orElseThrow(() -> new IllegalArgumentException("Unknown itemType '" + dto.getItemType() + "'"));
+    EventType eventType = EventType.fromApiName(dto.getEventType())
+        .orElseThrow(() -> new IllegalArgumentException("Unknown eventType '" + dto.getEventType() + "'"));
 
     Instant timestamp;
     try {

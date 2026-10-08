@@ -10,6 +10,8 @@
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
     <class>org.opencastproject.basicstatistics.RawEvent</class>
     <class>org.opencastproject.basicstatistics.StatisticsVersion</class>
+    <class>org.opencastproject.basicstatistics.persistence.EventTypeConverter</class>
+    <class>org.opencastproject.basicstatistics.persistence.ItemTypeConverter</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />

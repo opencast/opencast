@@ -22,31 +22,26 @@ package org.opencastproject.basicstatistics.persistence;
 
 import org.opencastproject.basicstatistics.EventType;
 
-import java.util.stream.Stream;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
-public class EventTypeConverter implements AttributeConverter<EventType, String> {
+public class EventTypeConverter implements AttributeConverter<EventType, Short> {
 
   @Override
-  public String convertToDatabaseColumn(EventType type) {
+  public Short convertToDatabaseColumn(EventType type) {
     if (type == null) {
       return null;
     }
-    return type.getCode();
+    return type.getDbId();
   }
 
   @Override
-  public EventType convertToEntityAttribute(String code) {
-    if (code == null) {
+  public EventType convertToEntityAttribute(Short dbId) {
+    if (dbId == null) {
       return null;
     }
-
-    return Stream.of(EventType.values())
-        .filter(c -> c.getCode().equals(code))
-        .findFirst()
-        .orElseThrow(IllegalArgumentException::new);
+    return EventType.fromDbId(dbId)
+        .orElseThrow(() -> new IllegalArgumentException("Unknown event type database ID " + dbId));
   }
 }
