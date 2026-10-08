@@ -26,14 +26,14 @@ import com.google.gson.JsonSyntaxException;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -55,16 +55,10 @@ import javax.persistence.Transient;
 })
 public class RawEvent {
 
-  @PrePersist
-  public void generateId() {
-    if (this.id == null) {
-      this.id = UUID.randomUUID().toString();
-    }
-  }
-
   @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id")
-  private String id;
+  private long id;
 
   @Column(name = "organization", nullable = false, length = 128)
   private String organization;
@@ -100,9 +94,8 @@ public class RawEvent {
 
   }
 
-  public RawEvent(String id, String organization, Instant timestamp, String session, ItemType itemType, String itemId,
+  public RawEvent(String organization, Instant timestamp, String session, ItemType itemType, String itemId,
       EventType eventType, String eventPayload) {
-    this.id = id;
     this.organization = organization;
     this.timestamp = timestamp;
     this.session = session;
@@ -146,12 +139,8 @@ public class RawEvent {
     }
   }
 
-  public String getId() {
+  public long getId() {
     return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
   }
 
   public String getOrganization() {
