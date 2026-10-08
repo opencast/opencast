@@ -24,7 +24,6 @@ import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.basicstatistics.StatisticsVersion;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.osgi.service.component.ComponentContext;
@@ -59,9 +58,6 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   private DBSessionFactory dbSessionFactory;
   private DBSession db;
 
-  /** The security service */
-  protected SecurityService securityService;
-
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.basicstatistics)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -71,17 +67,6 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   @Reference
   public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
     this.dbSessionFactory = dbSessionFactory;
-  }
-
-  /**
-   * OSGi callback to set the security service.
-   *
-   * @param securityService
-   *          the securityService to set
-   */
-  @Reference(name = "security-service")
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   @Activate
@@ -97,17 +82,17 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
 
   /**
    * {@inheritDoc}
-   * @see BasicStatisticsDatabaseServiceImpl#getRawEvents(int, int, SortCriterion)
+   * @see BasicStatisticsDatabaseServiceImpl#getRawEvents(String, int, int, SortCriterion)
    */
   @Override
-  public List<RawEvent> getRawEvents(int limit, int offset, SortCriterion sortCriterion)
-          throws BasicStatisticsDatabaseException {
+  public List<RawEvent> getRawEvents(String organizationId, int limit, int offset,
+          SortCriterion sortCriterion) throws BasicStatisticsDatabaseException {
     try {
       return db.exec(em -> {
         var criteriaBuilder = em.getCriteriaBuilder();
         var criteriaQuery = criteriaBuilder.createQuery(RawEvent.class);
         var from = criteriaQuery.from(RawEvent.class);
-        criteriaQuery.select(from);
+        criteriaQuery.select(from).where(criteriaBuilder.equal(from.get("organization"), organizationId));
 
         if (sortCriterion.getOrder().equals(SortCriterion.Order.Ascending)) {
           criteriaQuery.orderBy(criteriaBuilder.asc(from.get(sortCriterion.getFieldName())));
