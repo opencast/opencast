@@ -155,7 +155,8 @@ public class BasicStatisticsService {
   public List<RawEvent> getRawEvents(int limit, int offset, SortCriterion sortCriterion)
           throws IllegalStateException {
     try {
-      List<RawEvent> events = persistence.getRawEvents(limit, offset, sortCriterion);
+      String organizationId = securityService.getOrganization().getId();
+      List<RawEvent> events = persistence.getRawEvents(organizationId, limit, offset, sortCriterion);
       return events;
     } catch (BasicStatisticsDatabaseException e) {
       throw new IllegalStateException("Could not get raw events from database", e);
