@@ -33,12 +33,13 @@ public interface BasicStatisticsDatabaseService {
 
   /**
    * Get several raw events based on their order in the database
+   * @param organizationId The ID of the organization whose raw events to return
    * @param limit Maximum amount of raw events to return
    * @param offset The index of the first result to return
    * @return a list of {@link RawEvent}s
    * @throws BasicStatisticsDatabaseException if there is a problem communicating with the underlying data store
    */
-  List<RawEvent> getRawEvents(int limit, int offset, SortCriterion sortCriterion)
+  List<RawEvent> getRawEvents(String organizationId, int limit, int offset, SortCriterion sortCriterion)
           throws BasicStatisticsDatabaseException;
 
   /**
