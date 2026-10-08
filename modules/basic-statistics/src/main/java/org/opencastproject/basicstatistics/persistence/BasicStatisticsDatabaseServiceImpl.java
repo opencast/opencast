@@ -40,9 +40,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 @Component(
     immediate = true,
@@ -107,10 +104,10 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
           throws BasicStatisticsDatabaseException {
     try {
       return db.exec(em -> {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<RawEvent> criteriaQuery = criteriaBuilder.createQuery(RawEvent.class);
-        Root<RawEvent> from = criteriaQuery.from(RawEvent.class);
-        CriteriaQuery<RawEvent> select = criteriaQuery.select(from);
+        var criteriaBuilder = em.getCriteriaBuilder();
+        var criteriaQuery = criteriaBuilder.createQuery(RawEvent.class);
+        var from = criteriaQuery.from(RawEvent.class);
+        criteriaQuery.select(from);
 
         if (sortCriterion.getOrder().equals(SortCriterion.Order.Ascending)) {
           criteriaQuery.orderBy(criteriaBuilder.asc(from.get(sortCriterion.getFieldName())));
@@ -118,7 +115,7 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
           criteriaQuery.orderBy(criteriaBuilder.desc(from.get(sortCriterion.getFieldName())));
         }
 
-        TypedQuery<RawEvent> allQuery = em.createQuery(select);
+        TypedQuery<RawEvent> allQuery = em.createQuery(criteriaQuery);
 
         allQuery.setMaxResults(limit);
         allQuery.setFirstResult(offset);
@@ -155,7 +152,7 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   public void ensureVersionRecorded() throws BasicStatisticsDatabaseException {
     try {
       db.execTx(em -> {
-        TypedQuery<StatisticsVersion> query = em.createNamedQuery("StatisticsVersion.findLatest",
+        var query = em.createNamedQuery("StatisticsVersion.findLatest",
             StatisticsVersion.class);
         query.setMaxResults(1);
         List<StatisticsVersion> latest = query.getResultList();
@@ -176,7 +173,7 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   public Instant getVersion1Timestamp() throws BasicStatisticsDatabaseException {
     try {
       return db.exec(em -> {
-        TypedQuery<StatisticsVersion> query = em.createNamedQuery("StatisticsVersion.findByVersion",
+        var query = em.createNamedQuery("StatisticsVersion.findByVersion",
             StatisticsVersion.class);
         query.setParameter("version", 1);
         List<StatisticsVersion> results = query.getResultList();
