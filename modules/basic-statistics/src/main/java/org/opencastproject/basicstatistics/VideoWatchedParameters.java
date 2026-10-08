@@ -21,22 +21,22 @@
 package org.opencastproject.basicstatistics;
 
 public class VideoWatchedParameters {
-  private long from;
-  private long to;
+  private Long from;
+  private Long to;
 
-  public long getFrom() {
+  public Long getFrom() {
     return from;
   }
 
-  public void setFrom(long from) {
+  public void setFrom(Long from) {
     this.from = from;
   }
 
-  public long getTo() {
+  public Long getTo() {
     return to;
   }
 
-  public void setTo(long to) {
+  public void setTo(Long to) {
     this.to = to;
   }
 }
