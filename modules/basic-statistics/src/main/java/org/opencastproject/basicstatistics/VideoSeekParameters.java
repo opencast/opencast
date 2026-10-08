@@ -21,13 +21,13 @@
 package org.opencastproject.basicstatistics;
 
 public class VideoSeekParameters {
-  private long to; // time in the video that was jumped to
+  private Long to; // time in the video that was jumped to
 
-  public long getTo() {
+  public Long getTo() {
     return to;
   }
 
-  public void setTo(long to) {
+  public void setTo(Long to) {
     this.to = to;
   }
 }

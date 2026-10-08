@@ -126,13 +126,22 @@ public class RawEvent {
           }
         }
         case VIDEO_PAUSE, VIDEO_RESUME -> {
-          gson.fromJson(eventPayload, VideoPauseParameters.class);
+          VideoPauseParameters payload = gson.fromJson(eventPayload, VideoPauseParameters.class);
+          if (payload.getAt() == null) {
+            return false;
+          }
         }
         case VIDEO_SEEK -> {
-          gson.fromJson(eventPayload, VideoSeekParameters.class);
+          VideoSeekParameters payload = gson.fromJson(eventPayload, VideoSeekParameters.class);
+          if (payload.getTo() == null) {
+            return false;
+          }
         }
         case VIDEO_WATCHED -> {
-          gson.fromJson(eventPayload, VideoWatchedParameters.class);
+          VideoWatchedParameters payload = gson.fromJson(eventPayload, VideoWatchedParameters.class);
+          if (payload.getFrom() == null || payload.getTo() == null) {
+            return false;
+          }
         }
         case FETCH_FILE -> {
           FetchFileParameters payload = gson.fromJson(eventPayload, FetchFileParameters.class);
