@@ -105,3 +105,30 @@ Finish Installation
 
 If you came here as part of an installation, please head back to the installation guide you used for notes on how to run
 Opencast as a service.
+
+
+Checking That Opencast Is Working
+----------------------------------
+
+Once Opencast is running, check that it answers and that the admin credentials from
+[Step 2](#step-2-setting-authentication-details) work:
+
+    curl -u admin:opencast https://your-server/info/me.json
+
+This should return information about the admin user. A connection error means Opencast either is not running yet or
+is not reachable at that address; an authentication error means the credentials are wrong.
+
+Next, check that all of Opencast's services actually started up correctly:
+
+    curl -u admin:opencast https://your-server/services/health.json
+
+This returns a count of services by state, e.g. `{"health":{"healthy":82,"warning":0,"error":0}}`. A non-zero
+`warning` or `error` count usually means a service failed to start. Find out which one by checking
+`https://your-server/services/services.json` for entries whose `service_state` is not `NORMAL`, then take a look at
+`data/log/opencast.log` for the reason.
+
+On a multi-node installation, run both checks against the admin node. Since all nodes share the same service
+registry, `health.json` reports on the state of the whole cluster, not just the admin node.
+
+Finally, log into the administration interface at `https://your-server/` with the same credentials to confirm that
+the frontend is being served correctly as well.
