@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.impl;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -54,6 +55,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.IncidentService;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -97,9 +99,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 public class IngestServiceImplTest {
@@ -128,6 +132,8 @@ public class IngestServiceImplTest {
 
   private static long workflowInstanceID = 1L;
   private ServiceRegistryInMemoryImpl serviceRegistry;
+  /** The failure reasons of all jobs that were updated to the status failed */
+  private final List<Job.FailureReason> failedJobReasons = new ArrayList<>();
 
   private MediaPackage ingestMediaPackage;
   private MediaPackage schedulerMediaPackage;
@@ -326,7 +332,15 @@ public class IngestServiceImplTest {
     service.setSchedulerService(schedulerService);
     service.setMediaInspectionService(mediaInspectionService);
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class)) {
+      @Override
+      public Job updateJob(Job job) throws NotFoundException, ServiceRegistryException {
+        if (Status.FAILED.equals(job.getStatus())) {
+          failedJobReasons.add(job.getFailureReason());
+        }
+        return super.updateJob(job);
+      }
+    };
     serviceRegistry.registerService(service);
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
@@ -751,6 +765,100 @@ public class IngestServiceImplTest {
     }
     Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
     Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+  }
+
+  @Test
+  public void testInterruptedUploadIsDataFailure() throws Exception {
+    useWorkingFileRepositoryReadingUploads();
+
+    try {
+      service.addTrack(brokenUpload(), "track.mp4", MediaPackageElements.PRESENTATION_SOURCE,
+              service.createMediaPackage());
+      Assert.fail("The interrupted upload should have failed");
+    } catch (IOException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testInterruptedUploadIsDataFailureForAllUploadMethods() throws Exception {
+    useWorkingFileRepositoryReadingUploads();
+
+    final MediaPackageElementFlavor flavor = MediaPackageElements.PRESENTATION_SOURCE;
+    final List<ThrowingUpload> uploads = List.of(
+            () -> service.addPartialTrack(brokenUpload(), "track.mp4", flavor, 0L, service.createMediaPackage()),
+            () -> service.addCatalog(brokenUpload(), "catalog.xml", flavor, service.createMediaPackage()),
+            () -> service.addAttachment(brokenUpload(), "attachment.txt", flavor, service.createMediaPackage()));
+    for (ThrowingUpload upload : uploads) {
+      try {
+        upload.run();
+        Assert.fail("The interrupted upload should have failed");
+      } catch (IOException e) {
+        // expected
+      }
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA, Job.FailureReason.DATA, Job.FailureReason.DATA),
+            failedJobReasons);
+  }
+
+  @Test
+  public void testInterruptedZipUploadIsDataFailure() throws Exception {
+    try {
+      service.addZippedMediaPackage(brokenUpload());
+      Assert.fail("The interrupted upload should have failed");
+    } catch (IngestException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testStorageFailureIsNoDataFailure() throws Exception {
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        IOUtils.toByteArray(in);
+        throw new IOException("No space left on device");
+      }
+    });
+
+    try {
+      service.addTrack(new ByteArrayInputStream("data".getBytes()), "track.mp4",
+              MediaPackageElements.PRESENTATION_SOURCE, service.createMediaPackage());
+      Assert.fail("The failing storage should have failed the ingest");
+    } catch (IOException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.NONE), failedJobReasons);
+  }
+
+  /** Makes the working file repository read all of an upload, like the real one does */
+  private void useWorkingFileRepositoryReadingUploads() {
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        IOUtils.toByteArray(in);
+        return urlTrack;
+      }
+    });
+  }
+
+  @FunctionalInterface
+  private interface ThrowingUpload {
+    void run() throws Exception;
+  }
+
+  /** An upload of which the client goes away half way through */
+  private static InputStream brokenUpload() {
+    return new InputStream() {
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Idle timeout expired: 30000/30000 ms");
+      }
+    };
   }
 
   private void testEpisodeUpdateNewAndExisting() throws Exception {
