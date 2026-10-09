@@ -137,15 +137,19 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   public void ensureVersionRecorded() throws BasicStatisticsDatabaseException {
     try {
       db.execTx(em -> {
-        if (!isVersionRecorded(em, StatisticsVersion.CURRENT_VERSION)) {
-          em.persist(new StatisticsVersion(StatisticsVersion.CURRENT_VERSION, Instant.now()));
+        List<StatisticsVersion> latest = findLatest(em);
+        if (latest.isEmpty()) {
+          em.persist(new StatisticsVersion(1, StatisticsVersion.CURRENT_VERSION, Instant.now()));
+        } else if (latest.get(0).getVersion() != StatisticsVersion.CURRENT_VERSION) {
+          em.persist(new StatisticsVersion(latest.get(0).getRevision() + 1, StatisticsVersion.CURRENT_VERSION,
+              Instant.now()));
         }
       });
     } catch (Exception e) {
-      // Another node may have recorded this version between our check and our insert. The unique constraint on the
-      // version rejects the second row, which is exactly the outcome we want.
+      // If another node appended its entry first, the unique revision rejected ours. That is fine as long as what it
+      // appended is the current version. Anything else (e.g. a node running a different version) is an error.
       try {
-        if (isCurrentVersionRecorded()) {
+        if (isLatestVersionCurrent()) {
           return;
         }
       } catch (RuntimeException recheckFailure) {
@@ -155,17 +159,17 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
     }
   }
 
-  private boolean isCurrentVersionRecorded() {
+  private boolean isLatestVersionCurrent() {
     return db.exec(em -> {
-      return isVersionRecorded(em, StatisticsVersion.CURRENT_VERSION);
+      List<StatisticsVersion> latest = findLatest(em);
+      return !latest.isEmpty() && latest.get(0).getVersion() == StatisticsVersion.CURRENT_VERSION;
     });
   }
 
-  private static boolean isVersionRecorded(EntityManager em, int version) {
-    var query = em.createNamedQuery("StatisticsVersion.findByVersion", StatisticsVersion.class);
-    query.setParameter("version", version);
+  private static List<StatisticsVersion> findLatest(EntityManager em) {
+    var query = em.createNamedQuery("StatisticsVersion.findLatest", StatisticsVersion.class);
     query.setMaxResults(1);
-    return !query.getResultList().isEmpty();
+    return query.getResultList();
   }
 
   /**
@@ -176,9 +180,9 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   public Instant getVersion1Timestamp() throws BasicStatisticsDatabaseException {
     try {
       return db.exec(em -> {
-        var query = em.createNamedQuery("StatisticsVersion.findByVersion",
-            StatisticsVersion.class);
+        var query = em.createNamedQuery("StatisticsVersion.findByVersion", StatisticsVersion.class);
         query.setParameter("version", 1);
+        query.setMaxResults(1);
         List<StatisticsVersion> results = query.getResultList();
         return results.isEmpty() ? null : results.get(0).getActivatedAt();
       });

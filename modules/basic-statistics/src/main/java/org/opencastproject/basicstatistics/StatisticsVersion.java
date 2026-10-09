@@ -33,19 +33,28 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 /**
- * Records when each version of the statistics system first became active. A new row is only ever appended when
- * the running code's version has not been recorded yet — existing rows are never modified. Versions only ever
- * increase, and each version is recorded at most once, which the database enforces with a unique constraint.
+ * Records when each version of the statistics system became active. A new row is only ever appended when the
+ * running code's version differs from the most recently recorded one — existing rows are never modified. A version
+ * can therefore be recorded more than once, e.g. after downgrading and upgrading again.
+ *
+ * The rows form a numbered chain: each row has a revision, one higher than its predecessor. The revision is unique,
+ * so if several nodes start at the same time and see the same history, the database lets only one of them append the
+ * next row. This avoids duplicate rows that are caused by nothing but timing.
  *
  * This lets callers determine a "data may be incomplete before this date" threshold: by default, the timestamp
  * of the version-1 row, i.e. when statistics tracking first existed at all.
  */
 @Entity(name = "StatisticsVersion")
-@Table(name = "oc_basic_statistics_version", uniqueConstraints = @UniqueConstraint(columnNames = "stat_version"))
+@Table(name = "oc_basic_statistics_version", uniqueConstraints = @UniqueConstraint(columnNames = "revision"))
 @NamedQueries({
     @NamedQuery(
+        name = "StatisticsVersion.findLatest",
+        query = "SELECT v FROM StatisticsVersion v ORDER BY v.revision DESC"
+    ),
+    @NamedQuery(
         name = "StatisticsVersion.findByVersion",
-        query = "SELECT v FROM StatisticsVersion v WHERE v.version = :version"
+        query = "SELECT v FROM StatisticsVersion v WHERE v.version = :version "
+            + "ORDER BY v.activatedAt ASC, v.revision ASC"
     ),
 })
 public class StatisticsVersion {
@@ -58,6 +67,10 @@ public class StatisticsVersion {
   @Column(name = "id")
   private long id;
 
+  /** Position of this row in the history, starting at 1. Unique, see the class documentation. */
+  @Column(name = "revision", nullable = false)
+  private long revision;
+
   /** Named "stat_version" rather than "version" since the latter could be a reserved word. */
   @Column(name = "stat_version", nullable = false)
   private int version;
@@ -68,13 +81,18 @@ public class StatisticsVersion {
   public StatisticsVersion() {
   }
 
-  public StatisticsVersion(int version, Instant activatedAt) {
+  public StatisticsVersion(long revision, int version, Instant activatedAt) {
+    this.revision = revision;
     this.version = version;
     this.activatedAt = activatedAt;
   }
 
   public long getId() {
     return id;
+  }
+
+  public long getRevision() {
+    return revision;
   }
 
   public int getVersion() {
