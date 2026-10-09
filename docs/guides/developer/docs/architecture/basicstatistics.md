@@ -75,7 +75,7 @@ Response:
     "rejected": [
         {
             "index": 1,
-            "error": "unknown event_type 'banana'"
+            "error": "Unknown eventType 'banana'"
         }
     ]
 }
@@ -93,7 +93,7 @@ Apart from authentication and API path, there are the following differences:
     - `addr`: IP address (as string)
     - `ua`: user agent string
 - During input verification:
-    - All `event_types` are allowed (including `fetch-file`)
+    - All event types are allowed (including `fetch-file`)
     - The `timestamp` may be arbitrarily far in the past (i.e. `MAX_CLIENT_PUSH_DELAY` is not used)
 
 **Example**
