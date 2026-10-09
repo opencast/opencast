@@ -12,6 +12,7 @@
     <class>org.opencastproject.basicstatistics.StatisticsVersion</class>
     <class>org.opencastproject.basicstatistics.persistence.EventTypeConverter</class>
     <class>org.opencastproject.basicstatistics.persistence.ItemTypeConverter</class>
+    <class>org.opencastproject.basicstatistics.persistence.InstantConverter</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />
