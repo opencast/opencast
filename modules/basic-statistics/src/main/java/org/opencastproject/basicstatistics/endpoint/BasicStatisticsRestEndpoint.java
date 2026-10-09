@@ -37,6 +37,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
@@ -167,7 +169,7 @@ public class BasicStatisticsRestEndpoint {
       dto.setItemType(event.getItemType().getApiName());
       dto.setItemId(event.getItemId());
       dto.setEventType(event.getEventType().getApiName());
-      dto.setEventPayload(event.getEventPayload());
+      dto.setEventPayload(event.getEventPayload() == null ? null : JsonParser.parseString(event.getEventPayload()));
 
       clientEvents.add(dto);
     }
@@ -429,9 +431,23 @@ public class BasicStatisticsRestEndpoint {
     event.setItemType(itemType);
     event.setItemId(dto.getItemId());
     event.setEventType(eventType);
-    event.setEventPayload(dto.getEventPayload());
+    event.setEventPayload(payloadToString(dto.getEventPayload()));
 
     return event;
+  }
+
+  /**
+   * @return the compact JSON text of the payload to store, or null if there is none
+   * @throws IllegalArgumentException if the payload is neither null nor a JSON object
+   */
+  private static String payloadToString(JsonElement payload) throws IllegalArgumentException {
+    if (payload == null || payload.isJsonNull()) {
+      return null;
+    }
+    if (!payload.isJsonObject()) {
+      throw new IllegalArgumentException("Event payload must be a JSON object or null");
+    }
+    return payload.toString();
   }
 
   private RejectedEvent validate(RawEvent event, int index, Instant now) {
