@@ -241,10 +241,6 @@ public class BasicStatisticsRestEndpoint {
 
       ClientPushRequest pushRequest = GSON.fromJson(json, ClientPushRequest.class);
 
-      for (ClientEventDto event : pushRequest.getEvents()) {
-        logger.info(event.getTimestamp().toString());
-      }
-
       List<RawEvent> accepted = new ArrayList<>();
       List<RejectedEvent> rejected = new ArrayList<>();
       Instant now = Instant.now();
@@ -339,10 +335,6 @@ public class BasicStatisticsRestEndpoint {
 
       TrustedPushRequest pushRequest = GSON.fromJson(json, TrustedPushRequest.class);
 
-      for (TrustedEventDto event : pushRequest.getEvents()) {
-        logger.info(event.getTimestamp().toString());
-      }
-
       List<RawEvent> accepted = new ArrayList<>();
       List<RejectedEvent> rejected = new ArrayList<>();
       Instant now = Instant.now();
@@ -418,6 +410,9 @@ public class BasicStatisticsRestEndpoint {
     EventType eventType = EventType.fromApiName(dto.getEventType())
         .orElseThrow(() -> new IllegalArgumentException("Unknown eventType '" + dto.getEventType() + "'"));
 
+    if (dto.getTimestamp() == null) {
+      throw new IllegalArgumentException("Timestamp was not specified");
+    }
     Instant timestamp;
     try {
       timestamp = Instant.parse(dto.getTimestamp());
