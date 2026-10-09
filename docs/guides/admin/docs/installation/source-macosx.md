@@ -129,3 +129,5 @@ You can start Opencast using the start-opencast script:
 
 As soon as Opencast is completely started, browse to [localhost:8080](http://localhost:8080) to get to the
 administration interface.
+
+Opencast does not provide a service definition for macOS, so it has to be started manually as described here.
