@@ -1,0 +1,21 @@
+meta {
+  name: get_api_info_me
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/info/me
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.username: eq admin
+  res.body.userrole: isDefined
+  res.body.provider: isString
+  res.body.name : isString
+  res.body.username: isString
+  res.body.email: isString
+}

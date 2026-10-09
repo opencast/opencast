@@ -1,0 +1,27 @@
+meta {
+  name: get_list_provider_by_source
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/listproviders/LANGUAGES.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("List provider by source key-value properties should be strings", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      for (const key in body) {
+        expect(body[key]).to.be.a('string');
+      }
+    }
+  });
+}

@@ -1,0 +1,15 @@
+meta {
+  name: get_series_invalid_id
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/api/series/non-existent-series-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

@@ -1,0 +1,19 @@
+meta {
+  name: post_statistics_csv_invalid
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/statistics/data/export.csv
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  data: malformed_export_json
+}
+
+assert {
+  res.status: eq 400
+}

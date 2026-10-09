@@ -1,0 +1,23 @@
+meta {
+  name: delete_series_metadata
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/api/series/:seriesId/metadata?type=dublincore/series
+  body: none
+  auth: inherit
+}
+
+params:query {
+  type: dublincore/series
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+assert {
+  res.status: eq 403
+}

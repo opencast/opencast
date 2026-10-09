@@ -1,0 +1,23 @@
+meta {
+  name: put_series_metadata_invalid
+  type: http
+  seq: 13
+}
+
+put {
+  url: {{baseUrl}}/api/series/:seriesId/metadata?type=dublincore/series
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+body:form-urlencoded {
+  metadata: malformed_metadata_json
+}
+
+assert {
+  res.status: eq 400
+}

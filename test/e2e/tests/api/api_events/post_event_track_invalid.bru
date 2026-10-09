@@ -1,0 +1,23 @@
+meta {
+  name: post_event_track_invalid
+  type: http
+  seq: 22
+}
+
+post {
+  url: {{baseUrl}}/api/events/:eventId/track
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:multipart-form {
+  flavor: not_a_valid_flavor
+}
+
+assert {
+  res.status: eq 400
+}

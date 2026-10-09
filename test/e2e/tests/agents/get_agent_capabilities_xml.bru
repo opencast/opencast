@@ -1,0 +1,24 @@
+meta {
+  name: get_agent_capabilities_xml
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/agents/test-agent-bruno/capabilities.xml
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get capture agent capabilities XML should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.match(/<(ns2:)?properties-response/);
+    expect(body).to.include("capture.device.names");
+  });
+}

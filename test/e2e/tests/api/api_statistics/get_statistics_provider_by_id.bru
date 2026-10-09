@@ -1,0 +1,27 @@
+meta {
+  name: get_statistics_provider_by_id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/statistics/providers/:providerId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  providerId: influxdb-episode-views-provider
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Statistics provider should not be found without a configured statistics backend", function() {
+    // develop.opencast.org has no statistics providers (InfluxDB) configured,
+    // so requesting a provider by ID deterministically returns 404.
+    expect(res.status).to.equal(404);
+  });
+}

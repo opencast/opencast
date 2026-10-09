@@ -1,0 +1,19 @@
+meta {
+  name: delete_event_metadata
+  type: http
+  seq: 19
+}
+
+delete {
+  url: {{baseUrl}}/api/events/:eventId/metadata?type=dublincore/episode
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: eq 403
+}
