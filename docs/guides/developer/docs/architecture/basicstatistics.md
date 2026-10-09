@@ -84,7 +84,8 @@ Response:
 `POST /basicstatistics/trustedPush`
 ----------------------------
 This is intended for servers/nodes that Opencast trust, like octoka (which delivers files). 
-Authentication is required.
+Authentication is required, and the user must have the role `ROLE_BASIC_STATISTICS_TRUSTED_PUSH`.
+To set this up, create a dedicated user with that role and give its credentials to the trusted application.
 
 This endpoint is very similar to the "Client Push" endpoint.
 Apart from authentication and API path, there are the following differences:

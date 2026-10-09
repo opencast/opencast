@@ -393,7 +393,7 @@
 
     <!-- Enable access to basic statistics -->
     <sec:intercept-url pattern="/basicstatistics/clientPush" method="POST" access="permitAll" />
-    <sec:intercept-url pattern="/basicstatistics/trustedPush" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+    <sec:intercept-url pattern="/basicstatistics/trustedPush" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_BASIC_STATISTICS_TRUSTED_PUSH')" />
 
     <!-- Enable access to the redirect routes -->
     <sec:intercept-url pattern="/redirect/**" access="permitAll" />
