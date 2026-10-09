@@ -24,6 +24,7 @@ package org.opencastproject.workflow.handler.videoeditor;
 import static java.lang.String.format;
 
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -548,9 +549,11 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     try {
       logger.info("Create processing jobs for SMIL file: {}", smilCatalogs[0].getIdentifier());
       jobs = videoEditorService.processSmil(smil);
-      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+      JobBarrier.Result result = waitForStatus(jobs.toArray(new Job[jobs.size()]));
+      if (!result.isSuccess()) {
         throw new WorkflowOperationException(
-                format("Processing SMIL file failed: %s", smilCatalogs[0].getIdentifier()));
+                format("Processing SMIL file failed: %s. %s", smilCatalogs[0].getIdentifier(),
+                        describeFailedJobs(result)));
       }
       logger.info("Finished processing of SMIL file: {}", smilCatalogs[0].getIdentifier());
     } catch (ProcessFailedException ex) {
