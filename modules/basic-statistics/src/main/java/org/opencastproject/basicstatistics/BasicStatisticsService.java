@@ -219,7 +219,7 @@ public class BasicStatisticsService {
   }
 
   /**
-   * The session hash is defined as HMAC_SHA256(daily_secret, item_id || IP || UA) where:
+   * The session hash is defined as HMAC_SHA256(dailySecret, itemId || IP || UA) where:
    * @param dailySecret is a random secret, rotated/regenerated daily
    * @param itemId is the ID of the item the event involves (e.g. video UUID)
    * @param ip is the IP address of the user
