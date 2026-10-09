@@ -21,13 +21,15 @@
 
 package org.opencastproject.basicstatistics.endpoint;
 
+import com.google.gson.JsonElement;
+
 public class ClientEventDto {
 
   private String timestamp;
   private String itemType;
   private String itemId;
   private String eventType;
-  private String eventPayload;
+  private JsonElement eventPayload;
 
   public ClientEventDto() {
   }
@@ -64,11 +66,11 @@ public class ClientEventDto {
     this.eventType = eventType;
   }
 
-  public String getEventPayload() {
+  public JsonElement getEventPayload() {
     return eventPayload;
   }
 
-  public void setEventPayload(String eventPayload) {
+  public void setEventPayload(JsonElement eventPayload) {
     this.eventPayload = eventPayload;
   }
 }
