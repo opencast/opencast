@@ -43,11 +43,13 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -99,42 +101,69 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
     List<String> sourceTags = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
 
-    AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector;
+    AbstractMediaPackageElementSelector<MediaPackageElement> videoSelector;
 
     if (sourceTags == null && sourceFlavors == null) {
       logger.warn("No tags or flavor have been specified");
       return createResult(mediaPackage, Action.CONTINUE);
     }
-    elementSelector = new SimpleElementSelector();
+    videoSelector = new SimpleElementSelector();
 
     if (!sourceFlavors.isEmpty()) {
       for (MediaPackageElementFlavor flavor : sourceFlavors) {
-        elementSelector.addFlavor(flavor);
+        videoSelector.addFlavor(flavor);
       }
     }
     if (!sourceTags.isEmpty()) {
       for (String tag : sourceTags) {
-        elementSelector.addTag(tag);
+        videoSelector.addTag(tag);
       }
+    }
+
+    // Caption configuration
+    List<String> captionTags = asList(StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration("caption-tags")));
+    List<MediaPackageElementFlavor> captionFlavors = new ArrayList<>();
+    List<String> captionFlavorStrings = asList(StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration("caption-flavors")));
+    for (String flavorString : captionFlavorStrings) {
+      try {
+        captionFlavors.add(MediaPackageElementFlavor.parseFlavor(flavorString));
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException(flavorString + " is not a valid flavor!");
+      }
+    }
+    AbstractMediaPackageElementSelector<MediaPackageElement> captionSelector = new SimpleElementSelector();
+    for (MediaPackageElementFlavor flavor : captionFlavors) {
+      captionSelector.addFlavor(flavor);
+    }
+    for (String tag : captionTags) {
+      captionSelector.addTag(tag);
     }
 
     try {
       // Look for elements matching the tag
-      final Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, true);
-      if (elements.size() > 1) {
+      final Collection<MediaPackageElement> videoElements = videoSelector.select(mediaPackage, true);
+      if (videoElements.size() > 1) {
         throw new WorkflowOperationException("More than one element has been found for publishing to youtube: "
-            + elements);
+            + videoElements);
       }
 
-      if (elements.size() < 1) {
+      if (videoElements.size() < 1) {
         logger.info("No mediapackage element was found for publishing");
         return createResult(mediaPackage, Action.SKIP);
       }
 
+      Collection<MediaPackageElement> captionElements = captionSelector.select(mediaPackage, true);
+
       Job youtubeJob;
       try {
-        Track track = mediaPackage.getTrack(elements.iterator().next().getIdentifier());
-        youtubeJob = publicationService.publish(mediaPackage, track);
+        Track video = mediaPackage.getTrack(videoElements.iterator().next().getIdentifier());
+        List<Track> captions = new ArrayList<>();
+        for (MediaPackageElement caption : captionElements) {
+          captions.add(mediaPackage.getTrack(caption.getIdentifier()));
+        }
+        youtubeJob = publicationService.publish(mediaPackage, video, captions);
       } catch (PublicationException e) {
         throw new WorkflowOperationException(e);
       }
