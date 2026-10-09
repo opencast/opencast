@@ -190,13 +190,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementId, true);
   }
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
@@ -204,7 +204,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
@@ -215,7 +215,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       Set<String> elementIds,
       boolean checkAvailability,
       boolean preserveReference
-  ) throws DistributionException, MediaPackageException {
+  ) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -538,54 +538,47 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distributeSync(channelId, mediapackage, elementIds, true, false);
   }
 
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
+  }
+
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
+                                                  boolean checkAvailability)
+          throws DistributionException {
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
+  }
+
   public List<MediaPackageElement> distributeSync(
-          String channelId,
-          MediaPackage mediapackage,
-          Set<String> elementIds,
-          boolean checkAvailability,
-          boolean preserveReference
-  ) throws DistributionException, MediaPackageException {
+      String channelId,
+      MediaPackage mediapackage,
+      Set<String> elementIds,
+      boolean checkAvailability,
+      boolean preserveReference
+  ) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
     MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
-            checkAvailability, preserveReference);
+        checkAvailability, preserveReference);
     return Arrays.asList(distributedElements);
   }
 
   @Override
-  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
-                                                  boolean checkAvailability) throws DistributionException {
-    Job job = null;
-    try {
-      job = serviceRegistry
-          .createJob(
-              JOB_TYPE, Operation.Distribute.toString(), null, null, false, distributeJobLoad);
-      job.setStatus(Job.Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      final MediaPackageElement[] mediaPackageElements
-          = this.distributeElements(channelId, mediapackage, elementIds, checkAvailability);
-      job.setStatus(Job.Status.FINISHED);
-      return Arrays.asList(mediaPackageElements);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException(e);
-    } catch (NotFoundException e) {
-      throw new DistributionException("Unable to update distribution job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
-  }
-
-  @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet();
     elementIds.add(elementId);
     return retractSync(channelId, mediapackage, elementIds);
@@ -611,7 +604,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the mediapackage
    * @param elementIds
    *          the element identifiers
-   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @return the retracted elements
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
@@ -642,7 +635,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the mediapackage
    * @param element
    *          the element
-   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @return the retracted element
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */

@@ -31,7 +31,6 @@ import org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
@@ -154,6 +153,14 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability) throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability);
+  }
+
+  @Override
   public List<MediaPackageElement>  distributeSync(String channelId, MediaPackage mediaPackage, String elementId)
           throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
@@ -205,7 +212,7 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
 
   @Override
   public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
-      boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+      boolean checkAvailability, boolean preserveReference) throws DistributionException {
     throw new UnsupportedOperationException("Not supported yet.");
   //stub function
   }

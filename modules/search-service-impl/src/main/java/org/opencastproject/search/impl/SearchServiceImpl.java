@@ -188,7 +188,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   @Override
-  public Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId) {
+  public Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId) throws SearchException {
     try {
       return persistence.getSeries(seriesId);
     } catch (SearchServiceDatabaseException e) {
@@ -229,7 +229,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   @Override
-  public MediaPackage get(String mediaPackageId) throws NotFoundException, UnauthorizedException {
+  public MediaPackage get(String mediaPackageId) throws NotFoundException, UnauthorizedException, SearchException {
     try {
       return persistence.getMediaPackage(mediaPackageId);
     } catch (SearchServiceDatabaseException e) {
