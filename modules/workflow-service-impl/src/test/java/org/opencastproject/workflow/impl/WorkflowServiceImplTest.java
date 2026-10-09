@@ -664,7 +664,7 @@ public class WorkflowServiceImplTest {
     service.remove(wi1.getId());
     assertEquals(2, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
 
     service.remove(wi2.getId(), false);
@@ -698,7 +698,7 @@ public class WorkflowServiceImplTest {
     service.remove(wi1.getId());
     assertEquals(0, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
   }
 
@@ -722,7 +722,7 @@ public class WorkflowServiceImplTest {
     service.cleanupWorkflowInstances(0, WorkflowState.SUCCEEDED);
     assertEquals(0, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
   }
 
