@@ -773,6 +773,12 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       try {
         searchResponse = getClient().search(request, RequestOptions.DEFAULT);
       } catch (OpenSearchStatusException e) {
+        if (e.status() == RestStatus.BAD_REQUEST) {
+          logger.warn("Could not query documents from index {} because of a bad request: {}", getIndexName(),
+                  e.getMessage());
+          throw e;
+        }
+
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
