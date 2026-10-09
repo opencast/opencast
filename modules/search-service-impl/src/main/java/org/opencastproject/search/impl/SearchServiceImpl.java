@@ -21,7 +21,6 @@
 
 package org.opencastproject.search.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -404,7 +403,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public boolean verifyUrlAccess(final String path) {
     // Always allow access for admin
     final User user = securityService.getUser();
-    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    if (SecurityUtil.isGlobalAdmin(user)) {
       logger.debug("Allow access for admin `{}`", user);
       return true;
     }
