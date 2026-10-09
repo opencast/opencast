@@ -33,15 +33,61 @@ import org.opencastproject.util.data.Tuple;
 public interface AuthorizationService {
 
   /**
-   * Determines whether the current user can take the specified action on the media package.
+   * {@code user} defaults to the current user returned by the security service.
+   * {@code org} defaults to the current organization returned by the security service.
+   *
+   * @see AuthorizationService#hasPermission(MediaPackage, User, Organization, String)
+   */
+  boolean hasPermission(MediaPackage mp, String action);
+
+  /**
+   * {@code user} defaults to the current user returned by the security service.
+   * {@code org} defaults to the current organization returned by the security service.
+   *
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String)
+   */
+  boolean hasPermission(AccessControlList acl, String action);
+
+  /**
+   * {@code entityBelongsToOrg} defaults to true.
+   *
+   * @see AuthorizationService#hasPermission(MediaPackage, User, Organization, String)
+   */
+  boolean hasPermission(MediaPackage mp, User user, Organization org, String action);
+
+  /**
+   * {@code entityBelongsToOrg} defaults to true.
+   *
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String)
+   */
+  boolean hasPermission(AccessControlList acl, User user, Organization org, String action);
+
+  /**
+   * {@code entityBelongsToOrg} defaults to true.
+   * If you pass a mediapackage, the authorization service has to get the active ACL of the mediapackage. If you
+   * already have that ACL, calling this method might be slightly more performant.
+   *
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String, String)
+   */
+  boolean hasPermissionPerformance(AccessControlList acl, User user, Organization org, String action,
+      String mediaPackageId);
+
+  /**
+   * Determines whether the user can take the specified action on the media package.
    *
    * @param mp
    *          the media package
+   * @param user
+   *          the current user
+   * @param org
+   *          the current organization
    * @param action
    *          the action (e.g. read, modify, delete)
+   * @param entityOrgId
+   *          organization id of the mediapackage. If not the same organization as "org", permission will be denied
    * @return whether the current user has the correct privileges to take this action
    */
-  boolean hasPermission(MediaPackage mp, String action);
+  boolean hasPermission(MediaPackage mp, User user, Organization org, String action, String entityOrgId);
 
   /**
    * Determines whether the current user can take the specified action given the access control list.
@@ -50,11 +96,17 @@ public interface AuthorizationService {
    *
    * @param acl
    *          the access control list
+   * @param user
+   *          the current user
+   * @param org
+   *          the current organization
    * @param action
    *          the action (e.g. read, modify, delete)
+   * @param entityOrgId
+   *          organization id of the entity. If not the same organization as "org", permission will be denied
    * @return whether the current user has the correct privileges to take this action
    */
-  boolean hasPermission(AccessControlList acl, String action);
+  boolean hasPermission(AccessControlList acl, User user, Organization org, String action, String entityOrgId);
 
   /**
    * Gets the active access control list associated with the given media package, as specified by its XACML
