@@ -83,8 +83,8 @@ public class RawEvent {
   @Column(name = "event_type", nullable = false)
   private EventType eventType;
 
-  /** an arbitrary JSON payload that depends on the event type */
-  @Column(name = "event_payload", nullable = false, columnDefinition = "TEXT")
+  /** a JSON payload that depends on the event type, null for events without one */
+  @Column(name = "event_payload", columnDefinition = "TEXT")
   private String eventPayload;
 
   @Transient
