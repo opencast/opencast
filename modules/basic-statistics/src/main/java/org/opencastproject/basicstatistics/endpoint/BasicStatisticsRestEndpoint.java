@@ -310,7 +310,8 @@ public class BasicStatisticsRestEndpoint {
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(
       name = "trustedPush",
-      description = "Authenticated request for servers/nodes i.e. octoka",
+      description = "Authenticated request for servers/nodes i.e. octoka. "
+          + "Requires a special role, see the security config.",
       responses = {
           @RestResponse(
               responseCode = HttpServletResponse.SC_OK,
