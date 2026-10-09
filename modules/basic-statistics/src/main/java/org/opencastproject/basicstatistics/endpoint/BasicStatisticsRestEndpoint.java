@@ -165,7 +165,7 @@ public class BasicStatisticsRestEndpoint {
     for (RawEvent event : allEvents) {
 
       ClientEventDto dto = new ClientEventDto();
-      dto.setTimestamp(event.getTimestamp().toString());
+      dto.setTimestamp(formatTimestamp(event.getTimestamp()));
       dto.setItemType(event.getItemType().getApiName());
       dto.setItemId(event.getItemId());
       dto.setEventType(event.getEventType().getApiName());
@@ -429,6 +429,18 @@ public class BasicStatisticsRestEndpoint {
     event.setEventPayload(payloadToString(dto.getEventPayload()));
 
     return event;
+  }
+
+  /**
+   * Format a timestamp as RFC 3339 date-time for the API.
+   *
+   * {@link Instant#toString()} is documented as ISO-8601, which is more permissive than RFC 3339, but the format it
+   * produces for an instant is within RFC 3339: always UTC with the designator "Z", and fractional seconds in groups
+   * of three digits or omitted. The only deviation are years outside 0000 to 9999, which are printed with a sign or
+   * more than four digits. Events are not expected to have such timestamps.
+   */
+  private static String formatTimestamp(Instant timestamp) {
+    return timestamp.toString();
   }
 
   /**
