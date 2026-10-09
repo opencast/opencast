@@ -308,8 +308,10 @@ public class YouTubeV3PublicationServiceImpl
           .orElse(null);
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
-      final VideoUpload.License license = ccLicenses.map(
-          p -> p.matcher(c.getEpisodeLicense()).matches()).orElse(false)
+      final String episodeLicense = c.getEpisodeLicense();
+      final boolean isCreativeCommons = episodeLicense != null
+          && ccLicenses.map(pattern -> pattern.matcher(episodeLicense).matches()).orElse(false);
+      final VideoUpload.License license = isCreativeCommons
           ? VideoUpload.License.creativeCommon
           : VideoUpload.License.youtube;
       final VideoUpload videoUpload = new VideoUpload(
