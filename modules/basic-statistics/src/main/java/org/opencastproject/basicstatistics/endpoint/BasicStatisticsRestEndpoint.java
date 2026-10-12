@@ -289,7 +289,7 @@ public class BasicStatisticsRestEndpoint {
         }
 
         // Calculate/Add session hash
-        String sessionHash = basicStatisticsService.generateSessionHash(dailySecret, dto.getItemId(), ip, userAgent);
+        long sessionHash = basicStatisticsService.generateSessionHash(dailySecret, dto.getItemId(), ip, userAgent);
         event.setSession(sessionHash);
 
         accepted.add(event);
@@ -392,7 +392,7 @@ public class BasicStatisticsRestEndpoint {
         }
 
         // Calculate/Add session hash
-        String sessionHash = basicStatisticsService.generateSessionHash(
+        long sessionHash = basicStatisticsService.generateSessionHash(
             dailySecret,
             dto.getItemId(),
             ip,
