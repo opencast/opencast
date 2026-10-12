@@ -294,7 +294,7 @@ public class BasicStatisticsRestEndpoint {
 
       basicStatisticsService.create(accepted);
 
-      ClientPushResponse response = new ClientPushResponse(accepted.size(), rejected);
+      PushResponse response = new PushResponse(accepted.size(), rejected);
 
       return Response.ok(GSON.toJson(response), MediaType.APPLICATION_JSON).build();
 
@@ -400,7 +400,7 @@ public class BasicStatisticsRestEndpoint {
 
       basicStatisticsService.create(accepted);
 
-      ClientPushResponse response = new ClientPushResponse(accepted.size(), rejected);
+      PushResponse response = new PushResponse(accepted.size(), rejected);
 
       return Response.ok(GSON.toJson(response), MediaType.APPLICATION_JSON).build();
     } catch (JsonSyntaxException e) {
