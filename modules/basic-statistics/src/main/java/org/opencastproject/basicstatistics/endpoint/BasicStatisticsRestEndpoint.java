@@ -480,7 +480,7 @@ public class BasicStatisticsRestEndpoint {
   }
 
   private RejectedEvent validate(RawEvent event, int index, Instant now) {
-    if (event.getItemId() == null) {
+    if (StringUtils.isBlank(event.getItemId())) {
       return new RejectedEvent(index, "Item id was not specified");
     }
     try {
