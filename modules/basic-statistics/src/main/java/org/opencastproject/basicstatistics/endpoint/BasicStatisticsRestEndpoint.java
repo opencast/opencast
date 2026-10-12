@@ -183,7 +183,7 @@ public class BasicStatisticsRestEndpoint {
   @POST
   @Path("clientPush")
   @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "clientPush",
       description = "Unauthenticated request for clients, i.e. user browers",
@@ -223,6 +223,7 @@ public class BasicStatisticsRestEndpoint {
       ip = InetAddress.getByName(ipString);
     } catch (UnknownHostException e) {
       return Response.status(Response.Status.BAD_REQUEST)
+          .type(MediaType.TEXT_PLAIN)
           .entity("no IP address for the host could be found")
           .build();
     }
@@ -231,6 +232,7 @@ public class BasicStatisticsRestEndpoint {
     String userAgent = request.getHeader("User-Agent");
     if (userAgent == null) {
       return Response.status(Response.Status.BAD_REQUEST)
+          .type(MediaType.TEXT_PLAIN)
           .entity("Could not find User-Agent header")
           .build();
     }
@@ -249,6 +251,7 @@ public class BasicStatisticsRestEndpoint {
         dailySecret = secretService.getCurrentSecret();
       } catch (BasicStatisticsSecretServiceException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .type(MediaType.TEXT_PLAIN)
             .entity(e.getMessage())
             .build();
       }
@@ -297,6 +300,7 @@ public class BasicStatisticsRestEndpoint {
 
     } catch (JsonSyntaxException e) {
       return Response.status(Response.Status.BAD_REQUEST)
+          .type(MediaType.TEXT_PLAIN)
           .entity(e.getMessage())
           .build();
     }
@@ -305,7 +309,7 @@ public class BasicStatisticsRestEndpoint {
   @POST
   @Path("trustedPush")
   @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "trustedPush",
       description = "Authenticated request for servers/nodes i.e. octoka. "
@@ -343,6 +347,7 @@ public class BasicStatisticsRestEndpoint {
         dailySecret = secretService.getCurrentSecret();
       } catch (BasicStatisticsSecretServiceException e) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .type(MediaType.TEXT_PLAIN)
             .entity(e.getMessage())
             .build();
       }
@@ -364,6 +369,7 @@ public class BasicStatisticsRestEndpoint {
           ip = InetAddress.getByName(dto.getAddr());
         } catch (UnknownHostException e) {
           return Response.status(Response.Status.BAD_REQUEST)
+              .type(MediaType.TEXT_PLAIN)
               .entity("no IP address for the host could be found")
               .build();
         }
@@ -399,6 +405,7 @@ public class BasicStatisticsRestEndpoint {
       return Response.ok(GSON.toJson(response), MediaType.APPLICATION_JSON).build();
     } catch (JsonSyntaxException e) {
       return Response.status(Response.Status.BAD_REQUEST)
+          .type(MediaType.TEXT_PLAIN)
           .entity(e.getMessage())
           .build();
     }
