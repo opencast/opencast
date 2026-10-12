@@ -22,6 +22,7 @@
 package org.opencastproject.basicstatistics;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import java.time.Instant;
@@ -88,7 +89,7 @@ public class RawEvent {
   private String eventPayload;
 
   @Transient
-  private static final Gson gson = new Gson();
+  private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
   public RawEvent() {
 
@@ -103,6 +104,17 @@ public class RawEvent {
     this.itemId = itemId;
     this.eventType = eventType;
     this.eventPayload = eventPayload;
+  }
+
+  /**
+   * Serialize a payload for storing it in an event. The result only contains the fields of the payload, not anything
+   * else that was in the data it was parsed from.
+   *
+   * @param payload the payload, may be null if the event has none
+   * @return the JSON text of the payload, or null if there is none
+   */
+  public static String serializePayload(EventPayload payload) {
+    return payload == null ? null : gson.toJson(payload);
   }
 
   /**

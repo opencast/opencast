@@ -31,8 +31,6 @@ import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeTypes;
 
-import com.google.gson.Gson;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -108,8 +106,6 @@ public class StaticResourceServlet extends HttpServlet {
   private SecurityService securityService = null;
 
   private List<StaticFileAuthorization> authorizations = new ArrayList<>();
-
-  private static final Gson GSON = new Gson();
 
   private BasicStatisticsService statisticsService;
 
@@ -632,7 +628,7 @@ public class StaticResourceServlet extends HttpServlet {
       event.setItemType(ItemType.VIDEO);
       event.setItemId(mediaPackageId);
       event.setEventType(EventType.FETCH_FILE);
-      event.setEventPayload(GSON.toJson(payload));
+      event.setEventPayload(RawEvent.serializePayload(payload));
 
       statisticsService.recordFileFetched(event, request);
     } catch (Exception | InternalError e) {
