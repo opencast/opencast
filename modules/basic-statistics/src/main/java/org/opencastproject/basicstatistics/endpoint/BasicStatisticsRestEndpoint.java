@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 
 import org.opencastproject.basicstatistics.BasicStatisticsService;
+import org.opencastproject.basicstatistics.EventPayload;
 import org.opencastproject.basicstatistics.EventType;
 import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.RawEvent;
@@ -433,12 +434,21 @@ public class BasicStatisticsRestEndpoint {
           + "Expected RFC3339 format, e.g. 2026-04-27T14:56:38.415Z.");
     }
 
+    // Parse the payload into its type, and store that, so that unknown fields from the request are not stored
+    String payloadJson = payloadToString(dto.getEventPayload());
+    EventPayload payload;
+    try {
+      payload = RawEvent.parsePayload(eventType, payloadJson).orElse(null);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Event payload is malformed: " + e.getMessage());
+    }
+
     RawEvent event = new RawEvent();
     event.setTimestamp(timestamp);
     event.setItemType(itemType);
     event.setItemId(dto.getItemId());
     event.setEventType(eventType);
-    event.setEventPayload(payloadToString(dto.getEventPayload()));
+    event.setEventPayload(RawEvent.serializePayload(payload));
 
     return event;
   }
@@ -485,11 +495,6 @@ public class BasicStatisticsRestEndpoint {
   private RejectedEvent validate(RawEvent event, int index, Instant now) {
     if (StringUtils.isBlank(event.getItemId())) {
       return new RejectedEvent(index, "Item id was not specified");
-    }
-    try {
-      RawEvent.parsePayload(event.getEventType(), event.getEventPayload());
-    } catch (IllegalArgumentException e) {
-      return new RejectedEvent(index, "Event payload is malformed: " + e.getMessage());
     }
     if (event.getTimestamp().isAfter(now.plus(ALLOWED_CLOCK_SKEW))) {
       return new RejectedEvent(index, "Timestamp is too far in the future.");
