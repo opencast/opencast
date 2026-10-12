@@ -211,6 +211,9 @@ public class BasicStatisticsRestEndpoint {
     // Parse client IP
     InetAddress ip;
     String ipString;
+    // Behind a reverse proxy, the connection comes from the proxy, so the client address is taken from the
+    // X-Forwarded-For header. The IP is only used for the session has so even should the client forge it that causes
+    // no real harm.
     if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {
       logger.trace("Found '{}' header for client IP '{}'", X_FORWARDED_FOR, request.getHeader(X_FORWARDED_FOR));
       ipString = request.getHeader(X_FORWARDED_FOR);
