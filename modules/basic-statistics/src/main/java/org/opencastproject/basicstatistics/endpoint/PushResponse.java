@@ -23,12 +23,12 @@ package org.opencastproject.basicstatistics.endpoint;
 
 import java.util.List;
 
-public class ClientPushResponse {
+public class PushResponse {
 
   private int accepted;
   private List<RejectedEvent> rejected;
 
-  public ClientPushResponse(int accepted, List<RejectedEvent> rejected) {
+  public PushResponse(int accepted, List<RejectedEvent> rejected) {
     this.accepted = accepted;
     this.rejected = rejected;
   }
