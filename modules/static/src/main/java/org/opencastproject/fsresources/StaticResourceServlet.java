@@ -51,7 +51,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -636,7 +635,7 @@ public class StaticResourceServlet extends HttpServlet {
       event.setEventPayload(GSON.toJson(payload));
 
       statisticsService.recordFileFetched(event, request);
-    } catch (UnknownHostException | InternalError | IllegalArgumentException e) {
+    } catch (InternalError | IllegalArgumentException e) {
       logger.warn("Cannot report statistics to basic statistics service", e);
     }
   }

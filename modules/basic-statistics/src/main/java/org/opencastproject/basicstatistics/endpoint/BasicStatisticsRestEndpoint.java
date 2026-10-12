@@ -36,6 +36,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.common.net.InetAddresses;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -220,11 +220,11 @@ public class BasicStatisticsRestEndpoint {
       ipString = request.getRemoteAddr();
     }
     try {
-      ip = InetAddress.getByName(ipString);
-    } catch (UnknownHostException e) {
+      ip = parseIpAddress(ipString);
+    } catch (IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST)
           .type(MediaType.TEXT_PLAIN)
-          .entity("no IP address for the host could be found")
+          .entity("could not determine a valid client IP address")
           .build();
     }
 
@@ -370,9 +370,9 @@ public class BasicStatisticsRestEndpoint {
         }
         InetAddress ip;
         try {
-          ip = InetAddress.getByName(dto.getAddr());
-        } catch (UnknownHostException e) {
-          rejected.add(new RejectedEvent(index, "no IP address for the host '" + dto.getAddr() + "' could be found"));
+          ip = parseIpAddress(dto.getAddr());
+        } catch (IllegalArgumentException e) {
+          rejected.add(new RejectedEvent(index, "addr '" + dto.getAddr() + "' is not a valid IP address"));
           continue;
         }
 
@@ -438,6 +438,19 @@ public class BasicStatisticsRestEndpoint {
     event.setEventPayload(payloadToString(dto.getEventPayload()));
 
     return event;
+  }
+
+  /**
+   * Parse an IP address, i.e. an IPv4 or IPv6 address literal.
+   *
+   * This is deliberately not {@link InetAddress#getByName(String)}: that method resolves host names through DNS, which
+   * can be slow, and which we must not let clients trigger (the client IP can come from a request header), and it
+   * accepts unusual forms like an empty string, which it turns into the loopback address.
+   *
+   * @throws IllegalArgumentException if the string is not an IP address literal
+   */
+  private static InetAddress parseIpAddress(String address) throws IllegalArgumentException {
+    return InetAddresses.forString(address);
   }
 
   /**

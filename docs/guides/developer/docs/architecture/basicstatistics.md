@@ -90,7 +90,8 @@ To set this up, create a dedicated user with that role and give its credentials 
 This endpoint is very similar to the "Client Push" endpoint.
 Apart from authentication and API path, there are the following differences:
 - Each object in the request array must contain two additional fields:
-    - `addr`: IP address (as string)
+    - `addr`: IP address (as string). Only IPv4 and IPv6 addresses are accepted. Host names are rejected, as they would
+      have to be resolved through DNS.
     - `ua`: user agent string
 - During input verification:
     - All event types are allowed (including `fetch-file`)
