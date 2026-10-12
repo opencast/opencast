@@ -28,6 +28,8 @@ import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServic
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.requests.SortCriterion;
 
+import com.google.common.net.InetAddresses;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -184,13 +185,13 @@ public class BasicStatisticsService {
   }
 
   /**
+   * Record that a file was fetched, e.g. by a media player.
    *
-   * @param event
-   * @param request
-   * @throws UnknownHostException
+   * @param event the event to record
+   * @param request the request of the client that fetched the file
+   * @throws IllegalArgumentException if the client IP or the user agent of the request are missing or invalid
    */
-  public void recordFileFetched(RawEvent event, HttpServletRequest request)
-          throws UnknownHostException {
+  public void recordFileFetched(RawEvent event, HttpServletRequest request) {
     InetAddress ip;
     String ipString;
     if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {
@@ -199,7 +200,8 @@ public class BasicStatisticsService {
     } else {
       ipString = request.getRemoteAddr();
     }
-    ip = InetAddress.getByName(ipString);
+    // Only parse IP addresses. Looking up host names would let clients trigger DNS lookups through the header.
+    ip = InetAddresses.forString(ipString);
 
     // Parse user agent
     String userAgent = request.getHeader("User-Agent");
