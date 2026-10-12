@@ -67,9 +67,9 @@ public class RawEvent {
   @Column(name = "timestamp", nullable = false)
   private Instant timestamp;
 
-  /** session hash */
+  /** session hash, see {@link BasicStatisticsService#generateSessionHash} */
   @Column(name = "session", nullable = false)
-  private String session;
+  private Long session;
 
   /** type of item this applies to, like "video", "series" or "playlist" */
   @Column(name = "item_type", nullable = false)
@@ -94,7 +94,7 @@ public class RawEvent {
 
   }
 
-  public RawEvent(String organization, Instant timestamp, String session, ItemType itemType, String itemId,
+  public RawEvent(String organization, Instant timestamp, Long session, ItemType itemType, String itemId,
       EventType eventType, String eventPayload) {
     this.organization = organization;
     this.timestamp = timestamp;
@@ -159,11 +159,11 @@ public class RawEvent {
     this.timestamp = timestamp;
   }
 
-  public String getSession() {
+  public Long getSession() {
     return session;
   }
 
-  public void setSession(String session) {
+  public void setSession(Long session) {
     this.session = session;
   }
 
