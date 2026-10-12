@@ -607,24 +607,24 @@ public class StaticResourceServlet extends HttpServlet {
       long from,
       long to
   ) {
-    // We only care about request that fetch "video" files for now
-    if (!contentType.startsWith("video/")
-        && !contentType.startsWith(MimeTypes.HLS.toString())
-        && !contentType.startsWith(MimeTypes.DASH.toString())) {
-      return;
-    }
-
-    String[] parts = path.split("/");
-
-    // TODO: Find a less brittle way to determine these
-    if (parts.length < 5) {
-      logger.warn("Cannot determine media package and element id from path '{}', skipping statistics", path);
-      return;
-    }
-    String mediaPackageId = parts[3];
-    String elementId = parts[4];
-
     try {
+      // We only care about request that fetch "video" files for now
+      if (!contentType.startsWith("video/")
+          && !contentType.startsWith(MimeTypes.HLS.toString())
+          && !contentType.startsWith(MimeTypes.DASH.toString())) {
+        return;
+      }
+
+      String[] parts = path.split("/");
+
+      // TODO: Find a less brittle way to determine these
+      if (parts.length < 5) {
+        logger.warn("Cannot determine media package and element id from path '{}', skipping statistics", path);
+        return;
+      }
+      String mediaPackageId = parts[3];
+      String elementId = parts[4];
+
       EventPayload payload = new EventPayload.FetchFile(elementId, from, to);
 
       RawEvent event = new RawEvent();
@@ -635,7 +635,7 @@ public class StaticResourceServlet extends HttpServlet {
       event.setEventPayload(GSON.toJson(payload));
 
       statisticsService.recordFileFetched(event, request);
-    } catch (InternalError | IllegalArgumentException e) {
+    } catch (Exception | InternalError e) {
       logger.warn("Cannot report statistics to basic statistics service", e);
     }
   }
