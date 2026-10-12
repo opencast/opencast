@@ -180,7 +180,7 @@ public class BasicStatisticsService {
     try {
       persistence.createRawEvents(events);
     } catch (BasicStatisticsDatabaseException e) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("Could not persist raw events", e);
     }
   }
 
