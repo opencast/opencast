@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -221,14 +222,16 @@ public class BasicStatisticsService {
   }
 
   /**
-   * The session hash is defined as HMAC_SHA256(dailySecret, itemId || IP || UA) where:
+   * The session hash is defined as the first 8 bytes of HMAC_SHA256(dailySecret, itemId || IP || UA).
+   * The hash is truncated to save space. 64 bits are plenty, since only sessions within one day can collide,
+   * and a collision merely makes two sessions count as one.
    * @param dailySecret is a random secret, rotated/regenerated daily
    * @param itemId is the ID of the item the event involves (e.g. video UUID)
    * @param ip is the IP address of the user
    * @param userAgent is the user agent string of the user
    * @return the session hash
    */
-  public String generateSessionHash(
+  public long generateSessionHash(
       byte[] dailySecret,
       String itemId,
       InetAddress ip,
@@ -239,7 +242,7 @@ public class BasicStatisticsService {
     message.writeBytes(ip.getAddress());          // raw IPv4/IPv6 bytes
     message.writeBytes(userAgent.getBytes(StandardCharsets.UTF_8));
 
-    return new HmacUtils(HmacAlgorithms.HMAC_SHA_256, dailySecret)
-        .hmacHex(message.toByteArray());
+    byte[] hmac = new HmacUtils(HmacAlgorithms.HMAC_SHA_256, dailySecret).hmac(message.toByteArray());
+    return ByteBuffer.wrap(hmac).getLong();
   }
 }
