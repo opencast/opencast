@@ -312,7 +312,7 @@ public class BasicStatisticsRestEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "trustedPush",
-      description = "Authenticated request for servers/nodes i.e. octoka. "
+      description = "Push raw events from trusted servers/nodes, e.g. octoka. "
           + "Requires a special role, see the security config.",
       responses = {
           @RestResponse(
