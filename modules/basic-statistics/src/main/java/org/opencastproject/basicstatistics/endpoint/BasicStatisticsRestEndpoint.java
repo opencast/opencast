@@ -364,14 +364,16 @@ public class BasicStatisticsRestEndpoint {
           continue;
         }
         // Additional parsing
+        if (dto.getAddr() == null || dto.getAddr().isBlank()) {
+          rejected.add(new RejectedEvent(index, "addr (IP address) field must be set on trusted push"));
+          continue;
+        }
         InetAddress ip;
         try {
           ip = InetAddress.getByName(dto.getAddr());
         } catch (UnknownHostException e) {
-          return Response.status(Response.Status.BAD_REQUEST)
-              .type(MediaType.TEXT_PLAIN)
-              .entity("no IP address for the host could be found")
-              .build();
+          rejected.add(new RejectedEvent(index, "no IP address for the host '" + dto.getAddr() + "' could be found"));
+          continue;
         }
 
         // Validation
