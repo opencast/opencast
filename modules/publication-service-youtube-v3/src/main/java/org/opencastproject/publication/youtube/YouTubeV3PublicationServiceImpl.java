@@ -23,6 +23,7 @@ package org.opencastproject.publication.youtube;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -40,6 +41,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -60,10 +62,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
@@ -251,10 +253,16 @@ public class YouTubeV3PublicationServiceImpl
   }
 
   @Override
-  public Job publish(final MediaPackage mediaPackage, final Track track) throws PublicationException {
+  public Job publish(final MediaPackage mediaPackage, final Track track, final Attachment thumbnail)
+          throws PublicationException {
     if (mediaPackage.contains(track)) {
       try {
-        final List<String> args = Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), track.getIdentifier());
+        final List<String> args = new ArrayList<>();
+        args.add(MediaPackageParser.getAsXml(mediaPackage));
+        args.add(track.getIdentifier());
+        if (thumbnail != null) {
+          args.add(thumbnail.getIdentifier());
+        }
         return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args, youtubePublishJobLoad);
       } catch (ServiceRegistryException e) {
         throw new PublicationException("Unable to create a job for track: " + track.toString(), e);
@@ -274,12 +282,14 @@ public class YouTubeV3PublicationServiceImpl
    *          the mediapackage
    * @param elementId
    *          the mediapackage element id to publish
+   * @param thumbnailId
+   *          the optional mediapackage thumbnail element id to publish
    * @return the published element
    * @throws PublicationException
    *           if publication fails
    */
-  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId)
-          throws PublicationException {
+  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId,
+          final String thumbnailId) throws PublicationException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Mediapackage must be specified");
     } else if (elementId == null) {
@@ -319,6 +329,22 @@ public class YouTubeV3PublicationServiceImpl
           transferAudioLanguage ? language : null,
           license, privacyStatus, file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
+
+      if (thumbnailId != null) {
+        final MediaPackageElement thumbnailElement = mediaPackage.getElementById(thumbnailId);
+        if (thumbnailElement != null) {
+          try {
+            final File thumbnailFile = workspace.get(thumbnailElement.getURI());
+            youTubeService.setThumbnail(video.getId(), thumbnailFile, thumbnailElement.getMimeType().toString());
+          } catch (IOException | NotFoundException e) {
+            // The video is already on YouTube at this point. A missing thumbnail should not fail the whole
+            // publication, which would leave the video there without a way to retract it.
+            logger.warn("Failed to set thumbnail {} for video {}: {}", thumbnailElement, video.getId(),
+                e.getMessage());
+          }
+        }
+      }
+
       final int timeoutMinutes = 60;
       final long startUploadMilliseconds = new Date().getTime();
       while (!operationProgressListener.isComplete()) {
@@ -457,7 +483,9 @@ public class YouTubeV3PublicationServiceImpl
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
       switch (op) {
         case Publish:
-          Publication publicationElement = publish(job, mediapackage, arguments.get(1));
+          String elementId = arguments.get(1);
+          String thumbnailId = arguments.size() > 2 ? arguments.get(2) : null;
+          Publication publicationElement = publish(job, mediapackage, elementId, thumbnailId);
           return (publicationElement == null) ? null : MediaPackageElementParser.getAsXml(publicationElement);
         case Retract:
           Publication retractedElement = retract(job, mediapackage);

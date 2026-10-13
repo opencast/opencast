@@ -111,7 +111,7 @@ public class YouTubeV3PublicationServiceImplTest {
           anyObject(Float.class))).andReturn(new JobImpl()).once();
     replay(youTubeService, orgDirectory, security, registry, userDirectoryService, workspace);
     service.updated(getServiceProperties());
-    service.publish(mediaPackage, mediaPackage.getTracks()[0]);
+    service.publish(mediaPackage, mediaPackage.getTracks()[0], null);
   }
 
   private Dictionary getServiceProperties() throws IOException {
