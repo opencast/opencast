@@ -9,6 +9,34 @@ set of roles made up of the user's membership in Brightspace courses, of the for
 member of the Brightspace course `myCourseID` will be granted the Opencast role `ROLE_myCourseID`.
 
 
+### Requirements
+
+The Brightspace User Provider uses the Brightspace REST API (version 1.31 of the Learning Platform API) with the ID-Key
+authentication of D2L. The Brightspace URL therefore has to start with `https://`, and you need the following from your
+Brightspace administrator:
+
+- **Application ID and key**: These identify Opencast as an application towards Brightspace. They are issued when
+  registering an application with D2L.
+
+- **System user ID and key**: The provider makes its requests in the name of a Brightspace user, the system user. The ID
+  and key of that user are issued when the user authorizes the application to act on their behalf.
+
+- **Sufficient permissions for the system user**: The role of the system user needs at least the following permissions.
+  Otherwise Brightspace rejects requests or leaves out data, and users will lack some of their roles in Opencast.
+
+    - **See the user name of other users** (in the user information privacy settings): Required for looking up a user
+      by user name.
+    - **View user enrollments** and **Search for {role name}** for all roles your users have in courses: Required for
+      getting the courses and roles of a given user. Brightspace only returns the enrollments which the system user
+      could also see.
+
+The provider only reads data and never changes anything in Brightspace.
+
+Note: D2L has deprecated ID-Key authentication in favor of OAuth 2.0 and classifies older versions of the Learning
+Platform API, which includes version 1.31, as obsolete. D2L may remove access to them from Brightspace. Ask your
+Brightspace administrator whether your instance still supports both.
+
+
 ### Step 1: Enable the User Provider
 
 Edit `etc/org.opencastproject.plugin.impl.PluginManagerImpl` and make sure the
