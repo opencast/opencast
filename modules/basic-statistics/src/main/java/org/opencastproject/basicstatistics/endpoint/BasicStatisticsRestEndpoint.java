@@ -128,7 +128,8 @@ public class BasicStatisticsRestEndpoint {
   @Path("")
   @RestQuery(
       name = "getRawEvents",
-      description = "Get raw events.",
+      description = "Get raw events. This endpoint is internal and mainly meant for testing and debugging. It may "
+          + "change or be removed without notice, so external tools should not rely on it.",
       returnDescription = "A JSON object containing an array of raw events.",
       restParameters = {
           @RestParameter(name = "limit", isRequired = false, type = INTEGER,
