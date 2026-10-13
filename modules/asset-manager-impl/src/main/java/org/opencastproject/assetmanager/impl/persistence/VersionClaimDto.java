@@ -46,8 +46,8 @@ import javax.persistence.Table;
         query = "select a from VersionClaim a where a.mediaPackageId = :mediaPackageId"
     ),
     @NamedQuery(
-        name = "VersionClaim.update",
-        query = "update VersionClaim a set a.lastClaimed = :lastClaimed where a.mediaPackageId = :mediaPackageId"
+        name = "VersionClaim.increment",
+        query = "update VersionClaim a set a.lastClaimed = a.lastClaimed + 1 where a.mediaPackageId = :mediaPackageId"
     )
 })
 public class VersionClaimDto {
@@ -83,12 +83,15 @@ public class VersionClaimDto {
     );
   }
 
-  /** Update the last claimed version of a media package. */
-  public static Function<EntityManager, Integer> updateQuery(String mediaPackageId, long lastClaimed) {
+  /**
+   * Atomically increment the last claimed version of a media package by one.
+   *
+   * @return the number of rows updated: 1 if a row for this media package already existed, 0 if not.
+   */
+  public static Function<EntityManager, Integer> incrementQuery(String mediaPackageId) {
     return namedQuery.update(
-        "VersionClaim.update",
-        Pair.of("mediaPackageId", mediaPackageId),
-        Pair.of("lastClaimed", lastClaimed)
+        "VersionClaim.increment",
+        Pair.of("mediaPackageId", mediaPackageId)
     );
   }
 }
