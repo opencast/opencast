@@ -6,9 +6,9 @@ To that end external applications can send *raw events* to Opencast.
 
 - Raw events: low level user actions, with timestamp, pseudonomized for current day, fully anonymized for past days.
 
-Opencast offers two endpoints for adding events, `/basicstatistics/clientPush` and `/basicstatistics/trustedPush`.
+Opencast offers two endpoints for adding events, `/basic-statistics/clientPush` and `/basic-statistics/trustedPush`.
 
-`POST /basicstatistics/clientPush`
+`POST /basic-statistics/clientPush`
 ----------------------------
 
 Can be used without authentication
@@ -27,7 +27,7 @@ The request must contain a body containing a JSON object with the following fiel
 Request (JS):
 
 ```js
-await fetch("https://opencast.tld/basicstatistics/clientPush", {
+await fetch("https://opencast.tld/basic-statistics/clientPush", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",
@@ -81,7 +81,7 @@ Response:
 }
 ```
 
-`POST /basicstatistics/trustedPush`
+`POST /basic-statistics/trustedPush`
 ----------------------------
 This is intended for servers/nodes that Opencast trust, like octoka (which delivers files). 
 Authentication is required, and the user must have the role `ROLE_BASIC_STATISTICS_TRUSTED_PUSH`.
@@ -102,7 +102,7 @@ Apart from authentication and API path, there are the following differences:
 Request (JS just for demonstration purposes, likely not sent by JS):
 
 ```js
-await fetch("https://opencast.tld/basicstatistics/trustedPush", {
+await fetch("https://opencast.tld/basic-statistics/trustedPush", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",

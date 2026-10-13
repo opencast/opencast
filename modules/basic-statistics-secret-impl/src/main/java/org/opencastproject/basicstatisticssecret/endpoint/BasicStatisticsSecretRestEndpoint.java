@@ -46,13 +46,13 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Basic Statistics Secret REST Endpoint",
         "opencast.service.type=org.opencastproject.basicstatisticssecret",
-        "opencast.service.path=/basicstatistics-secret",
+        "opencast.service.path=/basic-statistics-secret",
         "opencast.service.jobproducer=false"
     },
     immediate = true,
     service = BasicStatisticsSecretRestEndpoint.class
 )
-@Path("/basicstatistics-secret")
+@Path("/basic-statistics-secret")
 @RestService(
     name = "BasicStatisticsSecretEndpoint",
     title = "Basic Statistics Secret Endpoint",
