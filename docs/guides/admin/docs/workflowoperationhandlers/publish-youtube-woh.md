@@ -24,12 +24,14 @@ YouTube has specific restrictions for custom thumbnails:
 Parameter Table
 ---------------
 
-|configuration keys         |description                                                                   |
-|---------------------------|------------------------------------------------------------------------------|
-|source-flavors             |The flavors to publish to YouTube                                             |
-|source-tags                |The tags to publish to YouTube                                                |
-|thumbnail-flavors          |The flavors of the thumbnail to publish to YouTube                            |
-|thumbnail-tags             |The tags of the thumbnail to publish to YouTube                               |
+|configuration keys         |description                                                                                                       |
+|---------------------------|------------------------------------------------------------------------------------------------------------------|
+|source-flavors             |The flavors of the video track to publish to YouTube.                                                             |
+|source-tags                |The tags of the video track to publish to YouTube.                                                                |
+|thumbnail-flavors          |The flavors of the thumbnail to publish to YouTube.                                                               |
+|thumbnail-tags             |The tags of the thumbnail to publish to YouTube.                                                                  |
+|caption-flavors            |The flavors of the captions to publish to YouTube.                                                                |
+|caption-tags               |The tags of the captions to publish to YouTube.                                                                   |
 
 
 Operation Example
@@ -41,4 +43,5 @@ Operation Example
     configurations:
       - source-tags: youtube
       - thumbnail-tags: youtube-thumbnail
+      - caption-flavors: captions/*
 ```

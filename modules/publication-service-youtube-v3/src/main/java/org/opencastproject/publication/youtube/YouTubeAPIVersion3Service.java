@@ -23,6 +23,7 @@ package org.opencastproject.publication.youtube;
 
 import org.opencastproject.publication.youtube.auth.ClientCredentials;
 
+import com.google.api.services.youtube.model.Caption;
 import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
@@ -136,6 +137,17 @@ public interface YouTubeAPIVersion3Service {
    * @throws IOException when transaction fails.
    */
   void removeMyPlaylist(String playlistId) throws IOException;
+
+  /**
+   * Add captions to a video.
+   * @param videoId the video id
+   * @param file the caption file
+   * @param language the language of the captions
+   * @param name the name of the captions
+   * @return the created caption object
+   * @throws IOException when transaction fails.
+   */
+  Caption addCaptions(String videoId, File file, String language, String name) throws IOException;
 
   /** Valid values for YouTube privacy statuses */
   enum PrivacyStatus {
