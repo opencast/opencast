@@ -60,7 +60,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -96,6 +98,9 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
 
   /** The default path to the ffmpeg binary */
   public static final String DEFAULT_FFMPEG_BINARY = "ffmpeg";
+
+  /** The number of trailing ffmpeg output lines included in the error message of a failed run */
+  private static final int FFMPEG_OUTPUT_TAIL_LINES = 20;
 
   /** The default waveform image scale algorithm */
   public static final String DEFAULT_WAVEFORM_SCALE = "lin";
@@ -346,6 +351,9 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     String[] command = new String[] {
         binary,
         "-nostats", "-nostdin", "-hide_banner",
+        // A leftover file at this path can only be from a prior run of this same job; without -y, some ffmpeg
+        // versions exit 0 without overwriting it, so Opencast would upload the stale image as if it succeeded.
+        "-y",
         "-i", mediaFile.getAbsolutePath(),
         "-lavfi", createWaveformFilter(width, height, color),
         "-frames:v", "1",
@@ -361,6 +369,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     Process ffmpegProcess = null;
     int exitCode = 1;
     BufferedReader errStream = null;
+    Deque<String> outputTail = new ArrayDeque<>();
     try {
       ffmpegProcess = pb.start();
 
@@ -368,6 +377,10 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       String line = errStream.readLine();
       while (line != null) {
         logger.debug(line);
+        if (outputTail.size() == FFMPEG_OUTPUT_TAIL_LINES) {
+          outputTail.removeFirst();
+        }
+        outputTail.addLast(line);
         line = errStream.readLine();
       }
 
@@ -390,7 +403,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
 
     if (exitCode != 0) {
       throw new WaveformServiceException(String.format("The encoder process exited abnormally with exit code %s "
-              + "using command\n%s", exitCode, String.join(" ", command)));
+              + "using command\n%s\nLast ffmpeg output:\n%s",
+              exitCode, String.join(" ", command), String.join("\n", outputTail)));
     }
 
     // put waveform image into workspace
