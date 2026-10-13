@@ -389,7 +389,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
-          boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+          boolean checkAvailability, boolean preserveReference) throws DistributionException {
     throw new UnsupportedOperationException("Not supported yet.");
     // stub function
   }
@@ -402,7 +402,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    */
   @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, Set<String> elementIds, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     notNull(mediaPackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -423,7 +423,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    */
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementId, true);
   }
 
@@ -435,7 +435,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    */
   @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, String elementId, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<>();
     elementIds.add(elementId);
     return distribute(channelId, mediaPackage, elementIds, checkAvailability);
@@ -626,8 +626,16 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability) throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distributeSync(channelId, mediapackage, elementIds, true);
