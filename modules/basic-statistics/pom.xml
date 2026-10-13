@@ -12,6 +12,8 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <!-- Run the tests in a time zone with daylight saving time, to find code which depends on the time zone -->
+    <argLine>-Duser.timezone=Europe/Berlin</argLine>
   </properties>
   <dependencies>
     <!-- Opencast dependencies -->
@@ -70,6 +72,11 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -81,6 +88,8 @@
           <ignoredUnusedDeclaredDependencies>
             <!-- runtime tests -->
             <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-server</ignoredUnusedDeclaredDependency>
+            <!-- provide a database for testing -->
+            <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
