@@ -5,6 +5,40 @@ LDAP Authentication and Authorization
 > There are separate instructions on how to [configure an LDAP-backed CAS server](security.cas.md).
 
 
+The Two Configuration Files
+---------------------------
+
+Setting up LDAP involves two configuration files, and several of their settings look alike. They have different jobs:
+
+- `etc/security/mh_default_org.xml` takes care of **authentication**. It defines how Opencast finds a user in LDAP and
+  checks the password when the user logs in. This decides who can log in.
+- `etc/org.opencastproject.userdirectory.ldap-<ID>.cfg` takes care of **authorization**. It defines how the roles, name
+  and email address of a user are read from LDAP. It does not decide who can log in.
+
+The `<ID>` links both files: The security configuration refers to `ldapAuthoritiesPopulator_<ID>`, which is provided by
+the LDAP service configuration with the matching `org.opencastproject.userdirectory.ldap.id`.
+
+Both files need to describe the same LDAP directory. These are the settings which appear in both of them:
+
+| Purpose                        | Security configuration                     | LDAP service configuration                   |
+|--------------------------------|--------------------------------------------|----------------------------------------------|
+| Address of the LDAP server     | `contextSource`, constructor argument      | `org.opencastproject.userdirectory.ldap.url` |
+| Account used to search in LDAP | `userDn` and `password` of `contextSource` | `userDn` and `password` (optional)           |
+| Where and how to find the user | `userDnPatterns` and `userSearch`          | `searchbase` and `searchfilter`              |
+
+The search settings are used for different things:
+
+- The `userDnPatterns` and `userSearch` of the security configuration find the user who wants to log in. They decide who
+  is allowed to log in. To restrict the login to certain users, restrict them there, for example with a filter which
+  also requires a group membership, like `(&(uid={0})(memberOf=cn=opencast,ou=groups,dc=example,dc=org))`.
+- The `searchbase` and `searchfilter` of the LDAP service configuration are used whenever Opencast needs the details of
+  a user, for example to determine their roles, name and email address. The results are cached. If the filter finds no
+  entry for a user, Opencast gets no LDAP data about this user from this provider. This does not prevent the user from
+  logging in.
+
+Usually, both should search the same part of the directory with the same filter.
+
+
 Security Configuration
 ----------------------
 
@@ -15,7 +49,7 @@ Edit the `etc/org.opencastproject.kernel.security.SpringSecurityConfigurationArt
 # ldap.instances.<organization_id>=<comma_separated_ldap_configuration_list>
 ldap.instances.mh_default_org=ldapinstance1,ldapinstance2
 ```
-In the example above, _ldapinstance1_ and _ldapinstance1_ correspond to LDAP service instances configured in `etc/org.opencastproject.userdirectory.ldap-<ID>.cfg` (see _LDAP Service Configuration_ below).
+In the example above, _ldapinstance1_ and _ldapinstance2_ correspond to LDAP service instances configured in `etc/org.opencastproject.userdirectory.ldap-<ID>.cfg` (see _LDAP Service Configuration_ below).
 
 Edit the security configuration file at `etc/security/mh_default_org.xml`. In a multi-tenant set-up, you will have one
 configuration file for each tenant at `etc/security/<organization_id>.xml`.
@@ -111,13 +145,14 @@ rename it as:
 
 Now adjust the service configuration to your needs.
 The parameters in this file control the user authorization, i.e. how the roles obtained from LDAP are handled and
-assigned to the users.
+assigned to the users. Note that the `searchbase` and `searchfilter` do not restrict who can log in, see
+[The Two Configuration Files](#the-two-configuration-files).
 
 
 Combination with Existing authorization Mechanisms
 --------------------------------------------------
 
-In the default configuration included in the `security_sample_ldap.xml-example` file, the LDAP is tried after the
+In the default configuration in `etc/security/mh_default_org.xml`, the LDAP is tried after the
 normal authorization mechanisms (i.e. the database). This means that if a user is present in both the database and the
 LDAP, the database will take precedence. The order is determined by the order in which the authentication providers
 appear on the security file. The relevant snippet is this:
@@ -236,6 +271,6 @@ at the bottom of the file. Please see the example below:
 </sec:authentication-manager>
 ```
 
-Then, a separate `.cfg` must be generated for each of the configured providers, as explained [here](#cfg). Please make
+Then, a separate `.cfg` must be generated for each of the configured providers, as explained in [LDAP Service Configuration](#ldap-service-configuration). Please make
 sure to configure the `org.opencastproject.userdirectory.ldap.id` parameter correctly. In this case, the values should
 be `theId` and `theId2`, respectively.
