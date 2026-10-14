@@ -151,7 +151,7 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
     List<NameValuePair> params = new ArrayList<NameValuePair>();
     try {
       params.add(new BasicNameValuePair("mediaPackageElement", MediaPackageElementParser.getAsXml(original)));
-      params.add(new BasicNameValuePair("override", new Boolean(override).toString()));
+      params.add(new BasicNameValuePair("override", Boolean.toString(override)));
       params.add(new BasicNameValuePair("options", Options.toJson(options)));
     } catch (Exception e) {
       throw new MediaInspectionException(e);

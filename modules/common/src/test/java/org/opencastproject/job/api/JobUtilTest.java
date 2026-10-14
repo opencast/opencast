@@ -34,7 +34,6 @@ import static org.opencastproject.util.JobUtil.sumQueueTime;
 import static org.opencastproject.util.JobUtil.update;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.JobUtil.waitForJobSuccess;
-import static org.opencastproject.util.data.Collections.list;
 
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier.Result;
@@ -205,7 +204,7 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setQueueTime(queueTime3);
 
-    long sumQueueTime = sumQueueTime(list(job1, job2, job3));
+    long sumQueueTime = sumQueueTime(List.of(job1, job2, job3));
     assertEquals(queueTime1 + queueTime2 + queueTime3, sumQueueTime);
   }
 
@@ -218,7 +217,7 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setStatus(Status.WAITING);
 
-    List<Job> nonFinished = getNonFinished(list(job1, job2, job3));
+    List<Job> nonFinished = getNonFinished(List.of(job1, job2, job3));
     assertEquals(2, nonFinished.size());
     assertFalse(nonFinished.contains(job1));
   }

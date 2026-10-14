@@ -25,7 +25,7 @@ import org.opencastproject.util.JaxbXmlSchemaGenerator;
 import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -175,7 +175,7 @@ public final class RestParamData {
    * @return an HTML formatted version of the xml schema for display
    */
   public String getEscapedXmlSchema() {
-    return StringEscapeUtils.escapeXml(xmlSchema);
+    return StringEscapeUtils.escapeXml10(xmlSchema);
   }
 
   /**

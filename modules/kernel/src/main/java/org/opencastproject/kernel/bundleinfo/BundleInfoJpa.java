@@ -68,7 +68,7 @@ public class BundleInfoJpa {
   @Column(name = "host", length = 128, nullable = false)
   protected String host;
 
-  @Column(name = "bundle_name", length = 128, nullable = false)
+  @Column(name = "bundle_name", length = 255, nullable = false)
   protected String bundleSymbolicName;
 
   @Column(name = "bundle_id", length = 128, nullable = false)

@@ -131,6 +131,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
@@ -152,6 +153,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -877,6 +879,13 @@ public class IndexServiceImpl implements IndexService {
 
     DublinCoreMetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
             .getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+    if (eventMetadata == null) {
+      // No common event metadata catalog was submitted at all, e.g. an empty metadata list.
+      // Fall back to the raw (empty) fields so that missing required fields (e.g. title) are rejected below
+      // instead of silently creating an event without them.
+      eventMetadata = getCommonEventCatalogUIAdapter().getRawFields();
+    }
+    DublinCoreMetadataUtil.validateRequiredFieldsPresent(eventMetadata);
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
@@ -940,7 +949,7 @@ public class IndexServiceImpl implements IndexService {
     org.joda.time.DateTime end = null;
     long duration = 0L;
     Properties caProperties = new Properties();
-    RRule rRule = null;
+    RRule<ZonedDateTime> rRule = null;
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       Properties configuration;
@@ -982,7 +991,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
-      rRule = new RRule((String) sourceMetadata.get("rrule"));
+      rRule = new RRule<>((String) sourceMetadata.get("rrule"));
     }
 
     Map<String, String> configuration = new HashMap<>();
@@ -1025,9 +1034,9 @@ public class IndexServiceImpl implements IndexService {
         }
         return mediaPackage.getIdentifier().toString();
       case SCHEDULE_MULTIPLE:
-        final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(),
-            duration, tz, captureAgentId, presenterUsernames, eventHttpServletRequest.getMediaPackage().get(),
-            configuration, (Map) caProperties, Optional.empty());
+        final Map<String, Period<ZonedDateTime>> scheduled = schedulerService.addMultipleEvents(rRule,
+            start.toDate(), end.toDate(), duration, tz, captureAgentId, presenterUsernames,
+            eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Optional.empty());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
         throw new IllegalArgumentException("Unknown source type: " + type);
@@ -1157,7 +1166,7 @@ public class IndexServiceImpl implements IndexService {
           if (tags != null) {
             tagsArray = tags.split(",");
             for (String tag : tagsArray) {
-              if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+              if (Strings.CS.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
                 langTag = StringUtils.trimToEmpty(tag);
                 break;
               }
@@ -1253,6 +1262,18 @@ public class IndexServiceImpl implements IndexService {
           final String id, final String metadataJSON, final ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
+    return updateEventMetadata(id, parseMetadataListFromJson(metadataJSON), index);
+  }
+
+  @Override
+  public MetadataList updateMediaPackageMetadata(final MediaPackage mediaPackage, final String metadataJSON)
+          throws IllegalArgumentException {
+    final MetadataList metadataList = parseMetadataListFromJson(metadataJSON);
+    updateMediaPackageMetadata(mediaPackage, metadataList);
+    return metadataList;
+  }
+
+  private MetadataList parseMetadataListFromJson(final String metadataJSON) throws IllegalArgumentException {
     final MetadataList metadataList;
     try {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
@@ -1260,7 +1281,7 @@ public class IndexServiceImpl implements IndexService {
     } catch (final org.json.simple.parser.ParseException e) {
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
-    return updateEventMetadata(id, metadataList, index);
+    return metadataList;
   }
 
   @Override
@@ -1690,7 +1711,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     // update series catalogs
-    if (!StringUtils.equals(oldSeriesId, mp.getSeries())) {
+    if (!Strings.CS.equals(oldSeriesId, mp.getSeries())) {
       List<String> seriesDcTags = new ArrayList<>();
       List<String> seriesAclTags = new ArrayList<>();
       Map<String, List<String>> seriesExtDcTags = new HashMap<>();
@@ -1853,9 +1874,14 @@ public class IndexServiceImpl implements IndexService {
 
     DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(
         MediaPackageElements.SERIES.toString());
-    if (seriesMetadata != null) {
-      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
+    if (seriesMetadata == null) {
+      // No series metadata catalog was submitted at all, e.g. an empty metadata list.
+      // Validate against the raw (empty) fields anyway so that missing required fields (e.g. title) are rejected
+      // instead of silently creating a series without them.
+      seriesMetadata = getCommonSeriesCatalogUIAdapter().getRawFields();
     }
+    DublinCoreMetadataUtil.validateRequiredFieldsPresent(seriesMetadata);
+    DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
 
     AccessControlList acl;
     if (optAcl.isPresent()) {
@@ -1922,6 +1948,7 @@ public class IndexServiceImpl implements IndexService {
     DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(
         MediaPackageElements.SERIES.toString());
     if (seriesMetadata != null) {
+      DublinCoreMetadataUtil.validateRequiredFieldsPresent(seriesMetadata);
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 

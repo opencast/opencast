@@ -21,7 +21,6 @@
 package org.opencastproject.security.impl.jpa;
 
 import org.opencastproject.security.api.Role;
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.Objects;
 
@@ -183,7 +182,7 @@ public final class JpaRole implements Role {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(name, getOrganizationId());
+    return Objects.hash(name, getOrganizationId());
   }
 
   @Override

@@ -21,7 +21,7 @@
 
 package org.opencastproject.transcription.microsoft.azure.model;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Map;
 
@@ -63,6 +63,6 @@ public class MicrosoftAzureSpeechTranscriptionFile {
   public MicrosoftAzureSpeechTranscriptionFile() { }
 
   public boolean isTranscriptionFile() {
-    return StringUtils.equalsIgnoreCase("Transcription", kind);
+    return Strings.CI.equals("Transcription", kind);
   }
 }

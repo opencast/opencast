@@ -38,7 +38,8 @@ def main():
         'name': 'develop',
         'branch': 'develop',
         'attribute': ''}]
-    for branch in release_branches:
+    for branch in sorted(release_branches, key=lambda branch: int(branch.split('/')[-1].split('.')[0]), reverse=True):
+        print(branch)
         name = branch.split('/')[-1]
         attribute = None
         if branch == stable_branch:

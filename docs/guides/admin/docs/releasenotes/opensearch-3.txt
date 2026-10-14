@@ -1,0 +1,47 @@
+Opencast now requires OpenSearch 3.x
+
+The Elasticsearch/OpenSearch client Opencast uses internally was swapped from Elastic's own (deprecated) client to
+OpenSearch's client, and that client library was further updated to the OpenSearch 3.x line. As a result, both
+Elasticsearch and OpenSearch 1.x/2.x are no longer supported; you must run OpenSearch 3.x.
+
+Elasticsearch was previously supported as an alternative to OpenSearch, but that support has been dropped as of this
+release.
+
+This is an index change, though no index mappings were altered by this release. OpenSearch only supports rolling/
+in-place upgrades between adjacent major versions (1.x to 2.x, or 2.x to 3.x), never skipping a major version, and it
+enforces `minimum_index_compatibility_version: 2.0.0` on 3.x: indices must have been *created* under OpenSearch 2.x
+or later.
+
+Critically, that check looks at the version an index (or, more precisely, its individual Lucene segments) was
+originally *created* with, not the OpenSearch version it has since been successfully running under. In practice this
+means that even indices which have been operating fine under OpenSearch 2.x for a long time can still carry old
+1.x/Elasticsearch 7.x segment metadata if they were never fully reindexed or force-merged, and OpenSearch will refuse
+to start on 3.x with an error such as `The index [...] was created with version [7.10.2] but the minimum compatible
+version is [2.0.0]. It should be re-indexed in OpenSearch 2.x before upgrading to 3.0.0.` (see
+[opensearch-project/OpenSearch#18717](https://github.com/opensearch-project/OpenSearch/issues/18717) and a
+[user report of the same issue](https://forum.opensearch.org/t/impossible-upgrade-opensearch-2-19-3-to-3-5-0-index-version-incompatible/27955)).
+Since every existing Opencast installation was, until this release, running on Elasticsearch 7.10.2 or OpenSearch
+1.x, this affects you: a same-version in-place *upgrade* of the OpenSearch node is not enough on its own.
+
+Because of this, rebuilding the index from Opencast's own database is the recommended path for this upgrade, since
+it sidesteps all Lucene segment-version concerns entirely:
+
+1. Install a fresh OpenSearch 3.x node.
+2. Point Opencast's `org.opencastproject.elasticsearch.*` configuration keys at the new node.
+3. Restart Opencast. Since the new node has no index yet, Opencast will create an empty one automatically.
+4. Trigger a full index rebuild with an authenticated `POST` request to `/index/rebuild` on the admin node. This
+   repopulates the index from the database and other backing services (series, scheduler, asset manager, comments,
+   workflow, search), not from the old OpenSearch index. You can check progress with
+   `GET /index/rebuild/states.json`.
+5. Once the rebuild finishes, decommission the old OpenSearch node.
+
+If you would rather preserve the existing index data in place instead of rebuilding it, you can still do a two-hop
+upgrade (1.x to 2.x, then 2.x to 3.x), but you must explicitly reindex or force-merge your indices while running on
+the OpenSearch 2.x intermediate stop so their segments are rewritten under a 2.x creation version; simply running the
+2.x binary against old data is not sufficient. Consult OpenSearch's own
+[upgrade documentation](https://docs.opensearch.org/latest/migrate-or-upgrade/rolling-upgrade/) for the exact steps,
+and reinstall the `analysis-icu` plugin at each hop, since plugins are version-locked to the OpenSearch major
+version.
+
+Note that the `docs/upgrade/20_to_21/update_index.sh` script does not apply to this change: it reindexes data from an
+old index *mapping* to a new one on an already-running cluster, and this release doesn't change any mapping.

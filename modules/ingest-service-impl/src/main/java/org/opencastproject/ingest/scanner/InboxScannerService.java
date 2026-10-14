@@ -23,8 +23,6 @@
 package org.opencastproject.ingest.scanner;
 
 import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
-import static org.opencastproject.util.data.Collections.dict;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -62,6 +60,7 @@ import java.time.temporal.ChronoField;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -266,9 +265,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     if (caRef == null) {
       throw new Error("Cannot obtain a reference to the ConfigurationAdmin service");
     }
-    final Dictionary<String, String> fileInstallConfig = dict(tuple("felix.fileinstall.dir", inbox.getAbsolutePath()),
-            tuple("felix.fileinstall.poll", Integer.toString(interval)),
-            tuple("felix.fileinstall.subdir.mode", "recurse"));
+    final Dictionary<String, String> fileInstallConfig = new Hashtable<>();
+    fileInstallConfig.put("felix.fileinstall.dir", inbox.getAbsolutePath());
+    fileInstallConfig.put("felix.fileinstall.poll", Integer.toString(interval));
+    fileInstallConfig.put("felix.fileinstall.subdir.mode", "recurse");
 
     // update file install config with the new directory
     try {

@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.api;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -365,7 +365,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
     // nullsafe comparison where null is lesser than non-null
     // workflows with null title probably aren't for displaying anyway
-    return StringUtils.compareIgnoreCase(this.getTitle(), workflowDefinition.getTitle());
+    return Strings.CI.compare(this.getTitle(), workflowDefinition.getTitle());
   }
 
   static class Adapter extends XmlAdapter<WorkflowDefinitionImpl, WorkflowDefinition> {

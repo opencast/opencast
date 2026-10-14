@@ -21,8 +21,7 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.EqualsUtil.hash;
+import java.util.Objects;
 
 /** The layout of a rectangular shape on a rectangular canvas. */
 public final class Layout {
@@ -58,11 +57,11 @@ public final class Layout {
   }
 
   private boolean eqFields(Layout that) {
-    return eq(dim, that.dim) && eq(offset, that.offset);
+    return Objects.equals(dim, that.dim) && Objects.equals(offset, that.offset);
   }
 
   @Override
   public int hashCode() {
-    return hash(dim, offset);
+    return Objects.hash(dim, offset);
   }
 }

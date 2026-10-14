@@ -1,6 +1,55 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.9 (2026-08-22)
+- [[#8053](https://github.com/opencast/opencast/pull/8053)] -
+  19.9 changelog
+- [[#7943](https://github.com/opencast/opencast/pull/7943)] -
+  Add logging to aid debugging of videosegmenter issues
+- [[#7933](https://github.com/opencast/opencast/pull/7933)] -
+  Log media package merging at debug level
+- [[#7899](https://github.com/opencast/opencast/pull/7899)] -
+  Match capture device keys by prefix, not substring
+- [[#7898](https://github.com/opencast/opencast/pull/7898)] -
+  Resolve wildcard timeline previews target flavor per track
+- [[#7895](https://github.com/opencast/opencast/pull/7895)] -
+  Add the anonymous role to every user
+- [[#7878](https://github.com/opencast/opencast/pull/7878)] -
+  Fix 500 error on GET /api/groups for API versions < 1.6.0
+- [[#7869](https://github.com/opencast/opencast/pull/7869)] -
+  Fix intermittent SchedulerServiceImplTest failures
+- [[#7786](https://github.com/opencast/opencast/pull/7786)] -
+  Adopter registration backend fixes
+
+
+## Opencast 19.8 (2026-08-12)
+- [[#7912](https://github.com/opencast/opencast/pull/7912)] -
+  19.8 changelog
+- [[#7872](https://github.com/opencast/opencast/pull/7872)] -
+  Fix duplicate userEntryPoint bean id for Shibboleth auth
+- [[#7802](https://github.com/opencast/opencast/pull/7802)] -
+  Update the paella-opencast-component and paella-opencast-core dependencies to their latest versions
+- [[#7790](https://github.com/opencast/opencast/pull/7790)] -
+  Fix captions not being published
+- [[#7788](https://github.com/opencast/opencast/pull/7788)] -
+  Fix timelinepreview error for events with captions track
+- [[#7752](https://github.com/opencast/opencast/pull/7752)] -
+  Changing `output-background` color code in partial-theming-watermark WF to a string
+- [[#7736](https://github.com/opencast/opencast/pull/7736)] -
+  Upgrade paella 8
+
+## Opencast 19.7 (2026-07-14)
+- [[#7764](https://github.com/opencast/opencast/pull/7764)] -
+  19.7 release notes
+- [[#7753](https://github.com/opencast/opencast/pull/7753)] -
+  Fix tag operation by adding missing callback
+- [[#7752](https://github.com/opencast/opencast/pull/7752)] -
+  Changing output-background color code in partial-theming-watermark WF to a string
+- [[#7736](https://github.com/opencast/opencast/pull/7736)] -
+  Upgrade paella 8
+- [[#7730](https://github.com/opencast/opencast/pull/7730)] -
+  Enforce absense of ACL deny rules
+
 ## Opencast 19.6 (2026-06-16)
 - [[#7725](https://github.com/opencast/opencast/pull/7725)] -
   19.6 release notes and changelog

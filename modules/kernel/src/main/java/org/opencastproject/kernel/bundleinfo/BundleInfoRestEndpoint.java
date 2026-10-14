@@ -23,14 +23,11 @@ package org.opencastproject.kernel.bundleinfo;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Jsons.arr;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
-import static org.opencastproject.util.data.Collections.set;
-import static org.opencastproject.util.data.Collections.toArray;
 
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -44,7 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -131,7 +130,7 @@ public abstract class BundleInfoRestEndpoint {
       final String bundleVersion = infos.get(0).getBundleVersion();
       final Optional<String> buildNumber = infos.get(0).getBuildNumber();
       for (BundleInfo a : infos) {
-        if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber)) {
+        if (!Objects.equals(a.getBundleVersion(), bundleVersion) || !Objects.equals(a.getBuildNumber(), buildNumber)) {
           return ok(TEXT_PLAIN_TYPE, "false");
         }
       }
@@ -160,7 +159,7 @@ public abstract class BundleInfoRestEndpoint {
       returnDescription = "The search results as json.")
   public Response getBundleVersion(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
     return withBundles(prefixes, infos -> {
-      final Set<BundleVersion> versions = set();
+      final Set<BundleVersion> versions = new HashSet<>();
       for (BundleInfo bundle : infos) {
         versions.add(bundle.getVersion());
       }
@@ -228,7 +227,7 @@ public abstract class BundleInfoRestEndpoint {
 
   /** Run <code>f</code> if there is at least one bundle matching the given prefixes. */
   private Response withBundles(List<String> prefixes, Function<List<BundleInfo>, Response> f) {
-    final List<BundleInfo> info = getDb().getBundles(toArray(String.class, prefixes));
+    final List<BundleInfo> info = getDb().getBundles(prefixes.toArray(String[]::new));
     if (info.size() > 0) {
       return f.apply(info);
     } else {

@@ -36,6 +36,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
+import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -82,7 +83,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -106,6 +106,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -233,6 +234,64 @@ public class IndexServiceImplTest {
     commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
     commonEventCatalogUIAdapter.setWorkspace(workspace);
     return Tuple.tuple(commonEventCatalogUIAdapter, metadataCell);
+  }
+
+  private CommonSeriesCatalogUIAdapter setupCommonSeriesCatalogUIAdapter()
+          throws org.osgi.service.cm.ConfigurationException {
+    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = new CommonSeriesCatalogUIAdapter();
+
+    Properties seriesCatalogProperties = new Properties();
+    InputStream in = null;
+    try {
+      in = getClass().getResourceAsStream("/series-catalog.properties");
+      seriesCatalogProperties.load(in);
+    } catch (IOException e) {
+      throw new ComponentException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+
+    commonSeriesCatalogUIAdapter.updated(PropertiesUtil.toDictionary(seriesCatalogProperties));
+    return commonSeriesCatalogUIAdapter;
+  }
+
+  /**
+   *
+   *
+   * Test Create Series
+   *
+   *
+   */
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSeriesWithoutMetadataExpectsIllegalArgumentException() throws Exception {
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+    indexServiceImpl.addCatalogUIAdapter(setupCommonSeriesCatalogUIAdapter());
+
+    // No metadata for the required title field was submitted at all (e.g. the "dublincore/series" catalog was
+    // omitted from the request), so this must be rejected instead of silently creating a series without a title.
+    indexServiceImpl.createSeries(new MetadataList(), new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSeriesWithBlankTitleExpectsIllegalArgumentException() throws Exception {
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = setupCommonSeriesCatalogUIAdapter();
+    indexServiceImpl.addCatalogUIAdapter(commonSeriesCatalogUIAdapter);
+
+    DublinCoreMetadataCollection seriesMetadata = commonSeriesCatalogUIAdapter.getRawFields();
+    MetadataField title = seriesMetadata.getOutputFields().get("title");
+    seriesMetadata.removeField(title);
+    MetadataField newTitle = new MetadataField(title);
+    newTitle.setValue("");
+    seriesMetadata.addField(newTitle);
+
+    MetadataList metadataList = new MetadataList();
+    metadataList.add(commonSeriesCatalogUIAdapter, seriesMetadata);
+
+    indexServiceImpl.createSeries(metadataList, new LinkedHashMap<>(), Optional.empty(), Optional.empty());
   }
 
   /**
@@ -672,7 +731,7 @@ public class IndexServiceImplTest {
     // Setup scheduler service
     Capture<Date> schedStart = EasyMock.newCapture();
     Capture<Date> schedEnd = EasyMock.newCapture();
-    Capture<RRule> schedRRule = EasyMock.newCapture();
+    Capture<RRule<ZonedDateTime>> schedRRule = EasyMock.newCapture();
     Capture schedDuration = EasyMock.newCapture();
     Capture<TimeZone> schedTz = EasyMock.newCapture();
 
@@ -685,14 +744,14 @@ public class IndexServiceImplTest {
             EasyMock.captureLong(schedDuration), EasyMock.capture(schedTz), EasyMock.anyString(),
             EasyMock.<Set<String>>anyObject(), EasyMock.capture(mp), EasyMock.<Map<String, String>>anyObject(),
             EasyMock.<Map<String, String>>anyObject(), EasyMock.<Optional<String>>anyObject())).
-            andAnswer(new IAnswer<Map<String, Period>>() {
+            andAnswer(new IAnswer<Map<String, Period<ZonedDateTime>>>() {
               @Override
-              public Map<String, Period> answer() throws Throwable {
-                List<Period> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
+              public Map<String, Period<ZonedDateTime>> answer() throws Throwable {
+                List<Period<ZonedDateTime>> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
                     schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
-                Map<String, Period> mapping = new LinkedHashMap<>();
+                Map<String, Period<ZonedDateTime>> mapping = new LinkedHashMap<>();
                 int counter = 0;
-                for (Period p : periods) {
+                for (Period<ZonedDateTime> p : periods) {
                   mapping.put(new IdImpl(UUID.randomUUID().toString()).toString(), p);
                 }
                 return mapping;
@@ -885,7 +944,7 @@ public class IndexServiceImplTest {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
 
@@ -910,11 +969,12 @@ public class IndexServiceImplTest {
 
     periods = generatePeriods(pst, start, end, days, durationMillis);
     simpleDateFormat.setTimeZone(pst);
-    Iterator<Period> iter = periods.iterator();
+    Iterator<Period<ZonedDateTime>> iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      Period<ZonedDateTime> p = iter.next();
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     //Expecting 4 days to be scheduled: Sat (26th), Sun (27th), Mon (28th), Tues(29th)
     assertEquals(4, periods.size());
@@ -931,9 +991,10 @@ public class IndexServiceImplTest {
     simpleDateFormat.setTimeZone(cet);
     iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      Period<ZonedDateTime> p = iter.next();
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     // Expecting 4 days to be scheduled:
     //period Fri Mar 25 00:05:52 CET 2016 to Fri Mar 25 00:10:52 CET 2016
@@ -955,9 +1016,10 @@ public class IndexServiceImplTest {
     simpleDateFormat.setTimeZone(nonDstTz);
     iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      Period<ZonedDateTime> p = iter.next();
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     // Expecting 4 days to be scheduled:
     // Got period Fri Mar 11 00:05:40 MST 2016 to Fri Mar 11 00:10:40 MST 2016
@@ -973,7 +1035,7 @@ public class IndexServiceImplTest {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     // CET
     TimeZone.setDefault(cet);
@@ -988,10 +1050,10 @@ public class IndexServiceImplTest {
     assertEquals(5, periods.size());
 
     TimeZone.setDefault(cet);
-    for (Period d : periods) {
-      DateTime dEnd = d.getEnd();
+    for (Period<ZonedDateTime> d : periods) {
+      ZonedDateTime dEnd = d.getEnd();
 
-      Date date = new Date(dEnd.getTime());
+      Date date = Date.from(dEnd.toInstant());
       Calendar instance = Calendar.getInstance();
       instance.setTime(date);
 
@@ -1133,11 +1195,12 @@ public class IndexServiceImplTest {
             updatedPresenters.getB().containsAll(multiUserList));
   }
 
-  private List<Period> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days, Long duration)
-          throws ParseException {
+  private List<Period<ZonedDateTime>> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days,
+          Long duration) throws ParseException {
     Calendar tzDate = Calendar.getInstance(tz);
     tzDate.setTime(start.getTime());
-    RRule rRule = new RRule(generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
+    RRule<ZonedDateTime> rRule = new RRule<>(
+            generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
     return calculatePeriods(rRule, start.getTime(), end.getTime(), duration, tz);
   }
 
@@ -1146,7 +1209,8 @@ public class IndexServiceImplTest {
   }
 
   // The Util class is in the scheduler-api bundle (this Test class is very similar to the test class in schduler-api)
-  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
+  public List<Period<ZonedDateTime>> calculatePeriods(RRule<ZonedDateTime> rrule, Date start, Date end,
+          long duration, TimeZone tz) {
     return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 }

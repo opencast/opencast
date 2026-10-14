@@ -45,6 +45,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-search-service-api</artifactId>
       <version>${project.version}</version>
@@ -86,9 +90,9 @@
       <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>${elasticsearch.version}</version>
+      <groupId>org.opensearch</groupId>
+      <artifactId>opensearch</artifactId>
+      <version>${opensearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>

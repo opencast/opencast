@@ -23,6 +23,7 @@ package org.opencastproject.publication.youtube;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -40,14 +41,15 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.api.services.youtube.model.Playlist;
-import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.osgi.service.cm.ConfigurationException;
@@ -60,13 +62,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Publishes media to a YouTube play list.
@@ -139,12 +147,20 @@ public class YouTubeV3PublicationServiceImpl
 
   private boolean enabled = false;
 
+  private boolean transferAudioLanguage;
+  private boolean transferMetadataLanguage;
+
+  private Map<String, Pattern> languagePatterns;
+
   /**
    * The default playlist to publish to, in case there is not enough information in the mediapackage to find a playlist
    */
   private String defaultPlaylist;
 
+  private Optional<Pattern> ccLicenses;
+
   private boolean makeVideosPrivate;
+  private YouTubeAPIVersion3Service.PrivacyStatus playlistPrivacy;
 
   private String[] tags;
 
@@ -203,10 +219,22 @@ public class YouTubeV3PublicationServiceImpl
           //
           youTubeService.initialize(clientCredentials);
           //
+          String languageTarget = YouTubeUtils.get(properties, YouTubeKey.languageTarget, false);
+          transferAudioLanguage = "audio".equals(languageTarget) || "both".equals(languageTarget);
+          transferMetadataLanguage = "metadata".equals(languageTarget) || "both".equals(languageTarget);
+          languagePatterns = YouTubeUtils.getAll(properties, YouTubeKey.languagePatterns).entrySet().stream()
+                  .collect(Collectors.toMap(
+                          Map.Entry::getKey,
+                          e -> Pattern.compile(e.getValue())));
+          ccLicenses = Optional.ofNullable(
+                  YouTubeUtils.get(properties, YouTubeKey.ccLicenses, false))
+                  .map(Pattern::compile);
           tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
           defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
-          makeVideosPrivate = StringUtils
-                  .containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
+          makeVideosPrivate = Strings.CI
+                  .contains(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
+          playlistPrivacy = YouTubeAPIVersion3Service.PrivacyStatus.valueOf(Objects.requireNonNullElse(
+                  YouTubeUtils.get(properties, YouTubeKey.playlistPrivacy, false), "public").toUpperCase());
           defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
         } else {
           logger.warn("Client information file does not exist: " + path);
@@ -225,10 +253,23 @@ public class YouTubeV3PublicationServiceImpl
   }
 
   @Override
-  public Job publish(final MediaPackage mediaPackage, final Track track) throws PublicationException {
+  public Job publish(final MediaPackage mediaPackage, final Track track, final Attachment thumbnail,
+          final List<Track> captions)
+          throws PublicationException {
     if (mediaPackage.contains(track)) {
       try {
-        final List<String> args = Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), track.getIdentifier());
+        final List<String> args = new ArrayList<>();
+        args.add(MediaPackageParser.getAsXml(mediaPackage));
+        args.add(track.getIdentifier());
+        // The thumbnail ID is positional, so keep its slot even when there is no thumbnail
+        args.add(thumbnail != null ? thumbnail.getIdentifier() : "");
+        if (captions != null && !captions.isEmpty()) {
+          final List<String> captionIds = new ArrayList<>();
+          for (Track caption : captions) {
+            captionIds.add(caption.getIdentifier());
+          }
+          args.add(StringUtils.join(captionIds, ","));
+        }
         return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args, youtubePublishJobLoad);
       } catch (ServiceRegistryException e) {
         throw new PublicationException("Unable to create a job for track: " + track.toString(), e);
@@ -248,12 +289,16 @@ public class YouTubeV3PublicationServiceImpl
    *          the mediapackage
    * @param elementId
    *          the mediapackage element id to publish
+   * @param thumbnailId
+   *          the optional mediapackage thumbnail element id to publish
+   * @param captions
+   *          the mediapackage caption elements to publish
    * @return the published element
    * @throws PublicationException
    *           if publication fails
    */
-  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId)
-          throws PublicationException {
+  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId,
+          final String thumbnailId, final List<Track> captions) throws PublicationException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Mediapackage must be specified");
     } else if (elementId == null) {
@@ -274,13 +319,43 @@ public class YouTubeV3PublicationServiceImpl
       final YouTubePublicationAdapter c = new YouTubePublicationAdapter(mediaPackage, workspace);
       final File file = workspace.get(element.getURI());
       final String episodeName = c.getEpisodeName();
+      final String episodeLanguage = c.getEpisodeLanguage();
+      final String language = episodeLanguage == null ? null : languagePatterns.entrySet().stream()
+          .filter(e -> e.getValue().matcher(c.getEpisodeLanguage()).matches())
+          .findAny()
+          .map(Map.Entry::getKey)
+          .orElse(null);
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
+      final String episodeLicense = c.getEpisodeLicense();
+      final boolean isCreativeCommons = episodeLicense != null
+          && ccLicenses.map(pattern -> pattern.matcher(episodeLicense).matches()).orElse(false);
+      final VideoUpload.License license = isCreativeCommons
+          ? VideoUpload.License.creativeCommon
+          : VideoUpload.License.youtube;
       final VideoUpload videoUpload = new VideoUpload(
           truncateTitleToMaxFieldLength(episodeName, false),
-          c.getEpisodeDescription(), privacyStatus,
-          file, operationProgressListener, tags);
+          c.getEpisodeDescription(),
+          transferMetadataLanguage ? language : null,
+          transferAudioLanguage ? language : null,
+          license, privacyStatus, file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
+
+      if (thumbnailId != null) {
+        final MediaPackageElement thumbnailElement = mediaPackage.getElementById(thumbnailId);
+        if (thumbnailElement != null) {
+          try {
+            final File thumbnailFile = workspace.get(thumbnailElement.getURI());
+            youTubeService.setThumbnail(video.getId(), thumbnailFile, thumbnailElement.getMimeType().toString());
+          } catch (IOException | NotFoundException e) {
+            // The video is already on YouTube at this point. A missing thumbnail should not fail the whole
+            // publication, which would leave the video there without a way to retract it.
+            logger.warn("Failed to set thumbnail {} for video {}: {}", thumbnailElement, video.getId(),
+                e.getMessage());
+          }
+        }
+      }
+
       final int timeoutMinutes = 60;
       final long startUploadMilliseconds = new Date().getTime();
       while (!operationProgressListener.isComplete()) {
@@ -296,13 +371,40 @@ public class YouTubeV3PublicationServiceImpl
       final Playlist playlist;
       final Playlist existingPlaylist = youTubeService.getMyPlaylistByTitle(playlistName);
       if (existingPlaylist == null) {
-        playlist = youTubeService.createPlaylist(playlistName, c.getContextDescription(), mediaPackage.getSeries());
+        playlist = youTubeService.createPlaylist(playlistName, c.getContextDescription(), playlistPrivacy,
+            mediaPackage.getSeries());
       } else {
         playlist = existingPlaylist;
       }
       youTubeService.addPlaylistItem(playlist.getId(), video.getId());
+
+      if (captions != null) {
+        for (Track caption : captions) {
+          try {
+            final File captionFile = workspace.get(caption.getURI());
+            String captionLanguage = null;
+            for (String tag : caption.getTags()) {
+              if (tag.startsWith("lang:")) {
+                captionLanguage = tag.substring(5);
+                break;
+              }
+            }
+            if (captionLanguage == null) {
+              logger.warn("No language tag (lang:<bcp-code>) found for caption track {}. Skipping upload.", caption);
+              continue;
+            }
+            // Google YouTube API requires ISO 639-1 language code.
+            // Opencast flavors often use that too.
+            youTubeService.addCaptions(video.getId(), captionFile, captionLanguage, caption.getFlavor().toString());
+          } catch (Exception e) {
+            logger.warn("Failed to upload captions {} for video {}: {}", caption, video.getId(), e.getMessage());
+          }
+        }
+      }
+
       // Create new publication element
-      final URL url = new URL("http://www.youtube.com/watch?v=" + video.getId());
+      final URL url = URI.create("http://www.youtube.com/watch?v=" + video.getId() + "&list=" + playlist.getId())
+          .toURL();
       return PublicationImpl.publication(
           UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
@@ -355,10 +457,9 @@ public class YouTubeV3PublicationServiceImpl
     if (youtube == null) {
       return null;
     }
-    final YouTubePublicationAdapter contextStrategy = new YouTubePublicationAdapter(mediaPackage, workspace);
-    final String episodeName = contextStrategy.getEpisodeName();
     try {
-      retract(mediaPackage.getSeriesTitle(), episodeName);
+      final java.net.URI uri = youtube.getURI();
+      retract(uri.toString());
     } catch (final Exception e) {
       logger.error("Failure retracting YouTube media {}", e.getMessage());
       throw new PublicationException("YouTube media retract failed on job: "
@@ -367,17 +468,41 @@ public class YouTubeV3PublicationServiceImpl
     return youtube;
   }
 
-  private void retract(final String seriesTitle, final String episodeName) throws Exception {
-    final List<SearchResult> items = youTubeService.searchMyVideos(
-        truncateTitleToMaxFieldLength(episodeName, false), null, 1).getItems();
-    if (!items.isEmpty()) {
-      final String videoId = items.get(0).getId().getVideoId();
-      if (seriesTitle != null) {
-        final Playlist playlist = youTubeService.getMyPlaylistByTitle(truncateTitleToMaxFieldLength(seriesTitle, true));
-        youTubeService.removeVideoFromPlaylist(playlist.getId(), videoId);
-      }
-      youTubeService.removeMyVideo(videoId);
+  private void retract(final String watchUrl) throws Exception {
+    if (watchUrl == null) {
+      throw new IllegalArgumentException("watchUrl must be specified");
     }
+    String videoId = null;
+    String playlistId = null;
+    try {
+      final java.net.URI uri = java.net.URI.create(watchUrl);
+      final String query = uri.getQuery();
+      if (query != null) {
+        for (String param : query.split("&")) {
+          String[] pair = param.split("=", 2);
+          if (pair.length == 2) {
+            if ("v".equals(pair[0])) {
+              videoId = pair[1];
+            } else if ("list".equals(pair[0])) {
+              playlistId = pair[1];
+            }
+          }
+        }
+      }
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Invalid YouTube watch URL: " + watchUrl, e);
+    }
+    if (videoId == null) {
+      throw new IllegalArgumentException("YouTube video ID not found in URL: " + watchUrl);
+    }
+    if (playlistId != null) {
+      try {
+        youTubeService.removeVideoFromPlaylist(playlistId, videoId);
+      } catch (Exception e) {
+        // Non-fatal: continue with video removal
+      }
+    }
+    youTubeService.removeMyVideo(videoId);
   }
 
   /**
@@ -394,7 +519,18 @@ public class YouTubeV3PublicationServiceImpl
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
       switch (op) {
         case Publish:
-          Publication publicationElement = publish(job, mediapackage, arguments.get(1));
+          String elementId = arguments.get(1);
+          String thumbnailId = arguments.size() > 2 ? StringUtils.trimToNull(arguments.get(2)) : null;
+          final List<Track> captions = new ArrayList<>();
+          if (arguments.size() > 3) {
+            for (String captionId : arguments.get(3).split(",")) {
+              final Track caption = mediapackage.getTrack(captionId);
+              if (caption != null) {
+                captions.add(caption);
+              }
+            }
+          }
+          Publication publicationElement = publish(job, mediapackage, elementId, thumbnailId, captions);
           return (publicationElement == null) ? null : MediaPackageElementParser.getAsXml(publicationElement);
         case Retract:
           Publication retractedElement = retract(job, mediapackage);
@@ -535,5 +671,4 @@ public class YouTubeV3PublicationServiceImpl
       }
     }
   }
-
 }

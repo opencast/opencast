@@ -325,13 +325,17 @@ public abstract class AbstractAclServiceRestEndpoint {
           }
   )
   public Response applyAclToEpisode(@PathParam("episodeId") String episodeId, @FormParam("aclId") Long aclId) {
-    final AclService aclService = aclService();
-    Optional<ManagedAcl> macl = aclService.getAcl(aclId);
-    if (macl.isEmpty()) {
-      return notFound();
-    }
     try {
-      Optional<AccessControlList> aclOpt = Optional.of(macl.get().getAcl());
+      final Optional<AccessControlList> aclOpt;
+      if (aclId == null) {
+        aclOpt = Optional.empty();
+      } else {
+        Optional<ManagedAcl> macl = aclService().getAcl(aclId);
+        if (macl.isEmpty()) {
+          return notFound();
+        }
+        aclOpt = Optional.of(macl.get().getAcl());
+      }
       Optional<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(episodeId);
       // the episode service is the source of authority for the retrieval of media packages
       if (mediaPackage.isPresent()) {

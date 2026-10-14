@@ -26,7 +26,6 @@ import static javax.xml.XMLConstants.DEFAULT_NS_PREFIX;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XML_NS_URI;
-import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
@@ -56,6 +55,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -679,7 +679,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     @Override
     public int hashCode() {
-      return hash(name, value);
+      return Objects.hash(name, value);
     }
 
     @Override

@@ -34,6 +34,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 
 import org.apache.commons.fileupload.MockHttpServletRequest;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -504,6 +505,115 @@ public class IngestRestServiceTest {
     response = restService.addMediaPackageTrack(request);
     assertEquals(Status.OK.getStatusCode(), response.getStatus());
     EasyMock.verify(ingestService);
+  }
+
+  @Test
+  public void testAddDCCatalogAsMultipartPreservesPlusCharacters() throws Exception {
+    // '+' in a multipart/form-data field value must not be turned into a space: unlike
+    // application/x-www-form-urlencoded, multipart/form-data has no such convention (see #2777).
+    Capture<MediaPackageElementFlavor> flavorCapture = EasyMock.newCapture();
+    Capture<InputStream> catalogCapture = EasyMock.newCapture();
+    IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
+    EasyMock.expect(ingestService.addCatalog(EasyMock.capture(catalogCapture), (String) EasyMock.anyObject(),
+            EasyMock.capture(flavorCapture), (MediaPackage) EasyMock.anyObject()))
+            .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    EasyMock.replay(ingestService);
+    restService.setIngestService(ingestService);
+
+    String dublinCore = "<dublincore xmlns=\"http://purl.org/dc/terms/\"><title>A+B Lecture</title></dublincore>";
+    Response response = restService.addDCCatalogAsMultipart(
+            newDCCatalogMultipartRequest("metadata/episode+extra", dublinCore));
+
+    assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertEquals("metadata/episode+extra", flavorCapture.getValue().toString());
+    assertEquals(dublinCore, IOUtils.toString(catalogCapture.getValue(), "UTF-8"));
+  }
+
+  @Test
+  public void testDiscardMediaPackageAsMultipartPreservesPlusCharacters() throws Exception {
+    Capture<MediaPackage> mediaPackageCapture = EasyMock.newCapture();
+    IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
+    ingestService.discardMediaPackage(EasyMock.capture(mediaPackageCapture));
+    EasyMock.expectLastCall().once();
+    EasyMock.replay(ingestService);
+    restService.setIngestService(ingestService);
+
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+    mp.setTitle("A+B Lecture");
+    StringBuilder requestBody = new StringBuilder();
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"mediaPackage\"\r\n");
+    requestBody.append("\r\n");
+    requestBody.append(MediaPackageParser.getAsXml(mp));
+    requestBody.append("\r\n");
+    requestBody.append("-----1234");
+    MockHttpServletRequest request = new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"),
+            "multipart/form-data; boundary=---1234");
+
+    Response response = restService.discardMediaPackageAsMultipart(request);
+
+    assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    assertEquals("A+B Lecture", mediaPackageCapture.getValue().getTitle());
+  }
+
+  private MockHttpServletRequest newDCCatalogMultipartRequest(String flavor, String dublinCore) throws Exception {
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+    StringBuilder requestBody = new StringBuilder();
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"mediaPackage\"\r\n");
+    requestBody.append("\r\n");
+    requestBody.append(MediaPackageParser.getAsXml(mp));
+    requestBody.append("\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"dublinCore\"\r\n");
+    requestBody.append("\r\n");
+    requestBody.append(dublinCore);
+    requestBody.append("\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"flavor\"\r\n");
+    requestBody.append("\r\n");
+    requestBody.append(flavor);
+    requestBody.append("\r\n");
+    requestBody.append("-----1234");
+    return new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"),
+            "multipart/form-data; boundary=---1234");
+  }
+
+  @Test
+  public void testAddMediaPackageRejectsUnparsableDate() throws Exception {
+    // An unparsable date used to be accepted here and only blow up much later during indexing, surfacing as a 500.
+    // The validation has to reject it up front, before the catalog is built.
+    Response response = restService.addMediaPackage(newMockRequestWithDate("created", "banana"), null);
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testAddMediaPackageDoesNotValidateTemporalAsDate() throws Exception {
+    // "temporal" carries a DCMI period rather than a plain date, so it must not be rejected as an unparsable date.
+    // This request does not reach a 200 because the shared mock has no DublinCoreCatalogService, but it must not
+    // fail with 400 either - that would mean legitimate scheduled recordings were being turned away.
+    String period = "start=2024-01-01T00:00:00Z; end=2024-01-01T01:00:00Z; scheme=W3C-DTF;";
+    Response response = restService.addMediaPackage(newMockRequestWithDate("temporal", period), null);
+    Assert.assertNotEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  private HttpServletRequest newMockRequestWithDate(String field, String value) throws Exception {
+    StringBuilder requestBody = new StringBuilder();
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"flavor\"\r\n");
+    requestBody.append("\r\ntest/flavor\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"" + field + "\"\r\n");
+    requestBody.append("\r\n" + value + "\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"BODY\"; filename=\"video.mp4\"\r\n");
+    requestBody.append("Content-Type: video/mp4\r\n");
+    requestBody.append("\r\n");
+    requestBody.append("This is the content of the file\n");
+    requestBody.append("\r\n");
+    requestBody.append("-----1234");
+    return new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"),
+            "multipart/form-data; boundary=---1234");
   }
 
   private HttpServletRequest newMockRequest() throws Exception {

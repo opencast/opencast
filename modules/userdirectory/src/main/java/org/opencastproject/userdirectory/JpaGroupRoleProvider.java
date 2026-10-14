@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -235,18 +236,11 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       }
     }
 
-    Set<Role> result = new HashSet<>();
-    int i = 0;
-    for (Role entry : roles) {
-      if (limit != 0 && result.size() >= limit) {
-        break;
-      }
-      if (i >= offset) {
-        result.add(entry);
-      }
-      i++;
-    }
-    return result.iterator();
+    return roles.stream()
+        .sorted(Comparator.comparing(Role::getName))  // Sort for consistent returns on limit+offset
+        .skip(offset)
+        .limit(limit > 0 ? limit : Long.MAX_VALUE)
+        .iterator();
   }
 
   /**
@@ -551,6 +545,10 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    */
   public void createGroup(String name, String description, String roles, String users)
           throws IllegalArgumentException, UnauthorizedException, ConflictException {
+
+    if (StringUtils.isBlank(name)) {
+      throw new IllegalArgumentException("name is required");
+    }
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
     HashSet<JpaRole> roleSet = new HashSet<>();

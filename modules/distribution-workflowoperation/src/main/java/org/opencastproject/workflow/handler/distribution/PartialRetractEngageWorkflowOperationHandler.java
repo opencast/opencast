@@ -21,9 +21,6 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
-
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
@@ -32,7 +29,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchService;
@@ -158,8 +154,11 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
 
       logger.info("Retraction operations complete, republishing updated mediapackage");
 
-      if (!isPublishable(mediaPackage)) {
-        throw new WorkflowOperationException("Media package does not meet criteria for publication");
+      List<String> publicationCriteriaViolations =
+              EngagePublicationSupport.getPublicationCriteriaViolations(mediaPackage);
+      if (!publicationCriteriaViolations.isEmpty()) {
+        throw new WorkflowOperationException("Media package does not meet criteria for publication: "
+                + String.join(", ", publicationCriteriaViolations));
       }
 
       // Adding media package to the search index
@@ -185,33 +184,6 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
         throw new WorkflowOperationException(e);
       }
     }
-  }
-
-  private Publication findPublicationElement(MediaPackage mediaPackage) throws WorkflowOperationException {
-    for (Publication element  : mediaPackage.getPublications()) {
-      if (CHANNEL_ID.equals(element.getChannel())) {
-        logger.debug("Found the publication element");
-        return element;
-      }
-    }
-    throw new WorkflowOperationException("Unable to find publication element!");
-  }
-
-  /** Media package must meet these criteria in order to be published. */
-  //TODO: Move this into some kind of abstract parent class since this is also used in
-  //PublishEngageWorkflowOperationHandler
-  private boolean isPublishable(MediaPackage mp) {
-    boolean hasTitle = !isBlank(mp.getTitle());
-    if (!hasTitle) {
-      logger.warn("Media package does not meet criteria for publication: There is no title");
-    }
-
-    boolean hasTracks = mp.hasTracks();
-    if (!hasTracks) {
-      logger.warn("Media package does not meet criteria for publication: There are no tracks");
-    }
-
-    return hasTitle && hasTracks;
   }
 
   @Reference(target = "(distribution.channel=download)")

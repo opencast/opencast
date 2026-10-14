@@ -24,6 +24,14 @@ sed -i 's_localhost:8080_localhost:8082_' opencast-dist-worker/etc/custom.proper
 sed -i 's_port=8080_port=8081_' opencast-dist-presentation/etc/org.ops4j.pax.web.cfg
 sed -i 's_port=8080_port=8082_' opencast-dist-worker/etc/org.ops4j.pax.web.cfg
 
+sed -i 's!# export KARAF_DEBUG.*!export KARAF_DEBUG=1!' opencast-dist-admin/bin/setenv
+sed -i 's!# export JAVA_DEBUG_PORT.*!export JAVA_DEBUG_PORT=5005!' opencast-dist-admin/bin/setenv
+#Note: Presentation has the lower debug port because it also has the lower http port (8081)!
+sed -i 's!# export KARAF_DEBUG.*!export KARAF_DEBUG=1!' opencast-dist-presentation/bin/setenv
+sed -i 's!# export JAVA_DEBUG_PORT.*!export JAVA_DEBUG_PORT=5006!' opencast-dist-presentation/bin/setenv
+sed -i 's!# export KARAF_DEBUG.*!export KARAF_DEBUG=1!' opencast-dist-worker/bin/setenv
+sed -i 's!# export JAVA_DEBUG_PORT.*!export JAVA_DEBUG_PORT=5007!' opencast-dist-worker/bin/setenv
+
 for node in admin presentation worker; do
   # configure database
   sed -i 's_^.*db.jdbc.driver=.*$_org.opencastproject.db.jdbc.driver=org.postgresql.Driver_' \

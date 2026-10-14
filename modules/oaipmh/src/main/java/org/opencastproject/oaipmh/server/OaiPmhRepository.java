@@ -41,10 +41,9 @@ import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
 
-import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -54,9 +53,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -84,7 +83,7 @@ import java.util.stream.Stream;
  */
 // todo - malformed date parameter must produce a BadArgument error - if a date parameter has a finer granularity than
 //        supported by the repository this must produce a BadArgument error
-public abstract class OaiPmhRepository implements ManagedService {
+public abstract class OaiPmhRepository {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhRepository.class);
   private static final OaiDcMetadataProvider OAI_DC_METADATA_PROVIDER = new OaiDcMetadataProvider();
   private static final String OAI_NS = OaiPmhConstants.OAI_2_0_XML_NS;
@@ -118,19 +117,18 @@ public abstract class OaiPmhRepository implements ManagedService {
    * Parse service configuration file.
    *
    * @param properties
-   *        Service configuration as dictionary
+   *        Service configuration as a map
    * @throws ConfigurationException
    *        If there is a problem within get configuration
    */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     if (properties == null) {
       return;
     }
 
     // Wipe set configuration in case some got removed
     sets = new ArrayList<>();
-    List<String> confKeys = EnumerationUtils.toList(properties.keys());
+    List<String> confKeys = new ArrayList<>(properties.keySet());
     for (String confKey : confKeys) {
       if (confKey.startsWith(CONF_KEY_SET_PREFIX) && confKey.endsWith(CONF_KEY_SET_SETSPEC_SUFFIX)) {
         String confKeyPrefix = confKey.replace(CONF_KEY_SET_SETSPEC_SUFFIX, "");
@@ -265,7 +263,7 @@ public abstract class OaiPmhRepository implements ManagedService {
       var metadataProviders = p.getMetadataPrefix().flatMap(mp -> getMetadataProvider(mp)).stream().toList();
       for (final MetadataProvider metadataProvider : metadataProviders) {
         if (p.getSet().isPresent() && !sets.stream().anyMatch(
-            setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
+            setDef -> Strings.CS.equals(setDef.getSetSpec(), p.getSet().get()))) {
           // If there is no set specification, immediately return a no result response
           return createNoRecordsMatchResponse(p);
         }
@@ -580,7 +578,7 @@ public abstract class OaiPmhRepository implements ManagedService {
           if (!resumptionTokenExists) {
             // start a new query
             if (p.getSet().isPresent() && !sets.stream().anyMatch(
-                setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
+                setDef -> Strings.CS.equals(setDef.getSetSpec(), p.getSet().get()))) {
               // If there is no set specification, immediately return a no result response
               return createNoRecordsMatchResponse(p);
             }

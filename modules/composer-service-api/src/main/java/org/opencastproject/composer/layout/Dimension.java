@@ -22,9 +22,10 @@
 package org.opencastproject.composer.layout;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
+
+import java.util.Objects;
 
 /** Dimension of a rectangular shape. */
 public final class Dimension {
@@ -59,7 +60,7 @@ public final class Dimension {
 
   @Override
   public int hashCode() {
-    return hash(width, height);
+    return Objects.hash(width, height);
   }
 
   @Override

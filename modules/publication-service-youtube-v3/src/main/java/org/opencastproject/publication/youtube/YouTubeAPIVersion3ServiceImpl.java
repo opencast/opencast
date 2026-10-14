@@ -24,7 +24,6 @@ package org.opencastproject.publication.youtube;
 import org.opencastproject.publication.youtube.auth.ClientCredentials;
 import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactory;
 import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactoryImpl;
-import org.opencastproject.util.data.Collections;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
@@ -33,6 +32,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequest;
+import com.google.api.services.youtube.model.Caption;
+import com.google.api.services.youtube.model.CaptionSnippet;
 import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
@@ -41,7 +42,6 @@ import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.google.api.services.youtube.model.PlaylistSnippet;
 import com.google.api.services.youtube.model.PlaylistStatus;
 import com.google.api.services.youtube.model.ResourceId;
-import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.api.services.youtube.model.VideoSnippet;
@@ -53,6 +53,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,15 +72,18 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   public Video addVideoToMyChannel(final VideoUpload videoUpload) throws IOException {
     final Video videoObjectDefiningMetadata = new Video();
     final VideoStatus status = new VideoStatus();
+    status.setLicense(videoUpload.getLicense().name());
     status.setPrivacyStatus(videoUpload.getPrivacyStatus());
     videoObjectDefiningMetadata.setStatus(status);
     // Metadata lives in VideoSnippet
     final VideoSnippet snippet = new VideoSnippet();
     snippet.setTitle(videoUpload.getTitle());
     snippet.setDescription(videoUpload.getDescription());
+    snippet.setDefaultLanguage(videoUpload.getMetadataLanguage());
+    snippet.setDefaultAudioLanguage(videoUpload.getAudioLanguage());
     final String[] tags = videoUpload.getTags();
     if (ArrayUtils.isNotEmpty(tags)) {
-      snippet.setTags(Collections.list(tags));
+      snippet.setTags(Arrays.asList(tags));
     }
     // Attach metadata to video object.
     videoObjectDefiningMetadata.setSnippet(snippet);
@@ -99,17 +103,26 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
-  public Playlist createPlaylist(final String title, final String description, final String... tags)
-          throws IOException {
+  public void setThumbnail(String videoId, File thumbnail, String mimeType) throws IOException {
+    final BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(thumbnail));
+    final InputStreamContent mediaContent = new InputStreamContent(mimeType, inputStream);
+    mediaContent.setLength(thumbnail.length());
+
+    final YouTube.Thumbnails.Set thumbnailSet = youTube.thumbnails().set(videoId, mediaContent);
+    execute(thumbnailSet);
+  }
+
+  @Override
+  public Playlist createPlaylist(final String title, final String description, PrivacyStatus privacyStatus,
+          final String... tags) throws IOException {
     final PlaylistSnippet playlistSnippet = new PlaylistSnippet();
     playlistSnippet.setTitle(title);
     playlistSnippet.setDescription(description);
     if (tags.length > 0) {
-      playlistSnippet.setTags(Collections.list(tags));
+      playlistSnippet.setTags(Arrays.asList(tags));
     }
-    // Playlists are always public. The videos therein might be private.
     final PlaylistStatus playlistStatus = new PlaylistStatus();
-    playlistStatus.setPrivacyStatus("public");
+    playlistStatus.setPrivacyStatus(privacyStatus.name().toLowerCase());
 
     // Create playlist with metadata and status.
     final Playlist youTubePlaylist = new Playlist();
@@ -161,21 +174,6 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   public void removeMyPlaylist(final String playlistId) throws IOException {
     final YouTube.Playlists.Delete deleteRequest = youTube.playlists().delete(playlistId);
     execute(deleteRequest);
-  }
-
-  @Override
-  public SearchListResponse searchMyVideos(final String queryTerm, final String pageToken, final long maxResults)
-          throws IOException {
-    final YouTube.Search.List search = youTube.search().list("id,snippet");
-    if (pageToken != null) {
-      search.set("pageToken", pageToken);
-    }
-    search.setQ(queryTerm);
-    search.setType("video");
-    search.setForMine(true);
-    search.setMaxResults(maxResults);
-    search.setFields("items(id,kind,snippet),nextPageToken,pageInfo,prevPageToken,tokenPagination");
-    return execute(search);
   }
 
   @Override
@@ -281,4 +279,27 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   private <T> T execute(final YouTubeRequest<T> command) throws IOException {
     return command.execute();
   }
+
+  @Override
+  public Caption addCaptions(String videoId, File file, String language, String name) throws IOException {
+    final Caption captionObjectDefiningMetadata = new Caption();
+    final CaptionSnippet snippet = new CaptionSnippet();
+    snippet.setVideoId(videoId);
+    snippet.setLanguage(language);
+    snippet.setName(name);
+    snippet.setIsDraft(false);
+    captionObjectDefiningMetadata.setSnippet(snippet);
+
+    final BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+    final InputStreamContent mediaContent = new InputStreamContent("application/octet-stream", inputStream);
+    mediaContent.setLength(file.length());
+
+    final YouTube.Captions.Insert captionInsert = youTube.captions()
+            .insert("snippet", captionObjectDefiningMetadata, mediaContent);
+    final MediaHttpUploader uploader = captionInsert.getMediaHttpUploader();
+    uploader.setDirectUploadEnabled(false);
+
+    return execute(captionInsert);
+  }
+
 }

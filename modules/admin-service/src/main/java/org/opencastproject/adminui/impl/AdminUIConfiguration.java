@@ -50,7 +50,7 @@ public class AdminUIConfiguration {
   private static final String OPT_MATCH_MANAGED_ACL_ROLE_PREFIXES = "match.managed.acl.role.prefixes";
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
-  private static final String DEFAULT_RETRACT_WORKFLOW_ID = "delete";
+  private static final String DEFAULT_RETRACT_WORKFLOW_ID = "retract-for-deletion";
   private static final String DEFAULT_MATCH_MANAGED_ACL_ROLE_PREFIXES = "";
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;

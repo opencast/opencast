@@ -78,6 +78,11 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
+            <configuration>
+              <environmentVariables>
+                <PUBLIC_URL>/ltitools</PUBLIC_URL>
+              </environmentVariables>
+            </configuration>
             <executions>
               <execution>
                 <id>npm ci</id>

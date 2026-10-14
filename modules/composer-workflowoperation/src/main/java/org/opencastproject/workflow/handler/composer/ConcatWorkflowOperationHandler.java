@@ -51,6 +51,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -216,7 +217,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     float fps = -1.0f;
     // Ignore fps if same Codec - no scaling
     if (!sameCodec && StringUtils.isNotEmpty(outputFrameRate)) {
-      if (StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)) {
+      if (Strings.CS.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)) {
         if (!NumberUtils.isCreatable(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
                 || !trackSelectors.keySet().contains(Integer.parseInt(
                         outputFrameRate.substring(OUTPUT_PART_PREFIX.length())))) {
@@ -278,7 +279,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
           logger.info("No video stream available in the track with flavor {}! {}", currentFlavor, t);
           return createResult(mediaPackage, Action.SKIP);
         }
-        if (StringUtils.startsWith(outputResolution, OUTPUT_PART_PREFIX)
+        if (Strings.CS.startsWith(outputResolution, OUTPUT_PART_PREFIX)
             && NumberUtils.isCreatable(outputResolution.substring(OUTPUT_PART_PREFIX.length()))
             && trackSelector.getKey() == Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))) {
           outputDimension = new Dimension(videoStreams[0].getFrameWidth(), videoStreams[0].getFrameHeight());
@@ -287,7 +288,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
             return createResult(mediaPackage, Action.SKIP);
           }
         }
-        if (fps <= 0 && StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)
+        if (fps <= 0 && Strings.CS.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)
                 && NumberUtils.isCreatable(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
                 && trackSelector.getKey() == Integer.parseInt(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))) {
           fps = videoStreams[0].getFrameRate();

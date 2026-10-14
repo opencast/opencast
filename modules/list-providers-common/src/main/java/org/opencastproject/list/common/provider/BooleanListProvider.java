@@ -25,6 +25,7 @@ import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 
 import java.util.HashMap;
@@ -61,12 +62,12 @@ public class BooleanListProvider implements ResourceListProvider {
 
     String listNameTrimmed = StringUtils.trimToEmpty(listName);
 
-    if (StringUtils.equalsIgnoreCase(YES, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed)) {
+    if (Strings.CI.equals(YES, listNameTrimmed)
+            || Strings.CI.equals(YES_NO, listNameTrimmed)) {
       result.put("true", YES);
     }
-    if (StringUtils.equalsIgnoreCase(NO, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed)) {
+    if (Strings.CI.equals(NO, listNameTrimmed)
+            || Strings.CI.equals(YES_NO, listNameTrimmed)) {
       result.put("false", NO);
     }
 
@@ -81,11 +82,11 @@ public class BooleanListProvider implements ResourceListProvider {
    */
   public static <Boolean> Optional<Boolean> parseValue(String filterValue) {
     String value = StringUtils.trimToEmpty(filterValue);
-    if (StringUtils.equalsIgnoreCase(YES, value)
-            || StringUtils.equalsIgnoreCase("true", value)) {
+    if (Strings.CI.equals(YES, value)
+            || Strings.CI.equals("true", value)) {
       return (Optional<Boolean>) Optional.ofNullable(true);
-    } else if (StringUtils.equalsIgnoreCase(NO, value)
-            || StringUtils.equalsIgnoreCase("false", value)) {
+    } else if (Strings.CI.equals(NO, value)
+            || Strings.CI.equals("false", value)) {
       return (Optional<Boolean>) Optional.ofNullable(false);
     } else {
       return Optional.<Boolean> empty();

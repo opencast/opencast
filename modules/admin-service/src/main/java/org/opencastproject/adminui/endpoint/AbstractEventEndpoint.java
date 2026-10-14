@@ -164,6 +164,7 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -176,6 +177,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1552,7 +1554,7 @@ public abstract class AbstractEventEndpoint {
 
     // lock metadata?
     final String wfState = event.getWorkflowState();
-    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+    if (wfState != null && WorkflowUtil.isActive(wfState)) {
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
     }
 
@@ -1624,7 +1626,7 @@ public abstract class AbstractEventEndpoint {
 
       // check if there's a running workflow
       final String wfState = event.getWorkflowState();
-      if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+      if (wfState != null && WorkflowUtil.isActive(wfState)) {
         eventsWithRunningWorkflow.add(eventId);
         continue;
       }
@@ -2515,7 +2517,7 @@ public abstract class AbstractEventEndpoint {
 
     long workflowInstanceId;
     try {
-      workflowId = StringUtils.remove(workflowId, ".json");
+      workflowId = Strings.CS.remove(workflowId, ".json");
       workflowInstanceId = Long.parseLong(workflowId);
     } catch (Exception e) {
       logger.warn("Unable to parse workflow id {}", workflowId);
@@ -2842,7 +2844,7 @@ public abstract class AbstractEventEndpoint {
     episodeAccessJson.put("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
-            && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState()))) {
+            && WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
       episodeAccessJson.put("locked", true);
     }
 
@@ -3073,12 +3075,12 @@ public abstract class AbstractEventEndpoint {
 
     String rruleString = (String) metadataJson.get("rrule");
 
-    RRule rrule = null;
+    RRule<ZonedDateTime> rrule = null;
     TimeZone timeZone = TimeZone.getDefault();
     String durationString = null;
     if (StringUtils.isNotEmpty(rruleString)) {
       try {
-        rrule = new RRule(rruleString);
+        rrule = new RRule<>(rruleString);
         rrule.validate();
       } catch (Exception e) {
         logger.warn("Unable to parse rrule {}: {}", rruleString, e.getMessage());

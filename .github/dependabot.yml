@@ -26,9 +26,10 @@ updates:
   schedule:
     interval: monthly
   groups:
-    fontawesome:
-      patterns:
-        - "@fortawesome*"
+    minor-and-patch:
+      update-types:
+        - minor
+        - patch
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/runtime-info-ui"

@@ -108,7 +108,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.text.ParseException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -641,15 +641,17 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified "
               + "since last request"),
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar "
-              + "is in the body")
+              + "is in the body"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "The cutoff parameter is "
+              + "not a valid number")
       }
   )
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
-          @QueryParam("cutoff") Long cutoff, @Context HttpServletRequest request) {
+          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) {
     Date endDate = null;
-    if (cutoff != null) {
+    if (StringUtils.isNotBlank(cutoff)) {
       try {
-        endDate = new Date(cutoff);
+        endDate = new Date(Long.parseLong(cutoff));
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }
@@ -974,10 +976,10 @@ public class SchedulerRestService {
       return RestUtil.R.badRequest("Cannot add event without proper start and end time");
     }
 
-    RRule rrule;
+    RRule<ZonedDateTime> rrule;
     try {
-      rrule = new RRule(rruleString);
-    } catch (ParseException e) {
+      rrule = new RRule<>(rruleString);
+    } catch (IllegalArgumentException e) {
       logger.debug("Could not parse recurrence rule");
       return RestUtil.R.badRequest("Could not parse recurrence rule");
     }
@@ -1927,7 +1929,7 @@ public class SchedulerRestService {
       throw new IllegalArgumentException();
     }
 
-    RRule rule = null;
+    RRule<ZonedDateTime> rule = null;
     if (StringUtils.isNotBlank(rrule)) {
       if (duration == null || StringUtils.isBlank(timezone)) {
         logger.info("Either duration or timezone were not specified");
@@ -1935,7 +1937,7 @@ public class SchedulerRestService {
       }
 
       try {
-        rule = new RRule(rrule);
+        rule = new RRule<>(rrule);
         rule.validate();
       } catch (Exception e) {
         logger.info("Unable to parse rrule {}: {}", rrule, getMessage(e));
@@ -2040,4 +2042,3 @@ public class SchedulerRestService {
     return jsonObj.toJSONString();
   }
 }
-

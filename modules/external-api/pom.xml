@@ -191,7 +191,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${gson.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -230,7 +229,6 @@
     <dependency>
       <groupId>uk.co.datumedge</groupId>
       <artifactId>hamcrest-json</artifactId>
-      <version>0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

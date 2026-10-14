@@ -39,7 +39,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,7 +229,13 @@ public class RemoteBase {
             }
           }
         } catch (Exception e) {
-          logger.error("Exception while trying to dispatch job to {}", fullUrl, e);
+          Throwable cause = e.getCause() != null ? e.getCause() : e;
+          if (cause instanceof ConnectException || cause instanceof SocketTimeoutException
+                  || cause instanceof UnknownHostException || cause instanceof NoRouteToHostException) {
+            logger.error("Could not reach node: {} ({})", remoteService.getHost(), cause.getMessage(), e);
+          } else {
+            logger.error("Exception while trying to dispatch job to {}", fullUrl, e);
+          }
           servicesInWarningState.add(fullUrl);
         }
         closeConnection(response);

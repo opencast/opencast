@@ -16,19 +16,14 @@ jobs:
     steps:
     - uses: actions/checkout@v7
 
-    - name: set up python
-      uses: actions/setup-python@v6
-      with:
-        python-version: 3.13
-
     - name: install javascript dependencies
       working-directory: modules/lti/
       run: npm ci
 
-    - name: install selenium
+    - name: install playwright browsers
       working-directory: modules/lti/
-      run: pip install -r requirements.txt
+      run: npx playwright install --with-deps firefox
 
-    - name: running selenium tests
+    - name: running playwright tests
       working-directory: modules/lti/
-      run: ./selenium-tests
+      run: npm run test:e2e

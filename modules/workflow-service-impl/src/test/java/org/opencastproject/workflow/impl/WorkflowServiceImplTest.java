@@ -297,6 +297,20 @@ public class WorkflowServiceImplTest {
   }
 
   @Test
+  public void testStopDoesNotOverwriteTerminatedState() throws Exception {
+    // A workflow which ran to completion must keep its SUCCEEDED state when stop() is called on it, so that the
+    // record of how it actually ended is not lost.
+    WorkflowInstance succeeded = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    Assert.assertEquals(WorkflowState.SUCCEEDED, service.stop(succeeded.getId()).getState());
+    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(succeeded.getId()).getState());
+
+    // Failed workflows are terminated as well and must be left alone likewise.
+    WorkflowInstance failed = startAndWait(failingDefinitionWithoutErrorHandler, mediapackage2, WorkflowState.FAILED);
+    Assert.assertEquals(WorkflowState.FAILED, service.stop(failed.getId()).getState());
+    Assert.assertEquals(WorkflowState.FAILED, service.getWorkflowById(failed.getId()).getState());
+  }
+
+  @Test
   public void testGetWorkflowByMediaPackageId() throws Exception {
     // Ensure that the database doesn't have a workflow instance with this media package
     Assert.assertEquals(0, service.countWorkflowInstances());
@@ -650,7 +664,7 @@ public class WorkflowServiceImplTest {
     service.remove(wi1.getId());
     assertEquals(2, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
 
     service.remove(wi2.getId(), false);
@@ -684,7 +698,7 @@ public class WorkflowServiceImplTest {
     service.remove(wi1.getId());
     assertEquals(0, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
   }
 
@@ -708,7 +722,7 @@ public class WorkflowServiceImplTest {
     service.cleanupWorkflowInstances(0, WorkflowState.SUCCEEDED);
     assertEquals(0, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
   }
 

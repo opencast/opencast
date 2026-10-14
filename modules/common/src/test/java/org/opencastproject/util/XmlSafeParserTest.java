@@ -297,4 +297,3 @@ public class XmlSafeParserTest {
     d4 = XmlSafeParser.parse(xmlInputSafe2);
   }
 }
-

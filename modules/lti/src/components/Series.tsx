@@ -11,9 +11,7 @@ import { Loading } from "./Loading";
 import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
 import 'bootstrap/dist/css/bootstrap.css';
-import Pagination from "react-js-pagination";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faEdit, faComments, faDownload } from "@fortawesome/free-solid-svg-icons";
+import { LuTrash, LuPencil, LuMessageCircle, LuDownload, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from "react-icons/lu";
 import * as i18next from "i18next";
 import { parsedQueryString, capitalize } from "../utils";
 import { sortByType } from "../trackUtils";
@@ -81,20 +79,20 @@ const SeriesEpisode: React.FC<EpisodeProps> = ({episode, deleteCallback, editCal
             <div className="ms-auto">
                 {deleteCallback !== undefined &&
                     <button onClick={(e) => { deleteCallback(episode.id); e.stopPropagation(); }}>
-                        <FontAwesomeIcon icon={faTrash} />
+                        <LuTrash />
                     </button>}
                 {editCallback !== undefined &&
                     <button onClick={(e) => { editCallback(episode.id); e.stopPropagation(); }}>
-                        <FontAwesomeIcon icon={faEdit} />
+                        <LuPencil />
                     </button>}
                 {annotateCallback !== undefined &&
                                     <button onClick={(e) => { annotateCallback(episode.id); e.stopPropagation(); }}>
-                                        <FontAwesomeIcon icon={faComments} />
+                                        <LuMessageCircle />
                                     </button>}
                 {downloadCallback !== undefined && Array.isArray(episode.mediapackage.tracks) && episode.mediapackage.tracks.length > 0 &&
                   <Dropdown style={{display: 'inline-block'}}>
                     <Dropdown.Toggle as={dropdownCustomToggle} >
-                      <FontAwesomeIcon icon={faDownload}/>
+                      <LuDownload/>
                     </Dropdown.Toggle>
                     <DropdownMenu>
                       {sortByType(episode.mediapackage.tracks).map((track) => {
@@ -284,10 +282,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
                         activePage={this.state.currentPage}
                         itemsCountPerPage={EPISONDES_PER_PAGE}
                         totalItemsCount={sr.total}
-                        pageRangeDisplayed={5}
-                        itemClass="page-item"
-                        linkClass="page-link"
-                        innerClass="pagination justify-content-center"
+                        pageRangeDisplayed={4}
                         onChange={this.handlePageChange.bind(this)}
                     />
                 </footer>
@@ -295,6 +290,147 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
         }
         return <Loading t={this.props.t} />;
     }
+}
+
+const Pagination = ({
+    activePage,
+    itemsCountPerPage,
+    totalItemsCount,
+    pageRangeDisplayed,
+    onChange,
+}: {
+    activePage: number
+    itemsCountPerPage: number
+    totalItemsCount: number | undefined
+    pageRangeDisplayed: number
+    onChange: any
+}) => {
+    if (!totalItemsCount) {
+        return <></>;
+    }
+
+    const totalPages = Math.ceil(totalItemsCount / itemsCountPerPage);
+    const accessiblePages = getPaginationRange({
+        activePage,
+        totalPages,
+        pageRangeDisplayed
+    });
+
+    // Navigation to previous page possible?
+    const isNavigatePrevious = () => {
+        return activePage > 1;
+    };
+
+    // Navigation to next page possible?
+    const isNavigateNext = () => {
+        return activePage < totalPages;
+    };
+
+    return (
+        <div className="pagination justify-content-center" style={{ marginBottom: "1rem" }}>
+            <button
+                className={isNavigatePrevious() ? "page-link" : "page-link disabled"}
+                aria-disabled={!isNavigatePrevious()}
+                onClick={() => {
+                    onChange(1)
+                }}
+                aria-label="Go to first page"
+            >
+                <LuChevronsLeft />
+            </button>
+            <button
+                className={isNavigatePrevious() ? "page-link" : "page-link disabled"}
+                aria-disabled={!isNavigatePrevious()}
+                onClick={() => {
+                    onChange(activePage - 1)
+                }}
+                aria-label="Go to Previous page"
+            >
+                <LuChevronLeft />
+            </button>
+            {accessiblePages.map((page, key) =>
+                page === activePage ? (
+                    <button key={key}
+                        className="page-link active"
+                    >
+                        {page}
+                    </button>
+                ) : (
+                    <button key={key}
+                        className="page-link"
+                        onClick={() => {
+                            onChange(page)
+                        }}
+                    >
+                        {page}
+                    </button>
+                ),
+            )}
+
+            <button
+                className={isNavigateNext() ? "page-link" : "page-link disabled"}
+                aria-disabled={!isNavigateNext()}
+                onClick={() => {
+                    onChange(activePage + 1)
+                }}
+                aria-label="Go to next page"
+            >
+                <LuChevronRight />
+            </button>
+            <button
+                className={isNavigateNext() ? "page-link" : "page-link disabled"}
+                aria-disabled={!isNavigateNext()}
+                onClick={() => {
+                    onChange(totalPages)
+                }}
+                aria-label="Go to last page"
+            >
+                <LuChevronsRight />
+            </button>
+        </div>
+    );
+}
+
+export function getPaginationRange({
+    activePage,
+    totalPages,
+    pageRangeDisplayed,
+}: {
+    activePage: number
+    totalPages: number
+    pageRangeDisplayed: number
+}): number[] {
+    if (totalPages <= 0) return [];
+
+    // If all pages fit, return everything
+    if (totalPages <= pageRangeDisplayed) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const halfRange = Math.floor(pageRangeDisplayed / 2);
+
+    let startPage = activePage - halfRange;
+    let endPage = activePage + halfRange;
+
+    // Adjust for even ranges
+    if (pageRangeDisplayed % 2 === 0) {
+        endPage -= 1;
+    }
+
+    if (startPage < 1) {
+        startPage = 1;
+        endPage = pageRangeDisplayed;
+    }
+
+    if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = totalPages - pageRangeDisplayed + 1;
+    }
+
+    return Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+    );
 }
 
 export const Series = withTranslation()(TranslatedSeries);

@@ -20,8 +20,6 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -47,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -65,6 +64,9 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
 
   /** Name of the configuration option that provides the catalog to examine */
   public static final String DCCATALOG_PROPERTY = "dccatalog";
+
+  /** Flavor type of the catalog in case it is not dublincore */
+  public static final String DCCATALOG_TYPE_PROPERTY = "dccatalog-type";
 
   /** Name of the configuration option that provides Dublin Core term/element */
   public static final String DCTERM_PROPERTY = "dcterm";
@@ -104,23 +106,25 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
     String configuredCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCCATALOG_PROPERTY));
-    String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
+    Optional<String> optConfiguredCatalogType = Optional.ofNullable(StringUtils.trimToNull(
+        currentOperation.getConfiguration(DCCATALOG_TYPE_PROPERTY)));
+    String catalogType = optConfiguredCatalogType.isPresent() ? optConfiguredCatalogType.get() : "dublincore";
+    EName configuredDCTerm = EName.fromString(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
 
     // Find Catalog
     Catalog[] catalogs = mediaPackage
-            .getCatalogs(new MediaPackageElementFlavor("dublincore", StringUtils.lowerCase(configuredCatalog)));
+            .getCatalogs(new MediaPackageElementFlavor(catalogType, StringUtils.lowerCase(configuredCatalog)));
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;
-      EName dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
 
       // Find DCTerm
       for (Catalog catalog : catalogs) {
         DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
         // Match Value
-        List<DublinCoreValue> values = dc.get(dcterm);
+        List<DublinCoreValue> values = dc.get(configuredDCTerm);
         if (values.isEmpty()) {
           // Use default
           if (configuredDefaultValue != null) {

@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -205,8 +204,8 @@ public interface AdaptivePlaylist extends Track {
 
     for (String f : variants) {
       try {
-        new URL(f); // ignore external paths
-      } catch (MalformedURLException e) {
+        URI.create(f).toURL(); // ignore external paths
+      } catch (MalformedURLException | IllegalArgumentException e) {
         // is relative path - read the variant playlist
         String name = FilenameUtils.concat(FilenameUtils.getFullPath(file.getAbsolutePath()), f);
         allFiles.addAll(getReferencedFiles(new File(name), true));
@@ -626,7 +625,9 @@ public interface AdaptivePlaylist extends Track {
         newTracks.add(rep.track); // segments are unchanged
         continue;
       }
-      replaceTrackFileInPlace(rep.origMpfile, newNames);
+      File f = replaceTrackFileInPlace(rep.origMpfile, newNames);
+      rep.track.setSize(f.length());
+      rep.track.setChecksum(null);
       rep.newMpuri = rep.origMpuri;
       newTracks.add(rep.track); // add changed variants
     }
@@ -640,7 +641,9 @@ public interface AdaptivePlaylist extends Track {
       newNames.put(logName, relPath);
     }
     // on master, fix references to variant playlists
-    replaceTrackFileInPlace(master.origMpfile, newNames);
+    File f = replaceTrackFileInPlace(master.origMpfile, newNames);
+    master.track.setSize(f.length());
+    master.track.setChecksum(null);
     master.newMpuri = master.track.getURI();
     newTracks.add(master.track);
     // Update the logical names to keep referential integrity
@@ -755,7 +758,9 @@ public interface AdaptivePlaylist extends Track {
         }
         newFiles.add(destFile);
         oldTracks.add(trackRep.track);
-        Track copyTrack = (Track) trackRep.track.clone(); // get all the properties, id, etc
+        Track copyTrack = (Track) trackRep.track.clone();
+        copyTrack.setSize(destFile.length());
+        copyTrack.setChecksum(null);
         mp.add(copyTrack); // add to mp and get new elementID
         Track newTrack = replaceTrackFileInWS.apply(destFile, copyTrack);
         if (newTrack == null) {

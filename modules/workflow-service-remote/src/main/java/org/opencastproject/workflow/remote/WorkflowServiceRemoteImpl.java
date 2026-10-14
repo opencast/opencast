@@ -213,7 +213,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+        return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()).trim());
       }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
@@ -229,7 +229,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+        return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()).trim());
       }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
@@ -557,7 +557,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (force) {
       List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
       queryStringParams.add(new BasicNameValuePair("force", "true"));
-      deleteString = deleteString + "?" + URLEncodedUtils.format(queryStringParams, "UTF_8");
+      deleteString = deleteString + "?" + URLEncodedUtils.format(queryStringParams, StandardCharsets.UTF_8);
     }
 
     HttpDelete delete = new HttpDelete(deleteString);

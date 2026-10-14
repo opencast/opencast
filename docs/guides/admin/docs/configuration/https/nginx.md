@@ -114,13 +114,10 @@ http {
 
             # Make sure to serve cookies only via secure connections.
             proxy_cookie_flags ~ secure httponly;
-            # When using Nginx <1.19.3 replace the above 'proxy_cookie_flags' line
-            # with the (uncommented) 'proxy_cookie_path' line below.
-            #proxy_cookie_path / "/; HTTPOnly; Secure";
 
             # Depending on your integration, you may also want to allow cookies
             # to be used on other sites. In that case, use this instead:
-            #proxy_cookie_path / "/; HTTPOnly; Secure; SameSite=None";
+            #proxy_cookie_flags ~ secure httponly samesite=none;
 
             # Do not buffer responses
             proxy_buffering         off;

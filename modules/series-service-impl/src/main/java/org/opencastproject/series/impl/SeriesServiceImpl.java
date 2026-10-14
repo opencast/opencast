@@ -22,7 +22,6 @@
 package org.opencastproject.series.impl;
 
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
-import static org.opencastproject.util.EqualsUtil.eqListSorted;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 
@@ -79,6 +78,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -425,7 +425,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     final Map<EName, List<DublinCoreValue>> bv = b.getValues();
     if (av.size() == bv.size()) {
       for (Map.Entry<EName, List<DublinCoreValue>> ave : av.entrySet()) {
-        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey()))) {
+        if (!Objects.equals(ave.getValue(), bv.get(ave.getKey()))) {
           return false;
         }
       }

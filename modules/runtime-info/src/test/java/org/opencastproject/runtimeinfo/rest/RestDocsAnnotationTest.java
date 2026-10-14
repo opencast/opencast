@@ -290,6 +290,30 @@ public class RestDocsAnnotationTest {
   }
 
   /**
+   * An endpoint declaring the empty path (or a bare slash) sits at the root of its service. The
+   * documentation renders the endpoint path directly after the service base URL, so such an
+   * endpoint must contribute an empty path rather than a slash. Otherwise the documented path for,
+   * say, the series service reads <code>POST /api/series/</code>, which the security configuration
+   * does not intercept -- it is declared without the trailing slash.
+   */
+  @Test
+  public void testRootPathHasNoTrailingSlash() throws Exception {
+    for (String methodName : new String[] { "methodRootEmptyPath", "methodRootSlashPath" }) {
+      Method testMethod = TestServletSample.class.getMethod(methodName);
+      RestDocData restDocData = new RestDocData("NAME", "TITLE", "URL", null);
+      restDocData.addEndpoint(testMethod.getAnnotation(RestQuery.class), testMethod.getReturnType(),
+              testMethod.getAnnotation(Produces.class), "POST", testMethod.getAnnotation(Path.class));
+
+      RestEndpointData endpoint = restDocData.holders.stream()
+              .flatMap(holder -> holder.getEndpoints().stream())
+              .findFirst()
+              .orElseThrow(() -> new AssertionError("no endpoint was documented for " + methodName));
+      assertEquals("endpoint declared by " + methodName + " must not be documented with a trailing slash",
+              "", endpoint.getPath());
+    }
+  }
+
+  /**
    * This sample class simulates a annotated REST service class.
    */
   @RestService(
@@ -407,6 +431,38 @@ public class RestDocsAnnotationTest {
 
     public String getSchema() {
       return "THIS IS SCHEMA";
+    }
+
+    /** An endpoint at the root of its service, declared the way the External API declares it. */
+    @POST
+    @Produces(MediaType.TEXT_XML)
+    @Path("")
+    @RestQuery(
+        name = "createseriesemptypath",
+        description = "Creates a series.",
+        responses = {
+            @RestResponse(description = "A new series is created", responseCode = HttpServletResponse.SC_CREATED)
+        },
+        returnDescription = "the new series"
+    )
+    public int methodRootEmptyPath() {
+      return 0;
+    }
+
+    /** The same endpoint, declared with a bare slash instead of the empty string. */
+    @POST
+    @Produces(MediaType.TEXT_XML)
+    @Path("/")
+    @RestQuery(
+        name = "createseriesslashpath",
+        description = "Creates a series.",
+        responses = {
+            @RestResponse(description = "A new series is created", responseCode = HttpServletResponse.SC_CREATED)
+        },
+        returnDescription = "the new series"
+    )
+    public int methodRootSlashPath() {
+      return 0;
     }
   }
 

@@ -35,11 +35,11 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Duration;
-import java.util.Dictionary;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -58,12 +57,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Component(
     immediate = true,
-    service = { ManagedService.class,ArtifactInstaller.class,StatisticsWriter.class },
+    service = { ArtifactInstaller.class,StatisticsWriter.class },
     property = {
         "service.description=Statistics Provider Influx Service"
     }
 )
-public class StatisticsProviderInfluxService implements ManagedService, ArtifactInstaller, StatisticsWriter {
+public class StatisticsProviderInfluxService implements ArtifactInstaller, StatisticsWriter {
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(StatisticsProviderInfluxService.class);
@@ -88,11 +87,6 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   @Reference
   public void setStatisticsCoordinator(StatisticsCoordinator service) {
     this.statisticsCoordinator = service;
-  }
-
-  @Activate
-  public void activate(ComponentContext cc) {
-    logger.info("Activating Statistics Provider Influx Service");
   }
 
   @Deactivate
@@ -156,25 +150,26 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
     install(file);
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> dictionary) {
-    if (dictionary == null) {
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) {
+    if (properties == null) {
       logger.info("No configuration available. Not connecting to influx DB.");
       disconnectInflux();
     } else {
-      final Object influxUriValue = dictionary.get(KEY_INFLUX_URI);
+      final Object influxUriValue = properties.get(KEY_INFLUX_URI);
       if (influxUriValue != null) {
         influxUri = influxUriValue.toString();
       }
-      final Object influxUserValue = dictionary.get(KEY_INFLUX_USER);
+      final Object influxUserValue = properties.get(KEY_INFLUX_USER);
       if (influxUserValue != null) {
         influxUser = influxUserValue.toString();
       }
-      final Object influxPwValue = dictionary.get(KEY_INFLUX_PW);
+      final Object influxPwValue = properties.get(KEY_INFLUX_PW);
       if (influxPwValue != null) {
         influxPw = influxPwValue.toString();
       }
-      final Object influxDbValue = dictionary.get(KEY_INFLUX_DB);
+      final Object influxDbValue = properties.get(KEY_INFLUX_DB);
       if (influxDbValue != null) {
         influxDbName = influxDbValue.toString();
       }

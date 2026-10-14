@@ -30,6 +30,7 @@
       },
       {
         "title": "### Dependencies",
+        "collapsed": true,
         "labels": [
           "type:dependencies"
         ]

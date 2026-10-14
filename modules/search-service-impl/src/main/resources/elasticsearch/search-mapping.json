@@ -146,5 +146,16 @@
     "type": {
       "type": "keyword"
     }
-  }
+  },
+  "dynamic_templates": [
+    {
+      "searchable_acl_template": {
+        "path_match": "searchable_acl.*",
+        "match_mapping_type": "string",
+        "mapping": {
+          "type": "keyword"
+        }
+      }
+    }
+  ]
 }

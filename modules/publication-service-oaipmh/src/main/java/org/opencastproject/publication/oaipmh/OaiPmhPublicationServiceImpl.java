@@ -57,10 +57,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -114,7 +114,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
   @Override
   protected String process(Job job) throws Exception {
-    if (!StringUtils.equalsIgnoreCase(JOB_TYPE, job.getJobType())) {
+    if (!Strings.CI.equals(JOB_TYPE, job.getJobType())) {
       throw new IllegalArgumentException("Can not handle job type " + job.getJobType());
     }
 
@@ -128,13 +128,14 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         String[] streamingElementIds = StringUtils.split(job.getArguments().get(3), SEPARATOR);
         checkAvailability = BooleanUtils.toBoolean(job.getArguments().get(4));
         publication = publish(job, mediaPackage, repository,
-                Collections.set(downloadElementIds), Collections.set(streamingElementIds), checkAvailability);
+                new HashSet<>(Arrays.asList(downloadElementIds)), new HashSet<>(Arrays.asList(streamingElementIds)),
+                checkAvailability);
         break;
       case Replace:
         final Set<? extends MediaPackageElement> downloadElements =
-            Collections.toSet(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(2)));
+            new HashSet<>(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(2)));
         final Set<? extends MediaPackageElement> streamingElements =
-            Collections.toSet(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(3)));
+            new HashSet<>(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(3)));
         final Set<MediaPackageElementFlavor> retractDownloadFlavors = Arrays.stream(
             StringUtils.split(job.getArguments().get(4), SEPARATOR))
             .filter(s -> !s.isEmpty())
@@ -146,7 +147,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
             .map(MediaPackageElementFlavor::parseFlavor)
             .collect(Collectors.toSet());
         final Set<? extends MediaPackageElement> publications =
-            Collections.toSet(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(6)));
+            new HashSet<>(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(6)));
         checkAvailability = BooleanUtils.toBoolean(job.getArguments().get(7));
         publication = replace(job, mediaPackage, repository, downloadElements, streamingElements,
             retractDownloadFlavors, retractStreamingFlavors, publications, checkAvailability);
@@ -159,7 +160,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         String[] flavors = StringUtils.split(job.getArguments().get(2), SEPARATOR);
         String[] tags = StringUtils.split(job.getArguments().get(3), SEPARATOR);
         publication = updateMetadata(job, mediaPackage, repository,
-                Collections.set(flavors), Collections.set(tags), checkAvailability);
+                new HashSet<>(Arrays.asList(flavors)), new HashSet<>(Arrays.asList(tags)), checkAvailability);
         break;
       default:
         throw new IllegalArgumentException("Can not handle this type of operation: " + job.getOperation());
@@ -183,11 +184,11 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       return serviceRegistry.createJob(JOB_TYPE, Operation.Replace.name(),
           Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), // 0
               repository, // 1
-              MediaPackageElementParser.getArrayAsXml(Collections.toList(downloadElements)), // 2
-              MediaPackageElementParser.getArrayAsXml(Collections.toList(streamingElements)), // 3
+              MediaPackageElementParser.getArrayAsXml(new ArrayList<>(downloadElements)), // 2
+              MediaPackageElementParser.getArrayAsXml(new ArrayList<>(streamingElements)), // 3
               StringUtils.join(retractDownloadFlavors, SEPARATOR), // 4
               StringUtils.join(retractStreamingFlavors, SEPARATOR), // 5
-              MediaPackageElementParser.getArrayAsXml(Collections.toList(publications)), // 6
+              MediaPackageElementParser.getArrayAsXml(new ArrayList<>(publications)), // 6
               Boolean.toString(checkAvailability))); // 7
     } catch (ServiceRegistryException e) {
       throw new PublicationException("Unable to create job", e);
@@ -657,7 +658,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
     String publicationChannel = getPublicationChannelName(repository);
     for (Publication p : mediaPackage.getPublications()) {
-      if (StringUtils.equals(publicationChannel, p.getChannel())) {
+      if (Strings.CS.equals(publicationChannel, p.getChannel())) {
         return p;
       }
     }
@@ -818,7 +819,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     // return the publication
     String publicationChannel = getPublicationChannelName(repository);
     for (Publication p : mediaPackage.getPublications()) {
-      if (StringUtils.equals(publicationChannel, p.getChannel())) {
+      if (Strings.CS.equals(publicationChannel, p.getChannel())) {
         return p;
       }
     }

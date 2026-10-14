@@ -41,7 +41,6 @@ import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 
@@ -294,13 +293,13 @@ public class PartialImportWorkflowOperationHandlerTest {
 
     TrackImpl videoTrack = new TrackImpl();
     videoTrack.setURI(URI.create("/test"));
-    videoTrack.setVideo(Collections.list((VideoStream) videoStream));
+    videoTrack.setVideo(List.of((VideoStream) videoStream));
 
     TrackImpl videoTrack2 = new TrackImpl();
     videoTrack2.setURI(URI.create("/test"));
-    videoTrack2.setVideo(Collections.list((VideoStream) videoStream2));
+    videoTrack2.setVideo(List.of((VideoStream) videoStream2));
 
-    List<Track> tracks = Collections.list((Track) videoTrack, (Track) videoTrack2);
+    List<Track> tracks = List.of((Track) videoTrack, (Track) videoTrack2);
 
     EncodingProfileImpl encodingProfile = new EncodingProfileImpl();
     encodingProfile.setIdentifier("test");

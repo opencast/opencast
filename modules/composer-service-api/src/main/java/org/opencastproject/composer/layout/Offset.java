@@ -22,7 +22,8 @@
 package org.opencastproject.composer.layout;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /** Offset in a left-handed cartesian coordinate system. */
 public final class Offset {
@@ -59,7 +60,7 @@ public final class Offset {
 
   @Override
   public int hashCode() {
-    return hash(x, y);
+    return Objects.hash(x, y);
   }
 
   @Override

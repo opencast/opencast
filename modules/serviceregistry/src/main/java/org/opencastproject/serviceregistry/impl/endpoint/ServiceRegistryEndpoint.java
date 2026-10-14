@@ -68,6 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -410,7 +411,7 @@ public class ServiceRegistryEndpoint {
     try {
       for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByLoad(serviceType)) {
         JaxbServiceRegistration jaxbReg = new JaxbServiceRegistration(reg);
-        URL internalHostUrl = new URL(jaxbReg.getHost());
+        URL internalHostUrl = URI.create(jaxbReg.getHost()).toURL();
         String tenantSpecificHost = StringUtils.trimToNull(properties.get("org.opencastproject.host."
             + internalHostUrl.getHost()));
         if (StringUtils.isNotBlank(tenantSpecificHost)) {
@@ -419,7 +420,7 @@ public class ServiceRegistryEndpoint {
         registrations.add(jaxbReg);
       }
       return Response.ok(registrations).build();
-    } catch (ServiceRegistryException | MalformedURLException e) {
+    } catch (ServiceRegistryException | MalformedURLException | IllegalArgumentException e) {
       throw new WebApplicationException(e);
     }
   }
@@ -449,7 +450,7 @@ public class ServiceRegistryEndpoint {
   @RestQuery(
       name = "health",
       description = "Checks the status of the registered services",
-      returnDescription = "Returns NO_CONTENT if services are in a proper state",
+      returnDescription = "Returns a count of healthy, warning and error services",
       restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING,
               description = "The service type identifier"),
@@ -473,7 +474,7 @@ public class ServiceRegistryEndpoint {
   @RestQuery(
       name = "health",
       description = "Checks the status of the registered services",
-      returnDescription = "Returns NO_CONTENT if services are in a proper state",
+      returnDescription = "Returns a count of healthy, warning and error services",
       restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING,
               description = "The service type identifier"),
@@ -781,10 +782,11 @@ public class ServiceRegistryEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(
       name = "childrenjobsasxml",
-      description = "Returns all children from a job as XML.",
-      returnDescription = "A list of children jobs as XML",
+      description = "Returns all descendants (children, their children and so on) of a job as XML.",
+      returnDescription = "A list of descendant jobs as XML",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier")
+          @RestParameter(name = "id", isRequired = true, type = Type.STRING,
+              description = "The ancestor job identifier")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Jobs found.")
@@ -798,17 +800,18 @@ public class ServiceRegistryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "childrenjobsasjson",
-      description = "Returns all children from a job as JSON.",
-      returnDescription = "A list of children jobs as JSON",
+      description = "Returns all descendants (children, their children and so on) of a job as JSON.",
+      returnDescription = "A list of descendant jobs as JSON",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier")
+          @RestParameter(name = "id", isRequired = true, type = Type.STRING,
+              description = "The ancestor job identifier")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Jobs found.")
       })
   public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) {
     try {
-      return new JaxbJobList(serviceRegistry.getChildJobs(id));
+      return new JaxbJobList(serviceRegistry.getDescendantJobs(id));
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

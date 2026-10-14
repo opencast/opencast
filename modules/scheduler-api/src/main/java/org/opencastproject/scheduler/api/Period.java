@@ -20,11 +20,8 @@
  */
 package org.opencastproject.scheduler.api;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-
-import org.opencastproject.util.EqualsUtil;
-
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -120,13 +117,14 @@ public final class Period {
   }
 
   private boolean eqFields(Period that) {
-    return eq(this.id, that.id) && eq(this.start, that.start) && eq(this.end, that.end)
-            && eq(this.purpose, that.purpose) && eq(this.comment, that.comment);
+    return Objects.equals(this.id, that.id) && Objects.equals(this.start, that.start)
+            && Objects.equals(this.end, that.end) && Objects.equals(this.purpose, that.purpose)
+            && Objects.equals(this.comment, that.comment);
   }
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(id, start, end, purpose, comment);
+    return Objects.hash(id, start, end, purpose, comment);
   }
 
 }

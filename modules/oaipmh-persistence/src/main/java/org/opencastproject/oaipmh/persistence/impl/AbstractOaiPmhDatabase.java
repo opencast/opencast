@@ -42,6 +42,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -302,33 +303,33 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   private boolean matchSetDefFilter(OaiPmhSetDefinitionFilter filter, List<SearchResultElementItem> elements) {
     // At least one filter criterion should match
     for (String criterion : filter.getCriteria().keySet()) {
-      if (StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, criterion)) {
+      if (Strings.CS.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, criterion)) {
         for (SearchResultElementItem element : elements) {
-          if (!StringUtils.equals(filter.getFlavor(), element.getFlavor())) {
+          if (!Strings.CS.equals(filter.getFlavor(), element.getFlavor())) {
             continue;
           }
           for (String criterionValue : filter.getCriteria().get(criterion)) {
-            if (StringUtils.contains(element.getXml(), criterionValue)) {
+            if (Strings.CS.contains(element.getXml(), criterionValue)) {
               return true;
             }
           }
         }
-      } else if (StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINSNOT, criterion)) {
+      } else if (Strings.CS.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINSNOT, criterion)) {
         for (SearchResultElementItem element : elements) {
-          if (!StringUtils.equals(filter.getFlavor(), element.getFlavor())) {
+          if (!Strings.CS.equals(filter.getFlavor(), element.getFlavor())) {
             continue;
           }
           for (String criterionValue : filter.getCriteria().get(criterion)) {
-            if (!StringUtils.contains(element.getXml(), criterionValue)) {
+            if (!Strings.CS.contains(element.getXml(), criterionValue)) {
               return true;
             }
           }
         }
-      } else if (StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_MATCH, criterion)) {
+      } else if (Strings.CS.equals(OaiPmhSetDefinitionFilter.CRITERION_MATCH, criterion)) {
         for (String criterionValue : filter.getCriteria().get(criterion)) {
           Pattern matchPattern = null; // wait with initialization until we found an element to test
           for (SearchResultElementItem element : elements) {
-            if (!StringUtils.equals(filter.getFlavor(), element.getFlavor())) {
+            if (!Strings.CS.equals(filter.getFlavor(), element.getFlavor())) {
               continue;
             }
             // initialize regex pattern once and only if we need it (for performance reasons)

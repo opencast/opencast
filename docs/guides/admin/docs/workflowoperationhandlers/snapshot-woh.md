@@ -18,6 +18,7 @@ Parameter Table
 |source-tags       |text            |Comma separated list of tags. Specifies which media should be the source of a snapshot.|
 |source-flavors    |presenter/source|Comma separated list of flavors. Specifies which media should be the source of a snapshot.|
 
+If neither tags nor flavors are configured, all elements of the media package are included.
 
 Operation Example
 -----------------

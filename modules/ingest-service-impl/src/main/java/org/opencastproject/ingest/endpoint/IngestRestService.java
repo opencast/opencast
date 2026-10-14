@@ -45,6 +45,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.OpencastMetadataCodec;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -178,6 +179,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
           "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
 
+  /**
+   * Dublin Core Terms which are interpreted as a single date further down the line and therefore need to be
+   * parsable as one. Note that "temporal" is deliberately absent: it carries a DCMI period
+   * (start=...; end=...;), not a plain date, and is decoded with decodeMandatoryPeriod elsewhere.
+   */
+  private static final List<String> DATE_DCTERMS = Arrays.asList("created", "date");
+
   /** Formatter to for the date into a string */
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat(IngestService.UTC_DATE_FORMAT);
 
@@ -302,7 +310,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("discardMediaPackage")
   @RestQuery(
       name = "discardMediaPackage",
-      description = "Discard a media package",
+      description = "Discard a media package, as application/x-www-form-urlencoded",
       restParameters = {
           @RestParameter(description = "Given media package to be destroyed", isRequired = true, name = "mediaPackage",
               type = RestParameter.Type.TEXT)
@@ -313,6 +321,40 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       },
       returnDescription = "")
   public Response discardMediaPackage(@FormParam("mediaPackage") String mpx) {
+    return discardMediaPackageElement(mpx);
+  }
+
+  @POST
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Path("discardMediaPackage")
+  @RestQuery(
+      name = "discardMediaPackageAsMultipart",
+      description = "Discard a media package, as multipart/form-data",
+      restParameters = {
+          @RestParameter(description = "Given media package to be destroyed", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
+  public Response discardMediaPackageAsMultipart(@Context HttpServletRequest request) {
+    String mpx = null;
+    try {
+      for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        if (item.isFormField() && "mediaPackage".equals(item.getFieldName())) {
+          mpx = Streams.asString(item.openStream(), "UTF-8");
+        }
+      }
+    } catch (FileUploadException | IOException e) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+    return discardMediaPackageElement(mpx);
+  }
+
+  private Response discardMediaPackageElement(String mpx) {
     logger.debug("discardMediaPackage(MediaPackage): {}", mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
@@ -984,6 +1026,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
               }
+              /* Reject unparsable dates here rather than letting them fail much later during indexing */
+              if (DATE_DCTERMS.contains(fieldName)) {
+                try {
+                  OpencastMetadataCodec.decodeDate(value);
+                } catch (IllegalArgumentException e) {
+                  return badRequest(String.format("Could not parse date '%s' for field '%s'", value, fieldName), e);
+                }
+              }
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();
               }
@@ -1577,7 +1627,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Adds a dublinCore metadata catalog to the MediaPackage and returns the grown mediaPackage. JQuery Ajax functions
-   * doesn't support multipart/form-data encoding.
+   * doesn't support multipart/form-data encoding, so this is what they should use; clients sending
+   * multipart/form-data should use {@link #addDCCatalogAsMultipart(HttpServletRequest)} instead.
    *
    * @param mp
    *          MediaPackage
@@ -1590,7 +1641,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("addDCCatalog")
   @RestQuery(
       name = "addDCCatalog",
-      description = "Add a dublincore episode catalog to a given media package using an url",
+      description = "Add a dublincore episode catalog to a given media package as application/x-www-form-urlencoded",
       restParameters = {
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
               type = RestParameter.Type.TEXT),
@@ -1607,6 +1658,63 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       returnDescription = "")
   public Response addDCCatalog(@FormParam("mediaPackage") String mp, @FormParam("dublinCore") String dc,
           @FormParam("flavor") String flavor) {
+    return addDCCatalogElement(mp, dc, flavor);
+  }
+
+  @POST
+  @Produces(MediaType.TEXT_XML)
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Path("addDCCatalog")
+  @RestQuery(
+      name = "addDCCatalogAsMultipart",
+      description = "Add a dublincore episode catalog to a given media package as multipart/form-data",
+      restParameters = {
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(description = "DublinCore catalog as XML", isRequired = true, name = "dublinCore",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(defaultValue = "dublincore/episode", description = "DublinCore Flavor", isRequired = false,
+              name = "flavor", type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
+  public Response addDCCatalogAsMultipart(@Context HttpServletRequest request) {
+    logger.trace("add DC catalog as multipart-form-data");
+    String mp = null;
+    String dc = null;
+    String flavor = null;
+    try {
+      for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        if (!item.isFormField()) {
+          continue;
+        }
+        String value = Streams.asString(item.openStream(), "UTF-8");
+        switch (item.getFieldName()) {
+          case "mediaPackage":
+            mp = value;
+            break;
+          case "dublinCore":
+            dc = value;
+            break;
+          case "flavor":
+            flavor = value;
+            break;
+          default:
+            break;
+        }
+      }
+    } catch (FileUploadException | IOException e) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+    return addDCCatalogElement(mp, dc, flavor);
+  }
+
+  private Response addDCCatalogElement(String mp, String dc, String flavor) {
     logger.trace("add DC catalog: {} with flavor: {} to media package: {}", dc, flavor, mp);
     MediaPackageElementFlavor dcFlavor = MediaPackageElements.EPISODE;
     if (flavor != null) {

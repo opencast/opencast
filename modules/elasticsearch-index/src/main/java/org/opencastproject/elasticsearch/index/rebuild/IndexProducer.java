@@ -23,6 +23,7 @@ package org.opencastproject.elasticsearch.index.rebuild;
 
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.DataType;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -37,6 +38,17 @@ public interface IndexProducer {
    *          Limit the data added to the index. Use ALL to re-index all data.
    */
   void repopulate(DataType dataType) throws IndexRebuildException;
+
+  /**
+   * Clear this service's own index, if it maintains one that is separate from the shared
+   * {@link org.opencastproject.elasticsearch.index.ElasticsearchIndex}.
+   *
+   * Most services feed data into that shared index, which is cleared independently, so the default
+   * implementation is a no-op. Services with their own dedicated index (e.g. the search service) must
+   * override this so that a full index clear or rebuild also clears their data.
+   */
+  default void clear() throws IOException {
+  }
 
   /**
    * Get the service that implements IndexProducer.

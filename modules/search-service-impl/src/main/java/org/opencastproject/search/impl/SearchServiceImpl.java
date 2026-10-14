@@ -52,8 +52,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -188,7 +188,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   @Override
-  public Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId) {
+  public Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId) throws SearchException {
     try {
       return persistence.getSeries(seriesId);
     } catch (SearchServiceDatabaseException e) {
@@ -229,7 +229,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   @Override
-  public MediaPackage get(String mediaPackageId) throws NotFoundException, UnauthorizedException {
+  public MediaPackage get(String mediaPackageId) throws NotFoundException, UnauthorizedException, SearchException {
     try {
       return persistence.getMediaPackage(mediaPackageId);
     } catch (SearchServiceDatabaseException e) {

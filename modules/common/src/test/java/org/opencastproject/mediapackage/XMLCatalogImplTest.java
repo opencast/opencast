@@ -22,8 +22,6 @@ package org.opencastproject.mediapackage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 
@@ -43,14 +41,14 @@ public class XMLCatalogImplTest {
    */
   @Test
   public void testEqualityOfCatalogEntries() throws Exception {
-    final Map<EName, String> a1 = map(
-        tuple(EName.mk("http://lang.org", "lang"), "en"),
-        tuple(EName.mk("http://value.org", "value"), "value"),
-        tuple(EName.mk("http://type.org", "type"), "string"));
-    final Map<EName, String> a2 = map(
-        tuple(EName.mk("http://type.org", "type"), "string"),
-        tuple(EName.mk("http://lang.org", "lang"), "en"),
-        tuple(EName.mk("http://value.org", "value"), "value"));
+    final Map<EName, String> a1 = Map.of(
+        EName.mk("http://lang.org", "lang"), "en",
+        EName.mk("http://value.org", "value"), "value",
+        EName.mk("http://type.org", "type"), "string");
+    final Map<EName, String> a2 = Map.of(
+        EName.mk("http://type.org", "type"), "string",
+        EName.mk("http://lang.org", "lang"), "en",
+        EName.mk("http://value.org", "value"), "value");
     final CatalogEntry c1 = new TestImpl().mkCatalogEntry(EName.mk("http://extron.com", "extron"), "value", a1);
     final CatalogEntry c2 = new TestImpl().mkCatalogEntry(EName.mk("http://extron.com", "extron"), "value", a2);
     assertEquals(c1, c2);

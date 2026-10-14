@@ -30,7 +30,6 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.data.functions.Misc;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -78,17 +77,17 @@ public final class JpaAclDb implements AclDb {
 
   @Override
   public List<ManagedAcl> getAcls(Organization org) {
-    return Misc.widen(db.execTx(ManagedAclEntity.findByOrgQuery(org.getId())));
+    return List.copyOf(db.execTx(ManagedAclEntity.findByOrgQuery(org.getId())));
   }
 
   @Override
   public Optional<ManagedAcl> getAcl(Organization org, long id) {
-    return Misc.widen(db.execTx(ManagedAclEntity.findByIdAndOrgQuery(org.getId(), id)));
+    return db.execTx(ManagedAclEntity.findByIdAndOrgQuery(org.getId(), id)).map(e -> e);
   }
 
   @Override
   public Optional<ManagedAcl> getAcl(Organization org, String name) {
-    return Misc.widen(db.execTx(ManagedAclEntity.findByNameAndOrgQuery(org.getId(), name)));
+    return db.execTx(ManagedAclEntity.findByNameAndOrgQuery(org.getId(), name)).map(e -> e);
   }
 
   @Override

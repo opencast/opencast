@@ -211,21 +211,21 @@ or `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.`
 Your unique asset identifier will follow the last dot after the prefix, in all capital alphabetical characters.
 Underbars are allowed. CONFIGURATION values are in JSON object format.
 
-Attribute    | Example         | Description
--------------| ----------------| -----------
-id           | track_presenter | One of "attachment" or "catalog" or "track", underbar (\_), unique text (no spaces)
-type         | track           | One of "attachment" or "catalog" or "track" to designate asset type (must match id prefix)
-flavorType   | presentation    | The primary flavor type. Used to reference asset in workflows, player, and media module
-flavorSubType| source          | The sub flavor type. Used to identify the sub flavor of this flavor type
-multiple     | false           | true or false, used by the admin UI to enable single or multiple file input selection
-displayOrder | 32              | Integer number, used by the admin UI to sort the display of upload options in the UI
-displayOverride | 'My New Catalog'    | A short asset title which overrides all translations
-displayFallback | 'My New Catalog'    | A short asset title which displays when no translation is found
-displayOverride.SHORT | 'Video of a Presenter'    | A short source title which overrides all translations
-displayFallback.SHORT | 'Video of a Presenter'    | A short source title which displays when no translation is found
-displayOverride.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which overrides all translation
-displayFallback.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which displays when no translation is found
-accept | 'video/\*,.png' | A list of accepted file formats as taken by the HTML \<input\>'s `accept` field. This field is optional. This has to be a list of comma separated values. Each value of the list can either be a IANA MediaType or a file ending.
+Attribute    | Example         | Description | Required
+-------------| ----------------| ----------- | 
+id           | track_presenter | One of "attachment" or "catalog" or "track", underbar (\_), unique text (no spaces) | YES
+type         | track           | One of "attachment" or "catalog" or "track" to designate asset type (must match id prefix) | YES
+flavorType   | presentation    | The primary flavor type. Used to reference asset in workflows, player, and media module | YES
+flavorSubType| source          | The sub flavor type. Used to identify the sub flavor of this flavor type | YES
+multiple     | false           | true or false, used by the admin UI to enable single or multiple file input selection | YES
+displayOrder | 32              | Integer number, used by the admin UI to sort the display of upload options in the UI | YES
+displayOverride | 'My New Catalog'    | A short asset title which overrides all translations | NO
+displayFallback | 'My New Catalog'    | A short asset title which displays when no translation is found | NO
+displayOverride.SHORT | 'Video of a Presenter'    | A short source title which overrides all translations | NO
+displayFallback.SHORT | 'Video of a Presenter'    | A short source title which displays when no translation is found | NO
+displayOverride.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which overrides all translation | NO
+displayFallback.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which displays when no translation is found | NO
+accept | 'video/\*,.png' | A list of accepted file formats as taken by the HTML \<input\>'s `accept` field. This has to be a list of comma separated values. Each value of the list can either be a IANA MediaType or a file ending. | NO
 
 
 The parameter key is internationalized as the display text in the admin interface.

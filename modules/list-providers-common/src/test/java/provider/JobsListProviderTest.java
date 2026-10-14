@@ -35,7 +35,7 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +86,7 @@ public class JobsListProviderTest {
         fail("Can not parse job state");
       }
 
-      assertTrue(StringUtils.startsWith(entry.getValue(), JobsListProvider.JOB_STATUS_FILTER_PREFIX));
+      assertTrue(Strings.CS.startsWith(entry.getValue(), JobsListProvider.JOB_STATUS_FILTER_PREFIX));
     }
   }
 
@@ -102,8 +102,8 @@ public class JobsListProviderTest {
 
       boolean match = false;
       for (WorkflowDefinition wfD : workflowDefinitions) {
-        if (StringUtils.equals(wfD.getId(), entry.getKey())
-                && StringUtils.equals(wfD.getTitle(), entry.getValue())) {
+        if (Strings.CS.equals(wfD.getId(), entry.getKey())
+                && Strings.CS.equals(wfD.getTitle(), entry.getValue())) {
           match = true;
           break;
         }

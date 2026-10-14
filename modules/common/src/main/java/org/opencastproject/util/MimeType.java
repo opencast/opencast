@@ -22,16 +22,12 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.eqObj;
-import static org.opencastproject.util.data.Collections.list;
-
-import org.opencastproject.util.data.Collections;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -103,12 +99,12 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   }
 
   public static MimeType mimeType(String type, String subtype, String suffix) {
-    return new MimeType(type, subtype, list(suffix), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(),
+    return new MimeType(type, subtype, List.of(suffix), List.of(), Optional.empty(), Optional.empty(),
         Optional.empty());
   }
 
   public static MimeType mimeType(String type, String subtype) {
-    return new MimeType(type, subtype, Collections.<String>nil(), Collections.<MimeType>nil(), Optional.empty(),
+    return new MimeType(type, subtype, List.of(), List.of(), Optional.empty(),
         Optional.empty(), Optional.empty());
   }
 
@@ -213,14 +209,6 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
     return flavor.equalsIgnoreCase(flavor);
   }
 
-  /**
-   * Returns the MimeType as a string of the form <code>type/subtype</code>
-   * @deprecated use {@link #toString()} instead
-   */
-  public String asString() {
-    return toString();
-  }
-
   /** Two mime types are considered equal if type and subtype are equal. */
   public boolean eq(MimeType other) {
     return eq(other.getType(), other.getSubtype());
@@ -261,7 +249,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(type, subtype);
+    return Objects.hash(type, subtype);
   }
 
   @Override
@@ -270,8 +258,8 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   }
 
   private boolean eqFields(MimeType that) {
-    return eqObj(this.type, that.type)
-            && eqObj(this.subtype, that.subtype);
+    return Objects.equals(this.type, that.type)
+            && Objects.equals(this.subtype, that.subtype);
   }
 
   static class Adapter extends XmlAdapter<String, MimeType> {

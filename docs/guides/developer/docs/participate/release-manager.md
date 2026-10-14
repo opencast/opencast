@@ -311,25 +311,17 @@ as an example:
 
 1. Switch to and update your local release branch, ensuring your local branch is up to date with the main repo.
 
-2. Add the release notes, and update the changelog. The `create-changelog` [helper script
-   ](https://github.com/opencast/helper-scripts/tree/master/release-management/create-changelog) is a convenient tool
-   for this.  The script can be called a few different ways, please read the documentation and figure our yours.
+2. Add the release notes.
 
         cd docs/guides/admin/docs/
         vim releasenotes.md
-        python3 helper-scripts/release-management/create-changelog.py [args] >> changelog/opencast-{{ opencast_major_version() }}.md
-        [ manual check that the doc looks correct ]
-        git add changelog/opencast-{{ opencast_major_version() }}.md
-
-    - Check that PRs tagged as features are all listed in the release notes, since sometimes committers miss adding the
-    text files.
-
-    - Ensure you check across the admin, editor, and studio repositories, since PRs in those repositories may not get
-    picked up by the script above!
 
     - The release notes for a major release (x.0) should be built from the various text files in the 
    `docs/guides/admin/docs/releasenotes` directory.  the release notes for a minor release (x.y) should be a rough
    summary of the development activity between x.y and x.y-1
+
+    - The release notes should link to the changelog, which does not exist at this step!  The URL will look like
+    https://github.com/opencast/opencast/releases/tag/<tag>, eg: https://github.com/opencast/opencast/releases/tag/21.0
 
 3. Switch to a new branch to create the release (name does not really matter):
 
@@ -366,8 +358,7 @@ as an example:
         git submodule foreach git branch -D tmp-{{ opencast_major_version() }}.0
 
 9. Check the “Create new release” GitHub Actions workflow.
-   It will automatically build and upload the release tarballs and create a new release draft.
-   Once it is finished, review the draft, adjust the description and publish the release.
+   It will automatically build and upload the release tarballs and create new release.
 
    If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
    manually in the GitHub user interface.

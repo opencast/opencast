@@ -21,8 +21,9 @@
 
 package org.opencastproject.util.data;
 
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.data.Tuple.tuple;
+
+import java.util.Objects;
 
 public final class Cells {
   private Cells() {
@@ -53,7 +54,7 @@ public final class Cells {
     return new FCell<A>() {
       @Override protected A calc() {
         final Tuple<B, Object> mChange = master.change();
-        if (ne(mChange.getB(), change)) {
+        if (!Objects.equals(mChange.getB(), change)) {
           a = f.apply(mChange.getA());
           change = mChange.getB();
         }

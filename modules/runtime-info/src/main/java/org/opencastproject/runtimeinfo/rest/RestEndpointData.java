@@ -28,7 +28,7 @@ import org.opencastproject.util.doc.DocData;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestResponse;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -462,7 +462,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
   }
 
   public String getEscapedReturnTypeSchema() {
-    return StringEscapeUtils.escapeXml(returnTypeSchema);
+    return StringEscapeUtils.escapeXml10(returnTypeSchema);
   }
 
 }

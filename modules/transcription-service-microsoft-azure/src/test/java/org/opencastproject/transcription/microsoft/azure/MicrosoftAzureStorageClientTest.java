@@ -22,6 +22,7 @@
 package org.opencastproject.transcription.microsoft.azure;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
@@ -114,7 +116,7 @@ public class MicrosoftAzureStorageClientTest {
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
     Assert.assertTrue("Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt",
-        StringUtils.endsWithIgnoreCase(blobUrl, "/" + azureStorageContainerName + "/test.txt"));
+        Strings.CI.endsWith(blobUrl, "/" + azureStorageContainerName + "/test.txt"));
   }
 
   @Test
@@ -128,7 +130,7 @@ public class MicrosoftAzureStorageClientTest {
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.ogg");
     Assert.assertTrue("Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt",
-        StringUtils.endsWithIgnoreCase(blobUrl, "/" + azureStorageContainerName + "/test.ogg"));
+        Strings.CI.endsWith(blobUrl, "/" + azureStorageContainerName + "/test.ogg"));
   }
 
   @Test
@@ -142,6 +144,6 @@ public class MicrosoftAzureStorageClientTest {
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
     Assert.assertNotNull(blobUrl);
-    azureStorageClient.deleteFile(new URL(blobUrl));
+    azureStorageClient.deleteFile(URI.create(blobUrl).toURL());
   }
 }

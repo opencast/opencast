@@ -102,7 +102,9 @@ public class SpeechToTextServiceRestEndpoint extends AbstractJobProducerEndpoint
           @RestParameter(name = "language", isRequired = false, type = STRING,
               description = "Language of the media file."),
           @RestParameter(name = "translate", isRequired = false, type = BOOLEAN,
-              description = "Enable translation to english") },
+              description = "Enable translation to english"),
+          @RestParameter(name = "async", isRequired = false, defaultValue = "false", type = BOOLEAN,
+              description = "If job will run outside the scope of a workflow") },
       responses = {
           @RestResponse(description = "Subtitles created successfully", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -113,10 +115,11 @@ public class SpeechToTextServiceRestEndpoint extends AbstractJobProducerEndpoint
   public Response speechToText(
           @FormParam("mediaFilePath") String mediaFilePath,
           @FormParam("language") String language,
-          @FormParam("translate") Boolean translate) {
+          @FormParam("translate") Boolean translate,
+          @FormParam("async") Boolean async) {
     try {
       logger.debug("Starting to generate subtitles.");
-      Job job = speechToTextService.transcribe(new URI(mediaFilePath), language, translate);
+      Job job = speechToTextService.transcribe(new URI(mediaFilePath), language, translate, async);
       return Response.ok(new JaxbJob(job)).build();
     } catch (JsonSyntaxException | URISyntaxException | NullPointerException e) {
       logger.debug("Invalid data passed to REST endpoint:\nmediaFilePath: {}\nlanguage: {}\ntranslate: {})",

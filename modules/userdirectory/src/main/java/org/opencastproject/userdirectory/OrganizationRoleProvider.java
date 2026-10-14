@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -112,7 +113,7 @@ public class OrganizationRoleProvider implements RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     }
     Organization organization = securityService.getOrganization();
-    HashSet<Role> foundRoles = new HashSet<Role>();
+    HashSet<Role> foundRoles = new HashSet<>();
     for (Iterator<Role> it = getRoles(); it.hasNext();) {
       Role role = it.next();
       // Anonymous roles are not relevant for adding to users or groups
@@ -123,22 +124,12 @@ public class OrganizationRoleProvider implements RoleProvider {
         foundRoles.add(role);
       }
     }
-    return offsetLimitCollection(offset, limit, foundRoles).iterator();
-  }
 
-  private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {
-    HashSet<T> result = new HashSet<T>();
-    int i = 0;
-    for (T entry : entries) {
-      if (limit != 0 && result.size() >= limit) {
-        break;
-      }
-      if (i >= offset) {
-        result.add(entry);
-      }
-      i++;
-    }
-    return result;
+    return foundRoles.stream()
+        .sorted(Comparator.comparing(Role::getName))  // Sort for consistent returns on limit+offset
+        .skip(offset)
+        .limit(limit > 0 ? limit : Long.MAX_VALUE)
+        .iterator();
   }
 
   private boolean like(String string, final String query) {

@@ -1,6 +1,6 @@
 services:
   opensearch:
-    image: opencast/opensearch:1
+    image: opencast/opensearch:3
     init: true
     build:
       context: .
@@ -16,3 +16,6 @@ services:
       - "DISABLE_INSTALL_DEMO_CONFIG=true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
       - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
       - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
+      - "search.insights.top_queries.latency.enabled=false" # disables Query Insights diagnostics, see searchindex docs for details
+      - "search.insights.top_queries.cpu.enabled=false"
+      - "search.insights.top_queries.memory.enabled=false"

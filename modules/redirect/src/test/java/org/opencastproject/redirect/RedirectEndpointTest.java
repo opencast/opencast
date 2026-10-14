@@ -28,9 +28,7 @@ import static org.easymock.EasyMock.replay;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -50,11 +48,11 @@ public class RedirectEndpointTest {
 
   /** Test the `POST /redirect/get` endpoint */
   @Test
-  public void testPostRedirectGet() throws MalformedURLException {
+  public void testPostRedirectGet() {
     String target = "/studio";
     Response response = endpoint.get(target, uriInfo);
     Assert.assertEquals(303, response.getStatus());
-    String expected = new URL(uriInfo.getBaseUri().toURL(), target).toString();
+    String expected = uriInfo.getBaseUri().resolve(target).toString();
     Assert.assertEquals(response.getLocation().toString(), expected);
   }
 
@@ -76,6 +74,13 @@ public class RedirectEndpointTest {
   @Test
   public void testPostRedirectGetNonRelativeTarget() {
     Response response = endpoint.get("https://opencast.org", uriInfo);
+    Assert.assertEquals(400, response.getStatus());
+  }
+
+  /** Test `POST /redirect/get` with a target that has its own scheme but no authority */
+  @Test
+  public void testPostRedirectGetOpaqueTarget() {
+    Response response = endpoint.get("javascript:alert(1)", uriInfo);
     Assert.assertEquals(400, response.getStatus());
   }
 }

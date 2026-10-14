@@ -20,5 +20,3 @@
  */
 
 package org.opencastproject.adminui.endpoint;
-
-

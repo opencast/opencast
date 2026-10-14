@@ -70,9 +70,10 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,13 +99,13 @@ import java.util.concurrent.ExecutionException;
  */
 @Component(
     immediate = true,
-    service = { WorkflowOperationHandler.class, ManagedService.class },
+    service = { WorkflowOperationHandler.class },
     property = {
         "service.description=Text Analysis Workflow Operation Handler",
         "workflow.operation=extract-text"
     }
 )
-public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperationHandler implements ManagedService {
+public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TextAnalysisWorkflowOperationHandler.class);
@@ -500,12 +501,20 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
     return catalogs;
   }
 
-  /**
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
-  @SuppressWarnings("rawtypes")
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  @Activate
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+    updated(cc.getProperties());
+  }
+
+  @Modified
+  public void modified(ComponentContext cc) {
+    updated(cc.getProperties());
+  }
+
+  @SuppressWarnings("rawtypes")
+  public void updated(Dictionary properties) {
     if (properties != null && properties.get(OPT_STABILITY_THRESHOLD) != null) {
       String threshold = StringUtils.trimToNull((String)properties.get(OPT_STABILITY_THRESHOLD));
       try {

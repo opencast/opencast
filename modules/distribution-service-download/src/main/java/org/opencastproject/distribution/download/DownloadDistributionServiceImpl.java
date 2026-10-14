@@ -22,9 +22,7 @@ package org.opencastproject.distribution.download;
 
 import static java.lang.String.format;
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.HttpUtil.waitForResource;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
@@ -92,6 +90,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -191,13 +190,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementId, true);
   }
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
@@ -205,7 +204,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
@@ -216,7 +215,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       Set<String> elementIds,
       boolean checkAvailability,
       boolean preserveReference
-  ) throws DistributionException, MediaPackageException {
+  ) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -539,54 +538,47 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distributeSync(channelId, mediapackage, elementIds, true, false);
   }
 
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
+  }
+
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
+                                                  boolean checkAvailability)
+          throws DistributionException {
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
+  }
+
   public List<MediaPackageElement> distributeSync(
-          String channelId,
-          MediaPackage mediapackage,
-          Set<String> elementIds,
-          boolean checkAvailability,
-          boolean preserveReference
-  ) throws DistributionException, MediaPackageException {
+      String channelId,
+      MediaPackage mediapackage,
+      Set<String> elementIds,
+      boolean checkAvailability,
+      boolean preserveReference
+  ) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
     MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
-            checkAvailability, preserveReference);
+        checkAvailability, preserveReference);
     return Arrays.asList(distributedElements);
   }
 
   @Override
-  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
-                                                  boolean checkAvailability) throws DistributionException {
-    Job job = null;
-    try {
-      job = serviceRegistry
-          .createJob(
-              JOB_TYPE, Operation.Distribute.toString(), null, null, false, distributeJobLoad);
-      job.setStatus(Job.Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      final MediaPackageElement[] mediaPackageElements
-          = this.distributeElements(channelId, mediapackage, elementIds, checkAvailability);
-      job.setStatus(Job.Status.FINISHED);
-      return Arrays.asList(mediaPackageElements);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException(e);
-    } catch (NotFoundException e) {
-      throw new DistributionException("Unable to update distribution job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
-  }
-
-  @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet();
     elementIds.add(elementId);
     return retractSync(channelId, mediapackage, elementIds);
@@ -612,7 +604,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the mediapackage
    * @param elementIds
    *          the element identifiers
-   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @return the retracted elements
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
@@ -643,7 +635,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the mediapackage
    * @param element
    *          the element
-   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @return the retracted element
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
@@ -837,13 +829,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       if (splitUrl.length < 5) {
         logger.warn("Malformed URI {}. Format must be .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
                         + " Trying URI without channelId", uriString);
-        return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]));
+        return Paths.get(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]).toFile();
       } else {
-        return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]));
+        return Paths.get(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]).toFile();
       }
     }
-    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
-            FilenameUtils.getName(uriString)));
+    return Paths.get(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
+            FilenameUtils.getName(uriString)).toFile();
   }
 
   /**
@@ -853,7 +845,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
     final String orgId = securityService.getOrganization().getId();
-    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().toString()));
+    return new File(distributionDirectory, Paths.get(orgId, channelId, mp.getIdentifier().toString()).toString());
   }
 
   /**
@@ -897,7 +889,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
           .fold(
               Misc.chuck(),
               status -> {
-                if (ne(status, HttpServletResponse.SC_OK)) {
+                if (!Objects.equals(status, HttpServletResponse.SC_OK)) {
                   logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
                   Misc.chuck(new DistributionException("Unable to load distributed file " + uri.toString()));
                 }

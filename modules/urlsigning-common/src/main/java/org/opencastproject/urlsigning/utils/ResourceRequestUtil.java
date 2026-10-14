@@ -339,7 +339,7 @@ public final class ResourceRequestUtil {
    * @return True if signed, false if not.
    */
   public static boolean isSigned(URI uri) {
-    List<NameValuePair> queryStringParameters = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8.toString());
+    List<NameValuePair> queryStringParameters = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8);
     boolean hasKeyId = false;
     boolean hasPolicy = false;
     boolean hasSignature = false;

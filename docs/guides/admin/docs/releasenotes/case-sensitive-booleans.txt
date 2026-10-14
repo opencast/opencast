@@ -1,0 +1,4 @@
+> Note that `AND`, `OR`, `NOT`, `true` and `false` are case-sensitive keywords: they must be written exactly as shown.
+
+This was the case already before, but if not adhered to will now cause the workflow to fail. Might cause workflow
+failures for users who were not respecting case-sensitivity, but their workflows worked somehow anyway.

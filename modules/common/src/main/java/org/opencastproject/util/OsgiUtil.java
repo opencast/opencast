@@ -38,6 +38,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.servlet.Servlet;
 
@@ -101,7 +102,21 @@ public final class OsgiUtil {
    *           key does not exist or its value is blank
    */
   public static String getCfg(Dictionary d, String key) throws ConfigurationException {
-    Object p = d.get(key);
+    return getCfg(d::get, key);
+  }
+
+  /**
+   * Get a mandatory, non-blank value from a configuration map.
+   *
+   * @throws ConfigurationException
+   *           key does not exist or its value is blank
+   */
+  public static String getCfg(Map<String, ?> properties, String key) throws ConfigurationException {
+    return getCfg(properties::get, key);
+  }
+
+  private static String getCfg(Function<String, ?> getter, String key) throws ConfigurationException {
+    Object p = getter.apply(key);
     if (p == null) {
       throw new ConfigurationException(key, "does not exist");
     }
@@ -114,14 +129,32 @@ public final class OsgiUtil {
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
   public static Optional<String> getOptCfg(Dictionary d, String key) {
-    return Optional.ofNullable(d.get(key))
+    return getOptCfg(d::get, key);
+  }
+
+  /** Get a value from a configuration map. Return none if the key does either not exist or the value is blank. */
+  public static Optional<String> getOptCfg(Map<String, ?> properties, String key) {
+    return getOptCfg(properties::get, key);
+  }
+
+  private static Optional<String> getOptCfg(Function<String, ?> getter, String key) {
+    return Optional.ofNullable(getter.apply(key))
         .map(Object::toString)
         .flatMap(Strings::trimToNone);
   }
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
   public static Optional<Integer> getOptCfgAsInt(Dictionary d, String key) {
-    return Optional.ofNullable(d.get(key))
+    return getOptCfgAsInt(d::get, key);
+  }
+
+  /** Get a value from a configuration map. Return none if the key does either not exist or the value is blank. */
+  public static Optional<Integer> getOptCfgAsInt(Map<String, ?> properties, String key) {
+    return getOptCfgAsInt(properties::get, key);
+  }
+
+  private static Optional<Integer> getOptCfgAsInt(Function<String, ?> getter, String key) {
+    return Optional.ofNullable(getter.apply(key))
         .map(Object::toString)
         .flatMap(Strings::trimToNone)
         .flatMap(s -> {
@@ -135,7 +168,16 @@ public final class OsgiUtil {
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
   public static Optional<Double> getOptCfgAsDouble(Dictionary d, String key) {
-    return Optional.ofNullable(d.get(key))
+    return getOptCfgAsDouble(d::get, key);
+  }
+
+  /** Get a value from a configuration map. Return none if the key does either not exist or the value is blank. */
+  public static Optional<Double> getOptCfgAsDouble(Map<String, ?> properties, String key) {
+    return getOptCfgAsDouble(properties::get, key);
+  }
+
+  private static Optional<Double> getOptCfgAsDouble(Function<String, ?> getter, String key) {
+    return Optional.ofNullable(getter.apply(key))
         .map(Object::toString)
         .flatMap(Strings::trimToNone)
         .flatMap(s -> {
@@ -166,10 +208,37 @@ public final class OsgiUtil {
   }
 
   /**
+   * Filter a configuration map by key prefix. For example the following map
+   * <code>{w.p.key1: "value1", w.p.key2: "value2", x: "1"}</code> filtered by
+   * <code>filterByPrefix(properties, "w.p.")</code> returns <code>{key1: "value1", key2: "value"}</code>.
+   */
+  public static Map<String, String> filterByPrefix(Map<String, ?> properties, String prefix) {
+    final Map<String, String> filtered = new HashMap<>();
+    final int prefixLength = prefix.length();
+    for (final String key : properties.keySet()) {
+      if (key.startsWith(prefix)) {
+        filtered.put(key.substring(prefixLength), properties.get(key).toString());
+      }
+    }
+    return filtered;
+  }
+
+  /**
    * Get an optional boolean from a dictionary.
    */
   public static Optional<Boolean> getOptCfgAsBoolean(Dictionary d, String key) {
-    return Optional.ofNullable(d.get(key))
+    return getOptCfgAsBoolean(d::get, key);
+  }
+
+  /**
+   * Get an optional boolean from a configuration map.
+   */
+  public static Optional<Boolean> getOptCfgAsBoolean(Map<String, ?> properties, String key) {
+    return getOptCfgAsBoolean(properties::get, key);
+  }
+
+  private static Optional<Boolean> getOptCfgAsBoolean(Function<String, ?> getter, String key) {
+    return Optional.ofNullable(getter.apply(key))
         .map(Object::toString)
         .flatMap(Strings::trimToNone)
         .map(Boolean::valueOf);
@@ -184,6 +253,20 @@ public final class OsgiUtil {
   public static int getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
     try {
       return Integer.parseInt(getCfg(d, key));
+    } catch (NumberFormatException e) {
+      throw new ConfigurationException(key, "not an integer");
+    }
+  }
+
+  /**
+   * Get a mandatory integer from a configuration map.
+   *
+   * @throws ConfigurationException
+   *           key does not exist or is not an integer
+   */
+  public static int getCfgAsInt(Map<String, ?> properties, String key) throws ConfigurationException {
+    try {
+      return Integer.parseInt(getCfg(properties, key));
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
     }

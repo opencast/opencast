@@ -48,6 +48,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -384,7 +385,7 @@ public class CaptureAgentStateRestService {
 
     Properties caps;
 
-    if (StringUtils.startsWith(configuration, "{")) {
+    if (Strings.CS.startsWith(configuration, "{")) {
       // JSON
       Gson gson = new Gson();
       try {
@@ -459,7 +460,8 @@ public class CaptureAgentStateRestService {
   @Path("recordings/{id}")
   @RestQuery(
       name = "setRecordingState",
-      description = "Set the status of a given recording, registering it if it is new",
+      description = "Set the status of an existing recording. The recording must correspond to a scheduled "
+        + "event; unknown identifiers return 404.",
       pathParameters = {
         @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING)
       },

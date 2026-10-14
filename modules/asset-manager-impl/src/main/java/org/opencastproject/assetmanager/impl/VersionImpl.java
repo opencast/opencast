@@ -20,9 +20,9 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import org.opencastproject.assetmanager.api.Version;
+
+import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -88,7 +88,7 @@ public final class VersionImpl implements Version {
 
   @Override
   public int hashCode() {
-    return hash(nr);
+    return Objects.hash(nr);
   }
 
   @Override

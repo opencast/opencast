@@ -26,6 +26,8 @@ import org.opencastproject.util.XProperties;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Dictionary;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Supports YouTube property management.
@@ -63,6 +65,24 @@ public final class YouTubeUtils {
       throw new IllegalArgumentException("Null or blank value for YouTube-related property: " + keyPrefix + key.name());
     }
     return trimmed;
+  }
+
+  /**
+   * Disciplined way of getting a list of properties with a common prefix
+   *
+   * @param dictionary may not be {@code null}
+   * @param key  may not be {@code null}
+   * @return associated values
+   */
+  public static Map<String, String> getAll(XProperties dictionary, YouTubeKey key) {
+    final String prefix = keyPrefix + key.name() + ".";
+    return dictionary.entrySet().stream()
+        .filter(e -> e.getKey() instanceof String)
+        .filter(e -> ((String) e.getKey()).startsWith(prefix))
+        .collect(Collectors.toMap(
+            e -> ((String) e.getKey()).substring(prefix.length()),
+            e -> StringUtils.trimToNull((String) e.getValue())
+        ));
   }
 
   /**

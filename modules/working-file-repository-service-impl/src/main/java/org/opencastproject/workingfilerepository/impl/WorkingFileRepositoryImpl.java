@@ -29,7 +29,6 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -39,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -391,7 +392,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       // Store the hash
       String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
       try {
-        FileUtils.writeStringToFile(md5FileTmp, md5);
+        FileUtils.writeStringToFile(md5FileTmp, md5, StandardCharsets.UTF_8);
       } catch (IOException e) {
         FileUtils.deleteQuietly(md5FileTmp);
         throw e;
@@ -424,7 +425,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)
             // On shared filesystems like NFS the move operation may create temporary .nfsXXX files
             // which will be removed by the NFS subsystem itself. We should skip these files.
-            && !StringUtils.startsWith(fileToDelete.getName(), ".nfs")) {
+            && !Strings.CS.startsWith(fileToDelete.getName(), ".nfs")) {
           logger.trace("delete {}", fileToDelete.getAbsolutePath());
           if (!fileToDelete.delete() && fileToDelete.exists()) {
             throw new IllegalStateException("Unable to delete file: " + fileToDelete.getAbsolutePath());
@@ -452,7 +453,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       String md5 = DigestUtils.md5Hex(md5In);
       IOUtils.closeQuietly(md5In);
       md5File = getMd5File(f);
-      FileUtils.writeStringToFile(md5File, md5);
+      FileUtils.writeStringToFile(md5File, md5, StandardCharsets.UTF_8);
       return md5File;
     } catch (IOException e) {
       FileUtils.deleteQuietly(md5File);
@@ -556,7 +557,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       directory = getCollectionDirectory(collectionId, false);
       if (directory == null) {
         //getCollectionDirectory returns null on a non-existant directory which is not being created...
-        directory = new File(PathSupport.concat(new String[] { rootDirectory, COLLECTION_PATH_PREFIX, collectionId }));
+        directory = Paths.get(rootDirectory, COLLECTION_PATH_PREFIX, collectionId).toFile();
         throw new NotFoundException(directory.getAbsolutePath());
       }
     } catch (IOException e) {
@@ -590,8 +591,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *         if creating a non-existing directory fails
    */
   private File getCollectionDirectory(String collectionId, boolean create) throws IOException {
-    File collectionDir = new File(
-            PathSupport.concat(new String[]{rootDirectory, COLLECTION_PATH_PREFIX, collectionId}));
+    File collectionDir = Paths.get(rootDirectory, COLLECTION_PATH_PREFIX, collectionId).toFile();
     if (!collectionDir.exists()) {
       if (!create) {
         return null;
@@ -688,7 +688,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       File md5File = null;
       try {
         md5File = getMd5File(f);
-        FileUtils.writeStringToFile(md5File, md5);
+        FileUtils.writeStringToFile(md5File, md5, StandardCharsets.UTF_8);
       } catch (IOException e) {
         FileUtils.deleteQuietly(md5File);
         throw e;

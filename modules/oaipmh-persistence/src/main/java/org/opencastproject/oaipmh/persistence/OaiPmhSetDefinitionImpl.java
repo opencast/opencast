@@ -21,6 +21,7 @@
 package org.opencastproject.oaipmh.persistence;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -64,9 +65,9 @@ public class OaiPmhSetDefinitionImpl implements OaiPmhSetDefinition {
       throw new IllegalArgumentException(String.format(
           "Set definition '%s' flavor not set for filter identified by '%s'.", setSpec, filterId));
     }
-    if (!StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, criterion)
-        && !StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINSNOT, criterion)
-        && !StringUtils.equals(OaiPmhSetDefinitionFilter.CRITERION_MATCH, criterion)) {
+    if (!Strings.CS.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, criterion)
+        && !Strings.CS.equals(OaiPmhSetDefinitionFilter.CRITERION_CONTAINSNOT, criterion)
+        && !Strings.CS.equals(OaiPmhSetDefinitionFilter.CRITERION_MATCH, criterion)) {
       throw new IllegalArgumentException(String.format(
           "Set definition '%s' filter (idenfied by '%s') criterion '%s' should be one of %s",
           setSpec, filterId, criterion, StringUtils.joinWith(", ",

@@ -20,15 +20,6 @@
     <replaceregexp file="target/assembly/etc/config.properties" match="^felix.fileinstall.enableConfigSave .*=.*$" replace="felix.fileinstall.enableConfigSave = false" byline="true"/>
   </target>
 
-  <target if="enableJobDispatching" name="job dispatching">
-    <echo>Enabling job dispatching</echo>
-    <replaceregexp
-      file="target/classes/etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg"
-      match="^#dispatch.interval=0$"
-      replace="dispatch.interval=2"
-      byline="true" />
-  </target>
-
   <target if="enableDeveloperMode" name="developer mode">
     <echo>Enabling developer mode</echo>
     <concat destfile="target/assembly/etc/shell.init.script" append="true">

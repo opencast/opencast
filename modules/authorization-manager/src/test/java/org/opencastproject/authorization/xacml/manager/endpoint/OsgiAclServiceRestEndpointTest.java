@@ -38,6 +38,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import javax.ws.rs.core.Response;
 
 public class OsgiAclServiceRestEndpointTest {
@@ -216,47 +218,100 @@ public class OsgiAclServiceRestEndpointTest {
 
     // GET
     // Test with existing acl Id
-    given().pathParams("aclId", publicAclId).expect().statusCode(OK).body("acl.ace[0].allow", equalTo(true))
-        .body("acl.ace[0].action", equalTo("read")).body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR")).when()
-        .get(host("/acl/{aclId}"));
+    given()
+        .pathParams("aclId", publicAclId)
+        .expect()
+        .statusCode(OK)
+        .body("acl.ace[0].allow", equalTo(true))
+        .body("acl.ace[0].action", equalTo("read"))
+        .body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
+        .when().get(host("/acl/{aclId}"));
 
     // Test with false acl Id
-    given().pathParams("aclId", "reddfsdffsd").expect().statusCode(NOT_FOUND).when().get(host("/acl/{aclId}"));
+    given()
+        .pathParams("aclId", "reddfsdffsd")
+        .expect()
+        .statusCode(NOT_FOUND)
+        .when().get(host("/acl/{aclId}"));
     // Get all acls
-    given().log().all().expect().statusCode(OK).log().all().body("[0].name", equalTo("Public"))
-        .body("[0].acl.ace[0].action", equalTo("read")).body("[0].acl.ace[0].allow", equalTo(true))
-        .body("[0].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR")).body("[1].name", equalTo("Private"))
-        .body("[1].acl.ace[0].action", equalTo("read")).body("[1].acl.ace[0].allow", equalTo(false))
-        .body("[1].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR")).when().get(host("/acl/acls.json"));
+    given().log().all().expect().statusCode(OK).log().all()
+        .body("[0].name", equalTo("Public"))
+        .body("[0].acl.ace[0].action", equalTo("read"))
+        .body("[0].acl.ace[0].allow", equalTo(true))
+        .body("[0].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
+        .body("[1].name", equalTo("Private"))
+        .body("[1].ace", equalTo(null))
+        .when().get(host("/acl/acls.json"));
 
     // POST
     // With a valid ACL
     String aclName = "PublicWrite";
-    Long publicAclWriteId = extractAclId(given().formParam("name", aclName).formParam("acl", publicAclWrite).expect()
-        .body("name", equalTo(aclName)).body("acl.ace[0].action", equalTo("write"))
-        .body("acl.ace[0].allow", equalTo(true)).body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
-        .statusCode(OK).when().post(host("/acl")));
+    Long publicAclWriteId = extractAclId(
+        given()
+            .formParam("name", aclName)
+            .formParam("acl", publicAclWrite)
+            .expect()
+            .body("name", equalTo(aclName)).body("acl.ace[0].action", equalTo("write"))
+            .body("acl.ace[0].allow", equalTo(true))
+            .body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
+            .statusCode(OK)
+            .when().post(host("/acl"))
+        );
     // Try to publish one with the same name
-    given().formParam("name", aclName).formParam("acl", publicAclWrite).expect().statusCode(CONFLICT).when()
-        .post(host("/acl"));
+    given()
+        .formParam("name", aclName)
+        .formParam("acl", publicAclWrite)
+        .expect()
+        .statusCode(CONFLICT)
+        .when().post(host("/acl"));
     // Post one with a wrong acl
-    given().formParam("name", "Wrong").formParam("acl", "test").expect().statusCode(BAD_REQUEST).when()
-        .post(host("/acl"));
+    given()
+        .formParam("name", "Wrong")
+        .formParam("acl", "test")
+        .expect()
+        .statusCode(BAD_REQUEST)
+        .when().post(host("/acl"));
 
     // PUT
-    given().pathParam("aclId", publicAclWriteId).formParam("name", aclName).formParam("acl", publicAclWrite2).expect()
-        .body("name", equalTo(aclName)).body("acl.ace[0].action", equalTo("write"))
-        .body("acl.ace[0].allow", equalTo(false)).body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
-        .statusCode(OK).when().put(host("/acl/{aclId}"));
-    given().pathParam("aclId", publicAclWriteId).formParam("name", aclName).formParam("acl", "test").expect()
-        .statusCode(BAD_REQUEST).when().put(host("/acl/{aclId}"));
-    given().pathParam("aclId", "wrong_id").formParam("name", aclName).formParam("acl", "test").expect()
-        .statusCode(NOT_FOUND).when().put(host("/acl/{aclId}"));
+    given()
+        .pathParam("aclId", publicAclWriteId).formParam("name", aclName)
+        .formParam("acl", publicAclWrite2)
+        .expect()
+        .body("name", equalTo(aclName))
+        .body("acl.ace", equalTo(Collections.emptyList()))
+        .statusCode(OK)
+        .when().put(host("/acl/{aclId}"));
+    given()
+        .pathParam("aclId", publicAclWriteId)
+        .formParam("name", aclName)
+        .formParam("acl", "test")
+        .expect()
+        .statusCode(BAD_REQUEST)
+        .when().put(host("/acl/{aclId}"));
+    given()
+        .pathParam("aclId", "wrong_id")
+        .formParam("name", aclName)
+        .formParam("acl", "test")
+        .expect()
+        .statusCode(NOT_FOUND)
+        .when().put(host("/acl/{aclId}"));
 
     // DELETE
-    given().pathParam("aclId", "wrong_id").expect().statusCode(NOT_FOUND).when().delete(host("/acl/{aclId}"));
-    given().pathParam("aclId", publicAclWriteId).expect().statusCode(NO_CONTENT).when().delete(host("/acl/{aclId}"));
-    given().pathParams("aclId", publicAclWriteId).expect().statusCode(NOT_FOUND).when().get(host("/acl/{aclId}"));
+    given()
+        .pathParam("aclId", "wrong_id")
+        .expect()
+        .statusCode(NOT_FOUND)
+        .when().delete(host("/acl/{aclId}"));
+    given()
+        .pathParam("aclId", publicAclWriteId)
+        .expect()
+        .statusCode(NO_CONTENT)
+        .when().delete(host("/acl/{aclId}"));
+    given()
+        .pathParams("aclId", publicAclWriteId)
+        .expect()
+        .statusCode(NOT_FOUND)
+        .when().get(host("/acl/{aclId}"));
   }
 
   // --

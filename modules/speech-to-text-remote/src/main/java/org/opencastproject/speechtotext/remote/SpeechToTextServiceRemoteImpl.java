@@ -65,15 +65,17 @@ public class SpeechToTextServiceRemoteImpl extends RemoteBase implements SpeechT
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean, Boolean)
    */
   @Override
-  public Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException {
+  public Job transcribe(URI mediaFile, String language, Boolean translate, Boolean async)
+          throws SpeechToTextServiceException {
 
     List<NameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("mediaFilePath", mediaFile.toString()));
     params.add(new BasicNameValuePair("language", language));
     params.add(new BasicNameValuePair("translate", translate.toString()));
+    params.add(new BasicNameValuePair("async", async.toString()));
 
     logger.info("Generating subtitle for {}", mediaFile);
     HttpResponse response = null;
@@ -94,11 +96,13 @@ public class SpeechToTextServiceRemoteImpl extends RemoteBase implements SpeechT
     }
   }
 
+  @Override
   @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
 
+  @Override
   @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.remoteServiceManager = remoteServiceManager;

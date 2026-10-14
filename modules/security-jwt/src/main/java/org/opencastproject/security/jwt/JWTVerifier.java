@@ -29,6 +29,7 @@ import com.nimbusds.jose.crypto.Ed25519Verifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.KeyType;
 import com.nimbusds.jwt.SignedJWT;
 
 import org.apache.commons.lang3.StringUtils;
@@ -78,24 +79,53 @@ public final class JWTVerifier {
 
     List<JWSVerifier> verifiers = new ArrayList<>();
     if (alg.equals(JWSAlgorithm.RS256) || alg.equals(JWSAlgorithm.RS384) || alg.equals(JWSAlgorithm.RS512)) {
-      for (JWK jwk : jwkSet) {
+      for (JWK jwk : matching(jwkSet, KeyType.RSA, alg)) {
         verifiers.add(new RSASSAVerifier(jwk.toRSAKey()));
       }
       return verify(jwt, claimConstraints, verifiers.toArray(new JWSVerifier[0]));
     } else if (alg.equals(JWSAlgorithm.ES256) || alg.equals(JWSAlgorithm.ES256K) || alg.equals(JWSAlgorithm.ES384)
         || alg.equals(JWSAlgorithm.ES512)) {
-      for (JWK jwk : jwkSet) {
+      for (JWK jwk : matching(jwkSet, KeyType.EC, alg)) {
         verifiers.add(new ECDSAVerifier(jwk.toECKey()));
       }
       return verify(jwt, claimConstraints, verifiers.toArray(new JWSVerifier[0]));
     } else if (alg.equals(JWSAlgorithm.EdDSA) || alg.equals(JWSAlgorithm.Ed25519)) {
-      for (JWK jwk : jwkSet) {
+      for (JWK jwk : matching(jwkSet, KeyType.OKP, alg)) {
         verifiers.add(new Ed25519Verifier(jwk.toPublicJWK().toOctetKeyPair()));
       }
       return verify(jwt, claimConstraints, verifiers.toArray(new JWSVerifier[0]));
     } else {
       throw new IllegalArgumentException("Unsupported algorithm '" + alg + "'");
     }
+  }
+
+  /**
+   * Filters a JWK set down to the keys of a given key type.
+   * <p>
+   * The algorithm is taken from the JWT header and is therefore attacker controlled, while the key
+   * type is a property of the configured JWK set. Converting a key to the type implied by the
+   * algorithm without checking would throw a {@link ClassCastException}, so keys of a different
+   * type are skipped here and simply do not yield a verifier.
+   *
+   * @param jwkSet The JWK set.
+   * @param keyType The key type required by the JWT's algorithm.
+   * @param alg The JWT's algorithm, for logging only.
+   * @return The keys of the requested type.
+   */
+  private static List<JWK> matching(List<JWK> jwkSet, KeyType keyType, JWSAlgorithm alg) {
+    List<JWK> matching = new ArrayList<>();
+    for (JWK jwk : jwkSet) {
+      if (keyType.equals(jwk.getKeyType())) {
+        matching.add(jwk);
+      } else {
+        logger.debug("Skipping JWK '{}' of type '{}', algorithm '{}' requires a key of type '{}'",
+            jwk.getKeyID(), jwk.getKeyType(), alg, keyType);
+      }
+    }
+    if (matching.isEmpty()) {
+      logger.warn("The JWK set contains no key of type '{}' as required by the JWT's algorithm '{}'", keyType, alg);
+    }
+    return matching;
   }
 
   /**

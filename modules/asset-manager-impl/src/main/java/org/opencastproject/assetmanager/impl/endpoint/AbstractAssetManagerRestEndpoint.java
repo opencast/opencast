@@ -483,6 +483,11 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
       return badRequest();
     }
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
+      // A null value would persist a Property row with every value column null, which then throws on every
+      // later read of that property, so entries without a value are skipped rather than stored.
+      if (entry.getValue() == null) {
+        continue;
+      }
       final PropertyId propertyId = PropertyId.mk(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
       final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
       if (!getAssetManager().setProperty(property)) {

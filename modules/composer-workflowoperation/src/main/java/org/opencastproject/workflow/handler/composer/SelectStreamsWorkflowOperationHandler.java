@@ -249,7 +249,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
     if (tracks.isEmpty()) {
       logger.info("No audio/video tracks with flavor '{}' found to prepare", sourceFlavor);
-      return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
     final List<AugmentedTrack> augmentedTracksAll = createAugmentedTracks(tracks, workflowInstance);

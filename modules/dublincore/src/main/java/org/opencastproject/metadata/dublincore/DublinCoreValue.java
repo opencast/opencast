@@ -22,13 +22,12 @@
 package org.opencastproject.metadata.dublincore;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.eq;
 
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.RequireUtil;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -148,12 +147,13 @@ public final class DublinCoreValue implements Serializable {
   }
 
   private boolean eqFields(DublinCoreValue that) {
-    return eq(value, that.value) && eq(language, that.language) && eq(encodingScheme, that.encodingScheme);
+    return Objects.equals(value, that.value) && Objects.equals(language, that.language)
+            && Objects.equals(encodingScheme, that.encodingScheme);
   }
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(value, language, encodingScheme);
+    return Objects.hash(value, language, encodingScheme);
   }
 
   @Override public String toString() {

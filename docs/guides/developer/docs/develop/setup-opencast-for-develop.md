@@ -246,6 +246,36 @@ To use it in IntelliJ, follow these steps:
 
 To use the plugin, you can run manually the check-style plugin through the menu View → Tool Windows → Checkstyle.
 
+#### Automatic Code Formatting
+
+Some of the style rules are not just checked but fixed automatically by the
+[Spotless](https://github.com/diffplug/spotless) Maven plugin, above all the import order, which is
+tedious to get right by hand. Spotless runs as part of every build, before Checkstyle, so a normal
+
+    ./mvnw install
+
+will silently repair the imports of the modules it builds. You can also run it on its own, either
+for the whole repository or for single modules:
+
+    ./mvnw spotless:apply
+    ./mvnw -pl modules/<module> spotless:apply
+
+Pass `-Dspotless.apply.skip=true` if you want a build to leave your sources alone. Continuous
+integration does exactly that and runs `./mvnw spotless:check` instead, so unformatted code cannot
+be merged.
+
+What Spotless takes care of:
+
+- the import order and grouping, including the removal of unused imports
+- a final newline at the end of every file
+
+Everything else, including the license header and the indentation, is only checked by Checkstyle and
+still has to be written correctly by hand.
+
+One limitation worth knowing: Spotless reads imports line by line and cannot handle a single import
+statement wrapped over two lines. Should you ever need such an import, add the file to the
+`<excludes>` of the plugin configuration in the root `pom.xml`.
+
 
 
 Now your IDE should be ready for developing.

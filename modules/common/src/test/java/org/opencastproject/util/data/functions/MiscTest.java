@@ -21,27 +21,9 @@
 
 package org.opencastproject.util.data.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.data.functions.Misc.ifThen;
-
 import org.junit.Test;
 
-import java.util.Optional;
-
 public class MiscTest {
-  @Test
-  public void testIfThen() {
-    assertEquals(Optional.of("hallo"), Optional.of("hello").map(ifThen("hello", "hallo")));
-    assertEquals(Optional.of(-1), Optional.of("none").map(ifThen("none", "-1")).flatMap(Strings::toInt));
-    assertEquals(Optional.of(300), Optional.of("300").map(ifThen("none", "-1")).flatMap(Strings::toInt));
-  }
-
-
-  @Test(expected = RuntimeException.class)
-  public void testIfThenError() {
-    Optional.of("200a").map(ifThen("none", "-1")).flatMap(Strings::toInt).orElseThrow(() -> new RuntimeException());
-  }
-
   @Test
   public void testCast() {
     Misc.cast(1, Integer.class);

@@ -123,6 +123,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
@@ -130,10 +131,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -201,7 +202,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     description = "The events endpoint provides resources and operations related to the events")
 @Component(
     immediate = true,
-    service = { EventsEndpoint.class,ManagedService.class },
+    service = { EventsEndpoint.class },
     property = {
         "service.description=External API - Events Endpoint",
         "opencast.service.type=org.opencastproject.external.events",
@@ -209,7 +210,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     }
 )
 @JaxrsResource
-public class EventsEndpoint implements ManagedService {
+public class EventsEndpoint {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
@@ -226,7 +227,7 @@ public class EventsEndpoint implements ManagedService {
   private static final String RETRACT_WORKFLOW = "retract.workflow.id";
 
   /** Default ID of the workflow used to retract published events */
-  private static final String DEFAULT_RETRACT_WORKFLOW = "delete";
+  private static final String DEFAULT_RETRACT_WORKFLOW = "retract-for-deletion";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
@@ -371,19 +372,21 @@ public class EventsEndpoint implements ManagedService {
     return new ArrayList<>(cachedCatalogUIAdapters);
   }
 
-  /** OSGi activation method */
   @Activate
-  void activate(ComponentContext cc) {
-    logger.info("Activating External API - Events Endpoint");
-
+  void activate(ComponentContext cc) throws ConfigurationException {
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
             RestConstants.SERVICE_PATH_PROPERTY);
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
+
+    updated(cc.getProperties());
   }
 
-  /** OSGi callback if properties file is present */
-  @Override
+  @Modified
+  void modified(ComponentContext cc) throws ConfigurationException {
+    updated(cc.getProperties());
+  }
+
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Ensure properties is not null
     if (properties == null) {
@@ -400,12 +403,12 @@ public class EventsEndpoint implements ManagedService {
 
     // Read preview subtype configuration
     // Default to DEFAULT_PREVIEW_SUBTYPE
-    previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    previewSubtype = Objects.toString(properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
 
-    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    retractWorkflowId = Objects.toString(properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
     logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 
@@ -1425,7 +1428,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         accessControlList = indexService.updateEventAcl(id, accessControlList, elasticsearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to update event '{}' acl with '{}'", id, acl, e);
+        logger.debug("Unable to update event '{}' acl with '{}'", id, acl, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1487,7 +1490,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         withNewAce = indexService.updateEventAcl(id, withNewAce, elasticsearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
+        logger.debug("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1538,7 +1541,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, elasticsearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
+        logger.debug("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -2557,7 +2560,7 @@ public class EventsEndpoint implements ManagedService {
               tags = List.of(StringUtils.split(tagsString, ','));
               // find lang tag if exists
               for (String tag : tags) {
-                if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+                if (Strings.CS.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
                   // lang tag is set
                   langTag = StringUtils.trimToEmpty(tag);
                   break;
