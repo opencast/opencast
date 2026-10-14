@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -237,7 +236,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
     }
 
     return roles.stream()
-        .sorted(Comparator.comparing(Role::getName))  // Sort for consistent returns on limit+offset
+        .sorted(Role.BY_NAME)  // Sort for consistent returns on limit+offset
         .skip(offset)
         .limit(limit > 0 ? limit : Long.MAX_VALUE)
         .iterator();

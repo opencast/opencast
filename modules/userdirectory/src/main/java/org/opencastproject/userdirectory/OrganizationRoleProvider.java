@@ -37,7 +37,6 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -126,7 +125,7 @@ public class OrganizationRoleProvider implements RoleProvider {
     }
 
     return foundRoles.stream()
-        .sorted(Comparator.comparing(Role::getName))  // Sort for consistent returns on limit+offset
+        .sorted(Role.BY_NAME)  // Sort for consistent returns on limit+offset
         .skip(offset)
         .limit(limit > 0 ? limit : Long.MAX_VALUE)
         .iterator();
