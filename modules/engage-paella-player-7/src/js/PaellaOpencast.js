@@ -23,7 +23,7 @@
 /* global OPENCAST_CONFIG_URL */
 /* global OPENCAST_PAELLA_URL */
 
-import { Paella, bindEvent, Events, utils, log } from 'paella-core';
+import { bindEvent, Events, log, Paella, utils } from 'paella-core';
 import getBasicPluginContext from 'paella-basic-plugins';
 import getSlidePluginContext from 'paella-slide-plugins';
 import getZoomPluginContext from 'paella-zoom-plugin';
@@ -50,6 +50,15 @@ function getUrlFromBase(base, url) {
 
   const fullURL = `${a}/${b}`;
   return fullURL;
+}
+
+/**
+ * Returns the JWT query parameter string (e.g. '&jwt=...') if a JWT is present
+ * in the page URL, or an empty string otherwise.
+ */
+export function getJwtParam() {
+  const jwt = new URLSearchParams(location.search).get('jwt');
+  return jwt ? `&jwt=${jwt}` : '';
 }
 
 export function getUrlFromOpencastServer(url) {
@@ -105,12 +114,7 @@ const initParams = {
   repositoryUrl: getUrlFromOpencastServer('/search/episode.json'),
 
   getManifestUrl: (repoUrl, videoId) => {
-    let out =  `${repoUrl}?id=${videoId}`;
-    const jwt = new URLSearchParams(location.search).get('jwt');
-    if (jwt) {
-      out += `&jwt=${jwt}`;
-    }
-    return out;
+    return `${repoUrl}?id=${videoId}${getJwtParam()}`;
   },
 
   getManifestFileUrl: (manifestUrl) => {
@@ -338,10 +342,10 @@ export class PaellaOpencast extends Paella {
   }
 
   async getEpisode({episodeId}) {
-    return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
-    .then(response => response.json() )
-    .then(response => response['result'][0])
-    .catch(() => null);
+    return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}${getJwtParam()}`))
+      .then(response => response.json() )
+      .then(response => response['result'][0])
+      .catch(() => null);
   }
 
   get opencastAuth() {

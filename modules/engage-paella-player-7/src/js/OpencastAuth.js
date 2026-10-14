@@ -19,7 +19,7 @@
  *
  */
 
-import { getUrlFromOpencastServer } from './PaellaOpencast';
+import { getJwtParam, getUrlFromOpencastServer } from './PaellaOpencast';
 
 export default class OpencastAuth {
   constructor(player) {
@@ -41,7 +41,9 @@ export default class OpencastAuth {
 
   async getEpisodeACL() {
     try {
-      const response = await fetch(getUrlFromOpencastServer(`/search/episode.json?id=${this.player.videoId}`));
+      const response = await fetch(
+        getUrlFromOpencastServer(`/search/episode.json?id=${this.player.videoId}${getJwtParam()}`)
+      );
       if (response.ok) {
         const episode = await response.json();
         return episode['result'][0]?.acl;
