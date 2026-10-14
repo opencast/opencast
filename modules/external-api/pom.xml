@@ -289,10 +289,16 @@
               org.json.simple.parser,
               org.osgi.framework,
               org.slf4j,
+              !org.opencastproject.lifecyclemanagement.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
+            <!-- The lifecycle management plugin is optional and may be enabled at runtime -->
+            <DynamicImport-Package>
+              org.opencastproject.lifecyclemanagement.api,
+              org.opencastproject.lifecyclemanagement.impl
+            </DynamicImport-Package>
             <Export-Package>
               org.opencastproject.external.api,
               org.opencastproject.external.common,

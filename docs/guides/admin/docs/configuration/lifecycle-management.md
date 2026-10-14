@@ -1,6 +1,18 @@
 LifeCycle Management
 ====================
 
+**This is regarded as a BETA FEATURE. As such it is not enabled by default and bugs are to be expected.**
+
+LifeCycle Management is an Opencast plugin. To enable it, set
+
+```properties
+opencast-plugin-lifecycle-management = on
+```
+
+in `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`. See [Plugin Management](plugin-management.md) for details.
+Until the plugin is enabled, no policies are loaded or applied and the `/api/lifecyclemanagement` endpoints are not
+available.
+
 The goal of LifeCycle Management is to allows users to automate administrative tasks that are specific to their use
 case. For example:
 
