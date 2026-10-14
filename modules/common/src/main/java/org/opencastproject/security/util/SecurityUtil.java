@@ -171,6 +171,27 @@ public final class SecurityUtil {
   }
 
   /**
+   * Check if the given user has the global admin role.
+   */
+  public static boolean isGlobalAdmin(final User user) {
+    return user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE);
+  }
+
+  /**
+   * Check if the given user has the admin role of the given organization.
+   */
+  public static boolean isOrganizationAdmin(final User user, final Organization organization) {
+    return user.hasRole(organization.getAdminRole());
+  }
+
+  /**
+   * Check if the given user is a global admin, or an admin of the given organization.
+   */
+  public static boolean isAdmin(final User user, final Organization organization) {
+    return isGlobalAdmin(user) || isOrganizationAdmin(user, organization);
+  }
+
+  /**
    * Check if the current user has access to the capture agent with the given id.
    * @param agentId
    *           The agent id to check.
@@ -183,7 +204,7 @@ public final class SecurityUtil {
       return;
     }
     final User user = securityService.getUser();
-    if (user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(user.getOrganization().getAdminRole())) {
+    if (isAdmin(user, user.getOrganization())) {
       return;
     }
     if (!user.hasRole(SecurityUtil.getCaptureAgentRole(agentId))) {
