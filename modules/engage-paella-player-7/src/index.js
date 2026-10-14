@@ -26,6 +26,8 @@ window.onload = async () => {
 
   try {
     await applyOpencastTheme(paella);
+    // Requests to static files are only made after loading the manifest.
+    await swReady;
     await paella.loadManifest();
 
     //check audio-only config
@@ -73,16 +75,45 @@ const swUrl = `sw.js?${new URLSearchParams({
   refresh: refreshEnabled,
 })}`;
 
-navigator.serviceWorker
-  .register(swUrl, { updateViaCache: 'none' })
-  // eslint-disable-next-line no-console
-  .catch(e => console.error('Failed to register service worker', e));
+// Resolves once the SW controls this page (or we gave up on that). Requests
+// made before that bypass the SW and thus fail for protected static files.
+const swReady = (async () => {
+  if (!('serviceWorker' in navigator)) {
+    // eslint-disable-next-line no-console
+    console.warn('Service workers not supported: cannot authenticate static file requests via JWT');
+    return;
+  }
+
+  // Listen before registering to not miss the event.
+  const controllerChange = new Promise(resolve => {
+    navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
+  });
+
+  try {
+    await navigator.serviceWorker.register(swUrl, { updateViaCache: 'none' });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to register service worker', e);
+    return;
+  }
+
+  // On the first visit, the SW claims this page right after activating. But
+  // e.g. after a hard reload, the page is never controlled, so we don't wait
+  // forever.
+  if (!navigator.serviceWorker.controller) {
+    const timeout = new Promise(resolve => setTimeout(() => resolve('timeout'), 3000));
+    if (await Promise.race([controllerChange, timeout]) === 'timeout') {
+      // eslint-disable-next-line no-console
+      console.warn('Page not controlled by service worker: static file requests won\'t include JWT');
+    }
+  }
+})();
 
 
 
 // If JWT refresh is enabled, we need to forward messages between the host of
 // this iframe and the SW (as they cannot communicate directly).
-if (refreshEnabled) {
+if (refreshEnabled && 'serviceWorker' in navigator) {
   // Forward messages coming from the iframe host to the SW.
   window.addEventListener('message', ev => {
     if (ev.source !== window.parent) {
