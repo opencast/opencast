@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -343,10 +344,20 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       if (failed.length() > 0) {
         failed.append(", ");
       }
-      Job job = entry.getKey();
-      failed.append(format("id=%d host=%s status=%s", job.getId(), job.getProcessingHost(), entry.getValue()));
+      long jobId = entry.getKey().getId();
+      failed.append(format("id=%d host=%s status=%s", jobId, getProcessingHost(jobId), entry.getValue()));
     }
     return failed.length() > 0 ? format("Failed jobs: [%s]", failed) : "";
+  }
+
+  /** The jobs passed to {@link #waitForStatus(Job...)} don't know their processing host, so ask the registry. */
+  private String getProcessingHost(long jobId) {
+    try {
+      return serviceRegistry.getJob(jobId).getProcessingHost();
+    } catch (NotFoundException | ServiceRegistryException e) {
+      logger.warn("Unable to look up processing host of job {}", jobId, e);
+      return null;
+    }
   }
 
   /**
