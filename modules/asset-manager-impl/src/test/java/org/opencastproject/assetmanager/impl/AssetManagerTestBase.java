@@ -335,6 +335,19 @@ public abstract class AssetManagerTestBase {
   }
 
   /**
+   * Filter list of properties by namespace. All properties with the namespace
+   * {@link AssetManagerImpl#SECURITY_NAMESPACE} will not be part of the resulting list.
+   *
+   * @param properties properties list to filter
+   * @return properties list without properties with namespace {@link AssetManagerImpl#SECURITY_NAMESPACE}
+   */
+  public List<Property> nonSecurityProperties(List<Property> properties) {
+    return properties.stream()
+        .filter(property -> !AssetManagerImpl.SECURITY_NAMESPACE.equals(property.getId().getNamespace()))
+        .toList();
+  }
+
+  /**
    * Create a test asset store.
    */
   protected AssetStore mkAssetStore(String storeType) {
