@@ -56,24 +56,17 @@ window.onload = async () => {
 };
 
 
-// Setup service worker to enable static file auth via JWT. We pass JWT and
-// video ID via query parameters in order to have them available in the SW
-// immediately. I know that typically, you want an unchanging URL for your SWs,
-// but that only applies to service workers that want to have a persistent state
-// as far as I can tell. This query parameter passing method is known and used.
-// Also, the SW is super tiny, so the additional fetches don't really matter.
+// Setup service worker to enable static file auth via JWT.
 const params = new URLSearchParams(window.location.search);
+const jwt = params.get('jwt');
+const videoId = params.get('id');
 let refreshEnabled = params.get('jwtRefresh') === 'true';
 if (refreshEnabled && window.self === window.top) {
   // eslint-disable-next-line no-console
   console.warn('jwtRefresh=true given, but not running in iframe');
   refreshEnabled = false;
 }
-const swUrl = `sw.js?${new URLSearchParams({
-  jwt: params.get('jwt'),
-  videoId: params.get('id'),
-  refresh: refreshEnabled,
-})}`;
+const swUrl = `sw.js?${new URLSearchParams({ refresh: refreshEnabled })}`;
 
 // Resolves once the SW controls this page (or we gave up on that). Requests
 // made before that bypass the SW and thus fail for protected static files.
@@ -83,6 +76,17 @@ const swReady = (async () => {
     console.warn('Service workers not supported: cannot authenticate static file requests via JWT');
     return;
   }
+
+  // Send our JWT to the SW, so that it can be used for the first requests
+  // already. A new SW starts with an empty cache, so we also do that whenever
+  // the controller changes (e.g. after an SW update).
+  const sendJwt = () => {
+    if (jwt && videoId) {
+      navigator.serviceWorker.controller?.postMessage({ type: 'oc-event-jwt', event: videoId, jwt });
+    }
+  };
+  navigator.serviceWorker.addEventListener('controllerchange', sendJwt);
+  sendJwt();
 
   // Listen before registering to not miss the event.
   const controllerChange = new Promise(resolve => {
@@ -121,9 +125,9 @@ if (refreshEnabled && 'serviceWorker' in navigator) {
     }
 
     const d = ev.data;
-    if (typeof d === 'object' && d?.type === 'oc-event-jwt' && typeof d?.jwt === 'string') {
-      const { type, jwt } = d;
-      navigator.serviceWorker.controller?.postMessage({ type, jwt });
+    if (typeof d === 'object' && d?.type === 'oc-event-jwt'
+      && typeof d?.event === 'string' && typeof d?.jwt === 'string') {
+      navigator.serviceWorker.controller?.postMessage({ type: d.type, event: d.event, jwt: d.jwt });
     }
   });
 
