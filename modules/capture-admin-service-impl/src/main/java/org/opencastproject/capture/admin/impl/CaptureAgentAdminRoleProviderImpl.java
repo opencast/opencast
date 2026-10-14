@@ -34,7 +34,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -118,7 +117,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
     Stream<Role> roleStream = getRolesStream()
             .filter(e -> like(e.getName(), query) || like(e.getDescription(), query))
-            .sorted(Comparator.comparing(Role::getName))  // Sort for consistent returns on limit+offset
+            .sorted(Role.BY_NAME)  // Sort for consistent returns on limit+offset
             .skip(offset);
     if (limit != 0) {
       roleStream = roleStream.limit(limit);
