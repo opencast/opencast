@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
@@ -323,6 +324,40 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingInterval, jobs);
     return barrier.waitForJobs(timeout);
+  }
+
+  /**
+   * Describes the jobs in <code>result</code> that did not finish successfully, identifying each by id, processing
+   * host and final status, for inclusion in a {@link WorkflowOperationException} message. Intended to be used
+   * together with {@link #waitForStatus(Job...)}, so a failure can be traced back to the worker that handled it.
+   *
+   * @param result
+   *          the outcome of a {@link #waitForStatus(Job...)} call
+   * @return a human-readable description of the failed jobs, or an empty string if all jobs finished successfully
+   */
+  protected String describeFailedJobs(JobBarrier.Result result) {
+    StringBuilder failed = new StringBuilder();
+    for (Map.Entry<Job, Job.Status> entry : result.getStatus().entrySet()) {
+      if (Job.Status.FINISHED.equals(entry.getValue())) {
+        continue;
+      }
+      if (failed.length() > 0) {
+        failed.append(", ");
+      }
+      long jobId = entry.getKey().getId();
+      failed.append(format("id=%d host=%s status=%s", jobId, getProcessingHost(jobId), entry.getValue()));
+    }
+    return failed.length() > 0 ? format("Failed jobs: [%s]", failed) : "";
+  }
+
+  /** The jobs passed to {@link #waitForStatus(Job...)} don't know their processing host, so ask the registry. */
+  private String getProcessingHost(long jobId) {
+    try {
+      return serviceRegistry.getJob(jobId).getProcessingHost();
+    } catch (NotFoundException | ServiceRegistryException e) {
+      logger.warn("Unable to look up processing host of job {}", jobId, e);
+      return null;
+    }
   }
 
   /**
