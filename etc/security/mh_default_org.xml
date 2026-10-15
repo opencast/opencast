@@ -400,7 +400,6 @@
     <sec:intercept-url pattern="/admin-ui/" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ui/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
-    <sec:intercept-url pattern="/admin-ng/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/index.js" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
