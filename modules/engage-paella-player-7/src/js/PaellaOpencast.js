@@ -86,6 +86,18 @@ export function loadOpencastConfig() {
   return opencastConfig;
 }
 
+// JWT given to this page by an embedding application (e.g. an LMS), if any.
+const jwt = utils.getUrlParameter('jwt');
+
+// Adds the JWT given to this page (if any) to the URL of an Opencast API
+// request, so that Opencast authorizes the request with it.
+export function withJwt(url) {
+  if (!jwt) {
+    return url;
+  }
+  return `${url}${url.includes('?') ? '&' : '?'}jwt=${encodeURIComponent(jwt)}`;
+}
+
 
 function myWebsiteCheckConsentFunction(type) {
   const cookie_consent_level = utils.getCookie('cookie_consent_level');
@@ -119,12 +131,7 @@ const initParams = {
   repositoryUrl: getUrlFromOpencastServer('/search/episode.json'),
 
   getManifestUrl: (repoUrl, videoId) => {
-    let out =  `${repoUrl}?id=${videoId}`;
-    const jwt = new URLSearchParams(location.search).get('jwt');
-    if (jwt) {
-      out += `&jwt=${jwt}`;
-    }
-    return out;
+    return withJwt(`${repoUrl}?id=${videoId}`);
   },
 
   getManifestFileUrl: (manifestUrl) => {
@@ -177,7 +184,7 @@ const initParams = {
       const data = await fetch(getUrlFromOpencastServer('/info/me.json'));
       const me = await data.json();
 
-      if (!me.roles.includes('ROLE_USER') && !new URLSearchParams(location.search).get('jwt')) {
+      if (!me.roles.includes('ROLE_USER') && !jwt) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
         await redirectToAuthPage();
         // This Error should not happen, as the user is redirected to the auth page.
@@ -352,7 +359,7 @@ export class PaellaOpencast extends Paella {
   }
 
   async getEpisode({episodeId}) {
-    return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
+    return fetch(withJwt(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`)))
     .then(response => response.json() )
     .then(response => response['result'][0])
     .catch(() => null);
