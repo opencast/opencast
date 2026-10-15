@@ -20,7 +20,7 @@
  */
 import { setUpClient } from '@opencast/jwtify';
 import { applyOpencastTheme } from './default-theme.js';
-import { PaellaOpencast, getUrlFromOpencastConfig } from './js/PaellaOpencast.js';
+import { PaellaOpencast, loadOpencastConfig } from './js/PaellaOpencast.js';
 
 window.onload = async () => {
   let paella = new PaellaOpencast('player-container');
@@ -32,8 +32,7 @@ window.onload = async () => {
     await paella.loadManifest();
 
     //check audio-only config
-    const config = await fetch(getUrlFromOpencastConfig('config.json'));
-    const configJson = await config.json();
+    const configJson = await loadOpencastConfig();
     const htmlPlayer = configJson?.opencast?.audioOnlyHTMLPlayer;
 
     // The player manifest access functions will only be available after the manifest has been loaded.

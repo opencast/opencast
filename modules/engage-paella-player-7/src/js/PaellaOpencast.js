@@ -74,6 +74,18 @@ export function getUrlFromOpencastPaella(url) {
   return getUrlFromBase(base, url);
 }
 
+let opencastConfig = null;
+
+// Loads `config.json`, which is used by Paella and contains our own settings
+// under `opencast`. It's only fetched once and all callers share the result,
+// so don't modify the returned object.
+export function loadOpencastConfig() {
+  if (!opencastConfig) {
+    opencastConfig = fetch(getUrlFromOpencastConfig('config.json')).then(response => response.json());
+  }
+  return opencastConfig;
+}
+
 
 function myWebsiteCheckConsentFunction(type) {
   const cookie_consent_level = utils.getCookie('cookie_consent_level');
@@ -102,6 +114,8 @@ const initParams = {
   },
   configResourcesUrl: getUrlFromOpencastConfig('/'),
   configUrl: getUrlFromOpencastConfig('/config.json'),
+  // Paella modifies the config (e.g. with skin overrides), so it gets a copy.
+  loadConfig: async () => structuredClone(await loadOpencastConfig()),
   repositoryUrl: getUrlFromOpencastServer('/search/episode.json'),
 
   getManifestUrl: (repoUrl, videoId) => {
