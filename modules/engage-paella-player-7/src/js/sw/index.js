@@ -21,6 +21,9 @@
 
 import { setUpServiceWorker } from '@opencast/jwtify';
 
+// Origins we attach JWTs to requests for, passed by the page (from its config).
+const trustedOcOrigins = new URLSearchParams(self.location.search).get('trustedOrigins')?.split(',') ?? [];
+
 // Requests to pages waiting for an answer: request ID -> resolve function.
 const pendingRequests = new Map();
 
@@ -63,7 +66,7 @@ const fetchJwts =  async (eventIds, { clientId }) => {
 
 const handle = setUpServiceWorker({
   getJwts: fetchJwts,
-  trustedOcOrigins: ['https://stable.opencast.org', 'http://localhost:8080', 'http://localhost:8081'], // TODO
+  trustedOcOrigins,
   debugLog: true, // TODO: remove
 });
 

@@ -66,7 +66,6 @@ if (refreshEnabled && window.self === window.top) {
   console.warn('jwtRefresh=true given, but not running in iframe');
   refreshEnabled = false;
 }
-const swUrl = 'sw.js';
 
 if ('serviceWorker' in navigator) {
   // Send our JWT to the SW, so that it can be used for the first requests
@@ -85,7 +84,27 @@ if ('serviceWorker' in navigator) {
 // Resolves once the SW controls this page (or we gave up on that). Requests
 // made before that bypass the SW and thus fail for protected static files.
 // Never rejects, and logs a warning itself if something went wrong.
-const swReady = setUpClient(swUrl);
+const swReady = (async () => {
+  // If loading the config fails, Paella fails to load as well and logs that.
+  const config = await loadOpencastConfig().catch(() => null);
+
+  // The SW only attaches JWTs to requests to these origins. They are passed
+  // via the SW URL, as the SW needs them right when it starts. Changing them
+  // thus reinstalls the SW.
+  const trustedOrigins = new Set([window.location.origin]);
+  for (const origin of config?.opencast?.jwt?.trustedOrigins ?? []) {
+    try {
+      // Normalize, e.g. remove trailing slash, as the SW compares exactly.
+      trustedOrigins.add(new URL(origin).origin);
+    } catch (_e) {
+      // eslint-disable-next-line no-console
+      console.warn(`Ignoring invalid entry in 'opencast.jwt.trustedOrigins': ${origin}`);
+    }
+  }
+
+  const swUrl = `sw.js?${new URLSearchParams({ trustedOrigins: [...trustedOrigins].join(',') })}`;
+  return setUpClient(swUrl);
+})();
 
 
 
