@@ -25,18 +25,10 @@ import { setUpServiceWorker } from '@opencast/jwtify';
 const params = new URLSearchParams(self.location.search);
 const refreshEnabled = params.get('refresh') === 'true';
 
-let lastClientId = null;
-// The refresh request currently waiting for an answer, if any.
-let pendingRefresh = null;
-if (refreshEnabled) {
-  // Remember the last client that sent a request. We will always ask it for
-  // fresh JWTs.
-  self.addEventListener('fetch', event => {
-    lastClientId = event.clientId;
-  });
-}
+// Requests to pages waiting for an answer: request ID -> resolve function.
+const pendingRequests = new Map();
 
-const fetchJwts =  async (eventIds) => {
+const fetchJwts =  async (eventIds, { clientId }) => {
   if (!refreshEnabled) {
     // eslint-disable-next-line no-console
     console.warn('jwtify asked for a JWT (none cached or expired), but JWT refresh is not enabled');
@@ -50,23 +42,29 @@ const fetchJwts =  async (eventIds) => {
   }
   const [eventId] = eventIds;
 
-  const client = await self.clients.get(lastClientId) ?? self.clients.matchAll()[0];
-  if (!client) {
-    // eslint-disable-next-line no-console
-    console.warn('No client connected to SW, but a JWT is needed for a request... weird');
+  // We ask the page that made the request. The client ID is empty for
+  // navigation requests (e.g. a static file opened directly in a tab), and only
+  // windows can answer.
+  const client = clientId ? await self.clients.get(clientId) : undefined;
+  if (client?.type !== 'window') {
     return new Map();
   }
 
   // Get fresh JWT by asking the host frame (by first asking the client).
   const jwt = await new Promise(resolve => {
-    pendingRefresh = { eventId, resolve };
+    const reqId = crypto.randomUUID();
+    pendingRequests.set(reqId, resolve);
     client.postMessage({
       type: 'oc-event-jwt-request',
       event: eventId,
+      reqId,
     });
 
     // After some timeout we give up, as there might not be anyone answering.
-    setTimeout(() => resolve(null), 3000);
+    setTimeout(() => {
+      pendingRequests.delete(reqId);
+      resolve(null);
+    }, 3000);
   });
 
   return new Map(jwt ? [[eventId, jwt]] : []);
@@ -79,14 +77,21 @@ const handle = setUpServiceWorker({
 });
 
 // Receive JWTs from clients. They are sent unsolicited when the page loads and
-// as answer to our `oc-event-jwt-request`.
+// as answer to our `oc-event-jwt-request` (with `reqId`, and `jwt: null` if
+// the page has none). We cache all of them, so that answers arriving after the
+// timeout are still useful.
 self.addEventListener('message', e => {
   const d = e.data;
-  if (typeof d === 'object' && d?.type === 'oc-event-jwt'
-    && typeof d?.event === 'string' && typeof d?.jwt === 'string') {
-    handle.cache.add(d.event, d.jwt);
-    if (pendingRefresh?.eventId === d.event) {
-      pendingRefresh.resolve(d.jwt);
+  if (typeof d === 'object' && d?.type === 'oc-event-jwt' && typeof d?.event === 'string') {
+    const jwt = typeof d.jwt === 'string' ? d.jwt : null;
+    if (jwt) {
+      handle.cache.add(d.event, jwt);
+    }
+
+    const resolve = pendingRequests.get(d.reqId);
+    if (resolve) {
+      pendingRequests.delete(d.reqId);
+      resolve(jwt);
     }
   }
 });

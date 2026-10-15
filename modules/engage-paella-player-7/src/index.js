@@ -18,6 +18,7 @@
  * the License.
  *
  */
+import { setUpClient } from '@opencast/jwtify';
 import { applyOpencastTheme } from './default-theme.js';
 import { PaellaOpencast, getUrlFromOpencastConfig } from './js/PaellaOpencast.js';
 
@@ -68,18 +69,11 @@ if (refreshEnabled && window.self === window.top) {
 }
 const swUrl = `sw.js?${new URLSearchParams({ refresh: refreshEnabled })}`;
 
-// Resolves once the SW controls this page (or we gave up on that). Requests
-// made before that bypass the SW and thus fail for protected static files.
-const swReady = (async () => {
-  if (!('serviceWorker' in navigator)) {
-    // eslint-disable-next-line no-console
-    console.warn('Service workers not supported: cannot authenticate static file requests via JWT');
-    return;
-  }
-
+if ('serviceWorker' in navigator) {
   // Send our JWT to the SW, so that it can be used for the first requests
-  // already. A new SW starts with an empty cache, so we also do that whenever
-  // the controller changes (e.g. after an SW update).
+  // already. A new SW or one that got reset (after a hard reload) has an empty
+  // cache, so we also do that whenever the controller changes. This listener
+  // is added before `setUpClient` so that it runs before `swReady` resolves.
   const sendJwt = () => {
     if (jwt && videoId) {
       navigator.serviceWorker.controller?.postMessage({ type: 'oc-event-jwt', event: videoId, jwt });
@@ -87,37 +81,23 @@ const swReady = (async () => {
   };
   navigator.serviceWorker.addEventListener('controllerchange', sendJwt);
   sendJwt();
+}
 
-  // Listen before registering to not miss the event.
-  const controllerChange = new Promise(resolve => {
-    navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
-  });
-
-  try {
-    await navigator.serviceWorker.register(swUrl, { updateViaCache: 'none' });
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to register service worker', e);
-    return;
-  }
-
-  // On the first visit, the SW claims this page right after activating. But
-  // e.g. after a hard reload, the page is never controlled, so we don't wait
-  // forever.
-  if (!navigator.serviceWorker.controller) {
-    const timeout = new Promise(resolve => setTimeout(() => resolve('timeout'), 3000));
-    if (await Promise.race([controllerChange, timeout]) === 'timeout') {
-      // eslint-disable-next-line no-console
-      console.warn('Page not controlled by service worker: static file requests won\'t include JWT');
-    }
-  }
-})();
+// Resolves once the SW controls this page (or we gave up on that). Requests
+// made before that bypass the SW and thus fail for protected static files.
+// Never rejects, and logs a warning itself if something went wrong.
+const swReady = setUpClient(swUrl);
 
 
 
 // If JWT refresh is enabled, we need to forward messages between the host of
 // this iframe and the SW (as they cannot communicate directly).
 if (refreshEnabled && 'serviceWorker' in navigator) {
+  // SW requests waiting for an answer from the iframe host: request ID -> SW.
+  // We reply to the SW that asked, which can differ from `controller` during
+  // an SW update.
+  const pendingRequests = new Map();
+
   // Forward messages coming from the iframe host to the SW.
   window.addEventListener('message', ev => {
     if (ev.source !== window.parent) {
@@ -126,17 +106,31 @@ if (refreshEnabled && 'serviceWorker' in navigator) {
 
     const d = ev.data;
     if (typeof d === 'object' && d?.type === 'oc-event-jwt'
-      && typeof d?.event === 'string' && typeof d?.jwt === 'string') {
-      navigator.serviceWorker.controller?.postMessage({ type: d.type, event: d.event, jwt: d.jwt });
+      && d?.event === videoId && typeof d?.jwt === 'string') {
+      const msg = { type: d.type, event: d.event, jwt: d.jwt };
+      if (pendingRequests.size === 0) {
+        // The host sent it without us asking: just put it into the SW's cache.
+        navigator.serviceWorker.controller?.postMessage(msg);
+      }
+      for (const [reqId, sw] of pendingRequests) {
+        sw.postMessage({ ...msg, reqId });
+      }
+      pendingRequests.clear();
     }
   });
 
   // Forward messages coming from the SW to the iframe host.
   navigator.serviceWorker.addEventListener('message', ev => {
     const d = ev.data;
-    if (typeof d === 'object' && d?.type === 'oc-event-jwt-request' && typeof d?.event === 'string') {
-      const { type, event } = d;
-      window.parent.postMessage({ type, event }, '*');
+    if (typeof d === 'object' && d?.type === 'oc-event-jwt-request'
+      && typeof d?.event === 'string' && typeof d?.reqId === 'string') {
+      if (d.event === videoId) {
+        pendingRequests.set(d.reqId, ev.source);
+        window.parent.postMessage({ type: d.type, event: d.event }, '*');
+      } else {
+        // We only ask the host for JWTs for our own event.
+        ev.source.postMessage({ type: 'oc-event-jwt', event: d.event, jwt: null, reqId: d.reqId });
+      }
     }
   });
 }
