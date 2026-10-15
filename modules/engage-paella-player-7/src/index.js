@@ -81,12 +81,17 @@ if ('serviceWorker' in navigator) {
   sendJwt();
 }
 
-// Resolves once the SW controls this page (or we gave up on that). Requests
-// made before that bypass the SW and thus fail for protected static files.
-// Never rejects, and logs a warning itself if something went wrong.
+// Resolves once the SW controls this page (or we gave up on that, or static
+// file auth is disabled). Requests made before that bypass the SW and thus fail
+// for protected static files. Never rejects, and logs a warning itself if
+// something went wrong.
 const swReady = (async () => {
   // If loading the config fails, Paella fails to load as well and logs that.
   const config = await loadOpencastConfig().catch(() => null);
+
+  // If disabled, `setUpClient` unregisters our SW in case it was installed
+  // before, so that it doesn't linger.
+  const enabled = config?.opencast?.jwt?.authStaticFiles === true;
 
   // The SW only attaches JWTs to requests to these origins. They are passed
   // via the SW URL, as the SW needs them right when it starts. Changing them
@@ -103,7 +108,7 @@ const swReady = (async () => {
   }
 
   const swUrl = `sw.js?${new URLSearchParams({ trustedOrigins: [...trustedOrigins].join(',') })}`;
-  return setUpClient(swUrl);
+  return setUpClient(swUrl, { enabled });
 })();
 
 
