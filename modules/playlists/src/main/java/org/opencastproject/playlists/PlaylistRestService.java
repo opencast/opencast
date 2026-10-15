@@ -37,6 +37,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -308,14 +309,21 @@ public class PlaylistRestService {
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
     Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
     if (optSort.isPresent()) {
-      sortCriterion = SortCriterion.parse(optSort.get());
+      try {
+        sortCriterion = SortCriterion.parse(optSort.get());
+      } catch (IllegalArgumentException e) {
+        return RestUtil.R.badRequest(String.format(
+            "Invalid sort parameter '%%s': %%s. Expected <field>:ASC or <field>:DESC, supported fields: updated",
+            optSort.get(), e.getMessage()));
+      }
 
       switch (sortCriterion.getFieldName()) {
         case "updated":
           break;
         default:
           logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
-          return Response.status(SC_BAD_REQUEST).build();
+          return RestUtil.R.badRequest(String.format(
+              "Unknown sort field '%%s', supported fields: updated", sortCriterion.getFieldName()));
       }
     }
 
