@@ -67,7 +67,7 @@ if (refreshEnabled && window.self === window.top) {
   console.warn('jwtRefresh=true given, but not running in iframe');
   refreshEnabled = false;
 }
-const swUrl = `sw.js?${new URLSearchParams({ refresh: refreshEnabled })}`;
+const swUrl = 'sw.js';
 
 if ('serviceWorker' in navigator) {
   // Send our JWT to the SW, so that it can be used for the first requests
@@ -90,47 +90,59 @@ const swReady = setUpClient(swUrl);
 
 
 
-// If JWT refresh is enabled, we need to forward messages between the host of
-// this iframe and the SW (as they cannot communicate directly).
-if (refreshEnabled && 'serviceWorker' in navigator) {
+// Answer JWT requests from the SW. If JWT refresh is enabled, we forward them
+// to the host of this iframe (as it and the SW cannot communicate directly).
+if ('serviceWorker' in navigator) {
   // SW requests waiting for an answer from the iframe host: request ID -> SW.
   // We reply to the SW that asked, which can differ from `controller` during
   // an SW update.
   const pendingRequests = new Map();
 
-  // Forward messages coming from the iframe host to the SW.
-  window.addEventListener('message', ev => {
-    if (ev.source !== window.parent) {
-      return;
-    }
-
-    const d = ev.data;
-    if (typeof d === 'object' && d?.type === 'oc-event-jwt'
-      && d?.event === videoId && typeof d?.jwt === 'string') {
-      const msg = { type: d.type, event: d.event, jwt: d.jwt };
-      if (pendingRequests.size === 0) {
-        // The host sent it without us asking: just put it into the SW's cache.
-        navigator.serviceWorker.controller?.postMessage(msg);
-      }
-      for (const [reqId, sw] of pendingRequests) {
-        sw.postMessage({ ...msg, reqId });
-      }
-      pendingRequests.clear();
-    }
-  });
-
-  // Forward messages coming from the SW to the iframe host.
   navigator.serviceWorker.addEventListener('message', ev => {
     const d = ev.data;
     if (typeof d === 'object' && d?.type === 'oc-event-jwt-request'
       && typeof d?.event === 'string' && typeof d?.reqId === 'string') {
-      if (d.event === videoId) {
+      const answer = token => ev.source.postMessage({
+        type: 'oc-event-jwt',
+        event: d.event,
+        jwt: token,
+        reqId: d.reqId,
+      });
+
+      if (d.event !== videoId) {
+        // We only have JWTs for our own event.
+        answer(null);
+      } else if (refreshEnabled) {
         pendingRequests.set(d.reqId, ev.source);
         window.parent.postMessage({ type: d.type, event: d.event }, '*');
       } else {
-        // We only ask the host for JWTs for our own event.
-        ev.source.postMessage({ type: 'oc-event-jwt', event: d.event, jwt: null, reqId: d.reqId });
+        // Our initial JWT (if any). The SW asks again e.g. after it was stopped
+        // and lost its cache. If the JWT is expired, requests fail either way.
+        answer(jwt);
       }
     }
   });
+
+  // Forward JWTs coming from the iframe host to the SW.
+  if (refreshEnabled) {
+    window.addEventListener('message', ev => {
+      if (ev.source !== window.parent) {
+        return;
+      }
+
+      const d = ev.data;
+      if (typeof d === 'object' && d?.type === 'oc-event-jwt'
+        && d?.event === videoId && typeof d?.jwt === 'string') {
+        const msg = { type: d.type, event: d.event, jwt: d.jwt };
+        if (pendingRequests.size === 0) {
+          // The host sent it without us asking: just put it into the SW's cache.
+          navigator.serviceWorker.controller?.postMessage(msg);
+        }
+        for (const [reqId, sw] of pendingRequests) {
+          sw.postMessage({ ...msg, reqId });
+        }
+        pendingRequests.clear();
+      }
+    });
+  }
 }

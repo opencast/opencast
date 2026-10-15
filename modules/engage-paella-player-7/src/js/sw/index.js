@@ -21,20 +21,10 @@
 
 import { setUpServiceWorker } from '@opencast/jwtify';
 
-// Get initial parameters
-const params = new URLSearchParams(self.location.search);
-const refreshEnabled = params.get('refresh') === 'true';
-
 // Requests to pages waiting for an answer: request ID -> resolve function.
 const pendingRequests = new Map();
 
 const fetchJwts =  async (eventIds, { clientId }) => {
-  if (!refreshEnabled) {
-    // eslint-disable-next-line no-console
-    console.warn('jwtify asked for a JWT (none cached or expired), but JWT refresh is not enabled');
-    return new Map();
-  }
-
   if (eventIds.size !== 1) {
     // eslint-disable-next-line no-console
     console.warn('jwtify asked for JWTs of multiple events at once, which is not supported');
@@ -50,7 +40,8 @@ const fetchJwts =  async (eventIds, { clientId }) => {
     return new Map();
   }
 
-  // Get fresh JWT by asking the host frame (by first asking the client).
+  // The page answers with its own JWT or, if JWT refresh is enabled, gets a
+  // fresh one from the iframe host.
   const jwt = await new Promise(resolve => {
     const reqId = crypto.randomUUID();
     pendingRequests.set(reqId, resolve);
