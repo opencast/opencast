@@ -213,7 +213,7 @@ public class PlaylistsEndpoint {
         sortCriterion = SortCriterion.parse(optSort.get());
       } catch (IllegalArgumentException e) {
         return RestUtil.R.badRequest(String.format(
-            "Invalid sort parameter '%%s': %%s. Expected <field>:ASC or <field>:DESC, supported fields: updated",
+            "Invalid sort parameter '%s': %s. Expected <field>:ASC or <field>:DESC, supported fields: updated",
             optSort.get(), e.getMessage()));
       }
 
@@ -223,7 +223,7 @@ public class PlaylistsEndpoint {
         default:
           logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
           return RestUtil.R.badRequest(String.format(
-              "Unknown sort field '%%s', supported fields: updated", sortCriterion.getFieldName()));
+              "Unknown sort field '%s', supported fields: updated", sortCriterion.getFieldName()));
       }
     }
 
