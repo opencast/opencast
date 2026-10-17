@@ -1,0 +1,42 @@
+meta {
+  name: put_series_metadata
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/api/series/:seriesId/metadata?type=dublincore/series
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:query {
+  type: dublincore/series
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+body:form-urlencoded {
+  metadata: [{"id":"title","value":"Advanced Mathematics - Edited"},{"id":"description","value":"This is an updated mathematics course"}]
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Update series metadata response should have correct types", function() {
+    if (res.status === 200) {
+      const catalogs = res.getBody();
+      if (catalogs && catalogs !== "") {
+        expect(catalogs).to.be.an('array');
+        catalogs.forEach(function(cat) {
+          expect(cat.flavor).to.be.a('string');
+          expect(cat.fields).to.be.an('array');
+        });
+      }
+    }
+  });
+}

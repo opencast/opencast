@@ -1,0 +1,21 @@
+meta {
+  name: get_user_invalid
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/users/non_existent_user_xyz.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Querying a non-existent user should return 404 Not Found", function() {
+    expect(res.status).to.equal(404);
+  });
+}

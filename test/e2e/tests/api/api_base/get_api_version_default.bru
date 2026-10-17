@@ -1,0 +1,16 @@
+meta {
+  name: get_api_version_default
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/version/default
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.default: isString
+}

@@ -1,0 +1,25 @@
+meta {
+  name: get_agent_configuration_json
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/agents/test-agent-bruno/configuration.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get capture agent configuration JSON should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body['properties-response']).to.be.an('object');
+    expect(body['properties-response'].properties.item.key).to.equal('capture.device.names');
+    expect(body['properties-response'].properties.item.value).to.equal('camera,screen');
+  });
+}

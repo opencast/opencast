@@ -1,0 +1,24 @@
+meta {
+  name: put_group
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/groups/:groupId
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  groupId: {{groupId}}
+}
+
+body:form-urlencoded {
+  name: Opencast Project System Administrators (Edited)
+  description: System administrators of Opencast Project
+}
+
+assert {
+  res.status: eq 200
+}

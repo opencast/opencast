@@ -1,0 +1,19 @@
+meta {
+  name: delete_workflow
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/workflows/:workflowInstanceId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  workflowInstanceId: {{workflowId}}
+}
+
+assert {
+  res.status: eq 204
+}

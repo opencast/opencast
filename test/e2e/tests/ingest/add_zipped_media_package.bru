@@ -1,0 +1,30 @@
+meta {
+  name: add_zipped_media_package
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/ingest/addZippedMediaPackage
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  BODY: @file(mediapackage.zip) @contentType(application/zip)
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Zipped ingest should return workflow XML", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.match(/<(wf:)?workflow/);
+    expect(body).to.include("state=\"INSTANTIATED\"");
+    expect(body).to.include("schedule-and-upload");
+  });
+}

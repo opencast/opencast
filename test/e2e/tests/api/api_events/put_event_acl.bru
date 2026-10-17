@@ -1,0 +1,23 @@
+meta {
+  name: put_event_acl
+  type: http
+  seq: 16
+}
+
+put {
+  url: {{baseUrl}}/api/events/:eventId/acl
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:form-urlencoded {
+  acl: [{"allow":true,"action":"read","role":"ROLE_USER"},{"allow":true,"action":"write","role":"ROLE_ADMIN"}]
+}
+
+assert {
+  res.status: eq 204
+}
