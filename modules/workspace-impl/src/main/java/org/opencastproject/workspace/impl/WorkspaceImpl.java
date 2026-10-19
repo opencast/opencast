@@ -343,10 +343,11 @@ public final class WorkspaceImpl implements Workspace {
       logger.debug("Created unique filename: {}", inWs);
     }
 
+    final String uriWithoutQuery = toStringWithoutQuery(uri);
     if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
             && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
-      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
-        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+      if (uriWithoutQuery.startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = uriWithoutQuery.substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist and is it up to date?
         logger.trace("Looking up {} at {}", uri.toString(), wfrCopy.getAbsolutePath());
@@ -388,9 +389,10 @@ public final class WorkspaceImpl implements Workspace {
   public InputStream read(final URI uri) throws NotFoundException, IOException {
 
     // Check if we can get the file from the working file repository directly
+    final String uriWithoutQuery = toStringWithoutQuery(uri);
     if (pathMappable != null) {
-      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
-        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+      if (uriWithoutQuery.startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = uriWithoutQuery.substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist?
         logger.trace("Looking up {} at {} for read", uri, wfrCopy);
@@ -781,6 +783,14 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   /**
+   * Get the URI as string, without the query. The query, e.g. the signature of stream security, is not part of the
+   * path of the file in the working file repository or in the workspace.
+   */
+  private static String toStringWithoutQuery(URI uri) {
+    return UriBuilder.fromUri(uri).replaceQuery(null).build().toString();
+  }
+
+  /**
    * Transforms a URI into a workspace File. If the file comes from the working file repository, the path in the
    * workspace mirrors that of the repository. If the file comes from another source, directories are created for each
    * segment of the URL. Sub-directories may be created as needed.
@@ -792,7 +802,7 @@ public final class WorkspaceImpl implements Workspace {
   File toWorkspaceFile(URI uri) {
     // MH-11497: Fix for compatibility with stream security: the query parameters are deleted.
     // TODO Refactor this class to use the URI class and methods instead of String for handling URIs
-    String uriString = UriBuilder.fromUri(uri).replaceQuery(null).build().toString();
+    String uriString = toStringWithoutQuery(uri);
     String wfrPrefix = wfr.getBaseUri().toString();
     String serverPath = FilenameUtils.getPath(uriString);
     if (uriString.startsWith(wfrPrefix)) {

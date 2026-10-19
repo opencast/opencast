@@ -97,7 +97,8 @@ public final class DistributionPathUtils {
 
 
   /**
-   * Splits up a distribution URI and returns a local path instead.
+   * Splits up a distribution URI and returns a local path instead. A query of the URI, e.g. from stream security, is
+   * ignored, as it is not part of the path of the file.
    *
    * @param localPath
    *          Path to the local distribution directory
@@ -113,13 +114,20 @@ public final class DistributionPathUtils {
       final String organizationId,
       final URI uri
   ) {
+    // The query, e.g. the signature of stream security, is not part of the path of the file
+    String uriString = uri.toString();
+    final int queryStart = uriString.indexOf('?');
+    if (queryStart >= 0) {
+      uriString = uriString.substring(0, queryStart);
+    }
+
     if (localPath == null
             || organizationId == null
-            || !uri.toString().startsWith(downloadUrl)) {
+            || !uriString.startsWith(downloadUrl)) {
       return null;
     }
 
-    final File file = Paths.get(localPath, uri.toString().substring(downloadUrl.length())).toFile();
+    final File file = Paths.get(localPath, uriString.substring(downloadUrl.length())).toFile();
 
     if (file.isFile()) {
       logger.debug("Converted {} to local file at {}", uri, file);
