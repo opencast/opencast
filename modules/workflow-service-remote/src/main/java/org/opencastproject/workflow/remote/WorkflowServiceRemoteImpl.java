@@ -188,7 +188,10 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
           throws WorkflowException {
 
-    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
+    List<NameValuePair> queryStringParams = new ArrayList<>();
+    queryStringParams.add(new BasicNameValuePair("action", action));
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/currentInstance.xml?"
+        + URLEncodedUtils.format(queryStringParams, StandardCharsets.UTF_8));
     HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
     try {
       if (response != null) {
