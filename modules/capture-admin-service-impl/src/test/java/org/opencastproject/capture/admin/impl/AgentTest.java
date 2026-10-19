@@ -41,7 +41,7 @@ public class AgentTest {
 
   @Before
   public void setUp() {
-    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", null);
+    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", new Properties());
     Assert.assertNotNull(agent);
     time = agent.getLastHeardFrom();
   }
