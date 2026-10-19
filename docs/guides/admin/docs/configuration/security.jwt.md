@@ -83,6 +83,8 @@ An external application wants a user to load a protected static file from Openca
 }
 ```
 
+To embed the Paella 7 player with such a JWT, see [Embedding with JWT](player/paella.player7/jwt.md).
+
 #### Opencast Studio
 
 An external application wants to let a user use Opencast Studio to record and upload a video. Since this does not happen in a single request, a browser session needs to be created. This can be achieved with the [`/redirect` API](https://develop.opencast.org/docs.html?path=/redirect). The JWT sent to that API needs to grant permissions to use all required APIs (which can be done by granting `ROLE_STUDIO`) and also specify user info, since Studio uses some use information.
