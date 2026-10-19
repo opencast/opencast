@@ -113,6 +113,7 @@ Example on how to create the Opencast {{ opencast_major_version() }} release bra
 4. Merge the new release branch forward, then fix the submodule versions back to develop
 
         git checkout develop
+        git submodule foreach git checkout develop
         git merge r/{{ opencast_major_version() }}.x
         sed -i 's#branch = .*#branch = develop#g' .gitmodules
         git add .gitmodules
