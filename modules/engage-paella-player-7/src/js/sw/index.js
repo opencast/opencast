@@ -67,7 +67,7 @@ const fetchJwts =  async (eventIds, { clientId }) => {
 const handle = setUpServiceWorker({
   getJwts: fetchJwts,
   trustedOcOrigins,
-  debugLog: true, // TODO: remove
+  // debugLog: true,
 });
 
 // Receive JWTs from clients. They are sent unsolicited when the page loads and
