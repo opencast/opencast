@@ -74,6 +74,30 @@ export function getUrlFromOpencastPaella(url) {
   return getUrlFromBase(base, url);
 }
 
+let opencastConfig = null;
+
+// Loads `config.json`, which is used by Paella and contains our own settings
+// under `opencast`. It's only fetched once and all callers share the result,
+// so don't modify the returned object.
+export function loadOpencastConfig() {
+  if (!opencastConfig) {
+    opencastConfig = fetch(getUrlFromOpencastConfig('config.json')).then(response => response.json());
+  }
+  return opencastConfig;
+}
+
+// JWT given to this page by an embedding application (e.g. an LMS), if any.
+const jwt = utils.getUrlParameter('jwt');
+
+// Adds the JWT given to this page (if any) to the URL of an Opencast API
+// request, so that Opencast authorizes the request with it.
+export function withJwt(url) {
+  if (!jwt) {
+    return url;
+  }
+  return `${url}${url.includes('?') ? '&' : '?'}jwt=${encodeURIComponent(jwt)}`;
+}
+
 
 function myWebsiteCheckConsentFunction(type) {
   const cookie_consent_level = utils.getCookie('cookie_consent_level');
@@ -102,10 +126,12 @@ const initParams = {
   },
   configResourcesUrl: getUrlFromOpencastConfig('/'),
   configUrl: getUrlFromOpencastConfig('/config.json'),
+  // Paella modifies the config (e.g. with skin overrides), so it gets a copy.
+  loadConfig: async () => structuredClone(await loadOpencastConfig()),
   repositoryUrl: getUrlFromOpencastServer('/search/episode.json'),
 
   getManifestUrl: (repoUrl, videoId) => {
-    return `${repoUrl}?id=${videoId}`;
+    return withJwt(`${repoUrl}?id=${videoId}`);
   },
 
   getManifestFileUrl: (manifestUrl) => {
@@ -158,7 +184,7 @@ const initParams = {
       const data = await fetch(getUrlFromOpencastServer('/info/me.json'));
       const me = await data.json();
 
-      if (!me.roles.includes('ROLE_USER')) {
+      if (!me.roles.includes('ROLE_USER') && !jwt) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
         await redirectToAuthPage();
         // This Error should not happen, as the user is redirected to the auth page.
@@ -333,7 +359,7 @@ export class PaellaOpencast extends Paella {
   }
 
   async getEpisode({episodeId}) {
-    return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
+    return fetch(withJwt(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`)))
     .then(response => response.json() )
     .then(response => response['result'][0])
     .catch(() => null);
