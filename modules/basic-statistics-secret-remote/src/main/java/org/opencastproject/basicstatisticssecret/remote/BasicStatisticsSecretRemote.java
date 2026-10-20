@@ -40,7 +40,8 @@ import java.time.Instant;
 import java.util.Base64;
 
 /**
- * This is a remote waveform service that will call the waveform service implementation on a remote host.
+ * This is a remote basic statistics secret service that gets the daily secret from the secret service implementation
+ * on a remote host. The secret is cached for a while.
  */
 @Component(
     immediate = true,
