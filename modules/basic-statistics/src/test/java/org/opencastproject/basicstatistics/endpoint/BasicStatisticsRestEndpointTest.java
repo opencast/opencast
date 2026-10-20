@@ -155,6 +155,14 @@ public class BasicStatisticsRestEndpointTest {
     return endpoint(body(events)).trustedPush(request(null, null, null));
   }
 
+  private Response rawClientPush(String requestBody) {
+    return endpoint(requestBody).clientPush(request(null, "10.0.0.7", "client-ua"));
+  }
+
+  private Response rawTrustedPush(String requestBody) {
+    return endpoint(requestBody).trustedPush(request(null, null, null));
+  }
+
   private static JsonObject responseBody(Response response) {
     assertEquals(200, response.getStatus());
     return JsonParser.parseString((String) response.getEntity()).getAsJsonObject();
@@ -323,6 +331,48 @@ public class BasicStatisticsRestEndpointTest {
 
     assertEquals(400, response.getStatus());
     assertTrue(stored.isEmpty());
+  }
+
+  @Test
+  public void testPushRejectsRequestWithoutEventList() {
+    // Bodies that do not contain a list of events, though they might still be valid JSON
+    String[] withoutEvents = {null, "", "   ", "null", "{}", "{\"events\": null}"};
+    // Bodies that are not what we expect at all
+    String[] malformed = {"banana", "{", "[]", "{\"events\": 5}", "{\"events\": \"banana\"}", "{\"events\": [5]}"};
+
+    for (String requestBody : withoutEvents) {
+      Response client = rawClientPush(requestBody);
+      assertEquals("clientPush: " + requestBody, 400, client.getStatus());
+      assertTrue(client.getEntity().toString().contains("'events' array"));
+      Response trusted = rawTrustedPush(requestBody);
+      assertEquals("trustedPush: " + requestBody, 400, trusted.getStatus());
+      assertTrue(trusted.getEntity().toString().contains("'events' array"));
+    }
+    for (String requestBody : malformed) {
+      assertEquals("clientPush: " + requestBody, 400, rawClientPush(requestBody).getStatus());
+      assertEquals("trustedPush: " + requestBody, 400, rawTrustedPush(requestBody).getStatus());
+    }
+    assertTrue(stored.isEmpty());
+  }
+
+  @Test
+  public void testPushRejectsNullEventsOneByOne() {
+    JsonObject client = responseBody(rawClientPush("{\"events\": [null, " + event() + ", null]}"));
+    assertEquals(1, client.get("accepted").getAsInt());
+    Map<Integer, String> rejectedByClient = rejected(client);
+    assertEquals(2, rejectedByClient.size());
+    assertRejected(rejectedByClient, 0, "must be a JSON object");
+    assertRejected(rejectedByClient, 2, "must be a JSON object");
+
+    JsonObject trusted = responseBody(rawTrustedPush("{\"events\": [null, " + trustedEvent() + ", null]}"));
+    assertEquals(1, trusted.get("accepted").getAsInt());
+    Map<Integer, String> rejectedByTrusted = rejected(trusted);
+    assertEquals(2, rejectedByTrusted.size());
+    assertRejected(rejectedByTrusted, 0, "must be a JSON object");
+    assertRejected(rejectedByTrusted, 2, "must be a JSON object");
+
+    // the valid events of both requests are still stored
+    assertEquals(2, stored.size());
   }
 
   @Test
