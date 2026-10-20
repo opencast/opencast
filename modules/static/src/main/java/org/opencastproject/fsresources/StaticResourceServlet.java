@@ -261,7 +261,7 @@ public class StaticResourceServlet extends HttpServlet {
               requestTimestamp,
               path,
               0,
-              file.length()
+              null
           );
         }
         if (e != null) {
@@ -592,8 +592,8 @@ public class StaticResourceServlet extends HttpServlet {
    * @param request http request to parse ip and user agent from
    * @param timestamp time of the response
    * @param path request path to parse mp id and element id from
-   * @param from range start
-   * @param to range end
+   * @param from range start, 0 if the request is not a range request
+   * @param to range end, or null if the request did not specify one
    */
   private void recordFileFetched(
       String contentType,
@@ -601,7 +601,7 @@ public class StaticResourceServlet extends HttpServlet {
       Instant timestamp,
       String path,
       long from,
-      long to
+      Long to
   ) {
     try {
       // We only care about request that fetch "video" files for now
