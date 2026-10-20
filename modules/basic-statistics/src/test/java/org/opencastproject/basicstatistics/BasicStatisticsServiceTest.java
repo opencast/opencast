@@ -24,15 +24,28 @@ package org.opencastproject.basicstatistics;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Test class for the basic statistics service
@@ -40,6 +53,9 @@ import javax.crypto.spec.SecretKeySpec;
 public class BasicStatisticsServiceTest {
 
   private static final byte[] SECRET = "secret".getBytes(StandardCharsets.UTF_8);
+
+  /** Path of a file of the media package "mp" and element "element", as the file server sees it */
+  private static final String PATH = "/mh_default_org/engage-player/mp/element/video.mp4";
 
   private BasicStatisticsService service;
   private InetAddress ip;
@@ -86,5 +102,48 @@ public class BasicStatisticsServiceTest {
   public void testSessionHashWithIpv6() throws Exception {
     long v6 = service.generateSessionHash(SECRET, "item", InetAddress.getByName("2001:db8::1"), "ua");
     assertNotEquals(v6, service.generateSessionHash(SECRET, "item", ip, "ua"));
+  }
+
+  /** The file server must not have to wait for the secret service, which can be slow or not reachable */
+  @Test(timeout = 10000)
+  public void testFileFetchedDoesNotWaitForSecretService() throws Exception {
+    CountDownLatch release = new CountDownLatch(1);
+    BasicStatisticsSecretService secrets = EasyMock.createNiceMock(BasicStatisticsSecretService.class);
+    EasyMock.expect(secrets.getCurrentSecret()).andAnswer(() -> {
+      release.await();
+      return SECRET;
+    }).anyTimes();
+    Organization organization = new DefaultOrganization();
+    SecurityService security = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(security.getOrganization()).andReturn(organization).anyTimes();
+    // Events are stored by another thread than the one of the request, which has to be put in the organization
+    security.setOrganization(organization);
+    EasyMock.expectLastCall().atLeastOnce();
+    HttpServletRequest request = EasyMock.createNiceMock(HttpServletRequest.class);
+    EasyMock.expect(request.getHeader("User-Agent")).andReturn("ua").anyTimes();
+    EasyMock.expect(request.getRemoteAddr()).andReturn("1.2.3.4").anyTimes();
+    EasyMock.replay(secrets, security, request);
+
+    List<RawEvent> stored = Collections.synchronizedList(new ArrayList<>());
+    BasicStatisticsService recording = new BasicStatisticsService() {
+      @Override
+      public void create(List<RawEvent> events) {
+        stored.addAll(events);
+      }
+    };
+    recording.setSecurityService(security);
+    recording.setBasicStatisticsSecretService(secrets);
+    recording.activate(Map.of());
+    Instant timestamp = Instant.parse("2026-10-20T10:00:00Z");
+
+    // these calls return although nothing could be processed yet
+    recording.fileFetched(PATH, "video/mp4", timestamp, 0, null, request);
+    recording.fileFetched(PATH, "video/mp4", timestamp, 0, null, request);
+    assertEquals(0, stored.size());
+
+    release.countDown();
+    recording.deactivate();
+    assertEquals(2, stored.size());
+    EasyMock.verify(security);
   }
 }
