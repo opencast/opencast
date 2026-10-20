@@ -260,16 +260,14 @@ public class StaticResourceServlet extends HttpServlet {
       if (withBody) {
         Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
-        if (e == null) {
-          recordFileFetched(
-              contentType,
-              req,
-              requestTimestamp,
-              path,
-              0,
-              null
-          );
-        }
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            0,
+            null
+        );
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -304,16 +302,14 @@ public class StaticResourceServlet extends HttpServlet {
         }
         Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
-        if (e == null) {
-          recordFileFetched(
-              contentType,
-              req,
-              requestTimestamp,
-              path,
-              range.start,
-              range.end
-          );
-        }
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            range.start,
+            range.endSpecified ? range.end : null
+        );
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -344,7 +340,7 @@ public class StaticResourceServlet extends HttpServlet {
             requestTimestamp,
             path,
             range.start,
-            range.end
+            range.endSpecified ? range.end : null
         );
       }
     }
@@ -492,6 +488,7 @@ public class StaticResourceServlet extends HttpServlet {
           currentRange.start = Long.parseLong(rangeDefinition.substring(0, dashPos));
           if (dashPos < rangeDefinition.length() - 1) {
             currentRange.end = Long.parseLong(rangeDefinition.substring(dashPos + 1, rangeDefinition.length()));
+            currentRange.endSpecified = true;
           } else {
             currentRange.end = fileLength - 1;
           }
@@ -574,6 +571,8 @@ public class StaticResourceServlet extends HttpServlet {
     protected long start;
     protected long end;
     protected long length;
+    /** Whether the request names the end of the range, and not just that it goes to the end of the file */
+    protected boolean endSpecified;
 
     /**
      * Validate range.
@@ -589,6 +588,7 @@ public class StaticResourceServlet extends HttpServlet {
       start = 0;
       end = 0;
       length = 0;
+      endSpecified = false;
     }
   }
 
