@@ -34,10 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -74,17 +74,13 @@ public class HelloWorldRestEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HelloWorldRestEndpoint.class);
 
-  /** The rest docs */
-  protected String docs;
-
   /** The service */
-  protected HelloWorldService helloWorldService;
+  private HelloWorldService helloWorldService;
 
   /**
    * Simple example service call
    *
    * @return The Hello World statement
-   * @throws Exception
    */
   @GET
   @Path("helloworld")
@@ -104,7 +100,7 @@ public class HelloWorldRestEndpoint {
       },
       returnDescription = "The text that the service returns."
   )
-  public Response helloWorld() throws Exception {
+  public Response helloWorld() {
     logger.info("REST call for Hello World");
     return Response.ok().entity(helloWorldService.helloWorld()).build();
   }
@@ -115,7 +111,6 @@ public class HelloWorldRestEndpoint {
    * @param name
    *          the optional name of the Person to greet
    * @return A Hello statement with optional name
-   * @throws Exception
    */
   @GET
   @Path("helloname")
@@ -143,16 +138,9 @@ public class HelloWorldRestEndpoint {
       },
       returnDescription = "The text that the service returns."
   )
-  public Response helloName(@FormParam("name") String name) throws Exception {
+  public Response helloName(@QueryParam("name") String name) {
     logger.info("REST call for Hello Name");
     return Response.ok().entity(helloWorldService.helloName(name)).build();
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_HTML)
-  @Path("docs")
-  public String getDocs() {
-    return docs;
   }
 
   @Reference
