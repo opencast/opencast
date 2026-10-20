@@ -25,7 +25,10 @@ import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseEx
 import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseService;
 import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
 import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServiceException;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.FileFetchListener;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.requests.SortCriterion;
@@ -37,6 +40,7 @@ import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -50,9 +54,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -88,6 +95,14 @@ public class BasicStatisticsService implements FileFetchListener {
   /** Daily secret service */
   protected BasicStatisticsSecretService secretService;
 
+  /**
+   * Processes file fetch events in the background, so that the file server never has to wait for the secret service
+   * or the database. A single thread keeps the events in order and the load on the database low.
+   */
+  private volatile ThreadPoolExecutor fileFetchExecutor;
+
+  private final AtomicLong droppedFileFetches = new AtomicLong();
+
   /** Callback to set the basic statistics database */
   @Reference(name = "basicstatistics-persistence")
   public void setPersistence(BasicStatisticsDatabaseService persistence) {
@@ -107,10 +122,43 @@ public class BasicStatisticsService implements FileFetchListener {
   }
 
   @Activate
-  @Modified
   void activate(Map<String, Object> properties) {
     logger.info("Activating Basic Statistics Service");
+    modified(properties);
+    // Up to 10000 events can wait to be processed, further events are dropped
+    fileFetchExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+        new ArrayBlockingQueue<>(10_000),
+        runnable -> {
+          Thread thread = new Thread(runnable, "basic-statistics-file-fetch");
+          thread.setDaemon(true);
+          return thread;
+        },
+        (runnable, executor) -> {
+          // Never block the caller. Losing an event is better than slowing down the file server.
+          long dropped = droppedFileFetches.incrementAndGet();
+          if (dropped == 1 || dropped % 1000 == 0) {
+            logger.warn("File fetch events are not processed fast enough, dropped {} so far", dropped);
+          }
+        });
+  }
+
+  @Modified
+  void modified(Map<String, Object> properties) {
     configuredCompletenessThreshold = parseCompletenessThreshold(properties);
+  }
+
+  @Deactivate
+  void deactivate() {
+    fileFetchExecutor.shutdown();
+    try {
+      // Give the pending events a few seconds to be processed
+      if (!fileFetchExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+        logger.warn("Dropping {} file fetch events on shutdown", fileFetchExecutor.shutdownNow().size());
+      }
+    } catch (InterruptedException e) {
+      fileFetchExecutor.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
   }
 
   private LocalDate parseCompletenessThreshold(Map<String, Object> properties) {
@@ -189,6 +237,9 @@ public class BasicStatisticsService implements FileFetchListener {
 
   /**
    * Record that a file was fetched, e.g. by a media player. Only video files are recorded.
+   * <p>
+   * This only does what is cheap on the calling thread. The event is then processed in the background, and dropped if
+   * too many events are waiting.
    *
    * @throws IllegalArgumentException if the client IP or the user agent of the request are missing or invalid
    */
@@ -236,15 +287,21 @@ public class BasicStatisticsService implements FileFetchListener {
       throw new IllegalArgumentException("User Agent missing from request header " + request);
     }
 
+    // The security context belongs to the thread of the request, so the background thread has to be given it
+    Organization organization = securityService.getOrganization();
+    User user = securityService.getUser();
+    fileFetchExecutor.execute(() -> SecurityUtil.runAs(securityService, organization, user,
+        () -> recordFileFetch(event, ip, userAgent)));
+  }
+
+  /** Runs in the background, see {@link #fileFetched} */
+  private void recordFileFetch(RawEvent event, InetAddress ip, String userAgent) {
     try {
       event.setSession(generateSessionHash(secretService.getCurrentSecret(), event.getItemId(), ip, userAgent));
-    } catch (BasicStatisticsSecretServiceException e) {
-      throw new InternalError("Error in the secret service", e);
+      create(List.of(event));
+    } catch (BasicStatisticsSecretServiceException | RuntimeException | InternalError e) {
+      logger.warn("Could not record file fetch event", e);
     }
-
-    List events = new ArrayList();
-    events.add(event);
-    create(events);
   }
 
   /**
