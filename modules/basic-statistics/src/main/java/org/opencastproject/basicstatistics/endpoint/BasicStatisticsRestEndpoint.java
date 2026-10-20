@@ -246,7 +246,13 @@ public class BasicStatisticsRestEndpoint {
     try {
       String json = readInputStream(request);
 
-      ClientPushRequest pushRequest = GSON.fromJson(json, ClientPushRequest.class);
+      ClientPushRequest pushRequest = json == null ? null : GSON.fromJson(json, ClientPushRequest.class);
+      if (pushRequest == null || pushRequest.getEvents() == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .type(MediaType.TEXT_PLAIN)
+            .entity("Request body must be a JSON object with an 'events' array")
+            .build();
+      }
 
       List<RawEvent> accepted = new ArrayList<>();
       List<RejectedEvent> rejected = new ArrayList<>();
@@ -263,6 +269,10 @@ public class BasicStatisticsRestEndpoint {
 
       for (int index = 0; index < pushRequest.getEvents().size(); index++) {
         ClientEventDto dto = pushRequest.getEvents().get(index);
+        if (dto == null) {
+          rejected.add(new RejectedEvent(index, "Event must be a JSON object, not null"));
+          continue;
+        }
 
         // Parsing dto into event
         RawEvent event;
@@ -342,7 +352,13 @@ public class BasicStatisticsRestEndpoint {
     try {
       String json = readInputStream(request);
 
-      TrustedPushRequest pushRequest = GSON.fromJson(json, TrustedPushRequest.class);
+      TrustedPushRequest pushRequest = json == null ? null : GSON.fromJson(json, TrustedPushRequest.class);
+      if (pushRequest == null || pushRequest.getEvents() == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .type(MediaType.TEXT_PLAIN)
+            .entity("Request body must be a JSON object with an 'events' array")
+            .build();
+      }
 
       List<RawEvent> accepted = new ArrayList<>();
       List<RejectedEvent> rejected = new ArrayList<>();
@@ -359,6 +375,10 @@ public class BasicStatisticsRestEndpoint {
 
       for (int index = 0; index < pushRequest.getEvents().size(); index++) {
         TrustedEventDto dto = pushRequest.getEvents().get(index);
+        if (dto == null) {
+          rejected.add(new RejectedEvent(index, "Event must be a JSON object, not null"));
+          continue;
+        }
 
         // Parsing dto into event
         RawEvent event;
