@@ -71,6 +71,31 @@ support per-event device positions, you should omit this configuration key.  Age
 list, or pass one or more configurations longer than 256 utf8 characters will be rejected with an HTTP 400.
 
 
+Capture Device Content
+----------------------
+
+An agent which supports onboard frame composition can define one or more content configurations.  Frame composition
+includes, but is not limited to, embedding multiple inputs into a single frame, applying watermarks, and applying
+filters to the resulting outputs.  This configuration value supercedes any capture input options provided to an agent.
+In other words, if `capture.device.names` contains both inputs A, and B, but the content configuration specifies to
+only capture from input B, then input A's data *MUST* not be recorded.  Note that a content configuration *MAY*
+configure different inputs for different capture outputs.  For example, a configuration indicating to capture all
+inputs to separate files, but only stream a single input is something your device is allowed to support.  If your agent
+supports this it should provide a set of comma delimited plain text strings, each no longer than 256 utf8 characters,
+under the `capture.device.content` agent configuration key.  These strings are vendor specific, but you should expect
+these to be directly visible to Opencast administrative users and thus be clear for end users.  If your agent does not
+per-event content configurations, you should omit this configuration key.  Agents which attempt to configure an empty
+list, or pass one or more configurations longer than 256 utf8 characters will be rejected with an http 400.
+
+
+Additional Vendor Configuration Keys
+------------------------------------
+
+Capture agent vendors *MAY* defined their own keys, provided these keys are prefixed with `X-$vendor_name` (cf.
+`X-pyca`), and neither the key names, nor the key's value exceed 256 utf8 characters.  If any key, or value does not
+meet these criterial the agent will be rejected with an http 400.  These keys are ignored by the core, aside from
+passing them through with the rest of the agent configuration.
+
 
 Capture Agent Input Selection
 =============================
