@@ -42,14 +42,6 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.jaxrs</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.service.component</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
