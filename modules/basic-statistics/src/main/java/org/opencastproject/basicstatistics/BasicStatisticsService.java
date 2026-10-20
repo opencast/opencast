@@ -26,6 +26,8 @@ import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseSe
 import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
 import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServiceException;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.FileFetchListener;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.requests.SortCriterion;
 
 import com.google.common.net.InetAddresses;
@@ -63,9 +65,9 @@ import javax.servlet.http.HttpServletRequest;
         "service.pid=org.opencastproject.basicstatistics.BasicStatisticsService"
     },
     immediate = true,
-    service = BasicStatisticsService.class
+    service = { BasicStatisticsService.class, FileFetchListener.class }
 )
-public class BasicStatisticsService {
+public class BasicStatisticsService implements FileFetchListener {
 
   /** The module specific logger */
   private static final Logger logger = LoggerFactory.getLogger(BasicStatisticsService.class);
@@ -186,13 +188,37 @@ public class BasicStatisticsService {
   }
 
   /**
-   * Record that a file was fetched, e.g. by a media player.
+   * Record that a file was fetched, e.g. by a media player. Only video files are recorded.
    *
-   * @param event the event to record
-   * @param request the request of the client that fetched the file
    * @throws IllegalArgumentException if the client IP or the user agent of the request are missing or invalid
    */
-  public void recordFileFetched(RawEvent event, HttpServletRequest request) {
+  @Override
+  public void fileFetched(String path, String contentType, Instant timestamp, long from, Long to,
+          HttpServletRequest request) {
+    // We only care about request that fetch "video" files for now
+    if (!contentType.startsWith("video/")
+        && !contentType.startsWith(MimeTypes.HLS.toString())
+        && !contentType.startsWith(MimeTypes.DASH.toString())) {
+      return;
+    }
+
+    String[] parts = path.split("/");
+
+    // TODO: Find a less brittle way to determine these
+    if (parts.length < 5) {
+      logger.warn("Cannot determine media package and element id from path '{}', skipping statistics", path);
+      return;
+    }
+    String mediaPackageId = parts[3];
+    String elementId = parts[4];
+
+    RawEvent event = new RawEvent();
+    event.setTimestamp(timestamp);
+    event.setItemType(ItemType.VIDEO);
+    event.setItemId(mediaPackageId);
+    event.setEventType(EventType.FETCH_FILE);
+    event.setEventPayload(RawEvent.serializePayload(new EventPayload.FetchFile(elementId, from, to)));
+
     InetAddress ip;
     String ipString;
     if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {

@@ -21,14 +21,10 @@
 
 package org.opencastproject.fsresources;
 
-import org.opencastproject.basicstatistics.BasicStatisticsService;
-import org.opencastproject.basicstatistics.EventPayload;
-import org.opencastproject.basicstatistics.EventType;
-import org.opencastproject.basicstatistics.ItemType;
-import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.FileFetchListener;
 import org.opencastproject.util.MimeTypes;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -107,11 +103,21 @@ public class StaticResourceServlet extends HttpServlet {
 
   private List<StaticFileAuthorization> authorizations = new ArrayList<>();
 
-  private BasicStatisticsService statisticsService;
+  /** Gets told about fetched files, if there is one. Serving files must work without it. */
+  private volatile FileFetchListener fileFetchListener;
 
-  @Reference
-  public void setBasicStatisticsService(BasicStatisticsService service) {
-    this.statisticsService = service;
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC
+  )
+  public void setFileFetchListener(FileFetchListener listener) {
+    this.fileFetchListener = listener;
+  }
+
+  public void unsetFileFetchListener(FileFetchListener listener) {
+    if (this.fileFetchListener == listener) {
+      this.fileFetchListener = null;
+    }
   }
 
   /**
@@ -587,11 +593,11 @@ public class StaticResourceServlet extends HttpServlet {
   }
 
   /**
-   * Sends statistic events to the basic statistic service
-   * @param contentType Mimetype string for determining item type
-   * @param request http request to parse ip and user agent from
+   * Tells the file fetch listener, if there is one, that a file was fetched
+   * @param contentType Mimetype string of the file
+   * @param request http request of the client that fetched the file
    * @param timestamp time of the response
-   * @param path request path to parse mp id and element id from
+   * @param path request path of the file
    * @param from range start, 0 if the request is not a range request
    * @param to range end, or null if the request did not specify one
    */
@@ -604,35 +610,12 @@ public class StaticResourceServlet extends HttpServlet {
       Long to
   ) {
     try {
-      // We only care about request that fetch "video" files for now
-      if (!contentType.startsWith("video/")
-          && !contentType.startsWith(MimeTypes.HLS.toString())
-          && !contentType.startsWith(MimeTypes.DASH.toString())) {
-        return;
+      FileFetchListener listener = fileFetchListener;
+      if (listener != null) {
+        listener.fileFetched(path, contentType, timestamp, from, to, request);
       }
-
-      String[] parts = path.split("/");
-
-      // TODO: Find a less brittle way to determine these
-      if (parts.length < 5) {
-        logger.warn("Cannot determine media package and element id from path '{}', skipping statistics", path);
-        return;
-      }
-      String mediaPackageId = parts[3];
-      String elementId = parts[4];
-
-      EventPayload payload = new EventPayload.FetchFile(elementId, from, to);
-
-      RawEvent event = new RawEvent();
-      event.setTimestamp(timestamp);
-      event.setItemType(ItemType.VIDEO);
-      event.setItemId(mediaPackageId);
-      event.setEventType(EventType.FETCH_FILE);
-      event.setEventPayload(RawEvent.serializePayload(payload));
-
-      statisticsService.recordFileFetched(event, request);
     } catch (Exception | InternalError e) {
-      logger.warn("Cannot report statistics to basic statistics service", e);
+      logger.warn("Cannot report fetched file to the file fetch listener", e);
     }
   }
 }
