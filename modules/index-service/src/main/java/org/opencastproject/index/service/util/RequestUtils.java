@@ -62,9 +62,9 @@ public final class RequestUtils {
     Map<String, String> fieldMap = new TreeMap<String, String>();
     for (JsonElement element : updatedFields) {
       JsonObject field = element.getAsJsonObject();
-      String id = asPlainString(field.get(ID_JSON_KEY), "");
-      String value = asPlainString(field.get(VALUE_JSON_KEY), "");
-      String requiredStr = asPlainString(field.get(REQUIRED_JSON_KEY), "false");
+      String id = GsonUtil.asText(field.get(ID_JSON_KEY), "");
+      String value = GsonUtil.asText(field.get(VALUE_JSON_KEY), "");
+      String requiredStr = GsonUtil.asText(field.get(REQUIRED_JSON_KEY), "false");
       boolean required = Boolean.parseBoolean(requiredStr);
 
       if (StringUtils.trimToNull(id) != null && (StringUtils.trimToNull(value) != null || !required)) {
@@ -76,17 +76,6 @@ public final class RequestUtils {
       }
     }
     return fieldMap;
-  }
-
-  /**
-   * Render a value the way the previous parser did, i.e. the plain text of a primitive rather than its JSON
-   * representation, falling back to <code>fallback</code> when the member is absent or null.
-   */
-  private static String asPlainString(JsonElement value, String fallback) {
-    if (value == null || value.isJsonNull()) {
-      return fallback;
-    }
-    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
   }
 
   /**
@@ -124,8 +113,8 @@ public final class RequestUtils {
           continue;
         }
         final JsonObject assetUpload = GsonUtil.parse(assetUploadJson).getAsJsonObject();
-        if (assetUploadId.equals(asPlainString(assetUpload.get("id"), null))) {
-          final List<String> accepts = Arrays.stream(asPlainString(assetUpload.get("accept"), "*/*").split(","))
+        if (assetUploadId.equals(GsonUtil.asText(assetUpload.get("id"), null))) {
+          final List<String> accepts = Arrays.stream(GsonUtil.asText(assetUpload.get("accept"), "*/*").split(","))
               .map(String::trim).collect(Collectors.toList());
           for (String accept : accepts) {
             if (accept.contains("/") && mediaType.is(MediaType.parse(accept))) {
