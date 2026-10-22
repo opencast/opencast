@@ -21,16 +21,16 @@
 
 package org.opencastproject.graphql.datafetcher.series;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.series.GqlSeries;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.SecurityService;
 
 import java.util.Objects;
@@ -57,7 +57,7 @@ public class SeriesDataFetcher implements ContextDataFetcher<GqlSeries> {
   @Override
   public GqlSeries get(OpencastContext opencastContext, DataFetchingEnvironment dataFetchingEnvironment) {
     SecurityService securityService = opencastContext.getService(SecurityService.class);
-    ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
+    OpenSearchIndex searchIndex = opencastContext.getService(OpenSearchIndex.class);
 
     try {
       SearchResult<Series> result = searchIndex.getByQuery(

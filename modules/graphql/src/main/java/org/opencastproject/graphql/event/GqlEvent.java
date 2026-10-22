@@ -21,7 +21,6 @@
 
 package org.opencastproject.graphql.event;
 
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.graphql.datafetcher.event.CommonEventMetadataDataFetcher;
 import org.opencastproject.graphql.datafetcher.event.CommonEventMetadataV2DataFetcher;
 import org.opencastproject.graphql.datafetcher.series.SeriesDataFetcher;
@@ -32,6 +31,7 @@ import org.opencastproject.graphql.type.DurationFunction;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadata;
 import org.opencastproject.graphql.type.output.GqlCommonEventMetadataV2;
 import org.opencastproject.graphql.type.output.GqlPublication;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import java.util.Arrays;

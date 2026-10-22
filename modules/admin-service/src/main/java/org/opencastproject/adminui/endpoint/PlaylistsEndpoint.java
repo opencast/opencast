@@ -36,13 +36,13 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.common.query.PlaylistsListQuery;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.playlists.PlaylistAccessControlEntry;
 import org.opencastproject.playlists.PlaylistEntry;
@@ -139,8 +139,8 @@ public class PlaylistsEndpoint {
   /** The playlists REST service for parsing utilities */
   private PlaylistRestService restService;
 
-  /** The Elasticsearch index for looking up event metadata */
-  private ElasticsearchIndex elasticsearchIndex;
+  /** The OpenSearch index for looking up event metadata */
+  private OpenSearchIndex opensearchIndex;
 
   /** The security service for organization/user context */
   private SecurityService securityService;
@@ -157,8 +157,8 @@ public class PlaylistsEndpoint {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Reference
@@ -519,7 +519,7 @@ public class PlaylistsEndpoint {
       }
 
       try {
-        SearchResult<Event> result = elasticsearchIndex.getByQuery(
+        SearchResult<Event> result = opensearchIndex.getByQuery(
             new EventSearchQuery(org, user).withIdentifier(contentId));
         if (result.getPageSize() != 0) {
           eventMap.put(contentId, result.getItems()[0].getSource());
