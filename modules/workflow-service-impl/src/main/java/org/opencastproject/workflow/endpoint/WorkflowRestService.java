@@ -376,6 +376,27 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
   )
   public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
+    return workflowsOfMediaPackage(mediaPackageId);
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_XML)
+  @Path("mediaPackage/{id}/instances.xml")
+  @RestQuery(name = "workflowsofmediapackagexml",
+      description = "Returns the workflows for a media package",
+      returnDescription = "Returns the workflows that are associated with the media package as XML.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package.")
+      }
+  )
+  public Response getWorkflowsOfMediaPackageAsXml(@PathParam("id") String mediaPackageId) {
+    return workflowsOfMediaPackage(mediaPackageId);
+  }
+
+  private Response workflowsOfMediaPackage(String mediaPackageId) {
     try {
       return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
     } catch (UnauthorizedException e) {
@@ -393,22 +414,65 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       returnDescription = "Returns the currentworkflow that are associated with the media package as JSON.",
       pathParameters = {
           @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+      restParameters = {
+          @RestParameter(name = "action", isRequired = false, type = STRING, defaultValue = "read",
+              description = "The permission the user needs on the workflow: read, write or contribute")
+      },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unknown action."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.")
       }
   )
-  public Response getRunningWorkflowOfMediaPackage(@PathParam("id") String mediaPackageId) {
+  public Response getRunningWorkflowOfMediaPackage(@PathParam("id") String mediaPackageId,
+      @QueryParam("action") String action) {
+    return runningWorkflowOfMediaPackage(mediaPackageId, action);
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_XML)
+  @Path("mediaPackage/{id}/currentInstance.xml")
+  @RestQuery(name = "currentworkflowofmediapackagexml",
+      description = "Returns the current workflow for a media package",
+      returnDescription = "Returns the current workflow that is associated with the media package as XML.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+      restParameters = {
+          @RestParameter(name = "action", isRequired = false, type = STRING, defaultValue = "read",
+              description = "The permission the user needs on the workflow: read, write or contribute")
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unknown action."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.")
+      }
+  )
+  public Response getRunningWorkflowOfMediaPackageAsXml(@PathParam("id") String mediaPackageId,
+      @QueryParam("action") String action) {
+    return runningWorkflowOfMediaPackage(mediaPackageId, action);
+  }
+
+  private Response runningWorkflowOfMediaPackage(String mediaPackageId, String action) {
+    final Permissions.Action requiredAction;
     try {
-      Optional<WorkflowInstance> optWorkflowInstance = service.
-              getRunningWorkflowInstanceByMediaPackage(mediaPackageId, Permissions.Action.READ.toString());
+      requiredAction = StringUtils.isBlank(action)
+          ? Permissions.Action.READ
+          : Permissions.Action.getEnum(action.trim());
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+    try {
+      Optional<WorkflowInstance> optWorkflowInstance = service
+          .getRunningWorkflowInstanceByMediaPackage(mediaPackageId, requiredAction.toString());
       if (optWorkflowInstance.isPresent()) {
         return Response.ok(new JaxbWorkflowInstance(optWorkflowInstance.get())).build();
       } else {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
 
-    } catch (WorkflowException | UnauthorizedException e) {
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.FORBIDDEN).build();
+    } catch (WorkflowException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }

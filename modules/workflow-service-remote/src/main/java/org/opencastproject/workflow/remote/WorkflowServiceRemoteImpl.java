@@ -22,6 +22,7 @@
 package org.opencastproject.workflow.remote;
 
 import static org.apache.http.HttpStatus.SC_CONFLICT;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -169,13 +170,18 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   @Override
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
-          throws WorkflowDatabaseException {
+          throws WorkflowDatabaseException, UnauthorizedException {
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
-    HttpResponse response = getResponse(get);
+    HttpResponse response = getResponse(get, SC_OK, SC_FORBIDDEN);
     try {
       if (response != null) {
+        if (SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
+          throw new UnauthorizedException("You do not have permission to load the workflow instances");
+        }
         return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
@@ -186,19 +192,26 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   @Override
   public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
-          throws WorkflowException {
+          throws WorkflowException, UnauthorizedException {
 
-    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
-    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
+    List<NameValuePair> queryStringParams = new ArrayList<>();
+    queryStringParams.add(new BasicNameValuePair("action", action));
+    HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/currentInstance.xml?"
+        + URLEncodedUtils.format(queryStringParams, StandardCharsets.UTF_8));
+    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK, SC_FORBIDDEN);
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           return Optional.empty();
+        } else if (SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
+          throw new UnauthorizedException("You do not have permission to load the workflow instance");
         }
         return Optional.ofNullable(
                 XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent())
         );
       }
+    } catch (UnauthorizedException e) {
+      throw e;
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
