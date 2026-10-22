@@ -31,6 +31,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.junit.Test;
 
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
@@ -103,6 +104,25 @@ public class GsonUtilTest {
     assertEquals("value", GsonUtil.getStringOrNull(json, "set"));
     assertNull(GsonUtil.getStringOrNull(json, "null"));
     assertNull(GsonUtil.getStringOrNull(json, "absent"));
+  }
+
+  /** Unlike JsonParser, parsing into a tree has to be as strict as the Gson instance. */
+  @Test(expected = JsonSyntaxException.class)
+  public void testParseRejectsLenientInput() {
+    GsonUtil.parse("{key: value}");
+  }
+
+  /** Same for readers. */
+  @Test(expected = JsonSyntaxException.class)
+  public void testParseReaderRejectsLenientInput() {
+    GsonUtil.parse(new StringReader("{key: value}"));
+  }
+
+  /** An empty document parses to JSON null, as it does with JsonParser. */
+  @Test
+  public void testParseEmptyDocument() {
+    assertEquals(JsonNull.INSTANCE, GsonUtil.parse(""));
+    assertEquals(JsonNull.INSTANCE, GsonUtil.parse(new StringReader("")));
   }
 
   /** Primitives render as their plain value, containers as JSON. */

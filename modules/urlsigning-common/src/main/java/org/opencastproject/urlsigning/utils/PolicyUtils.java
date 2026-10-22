@@ -22,8 +22,10 @@ package org.opencastproject.urlsigning.utils;
 
 import org.opencastproject.urlsigning.common.Policy;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Strictness;
 
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
@@ -35,6 +37,11 @@ import java.nio.charset.StandardCharsets;
  * A Utility class to encode / decode Policy files from and to Base 64 and Json.
  */
 public final class PolicyUtils {
+  /**
+   * Parses policies strictly, like {@code GsonUtil} in opencast-common does. That class is not used here to keep this
+   * module's dependencies small.
+   */
+  private static final Gson GSON = new GsonBuilder().setStrictness(Strictness.STRICT).create();
   /** The JSON key for object that contains the date and ip conditions for the resource. */
   private static final String CONDITION_KEY = "Condition";
   /** The JSON key for the date and time the resource will become available. */
@@ -82,7 +89,7 @@ public final class PolicyUtils {
    * @return A new {@link Policy} object populated from the JSON.
    */
   public static Policy fromJson(String policyJson) {
-    JsonObject jsonPolicy = JsonParser.parseString(policyJson).getAsJsonObject();
+    JsonObject jsonPolicy = GSON.fromJson(policyJson, JsonObject.class);
 
     JsonObject statement = jsonPolicy.getAsJsonObject(STATEMENT_KEY);
     String resource = statement.get(RESOURCE_KEY).getAsString();

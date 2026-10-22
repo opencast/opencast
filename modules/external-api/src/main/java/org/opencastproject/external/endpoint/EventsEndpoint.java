@@ -117,7 +117,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -1826,7 +1825,7 @@ public class EventsEndpoint {
             return error.get();
           }
           collection.removeField(field);
-          JsonArray subjectArray = JsonParser.parseString(updatedFields.get(key)).getAsJsonArray();
+          JsonArray subjectArray = GsonUtil.parse(updatedFields.get(key)).getAsJsonArray();
           collection.addField(
                   MetadataJson.copyWithDifferentJsonValue(field, joinAsPlainText(subjectArray)));
         } else if ("startDate".equals(key)) {
@@ -2420,7 +2419,7 @@ public class EventsEndpoint {
     }
     JsonObject parsedJson;
     try {
-      parsedJson = JsonParser.parseString(scheduling).getAsJsonObject();
+      parsedJson = GsonUtil.parse(scheduling).getAsJsonObject();
     } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Client sent unparsable scheduling information for event {}: {}", id, scheduling);
       return RestUtil.R.badRequest("Unparsable scheduling information");

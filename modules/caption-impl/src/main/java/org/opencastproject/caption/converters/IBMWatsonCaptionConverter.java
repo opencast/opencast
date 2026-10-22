@@ -34,7 +34,6 @@ import org.opencastproject.util.GsonUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -69,7 +68,7 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
     List<Caption> captionList = new ArrayList<Caption>();
 
     try {
-      JsonObject resultsObj = JsonParser.parseReader(new InputStreamReader(inputStream)).getAsJsonObject();
+      JsonObject resultsObj = GsonUtil.parse(new InputStreamReader(inputStream)).getAsJsonObject();
       String jobId = "Unknown";
       if (resultsObj.get("id") != null) {
         jobId = resultsObj.get("id").getAsString();

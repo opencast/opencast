@@ -33,7 +33,6 @@ import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -81,7 +80,7 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
     }
 
     try {
-      JsonObject outputObj = JsonParser.parseReader(new InputStreamReader(inputStream)).getAsJsonObject();
+      JsonObject outputObj = GsonUtil.parse(new InputStreamReader(inputStream)).getAsJsonObject();
       String jobId = "Unknown";
       if (outputObj.get("name") != null) {
         jobId = outputObj.get("name").getAsString();

@@ -125,7 +125,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
@@ -552,7 +551,7 @@ public class IndexServiceImpl implements IndexService {
             if ("metadata".equals(fieldName)) {
               String metadata = Streams.asString(item.openStream());
               try {
-                metadataJson = JsonParser.parseString(metadata).getAsJsonObject();
+                metadataJson = GsonUtil.parse(metadata).getAsJsonObject();
                 // in case of scheduling: Check if user has access to the CA
                 if (metadataJson.has("source")) {
                   final JsonObject sourceJson = metadataJson.getAsJsonObject("source");
@@ -662,7 +661,7 @@ public class IndexServiceImpl implements IndexService {
           if ("metadata".equals(fieldName)) {
             String metadata = Streams.asString(item.openStream());
             try {
-              metadataJson = JsonParser.parseString(metadata).getAsJsonObject();
+              metadataJson = GsonUtil.parse(metadata).getAsJsonObject();
             } catch (Exception e) {
               logger.warn("Unable to parse metadata {}", metadata);
               throw new IllegalArgumentException("Unable to parse metadata");
@@ -1284,7 +1283,7 @@ public class IndexServiceImpl implements IndexService {
     final MetadataList metadataList;
     try {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
-      MetadataJson.fillListFromJson(metadataList, JsonParser.parseString(metadataJSON).getAsJsonArray());
+      MetadataJson.fillListFromJson(metadataList, GsonUtil.parse(metadataJSON).getAsJsonArray());
     } catch (final JsonParseException e) {
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
@@ -2112,7 +2111,7 @@ public class IndexServiceImpl implements IndexService {
           throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);
     try {
-      MetadataJson.fillListFromJson(metadataList, JsonParser.parseString(metadataJSON).getAsJsonArray());
+      MetadataJson.fillListFromJson(metadataList, GsonUtil.parse(metadataJSON).getAsJsonArray());
     } catch (final JsonParseException e) {
       throw new IllegalArgumentException("Not able to parse the event metadata: " + metadataJSON, e);
     }
