@@ -24,10 +24,12 @@ package org.opencastproject.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.Strictness;
 import com.google.gson.ToNumberPolicy;
 
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +46,8 @@ import java.util.Map;
  * <li>By default Gson reads every JSON number into a {@code Double} when the target type is unknown, which silently
  * loses precision for large integers. {@code LONG_OR_DOUBLE} keeps integral values as {@code Long}.</li>
  * <li>By default Gson parses leniently and accepts input the JSON specification does not allow, such as unquoted
- * keys. Requests carrying such input used to be rejected, so parsing is set to strict.</li>
+ * keys, single quotes or comments. Parsing is set to strict so that only valid JSON is accepted. Note that this is
+ * stricter than json-simple was, which tolerated unescaped control characters in strings and trailing commas.</li>
  * </ul>
  * <p>
  * {@link Gson} is thread safe, so the single instance can be shared freely.
@@ -68,6 +71,40 @@ public final class GsonUtil {
    */
   public static Gson gson() {
     return GSON;
+  }
+
+  /**
+   * Parses a JSON document into a tree, using the same strict rules as {@link #gson()}.
+   * <p>
+   * Use this instead of {@link com.google.gson.JsonParser#parseString(String)}, which always parses leniently. Like
+   * {@code parseString}, an empty document is returned as {@link JsonNull}.
+   *
+   * @param json
+   *          the JSON document
+   * @return the parsed JSON tree
+   * @throws com.google.gson.JsonSyntaxException
+   *           if the input is not valid JSON
+   */
+  public static JsonElement parse(String json) {
+    return nullToJsonNull(GSON.fromJson(json, JsonElement.class));
+  }
+
+  /**
+   * Parses a JSON document into a tree, using the same strict rules as {@link #gson()}.
+   *
+   * @param json
+   *          the reader providing the JSON document
+   * @return the parsed JSON tree
+   * @throws com.google.gson.JsonParseException
+   *           if the input is not valid JSON or cannot be read
+   * @see #parse(String)
+   */
+  public static JsonElement parse(Reader json) {
+    return nullToJsonNull(GSON.fromJson(json, JsonElement.class));
+  }
+
+  private static JsonElement nullToJsonNull(JsonElement element) {
+    return element == null ? JsonNull.INSTANCE : element;
   }
 
   /**

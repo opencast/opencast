@@ -37,13 +37,13 @@ import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -283,7 +283,7 @@ public class EventHttpServletRequest {
       String processing = Streams.asString(item.openStream());
       if (StringUtils.isNotEmpty(processing)) {
         try {
-          eventHttpServletRequest.setProcessing(JsonParser.parseString(processing).getAsJsonObject());
+          eventHttpServletRequest.setProcessing(GsonUtil.parse(processing).getAsJsonObject());
         } catch (Exception e) {
           logger.warn("Unable to parse processing configuration {}", processing);
           throw new IllegalArgumentException("Unable to parse processing configuration");
@@ -293,7 +293,7 @@ public class EventHttpServletRequest {
       String scheduling = Streams.asString(item.openStream());
       if (StringUtils.isNotEmpty(scheduling)) {
         try {
-          eventHttpServletRequest.setScheduling(JsonParser.parseString(scheduling).getAsJsonObject());
+          eventHttpServletRequest.setScheduling(GsonUtil.parse(scheduling).getAsJsonObject());
         } catch (Exception e) {
           logger.warn("Unable to parse scheduling information {}", scheduling);
           throw new IllegalArgumentException("Unable to parse scheduling information");
@@ -382,7 +382,7 @@ public class EventHttpServletRequest {
    * @throws JsonParseException
    */
   protected static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow) {
-    JsonArray aclJson = JsonParser.parseString(json).getAsJsonArray();
+    JsonArray aclJson = GsonUtil.parse(json).getAsJsonArray();
     List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
     for (JsonElement element : aclJson) {
       JsonObject aceJson = element.getAsJsonObject();
@@ -430,7 +430,7 @@ public class EventHttpServletRequest {
           String startTimePattern)
           throws NotFoundException, java.text.ParseException {
     MetadataList metadataList = new MetadataList();
-    JsonArray jsonCatalogs = JsonParser.parseString(json).getAsJsonArray();
+    JsonArray jsonCatalogs = GsonUtil.parse(json).getAsJsonArray();
     for (JsonElement catalogElement : jsonCatalogs) {
       JsonObject catalog = catalogElement.getAsJsonObject();
       if (StringUtils.isBlank(asPlainString(catalog.get("flavor")))) {
@@ -467,7 +467,7 @@ public class EventHttpServletRequest {
             }
             collection.removeField(field);
             try {
-              JsonArray subjects = JsonParser.parseString(fields.get(key)).getAsJsonArray();
+              JsonArray subjects = GsonUtil.parse(fields.get(key)).getAsJsonArray();
               collection.addField(MetadataJson
                       .copyWithDifferentJsonValue(field, joinSubjects(subjects)));
             } catch (JsonParseException e) {

@@ -36,7 +36,6 @@ import org.opencastproject.util.GsonUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -82,7 +81,7 @@ public final class EndpointUtil {
    * @return the same document as a Gson tree
    */
   public static JsonElement fromJettison(JSONObject json) {
-    return JsonParser.parseString(json.toString());
+    return GsonUtil.parse(json.toString());
   }
 
   /**

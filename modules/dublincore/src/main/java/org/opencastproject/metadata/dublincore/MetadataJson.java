@@ -30,7 +30,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.lang3.StringUtils;
@@ -291,7 +290,7 @@ public final class MetadataJson {
         final JsonArray array;
         if (value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
           try {
-            array = JsonParser.parseString(value.getAsString()).getAsJsonArray();
+            array = GsonUtil.parse(value.getAsString()).getAsJsonArray();
           } catch (final JsonParseException | IllegalStateException e) {
             throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSON array:", e);
           }

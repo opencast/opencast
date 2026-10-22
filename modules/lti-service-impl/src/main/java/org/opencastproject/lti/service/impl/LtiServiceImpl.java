@@ -59,6 +59,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -71,7 +72,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -315,7 +315,7 @@ public class LtiServiceImpl implements LtiService {
 
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
 
-      JsonArray metadataJsonArray = JsonParser.parseString(metadataJson).getAsJsonArray();
+      JsonArray metadataJsonArray = GsonUtil.parse(metadataJson).getAsJsonArray();
 
       JsonArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
       MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
@@ -397,7 +397,7 @@ public class LtiServiceImpl implements LtiService {
     try {
       final MetadataList metadataList = new MetadataList();
       metadataList.add(adapter, collection);
-      MetadataJson.fillListFromJson(metadataList, JsonParser.parseString(metadata).getAsJsonArray());
+      MetadataJson.fillListFromJson(metadataList, GsonUtil.parse(metadata).getAsJsonArray());
       this.indexService.updateEventMetadata(eventId, metadataList, searchIndex);
       republishMetadata(eventId);
     } catch (IndexServiceException | SearchIndexException e) {

@@ -30,7 +30,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
 
@@ -144,7 +143,7 @@ public final class AccessControlParser {
   private static AccessControlList parseJson(String content) throws AccessControlParsingException {
     try {
       AccessControlList acl = new AccessControlList();
-      JsonElement jsonAclElement = JsonParser.parseString(content).getAsJsonObject().get(ACL);
+      JsonElement jsonAclElement = GsonUtil.parse(content).getAsJsonObject().get(ACL);
       if (jsonAclElement == null || jsonAclElement.isJsonNull()) {
         return acl;
       }

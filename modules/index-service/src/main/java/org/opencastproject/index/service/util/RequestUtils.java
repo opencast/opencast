@@ -23,13 +23,13 @@ package org.opencastproject.index.service.util;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.common.net.MediaType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,7 +58,7 @@ public final class RequestUtils {
    *           Thrown if the json is malformed.
    */
   public static Map<String, String> getKeyValueMap(String json) {
-    JsonArray updatedFields = JsonParser.parseString(json).getAsJsonArray();
+    JsonArray updatedFields = GsonUtil.parse(json).getAsJsonArray();
     Map<String, String> fieldMap = new TreeMap<String, String>();
     for (JsonElement element : updatedFields) {
       JsonObject field = element.getAsJsonObject();
@@ -123,7 +123,7 @@ public final class RequestUtils {
           // Ignore non-json-values
           continue;
         }
-        final JsonObject assetUpload = JsonParser.parseString(assetUploadJson).getAsJsonObject();
+        final JsonObject assetUpload = GsonUtil.parse(assetUploadJson).getAsJsonObject();
         if (assetUploadId.equals(asPlainString(assetUpload.get("id"), null))) {
           final List<String> accepts = Arrays.stream(asPlainString(assetUpload.get("accept"), "*/*").split(","))
               .map(String::trim).collect(Collectors.toList());

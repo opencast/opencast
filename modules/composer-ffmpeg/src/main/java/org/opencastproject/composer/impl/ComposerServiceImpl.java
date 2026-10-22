@@ -64,6 +64,7 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -73,7 +74,6 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -1589,7 +1589,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           Attachment watermarkAttachment;
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(LOWER_TRACK_INDEX));
           Layout lowerLayout = Serializer.layout(
-                  JsonParser.parseString(arguments.get(LOWER_TRACK_LAYOUT_INDEX)).getAsJsonObject());
+                  GsonUtil.parse(arguments.get(LOWER_TRACK_LAYOUT_INDEX)).getAsJsonObject());
           LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<>(firstTrack, lowerLayout);
           Optional<LaidOutElement<Track>> upperLaidOutElement = Optional.empty();
           if (NOT_AVAILABLE.equals(arguments.get(UPPER_TRACK_INDEX))
@@ -1598,11 +1598,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           } else {
             secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(UPPER_TRACK_INDEX));
             Layout upperLayout = Serializer.layout(
-                    JsonParser.parseString(arguments.get(UPPER_TRACK_LAYOUT_INDEX)).getAsJsonObject());
+                    GsonUtil.parse(arguments.get(UPPER_TRACK_LAYOUT_INDEX)).getAsJsonObject());
             upperLaidOutElement = Optional.ofNullable(new LaidOutElement<Track>(secondTrack, upperLayout));
           }
           Dimension compositeTrackSize = Serializer
-                  .dimension(JsonParser.parseString(arguments.get(COMPOSITE_TRACK_SIZE_INDEX)).getAsJsonObject());
+                  .dimension(GsonUtil.parse(arguments.get(COMPOSITE_TRACK_SIZE_INDEX)).getAsJsonObject());
           String backgroundColor = arguments.get(BACKGROUND_COLOR_INDEX);
           String audioSourceName = arguments.get(AUDIO_SOURCE_INDEX);
 
@@ -1611,7 +1611,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           if (arguments.size() > WATERMARK_INDEX && arguments.size() <= WATERMARK_LAYOUT_INDEX + 1) {
             watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
             Layout watermarkLayout = Serializer.layout(
-                    JsonParser.parseString(arguments.get(WATERMARK_LAYOUT_INDEX)).getAsJsonObject());
+                    GsonUtil.parse(arguments.get(WATERMARK_LAYOUT_INDEX)).getAsJsonObject());
             watermarkOption = Optional.of(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
           } else if (arguments.size() > WATERMARK_LAYOUT_INDEX + 1) {
             throw new IndexOutOfBoundsException("Too many composite arguments!");
@@ -1626,7 +1626,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           String frameRateString = arguments.get(2);
           Dimension outputDimension = null;
           if (StringUtils.isNotBlank(dimensionString)) {
-            outputDimension = Serializer.dimension(JsonParser.parseString(dimensionString).getAsJsonObject());
+            outputDimension = Serializer.dimension(GsonUtil.parse(dimensionString).getAsJsonObject());
           }
           float outputFrameRate = NumberUtils.toFloat(frameRateString, -1.0f);
           boolean sameCodec = Boolean.parseBoolean(arguments.get(3));

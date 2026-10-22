@@ -111,7 +111,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -674,7 +673,7 @@ public class SeriesEndpoint {
     try {
       JsonObject metadataJson;
       try {
-        metadataJson = JsonParser.parseString(metadata).getAsJsonObject();
+        metadataJson = GsonUtil.parse(metadata).getAsJsonObject();
       } catch (Exception e) {
         throw new IllegalArgumentException("Unable to parse metadata " + metadata, e);
       }

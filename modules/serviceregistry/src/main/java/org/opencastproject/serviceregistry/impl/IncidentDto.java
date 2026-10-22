@@ -25,10 +25,10 @@ import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Incident.Severity;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.data.Tuple;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -143,7 +143,7 @@ public class IncidentDto {
   /** @see org.opencastproject.job.api.Incident#getDetails() */
   public List<Tuple<String, String>> getTechnicalInformation() {
     final List<Tuple<String, String>> list = new ArrayList<Tuple<String, String>>();
-    JsonObject messageJson = JsonParser.parseString(details).getAsJsonObject();
+    JsonObject messageJson = GsonUtil.parse(details).getAsJsonObject();
     for (String title : messageJson.keySet()) {
       list.add(tuple(title, messageJson.get(title).getAsString()));
     }
@@ -153,7 +153,7 @@ public class IncidentDto {
   /** @see org.opencastproject.job.api.Incident#getDescriptionParameters() */
   public Map<String, String> getParameters() {
     Map<String, String> param = new HashMap<String, String>();
-    JsonObject paramJson = JsonParser.parseString(parameters).getAsJsonObject();
+    JsonObject paramJson = GsonUtil.parse(parameters).getAsJsonObject();
     for (String key : paramJson.keySet()) {
       param.put(key, paramJson.get(key).getAsString());
     }
