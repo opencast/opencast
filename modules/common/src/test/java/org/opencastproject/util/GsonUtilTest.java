@@ -117,4 +117,22 @@ public class GsonUtilTest {
     assertEquals("1.5", GsonUtil.asText(json.get("number")));
     assertEquals("{}", GsonUtil.asText(json.get("object")));
   }
+
+  /** Members render as plain text, and JSON null becomes null rather than the string "null". */
+  @Test
+  public void testToStringMap() {
+    JsonObject json = new JsonObject();
+    json.addProperty("string", "value");
+    json.addProperty("number", 42);
+    json.add("null", JsonNull.INSTANCE);
+    json.add("object", new JsonObject());
+
+    Map<String, String> map = GsonUtil.toStringMap(json);
+    assertEquals(4, map.size());
+    assertEquals("value", map.get("string"));
+    assertEquals("42", map.get("number"));
+    assertTrue(map.containsKey("null"));
+    assertNull(map.get("null"));
+    assertEquals("{}", map.get("object"));
+  }
 }

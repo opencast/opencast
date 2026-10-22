@@ -106,16 +106,6 @@ import javax.ws.rs.core.Response;
 )
 @JaxrsResource
 public class WorkflowsEndpoint {
-  /** Flatten a JSON object of scalars into a string map. */
-  private static Map<String, String> toStringMap(JsonObject json) {
-    Map<String, String> map = new HashMap<>();
-    for (String key : json.keySet()) {
-      JsonElement value = json.get(key);
-      map.put(key, value.isJsonNull() ? null : (value.isJsonPrimitive() ? value.getAsString() : value.toString()));
-    }
-    return map;
-  }
-
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);
 
@@ -218,7 +208,7 @@ public class WorkflowsEndpoint {
       Map<String, String> properties = new HashMap<>();
       if (isNoneBlank(configuration)) {
         try {
-          properties.putAll(toStringMap(GsonUtil.gson().fromJson(configuration, JsonObject.class)));
+          properties.putAll(GsonUtil.toStringMap(GsonUtil.gson().fromJson(configuration, JsonObject.class)));
         } catch (JsonParseException | IllegalStateException e) {
           return RestUtil.R.badRequest("Passed parameter 'configuration' is invalid JSON.");
         }
@@ -322,7 +312,8 @@ public class WorkflowsEndpoint {
       // Configuration
       if (isNoneBlank(configuration)) {
         try {
-          Map<String, String> properties = toStringMap(GsonUtil.gson().fromJson(configuration, JsonObject.class));
+          Map<String, String> properties = GsonUtil.toStringMap(
+              GsonUtil.gson().fromJson(configuration, JsonObject.class));
 
           // Remove old configuration
           wi.getConfigurationKeys().forEach(wi::removeConfiguration);

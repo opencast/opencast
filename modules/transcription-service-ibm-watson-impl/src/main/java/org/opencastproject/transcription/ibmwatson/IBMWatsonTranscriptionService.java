@@ -431,7 +431,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     String jobId = null;
     try {
       jsonObj = (JsonObject) obj;
-      jobId = getString(jsonObj, "id");
+      jobId = GsonUtil.getStringOrNull(jsonObj, "id");
 
       // Check for errors inside the results object. Sometimes we get a status completed, but
       // the transcription failed e.g.
@@ -444,7 +444,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       if (jsonObj.get("results") instanceof JsonArray) {
         JsonArray resultsArray = jsonObj.getAsJsonArray("results");
         if (resultsArray.size() > 0) {
-          String error = getString(resultsArray.get(0).getAsJsonObject(), "error");
+          String error = GsonUtil.getStringOrNull(resultsArray.get(0).getAsJsonObject(), "error");
           if (!StringUtils.isEmpty(error)) {
             retryOrError(jobId, mpId,
                 String.format("Transcription completed with error for mpId %s, jobId %s: %s", mpId, jobId, error));
@@ -477,7 +477,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   @Override
   public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
     JsonObject jsonObj = (JsonObject) obj;
-    String jobId = getString(jsonObj, "id");
+    String jobId = GsonUtil.getStringOrNull(jsonObj, "id");
     try {
       retryOrError(jobId, mpId, String.format("Transcription error for media package %s, job id %s", mpId, jobId));
     } catch (TranscriptionDatabaseException e) {
@@ -654,9 +654,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // }
           String jsonString = EntityUtils.toString(response.getEntity());
           JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
-          String jobId = getString(jsonObject, "id");
-          String jobStatus = getString(jsonObject, "status");
-          String jobUrl = getString(jsonObject, "url");
+          String jobId = GsonUtil.getStringOrNull(jsonObject, "id");
+          String jobStatus = GsonUtil.getStringOrNull(jsonObject, "status");
+          String jobUrl = GsonUtil.getStringOrNull(jsonObject, "url");
           logger.info("Transcription for mp {} has been submitted. Job id: {}, job status: {}, job url: {}", mpId,
                   jobId, jobStatus, jobUrl);
 
@@ -719,8 +719,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // Response returned is a json object described above
           String jsonString = EntityUtils.toString(entity);
           JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
-          String jobStatus = getString(jsonObject, "status");
-          mpId = getString(jsonObject, "user_token");
+          String jobStatus = GsonUtil.getStringOrNull(jsonObject, "status");
+          mpId = GsonUtil.getStringOrNull(jsonObject, "user_token");
           // user_token doesn't come back if this is not in the context of a callback so get the mpId from the db
           if (mpId == null) {
             TranscriptionJobControl jc = database.findByJob(jobId);
@@ -773,12 +773,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
               new ByteArrayInputStream(jsonObj.toString().getBytes()));
     }
-  }
-
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getString(JsonObject json, String key) {
-    JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   /** True when the member is present and not JSON null. */

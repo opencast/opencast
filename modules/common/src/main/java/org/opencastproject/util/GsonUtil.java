@@ -28,6 +28,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.Strictness;
 import com.google.gson.ToNumberPolicy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides the {@link Gson} instance Opencast uses for reading and writing JSON.
  * <p>
@@ -99,5 +102,24 @@ public final class GsonUtil {
    */
   public static String asText(JsonElement value) {
     return value.isJsonPrimitive() ? value.getAsString() : value.toString();
+  }
+
+  /**
+   * Flattens a JSON object into a map of strings.
+   * <p>
+   * json-simple's object was a {@link Map} already, so callers used to cast it and read the values as strings. This
+   * renders each member with {@link #asText(JsonElement)} and maps JSON null to {@code null}, as the cast did.
+   *
+   * @param json
+   *          the object to flatten
+   * @return the members of the object as plain text
+   */
+  public static Map<String, String> toStringMap(JsonObject json) {
+    Map<String, String> map = new HashMap<>();
+    for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+      JsonElement value = entry.getValue();
+      map.put(entry.getKey(), value.isJsonNull() ? null : asText(value));
+    }
+    return map;
   }
 }

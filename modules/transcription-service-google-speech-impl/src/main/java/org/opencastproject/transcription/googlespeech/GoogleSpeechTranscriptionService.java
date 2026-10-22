@@ -61,7 +61,6 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.io.FilenameUtils;
@@ -411,7 +410,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     try {
       jsonObj = (JsonObject) obj;
-      jobId = getString(jsonObj, "name");
+      jobId = GsonUtil.getStringOrNull(jsonObj, "name");
       logger.info("Transcription done for mpId {}, jobId {}", mpId, jobId);
       JsonArray resultsArray = getTranscriptionResult(jsonObj);
 
@@ -459,7 +458,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     String jobId = null;
     try {
       jsonObj = (JsonObject) obj;
-      jobId = getString(jsonObj, "name");
+      jobId = GsonUtil.getStringOrNull(jsonObj, "name");
       // Update state in database
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
       TranscriptionJobControl jobControl = database.findByJob(jobId);
@@ -551,7 +550,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
            * "progressPercent": 90, "startTime": "2017-07-20T16:36:55.033650Z",
            * "lastUpdateTime": "2017-07-20T16:37:17.158630Z" } }
            */
-          String jobId = getString(jsonObject, "name");
+          String jobId = GsonUtil.getStringOrNull(jsonObject, "name");
           logger.info(
                   "Transcription for mp {} has been submitted. Job id: {}", mpId,
                   jobId);
@@ -562,7 +561,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           return;
         default:
           JsonObject errorObj = jsonObject.getAsJsonObject("error");
-          logger.warn("Invalid argument returned, status: {} with message: {}", code, getString(errorObj, "message"));
+          logger.warn("Invalid argument returned, status: {} with message: {}", code,
+              GsonUtil.getStringOrNull(errorObj, "message"));
           break;
       }
       throw new TranscriptionServiceException("Could not create recognition job. Status returned: " + code);
@@ -811,7 +811,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          accessToken = getString(jsonObject, ACCESS_TOKEN_NAME);
+          accessToken = GsonUtil.getStringOrNull(jsonObject, ACCESS_TOKEN_NAME);
           long duration = jsonObject.get(ACCESS_TOKEN_EXPIRY_NAME).getAsLong(); // Duration in second
           tokenExpiryTime = (System.currentTimeMillis() + (duration * 1000)); // time in millisecond
           if (!INVALID_TOKEN.equals(accessToken)) {
@@ -822,8 +822,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
               String.format("Created token is invalid. Status returned: %d", code), code);
         case HttpStatus.SC_BAD_REQUEST: // 400
         case HttpStatus.SC_UNAUTHORIZED: // 401
-          String error = getString(jsonObject, "error");
-          String errorDetails = getString(jsonObject, "error_description");
+          String error = GsonUtil.getStringOrNull(jsonObject, "error");
+          String errorDetails = GsonUtil.getStringOrNull(jsonObject, "error_description");
           logger.warn("Invalid argument returned, status: {}", code);
           logger.warn("Unable to refresh Google Cloud Service token, error: {}, error details: {}",
               error, errorDetails);
@@ -889,12 +889,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   private JsonArray getTranscriptionResult(JsonObject jsonObj) {
     JsonObject responseObj = jsonObj.getAsJsonObject("response");
     return responseObj.getAsJsonArray("results");
-  }
-
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getString(JsonObject json, String key) {
-    JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   protected void deleteStorageFile(String mpId, String token) throws IOException {

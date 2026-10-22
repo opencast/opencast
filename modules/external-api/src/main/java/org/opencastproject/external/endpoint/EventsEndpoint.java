@@ -96,6 +96,7 @@ import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -695,7 +696,7 @@ public class EventsEndpoint {
 
           Map<String, String> configuration = new HashMap<>();
           if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-            configuration = toStringMap(
+            configuration = GsonUtil.toStringMap(
                 eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
           }
 
@@ -820,16 +821,6 @@ public class EventsEndpoint {
       logger.error("Unable to create event", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  /** Flatten a JSON object of scalars into a string map. */
-  private static Map<String, String> toStringMap(JsonObject json) {
-    Map<String, String> map = new HashMap<>();
-    for (String key : json.keySet()) {
-      JsonElement value = json.get(key);
-      map.put(key, value.isJsonNull() ? null : (value.isJsonPrimitive() ? value.getAsString() : value.toString()));
-    }
-    return map;
   }
 
   /** Join array entries with commas using their plain text rather than their JSON representation. */

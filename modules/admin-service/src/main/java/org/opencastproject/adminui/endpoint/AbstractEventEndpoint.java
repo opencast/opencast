@@ -157,7 +157,6 @@ import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowUtil;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -2444,7 +2443,7 @@ public abstract class AbstractEventEndpoint {
           caMetadataOpt = Optional.of(caMetadata);
         }
 
-        Map<String, String> workflowConfig = toStringMap(configJSON.getAsJsonObject("configuration"));
+        Map<String, String> workflowConfig = GsonUtil.toStringMap(configJSON.getAsJsonObject("configuration"));
         Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(id));
         if (!oldWorkflowConfig.equals(workflowConfig)) {
           workflowConfigOpt = Optional.of(workflowConfig);
@@ -3874,15 +3873,6 @@ public abstract class AbstractEventEndpoint {
     final JsonArray array = new JsonArray();
     array.add(element);
     return array;
-  }
-
-  /** Read an object of string members into a plain Map, which JSONObject used to be already. */
-  private static Map<String, String> toStringMap(JsonObject json) {
-    final Map<String, String> map = new HashMap<>();
-    for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
-      map.put(entry.getKey(), GsonUtil.asText(entry.getValue()));
-    }
-    return map;
   }
 
 }

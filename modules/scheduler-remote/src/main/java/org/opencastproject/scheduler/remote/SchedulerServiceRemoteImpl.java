@@ -83,7 +83,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -413,8 +412,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
             presenters.add(presenter.getAsString());
           }
 
-          final Map<String, String> wfProperties = toStringMap(json.getAsJsonObject("wfProperties"));
-          final Map<String, String> agentConfig = toStringMap(json.getAsJsonObject("agentConfig"));
+          final Map<String, String> wfProperties = GsonUtil.toStringMap(json.getAsJsonObject("wfProperties"));
+          final Map<String, String> agentConfig = GsonUtil.toStringMap(json.getAsJsonObject("agentConfig"));
 
           String status = GsonUtil.getStringOrNull(json, "state");
           String lastHeard = GsonUtil.getStringOrNull(json, "lastHeardFrom");
@@ -803,15 +802,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       closeConnection(response);
     }
     throw new SchedulerException("Unable to update recording state of event with mediapackage id " + mediapackageId);
-  }
-
-  /** Read an object of string members into a plain Map, which JSONObject used to be already. */
-  private static Map<String, String> toStringMap(JsonObject json) {
-    Map<String, String> map = new HashMap<>();
-    for (Entry<String, JsonElement> entry : json.entrySet()) {
-      map.put(entry.getKey(), GsonUtil.asText(entry.getValue()));
-    }
-    return map;
   }
 
   @Override

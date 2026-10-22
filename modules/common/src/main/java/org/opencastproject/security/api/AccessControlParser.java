@@ -23,6 +23,7 @@ package org.opencastproject.security.api;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.XmlSafeParser;
 
 import com.google.gson.JsonArray;
@@ -176,18 +177,12 @@ public final class AccessControlParser {
    * @return the access control entry
    */
   private static AccessControlEntry getAce(JsonObject jsonAce) {
-    String role = getStringOrNull(jsonAce, ROLE);
-    String action = getStringOrNull(jsonAce, ACTION);
+    String role = GsonUtil.getStringOrNull(jsonAce, ROLE);
+    String action = GsonUtil.getStringOrNull(jsonAce, ACTION);
     boolean allow = jsonAce.has(ALLOW) && !jsonAce.get(ALLOW).isJsonNull()
         ? jsonAce.get(ALLOW).getAsBoolean()
         : true;
     return new AccessControlEntry(role, action, allow);
-  }
-
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getStringOrNull(JsonObject json, String key) {
-    JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   /**

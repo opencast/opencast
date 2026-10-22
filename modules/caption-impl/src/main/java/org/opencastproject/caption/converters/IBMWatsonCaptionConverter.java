@@ -29,6 +29,7 @@ import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -78,7 +79,7 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
       if (resultsObj.get("warnings") != null) {
         JsonArray warningsArray = resultsObj.getAsJsonArray("warnings");
         for (JsonElement w : warningsArray) {
-          logger.warn("Warning from Speech-To-Text service: {}", asText(w));
+          logger.warn("Warning from Speech-To-Text service: {}", GsonUtil.asText(w));
         }
       }
 
@@ -128,13 +129,13 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
                   JsonArray wordTsArray = timestampsArray.get(indexFirst).getAsJsonArray();
                   if (wordTsArray.size() == 3) {
                     start = NumberFormat.getInstance(Locale.US)
-                        .parse(removeEndCharacter(asText(wordTsArray.get(1)), "s")).doubleValue();
+                        .parse(removeEndCharacter(GsonUtil.asText(wordTsArray.get(1)), "s")).doubleValue();
                   }
                   // Get end time of last element
                   wordTsArray = timestampsArray.get(indexLast).getAsJsonArray();
                   if (wordTsArray.size() == 3) {
                     end = NumberFormat.getInstance(Locale.US)
-                        .parse(removeEndCharacter(asText(wordTsArray.get(2)), "s")).doubleValue();
+                        .parse(removeEndCharacter(GsonUtil.asText(wordTsArray.get(2)), "s")).doubleValue();
                   }
                 }
                 if (start == -1 || end == -1) {
@@ -181,11 +182,6 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
   @Override
   public Type getElementType() {
     return MediaPackageElement.Type.Attachment;
-  }
-
-  /** Render a value as plain text: the raw string for primitives, JSON otherwise. */
-  private static String asText(JsonElement value) {
-    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
   }
 
   private Time buildTime(long ms) throws IllegalTimeFormatException {
