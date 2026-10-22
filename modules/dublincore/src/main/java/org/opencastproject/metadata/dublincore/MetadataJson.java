@@ -399,7 +399,7 @@ public final class MetadataJson {
 
   public static MetadataField copyWithDifferentJsonValue(final MetadataField t, final String v) {
     final MetadataField copy = new MetadataField(t);
-    copy.setValue(valueFromJson(new JsonPrimitive(v), copy));
+    copy.setValue(valueFromJson(new JsonPrimitive(v == null ? "" : v), copy));
     return copy;
   }
 
@@ -418,7 +418,7 @@ public final class MetadataJson {
       throw new IllegalArgumentException("Input has to be a JSON array with one entry");
     }
 
-    return json.get(0).getAsJsonObject().getAsJsonArray(KEY_METADATA_FIELDS);
+    return GsonUtil.getArrayOrNull(json.get(0).getAsJsonObject(), KEY_METADATA_FIELDS);
   }
 
   public static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final JsonElement json) {

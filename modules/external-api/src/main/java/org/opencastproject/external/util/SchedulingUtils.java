@@ -268,7 +268,7 @@ public final class SchedulingUtils {
       final String startDate = getString(json, JSON_KEY_START_DATE);
       final String endDate = getString(json, JSON_KEY_END_DATE);
       final String agentId = getString(json, JSON_KEY_AGENT_ID);
-      final JsonArray inputs = json.getAsJsonArray(JSON_KEY_INPUTS);
+      final JsonArray inputs = GsonUtil.getArrayOrNull(json, JSON_KEY_INPUTS);
       final String rrule = getString(json, JSON_KEY_RRULE);
 
       // Special handling because the original implementation required String but now we require long

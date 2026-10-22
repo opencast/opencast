@@ -23,6 +23,7 @@ package org.opencastproject.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
@@ -124,6 +125,44 @@ public final class GsonUtil {
   public static String getStringOrNull(JsonObject json, String key) {
     JsonElement value = json.get(key);
     return value == null || value.isJsonNull() ? null : value.getAsString();
+  }
+
+  /**
+   * Reads an object member from a JSON object.
+   * <p>
+   * Like {@link #getStringOrNull(JsonObject, String)}, this treats an absent key and an explicit JSON null alike.
+   * {@link JsonObject#getAsJsonObject(String)} would fail on the latter.
+   *
+   * @param json
+   *          the object to read from
+   * @param key
+   *          the member name
+   * @return the member as an object, or {@code null} if it is absent or JSON null
+   * @throws IllegalStateException
+   *           if the member is not an object
+   */
+  public static JsonObject getObjectOrNull(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsJsonObject();
+  }
+
+  /**
+   * Reads an array member from a JSON object.
+   * <p>
+   * Like {@link #getStringOrNull(JsonObject, String)}, this treats an absent key and an explicit JSON null alike.
+   * {@link JsonObject#getAsJsonArray(String)} would fail on the latter.
+   *
+   * @param json
+   *          the object to read from
+   * @param key
+   *          the member name
+   * @return the member as an array, or {@code null} if it is absent or JSON null
+   * @throws IllegalStateException
+   *           if the member is not an array
+   */
+  public static JsonArray getArrayOrNull(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsJsonArray();
   }
 
   /**

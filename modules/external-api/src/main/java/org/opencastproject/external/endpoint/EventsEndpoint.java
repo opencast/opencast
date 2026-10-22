@@ -688,15 +688,15 @@ public class EventsEndpoint {
           }
           JsonObject processing = eventHttpServletRequest.getProcessing().get();
 
-          String workflowId = processing.has("workflow") ? processing.get("workflow").getAsString() : null;
+          String workflowId = GsonUtil.getStringOrNull(processing, "workflow");
           if (workflowId == null) {
             throw new IllegalArgumentException("No workflow template in metadata");
           }
 
           Map<String, String> configuration = new HashMap<>();
-          if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-            configuration = GsonUtil.toStringMap(
-                eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
+          JsonObject configurationJson = GsonUtil.getObjectOrNull(processing, "configuration");
+          if (configurationJson != null) {
+            configuration = GsonUtil.toStringMap(configurationJson);
           }
 
           Optional<Map<String, String>> caMetadataOpt = Optional.empty();
