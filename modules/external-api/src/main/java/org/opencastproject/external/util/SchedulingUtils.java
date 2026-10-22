@@ -40,7 +40,6 @@ import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -245,15 +244,6 @@ public final class SchedulingUtils {
       return result;
     }
 
-    /** Read a member as plain text, null when absent or JSON null. */
-    private static String getString(JsonObject json, String key) {
-      final JsonElement value = json.get(key);
-      if (value == null || value.isJsonNull()) {
-        return null;
-      }
-      return value.isJsonPrimitive() ? value.getAsString() : value.toString();
-    }
-
     /**
      * Parse the given json and create a new SchedulingInfo.
      *
@@ -265,14 +255,14 @@ public final class SchedulingUtils {
     public static SchedulingInfo of(JsonObject json) {
       final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
       final SchedulingInfo schedulingInfo = new SchedulingInfo();
-      final String startDate = getString(json, JSON_KEY_START_DATE);
-      final String endDate = getString(json, JSON_KEY_END_DATE);
-      final String agentId = getString(json, JSON_KEY_AGENT_ID);
+      final String startDate = GsonUtil.asText(json.get(JSON_KEY_START_DATE), null);
+      final String endDate = GsonUtil.asText(json.get(JSON_KEY_END_DATE), null);
+      final String agentId = GsonUtil.asText(json.get(JSON_KEY_AGENT_ID), null);
       final JsonArray inputs = GsonUtil.getArrayOrNull(json, JSON_KEY_INPUTS);
-      final String rrule = getString(json, JSON_KEY_RRULE);
+      final String rrule = GsonUtil.asText(json.get(JSON_KEY_RRULE), null);
 
       // Special handling because the original implementation required String but now we require long
-      final String durationString = getString(json, JSON_KEY_DURATION);
+      final String durationString = GsonUtil.asText(json.get(JSON_KEY_DURATION), null);
 
       if (isNotBlank(startDate)) {
         schedulingInfo.startDate = Optional.of(Date.from(Instant.from(dateFormatter.parse(startDate))));

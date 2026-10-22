@@ -558,7 +558,8 @@ public class IndexServiceImpl implements IndexService {
                   if (sourceJson.has("metadata")) {
                     final JsonObject sourceMetadataJson = sourceJson.getAsJsonObject("metadata");
                     if (sourceMetadataJson.has("device")) {
-                      SecurityUtil.checkAgentAccess(securityService, getString(sourceMetadataJson, "device"));
+                      SecurityUtil.checkAgentAccess(securityService,
+                          GsonUtil.getStringOrNull(sourceMetadataJson, "device"));
                     }
                   }
                 }
@@ -741,7 +742,7 @@ public class IndexServiceImpl implements IndexService {
       throw new IllegalArgumentException("No processing field in metadata");
     }
 
-    String workflowDefId = getString(processing, "workflow");
+    String workflowDefId = GsonUtil.getStringOrNull(processing, "workflow");
     if (workflowDefId == null) {
       throw new IllegalArgumentException("No workflow definition field in processing metadata");
     }
@@ -769,12 +770,6 @@ public class IndexServiceImpl implements IndexService {
     return wfId;
   }
 
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getString(JsonObject json, String key) {
-    JsonElement value = json == null ? null : json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
-  }
-
   /**
    * Get the type of the source that is creating the event.
    *
@@ -787,7 +782,7 @@ public class IndexServiceImpl implements IndexService {
   private SourceType getSourceType(JsonObject source) {
     SourceType type;
     try {
-      type = SourceType.valueOf(getString(source, "type"));
+      type = SourceType.valueOf(GsonUtil.getStringOrNull(source, "type"));
     } catch (Exception e) {
       logger.error("Unknown source type '{}'", source.get("type"));
       throw new IllegalArgumentException("Unknown source type");
@@ -874,7 +869,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     // Get Workflow
-    String workflowTemplate = getString(eventHttpServletRequest.getProcessing().get(), "workflow");
+    String workflowTemplate = GsonUtil.getStringOrNull(eventHttpServletRequest.getProcessing().get(), "workflow");
     if (workflowTemplate == null) {
       throw new IllegalArgumentException("No workflow template in metadata");
     }
@@ -898,13 +893,13 @@ public class IndexServiceImpl implements IndexService {
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       try {
         MetadataField current = eventMetadata.getOutputFields().get("location");
-        eventMetadata.updateStringField(current, getString(sourceMetadata, "device"));
+        eventMetadata.updateStringField(current, GsonUtil.getStringOrNull(sourceMetadata, "device"));
       } catch (Exception e) {
         logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
         throw new IllegalArgumentException("Unable to parse device");
       }
-      if (StringUtils.isNotEmpty(getString(sourceMetadata, "start"))) {
-        currentStartDate = EncodingSchemeUtils.decodeDate(getString(sourceMetadata, "start"));
+      if (StringUtils.isNotEmpty(GsonUtil.getStringOrNull(sourceMetadata, "start"))) {
+        currentStartDate = EncodingSchemeUtils.decodeDate(GsonUtil.getStringOrNull(sourceMetadata, "start"));
       }
     }
 
@@ -959,14 +954,14 @@ public class IndexServiceImpl implements IndexService {
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       Properties configuration;
       try {
-        captureAgentId = getString(sourceMetadata, "device");
-        configuration = captureAgentStateService.getAgentConfiguration(getString(sourceMetadata, "device"));
+        captureAgentId = GsonUtil.getStringOrNull(sourceMetadata, "device");
+        configuration = captureAgentStateService.getAgentConfiguration(captureAgentId);
       } catch (Exception e) {
         logger.warn("Unable to parse device {}: because:", sourceMetadata.get("device"), e);
         throw new IllegalArgumentException("Unable to parse device");
       }
 
-      String durationString = getString(sourceMetadata, "duration");
+      String durationString = GsonUtil.getStringOrNull(sourceMetadata, "duration");
       if (StringUtils.isBlank(durationString)) {
         throw new IllegalArgumentException("No duration in source metadata");
       }
@@ -983,12 +978,12 @@ public class IndexServiceImpl implements IndexService {
       }
 
       org.joda.time.DateTime now = new org.joda.time.DateTime(DateTimeZone.UTC);
-      start = now.withMillis(DateTimeSupport.fromUTC(getString(sourceMetadata, "start")));
-      end = now.withMillis(DateTimeSupport.fromUTC(getString(sourceMetadata, "end")));
+      start = now.withMillis(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(sourceMetadata, "start")));
+      end = now.withMillis(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(sourceMetadata, "end")));
       duration = Long.parseLong(durationString);
       DublinCoreValue period = EncodingSchemeUtils
               .encodePeriod(new DCMIPeriod(start.toDate(), start.plus(duration).toDate()), Precision.Second);
-      String inputs = getString(sourceMetadata, "inputs");
+      String inputs = GsonUtil.getStringOrNull(sourceMetadata, "inputs");
 
       caProperties.putAll(configuration);
       dc.set(DublinCore.PROPERTY_TEMPORAL, period);
@@ -996,7 +991,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
-      rRule = new RRule<>(getString(sourceMetadata, "rrule"));
+      rRule = new RRule<>(GsonUtil.getStringOrNull(sourceMetadata, "rrule"));
     }
 
     Map<String, String> configuration = new HashMap<>();
@@ -1145,7 +1140,7 @@ public class IndexServiceImpl implements IndexService {
     for (JsonElement element : assetMetadata) {
       try {
         JsonObject asset = element.getAsJsonObject();
-        assetDataMap.put(getString(asset, "id"), asset);
+        assetDataMap.put(GsonUtil.getStringOrNull(asset, "id"), asset);
       } catch (Exception e) {
         throw new IllegalArgumentException("Unable to parse metadata", e);
       }
@@ -1163,10 +1158,10 @@ public class IndexServiceImpl implements IndexService {
       try {
         if ((assetMetadata != null) && (assetDataMap.get(asset) != null)) {
           JsonObject assetData = assetDataMap.get(asset);
-          String type = getString(assetData, "type");
-          String flavorType = getString(assetData, "flavorType");
-          String flavorSubType = getString(assetData, "flavorSubType");
-          String tags = getString(assetData, "tags");
+          String type = GsonUtil.getStringOrNull(assetData, "type");
+          String flavorType = GsonUtil.getStringOrNull(assetData, "flavorType");
+          String flavorSubType = GsonUtil.getStringOrNull(assetData, "flavorSubType");
+          String tags = GsonUtil.getStringOrNull(assetData, "tags");
           String[] tagsArray = null;
           // Captions may have lang:LANG_CODE tag set.
           String langTag = null;

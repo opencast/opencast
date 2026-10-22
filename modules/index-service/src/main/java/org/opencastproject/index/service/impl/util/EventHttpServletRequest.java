@@ -352,22 +352,10 @@ public class EventHttpServletRequest {
     return eventHttpServletRequest;
   }
 
-  /**
-   * Render a value as plain text rather than as JSON, i.e. without the quotes a JsonElement's toString() would add,
-   * and as the empty string when the member is absent or null. This matches how the previous parser, which handed
-   * back bare Java values, was used here.
-   */
-  private static String asPlainString(JsonElement value) {
-    if (value == null || value.isJsonNull()) {
-      return "";
-    }
-    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
-  }
-
   /** Join subject values with commas, using the plain text of each entry rather than its JSON representation. */
   private static String joinSubjects(JsonArray subjects) {
     return StreamSupport.stream(subjects.spliterator(), false)
-        .map(EventHttpServletRequest::asPlainString)
+        .map(subject -> GsonUtil.asText(subject, ""))
         .collect(Collectors.joining(","));
   }
 
@@ -386,14 +374,14 @@ public class EventHttpServletRequest {
     List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
     for (JsonElement element : aclJson) {
       JsonObject aceJson = element.getAsJsonObject();
-      String action = asPlainString(aceJson.get(ACTION_JSON_KEY));
+      String action = GsonUtil.asText(aceJson.get(ACTION_JSON_KEY), "");
       String allow;
       if (assumeAllow) {
         allow = "true";
       } else {
-        allow = asPlainString(aceJson.get(ALLOW_JSON_KEY));
+        allow = GsonUtil.asText(aceJson.get(ALLOW_JSON_KEY), "");
       }
-      String role = asPlainString(aceJson.get(ROLE_JSON_KEY));
+      String role = GsonUtil.asText(aceJson.get(ROLE_JSON_KEY), "");
       if (StringUtils.trimToNull(action) != null && StringUtils.trimToNull(allow) != null
               && StringUtils.trimToNull(role) != null) {
         AccessControlEntry ace = new AccessControlEntry(role, action, Boolean.parseBoolean(allow));
@@ -433,11 +421,11 @@ public class EventHttpServletRequest {
     JsonArray jsonCatalogs = GsonUtil.parse(json).getAsJsonArray();
     for (JsonElement catalogElement : jsonCatalogs) {
       JsonObject catalog = catalogElement.getAsJsonObject();
-      if (StringUtils.isBlank(asPlainString(catalog.get("flavor")))) {
+      if (StringUtils.isBlank(GsonUtil.asText(catalog.get("flavor"), ""))) {
         throw new IllegalArgumentException(
                 "Unable to create new event as no flavor was given for one of the metadata collections");
       }
-      String flavorString = asPlainString(catalog.get("flavor"));
+      String flavorString = GsonUtil.asText(catalog.get("flavor"), "");
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
       DublinCoreMetadataCollection collection = null;
@@ -454,7 +442,7 @@ public class EventHttpServletRequest {
                 String.format("Unable to find an EventCatalogUIAdapter with Flavor '%s'", flavorString));
       }
 
-      String fieldsJson = asPlainString(catalog.get("fields"));
+      String fieldsJson = GsonUtil.asText(catalog.get("fields"), "");
       if (StringUtils.trimToNull(fieldsJson) != null) {
         Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
         for (String key : fields.keySet()) {
