@@ -3,8 +3,8 @@ Job Dispatch
 
 Workflow operations rarely do their own work. Instead, they create one or more [jobs](../architecture/overview.md#jobs-and-services)
 and hand them to the service registry, which is responsible for getting each job to a service instance that can run
-it. This page covers how that happens: the scheduled dispatch loop, how a service is chosen, and the handshake
-between the node doing the dispatching and the node accepting the job.
+it. This page covers how that happens: the scheduled dispatch loop, how the node that does the dispatching is
+elected, how a service is chosen, and the handshake between that node and the node accepting the job.
 
 For a walkthrough with diagrams, see [this webinar on job dispatching and job loads](https://explore.opencast.org/webinars/v/PGom1gu6yO4).
 
@@ -32,16 +32,43 @@ The Dispatch Loop
 (`org.opencastproject.serviceregistry.impl.JobDispatcher.cfg`). Each round, it pages through dispatchable jobs
 (`RESTART` first, then `QUEUED`, a page at a time) and tries to dispatch each one.
 
-Only one node in a cluster should have dispatching enabled — in practice, the admin node (or the combined
-admin/presentation node, or the allinone node in a single-node deployment); the interval defaults to `0`, which
-disables it everywhere else. Nothing stops more than one dispatcher from running: each dispatch attempt updates the
-job's database row under optimistic locking, so a second dispatcher racing for the same job simply gets its update
-rejected and moves on rather than double-dispatching it. But every enabled dispatcher independently queries the same
-dispatchable jobs and the same candidate services each round, so more than one is just wasted contention with no
-benefit — worker, presentation and ingest nodes have no reason to enable it.
+Dispatching is enabled by default on every node: `dispatch.interval` defaults to 2 seconds, and setting it to `0`
+excludes a node from dispatching. These nodes are only *candidates*, though. At any time, just one of them is the
+elected dispatcher, and only that node dispatches jobs. In a round on any other candidate, the loop notices that it is
+not the elected dispatcher and returns without doing anything. So nobody has to pick a dispatcher node by hand.
 
 Jobs of type `org.opencastproject.workflow` — which represent starting a workflow or its next operation, rather than
 a unit of actual processing — are collected separately and dispatched only after every other job in that round.
+
+
+Electing the Dispatcher
+------------------------
+
+The election is a lease stored in a single database row (`oc_dispatch_lock`). At the start of every round, each
+candidate tries to acquire or renew the lease (`DispatchLeaseManager.tryAcquireOrRenew()`). The node that holds a
+valid lease goes on to dispatch, the others skip the round. Acquisition is a single, portable JPQL bulk update:
+
+```sql
+UPDATE DispatchLock d
+   SET d.owner = :me, d.leaseExpires = :newExpiry
+ WHERE d.owner = :me OR d.leaseExpires < CURRENT_TIMESTAMP
+```
+
+The comparison uses the database's own `CURRENT_TIMESTAMP` instead of any node's local clock, so all candidates judge
+whether the lease has expired against one shared clock and not against each other. The race between candidates is
+decided entirely by the row-level locking of the database during the update, with no advisory locks and no
+vendor-specific SQL, so it works the same on MariaDB, PostgreSQL and the H2 database used in tests.
+
+The lease stays valid for `dispatch.lock.timeout` seconds, by default three times `dispatch.interval`. If the
+dispatcher stops renewing it, because it crashed or lost its connection to the database, another candidate takes over
+once it has expired. The timeout should be a small multiple of the interval, so that one missed round does not cause a
+needless change of dispatcher, while a dead node is still replaced quickly. When a node shuts down cleanly or is
+reconfigured, it releases the lease, so that another candidate can take over immediately instead of waiting for the
+timeout.
+
+Optimistic locking remains as a second line of defense. Each dispatch attempt updates the job's database row (the
+`@Version` column of `JpaJob`), so even if two nodes both believe they hold the lease during a narrow race, the second
+one gets its update rejected and moves on, and the job is not dispatched twice.
 
 
 Choosing a Service
@@ -126,5 +153,5 @@ job-producing service, to check that it is still there. A service that fails to 
 watch list; if it fails again on the *next* heartbeat, it is unregistered and marked offline. One missed heartbeat is
 tolerated, two in a row is not.
 
-The heartbeat only runs on a node that also has dispatching enabled; on any other node, `dispatch.interval` being `0`
-disables both together.
+The heartbeat runs on every node that has dispatching enabled, so on all candidates and not only on the elected
+dispatcher. On a node where `dispatch.interval` is `0`, both are disabled together.
