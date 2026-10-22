@@ -29,6 +29,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
@@ -69,6 +70,13 @@ public class WorkspaceImplTest {
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
+
+  private static final String STREAM_SECURITY_QUERY = "?policy=eyJTdGF0ZW1lbnQiOnt9fQ&keyId=mh_default_org"
+          + "&signature=abc";
+
+  /** A working file repository that has its files on the file system the workspace can access */
+  private interface PathMappableRepository extends WorkingFileRepository, PathMappable {
+  }
 
   @Before
   public void setUp() {
@@ -120,6 +128,57 @@ public class WorkspaceImplTest {
       Assert.assertNotNull(workspace.get(urlToSource.toURI()));
     } catch (NotFoundException e) {
       // This happens on some machines, so we catch and handle it.
+    }
+  }
+
+  /** Set up a working file repository on the file system with one file, from which no file may be downloaded */
+  private void setUpWorkingFileRepositoryWithFile(String path, String content) throws Exception {
+    File repoDirectory = testFolder.newFolder("repository");
+    File file = new File(repoDirectory, path);
+    FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
+
+    PathMappableRepository repo = EasyMock.createNiceMock(PathMappableRepository.class);
+    EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
+    EasyMock.expect(repo.getPathPrefix()).andReturn(repoDirectory.getAbsolutePath()).anyTimes();
+    EasyMock.expect(repo.getUrlPrefix()).andReturn("http://localhost:8080/files/").anyTimes();
+    EasyMock.replay(repo);
+    workspace.setRepository(repo);
+
+    Organization organization = EasyMock.createMock(Organization.class);
+    EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
+    SecurityService securityService = EasyMock.createMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.replay(securityService, organization);
+    workspace.setSecurityService(securityService);
+
+    // Any download fails the test
+    TrustedHttpClient httpClient = EasyMock.createMock(TrustedHttpClient.class);
+    EasyMock.replay(httpClient);
+    workspace.setTrustedHttpClient(httpClient);
+  }
+
+  // Stream security adds a query to the URLs, which is not part of the path of the file. The file must be taken from
+  // the working file repository directly, as it is without the query, and not be downloaded.
+  @Test
+  public void testGetWithQueryUsesFileInWorkingFileRepository() throws Exception {
+    setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>");
+    String url = "http://localhost:8080/files/mediapackage/mp1/element1/xacml.xml";
+
+    for (String uri : new String[]{url, url + STREAM_SECURITY_QUERY}) {
+      File file = workspace.get(new URI(uri));
+      Assert.assertEquals(uri, "<policy/>", FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+    }
+  }
+
+  @Test
+  public void testReadWithQueryUsesFileInWorkingFileRepository() throws Exception {
+    setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>");
+    String url = "http://localhost:8080/files/mediapackage/mp1/element1/xacml.xml";
+
+    for (String uri : new String[]{url, url + STREAM_SECURITY_QUERY}) {
+      try (InputStream in = workspace.read(new URI(uri))) {
+        Assert.assertEquals(uri, "<policy/>", IOUtils.toString(in, StandardCharsets.UTF_8));
+      }
     }
   }
 
