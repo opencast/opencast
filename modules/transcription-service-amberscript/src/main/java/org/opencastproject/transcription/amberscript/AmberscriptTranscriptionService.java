@@ -63,7 +63,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
@@ -555,7 +554,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     String jobId = null;
     try {
       jsonObj = (JsonObject) obj;
-      jobId = getString(jsonObj, "name");
+      jobId = GsonUtil.getStringOrNull(jsonObj, "name");
       // Update state in database
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
       TranscriptionJobControl jobControl = database.findByJob(jobId);
@@ -673,7 +672,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               + "Response: {}", removePrivateInfo(submitUrl), jsonString);
 
       JsonObject result = jsonObject.getAsJsonObject("jobStatus");
-      String jobId = getString(result, "jobId");
+      String jobId = GsonUtil.getStringOrNull(result, "jobId");
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -683,8 +682,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
           EntityUtils.consume(entity);
           return;
         default:
-          String error = getString(result, "error");
-          String message = getString(result, "message");
+          String error = GsonUtil.getStringOrNull(result, "error");
+          String message = GsonUtil.getStringOrNull(result, "message");
           String msg = String.format("Unable to submit job: API returned %s - %s: %s", code, error, message);
           logger.warn(msg);
           throw new TranscriptionServiceException(msg);
@@ -729,13 +728,13 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       switch (code) {
         case HttpStatus.SC_OK:
           JsonObject result = jsonObject.getAsJsonObject("jobStatus");
-          String status = getString(result, "status");
+          String status = GsonUtil.getStringOrNull(result, "status");
           switch (status) {
             case STATUS_OPEN:
               logger.debug("Captions job '{}' has not finished yet.", jobId);
               return false;
             case STATUS_ERROR:
-              var errorMsg = getString(result, "errorMsg");
+              var errorMsg = GsonUtil.getStringOrNull(result, "errorMsg");
               throw new TranscriptionServiceException(
                       String.format("Captions job '%s' failed: %s", jobId, errorMsg),
                       code,
@@ -752,8 +751,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               return false; // only here to obey checkstyle
           }
         default:
-          String error = getString(jsonObject, "error");
-          String errorMessage = getString(jsonObject, "errorMessage");
+          String error = GsonUtil.getStringOrNull(jsonObject, "error");
+          String errorMessage = GsonUtil.getStringOrNull(jsonObject, "errorMessage");
           logger.warn("Error while checking status: {}."
                   + System.lineSeparator() + "{}: {}", code, error, errorMessage);
           throw new TranscriptionServiceException(
@@ -1115,12 +1114,6 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         logger.warn("Could not cleanup old submission and transcript results files", e);
       }
     }
-  }
-
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getString(JsonObject json, String key) {
-    JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   private String removePrivateInfo(String unsafeString) {

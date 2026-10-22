@@ -24,6 +24,7 @@ package org.opencastproject.metadata.dublincore;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -344,12 +345,6 @@ public final class MetadataJson {
     }
   }
 
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getStringOrNull(final JsonObject json, final String key) {
-    final JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
-  }
-
   /** True if the element is a JSON string, matching the previous instanceof String checks. */
   private static boolean isJsonString(final JsonElement value) {
     return value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString();
@@ -434,7 +429,7 @@ public final class MetadataJson {
 
     for (final JsonElement element : json.getAsJsonArray()) {
       final JsonObject item = element.getAsJsonObject();
-      final String fieldId = getStringOrNull(item, KEY_METADATA_ID);
+      final String fieldId = GsonUtil.getStringOrNull(item, KEY_METADATA_ID);
 
       if (fieldId == null) {
         continue;
@@ -458,8 +453,8 @@ public final class MetadataJson {
     for (final JsonElement element : json) {
       final JsonObject item = element.getAsJsonObject();
       final MediaPackageElementFlavor flavor = MediaPackageElementFlavor
-              .parseFlavor(getStringOrNull(item, KEY_METADATA_FLAVOR));
-      final String title = getStringOrNull(item, KEY_METADATA_TITLE);
+              .parseFlavor(GsonUtil.getStringOrNull(item, KEY_METADATA_FLAVOR));
+      final String title = GsonUtil.getStringOrNull(item, KEY_METADATA_TITLE);
       if (title == null) {
         continue;
       }

@@ -36,6 +36,7 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.gson.JsonArray;
@@ -244,11 +245,6 @@ public final class SchedulingUtils {
       return result;
     }
 
-    /** Render an element as plain text rather than as JSON. */
-    private static String asPlainText(JsonElement value) {
-      return value.isJsonPrimitive() ? value.getAsString() : value.toString();
-    }
-
     /** Read a member as plain text, null when absent or JSON null. */
     private static String getString(JsonObject json, String key) {
       final JsonElement value = json.get(key);
@@ -301,7 +297,7 @@ public final class SchedulingUtils {
 
       if (inputs != null) {
         schedulingInfo.inputs = Optional.of(StreamSupport.stream(inputs.spliterator(), false)
-            .map(SchedulingInfo::asPlainText)
+            .map(GsonUtil::asText)
             .collect(Collectors.joining(",")));
       }
       if (isNotBlank(rrule)) {
