@@ -181,6 +181,20 @@ public final class GsonUtil {
   }
 
   /**
+   * Renders a JSON value as plain text like {@link #asText(JsonElement)}, falling back to a default for an absent
+   * member or JSON null.
+   *
+   * @param value
+   *          the value to render, may be {@code null}
+   * @param fallback
+   *          the text to return if the value is {@code null} or JSON null
+   * @return the value as plain text, or the fallback
+   */
+  public static String asText(JsonElement value, String fallback) {
+    return value == null || value.isJsonNull() ? fallback : asText(value);
+  }
+
+  /**
    * Flattens a JSON object into a map of strings.
    * <p>
    * json-simple's object was a {@link Map} already, so callers used to cast it and read the values as strings. This

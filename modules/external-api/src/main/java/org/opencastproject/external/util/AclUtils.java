@@ -43,14 +43,6 @@ public final class AclUtils {
   private AclUtils() {
   }
 
-  /** Render a value as plain text rather than JSON, empty when absent or null. */
-  private static String asPlainString(JsonElement value) {
-    if (value == null || value.isJsonNull()) {
-      return "";
-    }
-    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
-  }
-
   /**
    * De-serialize an JSON into an {@link AccessControlList}.
    *
@@ -69,14 +61,14 @@ public final class AclUtils {
     List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
     for (JsonElement element : aclJson) {
       JsonObject aceJson = element.getAsJsonObject();
-      String action = asPlainString(aceJson.get(ACTION_JSON_KEY));
+      String action = GsonUtil.asText(aceJson.get(ACTION_JSON_KEY), "");
       String allow;
       if (assumeAllow) {
         allow = "true";
       } else {
-        allow = asPlainString(aceJson.get(ALLOW_JSON_KEY));
+        allow = GsonUtil.asText(aceJson.get(ALLOW_JSON_KEY), "");
       }
-      String role = asPlainString(aceJson.get(ROLE_JSON_KEY));
+      String role = GsonUtil.asText(aceJson.get(ROLE_JSON_KEY), "");
       if (StringUtils.trimToNull(action) != null && StringUtils.trimToNull(allow) != null
               && StringUtils.trimToNull(role) != null) {
         AccessControlEntry ace = new AccessControlEntry(role, action, Boolean.parseBoolean(allow));
