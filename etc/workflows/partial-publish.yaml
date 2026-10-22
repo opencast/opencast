@@ -51,7 +51,7 @@ operations:
     configurations:
       - source-flavor: '*/trimmed'
       - target-flavor: '*/search+preview'
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: search-cover.http
       - time: 3
 
@@ -63,7 +63,7 @@ operations:
     configurations:
       - source-flavor: presentation/trimmed
       - target-flavor: presentation/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
 
@@ -83,7 +83,7 @@ operations:
     configurations:
       - source-flavor: presenter/trimmed
       - target-flavor: presenter/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
 
