@@ -46,6 +46,7 @@ operations:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Encode to engage search result thumbnails
   - id: image
+    if: NOT ${presentation/thumbnail_edited}
     exception-handler-workflow: partial-error
     description: Creating search result default thumbnails
     configurations:
@@ -66,14 +67,6 @@ operations:
       - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
-
-  - id: tag
-    if: ${presentation/thumbnail_edited}
-    exception-handler-workflow: partial-error
-    description: Prepare thumbnail for publication
-    configurations:
-      - source-flavor: presentation/player+preview
-      - target-tags: +engage-download
 
   # Create a cover image
   - id: image
@@ -98,12 +91,23 @@ operations:
       - target-flavor: presenter/player+preview
       - target-tags: archive, engage-download
 
+  # Clone the custom engage search result thumbnails
+  - id: clone
+    if: ${presentation/thumbnail_edited}
+    exception-handler-workflow: partial-error
+    description: Creating search result custom thumbnails
+    configurations:
+      - source-flavor: '*/player+preview'
+      - target-flavor: '*/search+preview'
+
+  # Apply the engage-download tag to the custom thumbnails
+  # in *both* the search and player preview images
   - id: tag
-    if: ${presenter/thumbnail_edited}
+    if: ${presenter/thumbnail_edited} OR ${presentation/thumbnail_edited}
     exception-handler-workflow: partial-error
     description: Prepare thumbnail for publication
     configurations:
-      - source-flavor: presenter/player+preview
+      - source-flavors: '*/player+preview, */search+preview'
       - target-tags: +engage-download
 
   # Generate timeline preview images
