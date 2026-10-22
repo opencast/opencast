@@ -330,8 +330,8 @@ public final class BulkUpdateUtil {
           final JsonObject jsonObject = jsonGroup.getAsJsonObject();
           final List<String> eventIds = new ArrayList<>();
           jsonObject.getAsJsonArray(KEY_EVENTS).forEach(id -> eventIds.add(id.getAsString()));
-          final JsonObject metadata = jsonObject.getAsJsonObject(KEY_METADATA);
-          final JsonObject scheduling = jsonObject.getAsJsonObject(KEY_SCHEDULING);
+          final JsonObject metadata = GsonUtil.getObjectOrNull(jsonObject, KEY_METADATA);
+          final JsonObject scheduling = GsonUtil.getObjectOrNull(jsonObject, KEY_SCHEDULING);
           groups.add(new BulkUpdateInstructionGroup(eventIds, metadata, scheduling));
         }
       } catch (final JsonParseException | IllegalStateException | NullPointerException e) {
