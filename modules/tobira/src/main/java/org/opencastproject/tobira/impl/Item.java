@@ -93,11 +93,7 @@ class Item {
       // Figure out whether this is a live event
       final var isLive = Arrays.stream(mp.getTracks()).anyMatch(track -> track.isLive());
 
-      // Obtain creators. We first try to obtain it from the DCCs. We collect
-      // into `LinkedHashSet` to deduplicate entries.
-      // NB: this used to collect into a LinkedHashSet "to deduplicate entries", but the values were
-      // wrapped in objects without equals(), so nothing was ever deduplicated. Keep the previous
-      // behaviour here; deduplicating would be a change in what we report, not part of this port.
+      // Obtain creators. We first try to obtain it from the DCCs.
       final var creators = new JsonArray();
       dccs.stream()
               .flatMap(dcc -> dcc.get(DublinCore.PROPERTY_CREATOR).stream())
