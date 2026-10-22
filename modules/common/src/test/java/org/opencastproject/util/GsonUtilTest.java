@@ -106,6 +106,19 @@ public class GsonUtilTest {
     assertNull(GsonUtil.getStringOrNull(json, "absent"));
   }
 
+  /** Same for object and array members. */
+  @Test
+  public void testGetObjectAndArrayOrNull() {
+    JsonObject json = GsonUtil.parse("{\"object\":{\"k\":\"v\"},\"array\":[1],\"null\":null}").getAsJsonObject();
+
+    assertEquals("v", GsonUtil.getObjectOrNull(json, "object").get("k").getAsString());
+    assertNull(GsonUtil.getObjectOrNull(json, "null"));
+    assertNull(GsonUtil.getObjectOrNull(json, "absent"));
+    assertEquals(1, GsonUtil.getArrayOrNull(json, "array").size());
+    assertNull(GsonUtil.getArrayOrNull(json, "null"));
+    assertNull(GsonUtil.getArrayOrNull(json, "absent"));
+  }
+
   /** Unlike JsonParser, parsing into a tree has to be as strict as the Gson instance. */
   @Test(expected = JsonSyntaxException.class)
   public void testParseRejectsLenientInput() {

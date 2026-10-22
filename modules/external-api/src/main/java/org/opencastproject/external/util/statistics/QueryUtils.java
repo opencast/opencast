@@ -248,7 +248,7 @@ public final class QueryUtils {
   private static Query parseQuery(JsonObject queryJson, StatisticsService statisticsService) {
 
     // Get the mandatory provider identifier
-    JsonObject providerJson = queryJson.getAsJsonObject("provider");
+    JsonObject providerJson = GsonUtil.getObjectOrNull(queryJson, "provider");
     String providerId = getField(providerJson, "identifier", "Identifier of provider is missing");
 
     Optional<StatisticsProvider> provider = statisticsService.getProvider(providerId);
@@ -257,7 +257,7 @@ public final class QueryUtils {
     }
 
     // Get the query parameters
-    JsonObject parametersJson = queryJson.getAsJsonObject("parameters");
+    JsonObject parametersJson = GsonUtil.getObjectOrNull(queryJson, "parameters");
     Parameters parameters = parseParameters(parametersJson, provider.get());
 
     return new Query(provider.get(), parameters);

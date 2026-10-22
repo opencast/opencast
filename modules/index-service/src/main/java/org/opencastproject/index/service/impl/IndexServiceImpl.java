@@ -736,7 +736,7 @@ public class IndexServiceImpl implements IndexService {
     String wfId = null;
     String mpId = mediaPackage.getIdentifier().toString();
 
-    JsonObject processing = metadataJson.getAsJsonObject("processing");
+    JsonObject processing = GsonUtil.getObjectOrNull(metadataJson, "processing");
     if (processing == null) {
       throw new IllegalArgumentException("No processing field in metadata");
     }
@@ -746,7 +746,7 @@ public class IndexServiceImpl implements IndexService {
       throw new IllegalArgumentException("No workflow definition field in processing metadata");
     }
 
-    JsonObject configJson = processing.getAsJsonObject("configuration");
+    JsonObject configJson = GsonUtil.getObjectOrNull(processing, "configuration");
 
     try {
       // Start the new workflow on the snapshot
@@ -806,7 +806,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private AccessControlList getAccessControlList(JsonObject metadataJson) {
     AccessControlList acl = new AccessControlList();
-    JsonObject accessJson = metadataJson.getAsJsonObject("access");
+    JsonObject accessJson = GsonUtil.getObjectOrNull(metadataJson, "access");
     if (accessJson != null) {
       try {
         acl = AccessControlParser.parseAcl(accessJson.toString());
@@ -823,17 +823,17 @@ public class IndexServiceImpl implements IndexService {
       throw new IllegalArgumentException("No metadata set");
     }
 
-    JsonObject source = metadataJson.getAsJsonObject("source");
+    JsonObject source = GsonUtil.getObjectOrNull(metadataJson, "source");
     if (source == null) {
       throw new IllegalArgumentException("No source field in metadata");
     }
 
-    JsonObject processing = metadataJson.getAsJsonObject("processing");
+    JsonObject processing = GsonUtil.getObjectOrNull(metadataJson, "processing");
     if (processing == null) {
       throw new IllegalArgumentException("No processing field in metadata");
     }
 
-    JsonArray allEventMetadataJson = metadataJson.getAsJsonArray("metadata");
+    JsonArray allEventMetadataJson = GsonUtil.getArrayOrNull(metadataJson, "metadata");
     if (allEventMetadataJson == null) {
       throw new IllegalArgumentException("No metadata field in metadata");
     }
@@ -893,7 +893,7 @@ public class IndexServiceImpl implements IndexService {
     DublinCoreMetadataUtil.validateRequiredFieldsPresent(eventMetadata);
 
     Date currentStartDate = null;
-    JsonObject sourceMetadata = eventHttpServletRequest.getSource().get().getAsJsonObject("metadata");
+    JsonObject sourceMetadata = GsonUtil.getObjectOrNull(eventHttpServletRequest.getSource().get(), "metadata");
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       try {
@@ -1000,9 +1000,10 @@ public class IndexServiceImpl implements IndexService {
     }
 
     Map<String, String> configuration = new HashMap<>();
-    if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-      configuration = GsonUtil.toStringMap(
-          eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
+    JsonObject configurationJson = GsonUtil.getObjectOrNull(eventHttpServletRequest.getProcessing().get(),
+        "configuration");
+    if (configurationJson != null) {
+      configuration = GsonUtil.toStringMap(configurationJson);
     }
     for (Entry<String, String> entry : configuration.entrySet()) {
       caProperties.put(WORKFLOW_CONFIG_PREFIX.concat(entry.getKey()), entry.getValue());
@@ -1918,12 +1919,12 @@ public class IndexServiceImpl implements IndexService {
   public String createSeries(JsonObject metadata)
           throws IllegalArgumentException, IndexServiceException, UnauthorizedException {
 
-    JsonArray seriesMetadataJson = metadata.getAsJsonArray("metadata");
+    JsonArray seriesMetadataJson = GsonUtil.getArrayOrNull(metadata, "metadata");
     if (seriesMetadataJson == null) {
       throw new IllegalArgumentException("No metadata field in metadata");
     }
 
-    JsonObject options = metadata.getAsJsonObject("options");
+    JsonObject options = GsonUtil.getObjectOrNull(metadata, "options");
     if (options == null) {
       throw new IllegalArgumentException("No options field in metadata");
     }
