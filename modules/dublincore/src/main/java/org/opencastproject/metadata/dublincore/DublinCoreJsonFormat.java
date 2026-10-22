@@ -24,6 +24,7 @@ package org.opencastproject.metadata.dublincore;
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_UNDEFINED;
 
 import org.opencastproject.mediapackage.EName;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -80,17 +81,17 @@ public final class DublinCoreJsonFormat {
         for (final JsonElement valueObject : entry.getValue().getAsJsonArray()) {
           final JsonObject value = valueObject.getAsJsonObject();
           // the value
-          final String valueString = getStringOrNull(value, "value");
+          final String valueString = GsonUtil.getStringOrNull(value, "value");
           // the language
           final String lang;
           {
-            final String l = getStringOrNull(value, "lang");
+            final String l = GsonUtil.getStringOrNull(value, "lang");
             lang = l != null ? l : LANGUAGE_UNDEFINED;
           }
           // the encoding scheme
           final EName encodingScheme;
           {
-            final String s = getStringOrNull(value, "type");
+            final String s = GsonUtil.getStringOrNull(value, "type");
             encodingScheme = s != null ? dc.toEName(s) : null;
           }
           // add the new value to this DC document
@@ -99,12 +100,6 @@ public final class DublinCoreJsonFormat {
       }
     }
     return dc;
-  }
-
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getStringOrNull(JsonObject json, String key) {
-    final JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   /**

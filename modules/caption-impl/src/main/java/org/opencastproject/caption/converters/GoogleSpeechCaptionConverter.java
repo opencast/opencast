@@ -29,9 +29,9 @@ import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -128,14 +128,14 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
                     if (wordTSList.size() == 3) {
                       // Remove 's' at the end
                       Number startNumber = NumberFormat.getInstance(Locale.US)
-                          .parse(removeEndCharacter(asText(wordTSList.get("startTime")), "s"));
+                          .parse(removeEndCharacter(GsonUtil.asText(wordTSList.get("startTime")), "s"));
                       start = startNumber.doubleValue();
                     }
                     // Get end time of last element
                     wordTSList = timestampsArray.get(indexLast).getAsJsonObject();
                     if (wordTSList.size() == 3) {
                       Number endNumber = NumberFormat.getInstance(Locale.US)
-                          .parse(removeEndCharacter(asText(wordTSList.get("endTime")), "s"));
+                          .parse(removeEndCharacter(GsonUtil.asText(wordTSList.get("endTime")), "s"));
                       end = endNumber.doubleValue();
                     }
                   }
@@ -184,11 +184,6 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
   @Override
   public Type getElementType() {
     return MediaPackageElement.Type.Attachment;
-  }
-
-  /** Render a value as plain text: the raw string for primitives, JSON otherwise. */
-  private static String asText(JsonElement value) {
-    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
   }
 
   private Time buildTime(long ms) throws IllegalTimeFormatException {

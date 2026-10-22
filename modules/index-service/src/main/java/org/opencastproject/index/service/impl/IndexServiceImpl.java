@@ -105,6 +105,7 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
@@ -753,7 +754,7 @@ public class IndexServiceImpl implements IndexService {
       // Workflow params are assumed to be String (not mixed with Number)
       Map<String, String> params = new HashMap<String, String>();
       if (configJson != null) {
-        params.putAll(toStringMap(configJson));
+        params.putAll(GsonUtil.toStringMap(configJson));
       }
 
       WorkflowInstance workflowInstance = workflowService.start(
@@ -773,16 +774,6 @@ public class IndexServiceImpl implements IndexService {
   private static String getString(JsonObject json, String key) {
     JsonElement value = json == null ? null : json.get(key);
     return value == null || value.isJsonNull() ? null : value.getAsString();
-  }
-
-  /** Flatten a JSON object of scalars into a string map, as the old JSONObject-as-Map cast produced. */
-  private static Map<String, String> toStringMap(JsonObject json) {
-    Map<String, String> map = new HashMap<>();
-    for (String key : json.keySet()) {
-      JsonElement value = json.get(key);
-      map.put(key, value.isJsonNull() ? null : (value.isJsonPrimitive() ? value.getAsString() : value.toString()));
-    }
-    return map;
   }
 
   /**
@@ -1011,7 +1002,8 @@ public class IndexServiceImpl implements IndexService {
 
     Map<String, String> configuration = new HashMap<>();
     if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-      configuration = toStringMap(eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
+      configuration = GsonUtil.toStringMap(
+          eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
     }
     for (Entry<String, String> entry : configuration.entrySet()) {
       caProperties.put(WORKFLOW_CONFIG_PREFIX.concat(entry.getKey()), entry.getValue());

@@ -31,7 +31,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
@@ -171,8 +170,8 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
     JsonObject jsonObj = null;
     try {
       jsonObj = GsonUtil.gson().fromJson(body, JsonObject.class);
-      String mpId = getString(jsonObj, "user_token");
-      String event = getString(jsonObj, "event");
+      String mpId = GsonUtil.getStringOrNull(jsonObj, "user_token");
+      String event = GsonUtil.getStringOrNull(jsonObj, "event");
       logger.info("Transcription notification for mp {} is {}", mpId, event);
 
       if (IBMWatsonTranscriptionService.JobEvent.COMPLETED_WITH_RESULTS.equals(event)) {
@@ -191,12 +190,6 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
       logger.warn("Error handling notification results: {}", e.getMessage());
       return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     }
-  }
-
-  /** Read a string member, returning null when it is absent or JSON null. */
-  private static String getString(JsonObject json, String key) {
-    JsonElement value = json.get(key);
-    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
 }
