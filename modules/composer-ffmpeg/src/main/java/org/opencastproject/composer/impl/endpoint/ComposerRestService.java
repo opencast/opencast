@@ -43,6 +43,7 @@ import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -51,8 +52,6 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-
-import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -680,7 +679,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
 
     // Deserialize the source elements
     MediaPackageElement lowerTrack = MediaPackageElementParser.getFromXml(lowerTrackXml);
-    Layout lowerLayout = Serializer.layout(JsonParser.parseString(lowerLayoutJson).getAsJsonObject());
+    Layout lowerLayout = Serializer.layout(GsonUtil.parse(lowerLayoutJson).getAsJsonObject());
     if (!Track.TYPE.equals(lowerTrack.getElementType())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("lowerTrack element must be of type track").build();
     }
@@ -689,7 +688,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     Optional<LaidOutElement<Track>> upperLaidOutElement = Optional.<LaidOutElement<Track>> empty();
     if (StringUtils.isNotBlank(upperTrackXml)) {
       MediaPackageElement upperTrack = MediaPackageElementParser.getFromXml(upperTrackXml);
-      Layout upperLayout = Serializer.layout(JsonParser.parseString(upperLayoutJson).getAsJsonObject());
+      Layout upperLayout = Serializer.layout(GsonUtil.parse(upperLayoutJson).getAsJsonObject());
       if (!Track.TYPE.equals(upperTrack.getElementType())) {
         return Response.status(Response.Status.BAD_REQUEST).entity("upperTrack element must be of type track").build();
       }
@@ -697,7 +696,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     }
     Optional<LaidOutElement<Attachment>> watermarkLaidOutElement = Optional.<LaidOutElement<Attachment>> empty();
     if (StringUtils.isNotBlank(watermarkAttachmentXml)) {
-      Layout watermarkLayout = Serializer.layout(JsonParser.parseString(watermarkLayoutJson).getAsJsonObject());
+      Layout watermarkLayout = Serializer.layout(GsonUtil.parse(watermarkLayoutJson).getAsJsonObject());
       MediaPackageElement watermarkAttachment = MediaPackageElementParser.getFromXml(watermarkAttachmentXml);
       if (!Attachment.TYPE.equals(watermarkAttachment.getElementType())) {
         return Response.status(Response.Status.BAD_REQUEST).entity("watermarkTrack element must be of type track")
@@ -707,7 +706,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
               watermarkLayout));
     }
 
-    Dimension compositeTrackSize = Serializer.dimension(JsonParser.parseString(compositeSizeJson).getAsJsonObject());
+    Dimension compositeTrackSize = Serializer.dimension(GsonUtil.parse(compositeSizeJson).getAsJsonObject());
 
     try {
       // Asynchronously composite the specified source elements
@@ -783,7 +782,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       // Asynchronously concat the specified tracks together
       Dimension dimension = null;
       if (StringUtils.isNotBlank(outputDimension)) {
-        dimension = Serializer.dimension(JsonParser.parseString(outputDimension).getAsJsonObject());
+        dimension = Serializer.dimension(GsonUtil.parse(outputDimension).getAsJsonObject());
       }
       boolean hasSameCodec = Boolean.parseBoolean(sameCodec);
       Job job = null;

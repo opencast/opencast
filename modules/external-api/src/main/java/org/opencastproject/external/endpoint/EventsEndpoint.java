@@ -118,7 +118,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -1836,7 +1835,7 @@ public class EventsEndpoint {
           }
           JsonArray subjectArray;
           try {
-            subjectArray = JsonParser.parseString(updatedFields.get(key)).getAsJsonArray();
+            subjectArray = GsonUtil.parse(updatedFields.get(key)).getAsJsonArray();
           } catch (JsonParseException | IllegalStateException e) {
             logger.debug("Unable to update event '{}' as the subjects '{}' are no json array",
                     id, updatedFields.get(key), e);
@@ -2511,7 +2510,7 @@ public class EventsEndpoint {
     }
     JsonObject parsedJson;
     try {
-      parsedJson = JsonParser.parseString(scheduling).getAsJsonObject();
+      parsedJson = GsonUtil.parse(scheduling).getAsJsonObject();
     } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Client sent unparsable scheduling information for event {}: {}", id, scheduling);
       return RestUtil.R.badRequest("Unparsable scheduling information");

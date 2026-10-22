@@ -24,11 +24,11 @@ import static org.opencastproject.index.service.util.JSONUtils.safeString;
 
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +65,7 @@ public final class AclUtils {
    */
   public static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow)
           throws IllegalArgumentException {
-    JsonArray aclJson = JsonParser.parseString(json).getAsJsonArray();
+    JsonArray aclJson = GsonUtil.parse(json).getAsJsonArray();
     List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
     for (JsonElement element : aclJson) {
       JsonObject aceJson = element.getAsJsonObject();

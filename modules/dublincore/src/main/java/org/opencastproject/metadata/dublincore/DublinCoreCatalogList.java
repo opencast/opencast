@@ -21,13 +21,13 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -153,7 +153,7 @@ public class DublinCoreCatalogList {
     List<DublinCoreCatalog> catalogs = new ArrayList<DublinCoreCatalog>();
     if (dcString.startsWith("{")) {
       try {
-        JsonObject json = JsonParser.parseString(dcString).getAsJsonObject();
+        JsonObject json = GsonUtil.parse(dcString).getAsJsonObject();
         long totalCount = Long.parseLong(json.get("totalCount").getAsString());
         for (JsonElement catalog : json.getAsJsonArray("catalogs")) {
           catalogs.add(DublinCoreJsonFormat.read(catalog.getAsJsonObject()));

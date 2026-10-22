@@ -52,7 +52,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
@@ -418,7 +417,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           logger.debug("Successfully received series {} properties from the remote series index", seriesID);
           StringWriter writer = new StringWriter();
           IOUtils.copy(response.getEntity().getContent(), writer, StandardCharsets.UTF_8);
-          JsonArray jsonProperties = JsonParser.parseString(writer.toString()).getAsJsonArray();
+          JsonArray jsonProperties = GsonUtil.parse(writer.toString()).getAsJsonArray();
           Map<String, String> properties = new TreeMap<>();
           for (JsonElement element : jsonProperties) {
             for (Map.Entry<String, JsonElement> property : element.getAsJsonObject().entrySet()) {
@@ -579,7 +578,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         final int statusCode = response.getStatusLine().getStatusCode();
         switch (statusCode) {
           case SC_OK:
-            JsonArray elementArray = JsonParser.parseString(
+            JsonArray elementArray = GsonUtil.parse(
                 IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8)).getAsJsonArray();
             Map<String, byte[]> elements = new HashMap<>();
             for (JsonElement element : elementArray) {

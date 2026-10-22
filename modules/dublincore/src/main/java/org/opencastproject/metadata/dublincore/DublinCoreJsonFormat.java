@@ -29,7 +29,6 @@ import org.opencastproject.util.GsonUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -58,7 +57,7 @@ public final class DublinCoreJsonFormat {
    */
   @Nonnull
   public static DublinCoreCatalog read(String json) {
-    return read(JsonParser.parseString(json).getAsJsonObject());
+    return read(GsonUtil.parse(json).getAsJsonObject());
   }
 
   /**
