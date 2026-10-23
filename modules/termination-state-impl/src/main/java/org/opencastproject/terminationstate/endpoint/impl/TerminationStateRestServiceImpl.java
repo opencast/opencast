@@ -33,7 +33,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -97,10 +98,10 @@ public class TerminationStateRestServiceImpl implements TerminationStateRestServ
   )
   public Response getState() {
     if (service != null) {
-      JSONObject json = new JSONObject();
+      JsonObject json = new JsonObject();
       String state = service.getState().toString();
-      json.put("state", state);
-      return Response.ok(json.toJSONString()).build();
+      json.addProperty("state", state);
+      return Response.ok(json.toString()).build();
     } else {
       logger.error("TerminationStateService is not available");
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();

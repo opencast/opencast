@@ -30,13 +30,14 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,14 +48,13 @@ import io.restassured.http.ContentType;
 
 public class CaptureAgentsEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestCaptureAgentsEndpoint.class);
-  private final JSONParser parser = new JSONParser();
 
-  private JSONObject getCaptureAgent(String name, JSONArray captureAgents) {
-    JSONObject result = null;
-    for (Object agent : captureAgents) {
-      JSONObject agentJson = (JSONObject) agent;
-      if (!StringUtils.isBlank(agentJson.get("Name").toString())
-              && agentJson.get("Name").toString().equalsIgnoreCase(name)) {
+  private JsonObject getCaptureAgent(String name, JsonArray captureAgents) {
+    JsonObject result = null;
+    for (JsonElement agent : captureAgents) {
+      JsonObject agentJson = agent.getAsJsonObject();
+      if (!StringUtils.isBlank(agentJson.get("Name").getAsString())
+              && agentJson.get("Name").getAsString().equalsIgnoreCase(name)) {
         result = agentJson;
       }
     }
@@ -71,9 +71,9 @@ public class CaptureAgentsEndpointTest {
    * @param checkInputs
    *          Whether to check the capture agent's inputs ]
    */
-  private void checkCaptureAgentResults(String expected, String actual, boolean checkInputs) throws ParseException {
-    JSONObject expectedJson = (JSONObject) parser.parse(expected);
-    JSONObject resultJson = (JSONObject) parser.parse(actual);
+  private void checkCaptureAgentResults(String expected, String actual, boolean checkInputs) {
+    JsonObject expectedJson = JsonParser.parseString(expected).getAsJsonObject();
+    JsonObject resultJson = JsonParser.parseString(actual).getAsJsonObject();
     assertEquals("The expected total should match the result total", expectedJson.get("total"),
         resultJson.get("total"));
     assertEquals("The expected offset should match the result offset", expectedJson.get("offset"),
@@ -82,7 +82,7 @@ public class CaptureAgentsEndpointTest {
         resultJson.get("count"));
     assertEquals("The expected limit should match the result limit", expectedJson.get("limit"),
         resultJson.get("limit"));
-    checkCaptureAgentResults((JSONArray) expectedJson.get("results"), (JSONArray) resultJson.get("results"),
+    checkCaptureAgentResults(expectedJson.getAsJsonArray("results"), resultJson.getAsJsonArray("results"),
         checkInputs);
   }
 
@@ -96,20 +96,20 @@ public class CaptureAgentsEndpointTest {
    * @param checkInputs
    *          Whether to check the agent's inputs
    */
-  private void checkCaptureAgentResults(JSONArray expectedJson, JSONArray resultJson, boolean checkInputs) {
-    for (Object captureAgent : resultJson) {
-      JSONObject captureAgentJson = (JSONObject) captureAgent;
-      String name = captureAgentJson.get("Name").toString();
+  private void checkCaptureAgentResults(JsonArray expectedJson, JsonArray resultJson, boolean checkInputs) {
+    for (JsonElement captureAgent : resultJson) {
+      JsonObject captureAgentJson = captureAgent.getAsJsonObject();
+      String name = captureAgentJson.get("Name").getAsString();
       if (!StringUtils.isBlank(name)) {
-        JSONObject expected = getCaptureAgent(name, expectedJson);
+        JsonObject expected = getCaptureAgent(name, expectedJson);
         assertEquals(expected.get("Name"), captureAgentJson.get("Name"));
         assertEquals(expected.get("Status"), captureAgentJson.get("Status"));
         assertEquals(expected.get("Update"), captureAgentJson.get("Update"));
 
         if (checkInputs) {
           // Check inputs
-          JSONObject expectedInputs = (JSONObject) ((JSONArray) expected.get("inputs")).get(0);
-          JSONObject actualInputs = (JSONObject) ((JSONArray) captureAgentJson.get("inputs")).get(0);
+          JsonObject expectedInputs = expected.getAsJsonArray("inputs").get(0).getAsJsonObject();
+          JsonObject actualInputs = captureAgentJson.getAsJsonArray("inputs").get(0).getAsJsonObject();
           assertEquals(expectedInputs.get("id"), actualInputs.get("id"));
           assertEquals(expectedInputs.get("value"), actualInputs.get("value"));
         }
@@ -140,7 +140,7 @@ public class CaptureAgentsEndpointTest {
   }
 
   @Test
-  public void testGetAllWithParams() throws ParseException, IOException {
+  public void testGetAllWithParams() throws IOException {
     int limit = 0;
     int offset = 2;
     int total = 4;
@@ -168,7 +168,7 @@ public class CaptureAgentsEndpointTest {
   }
 
   @Test
-  public void testSortAgentsByLastUpdatedTimestamp() throws ParseException, IOException {
+  public void testSortAgentsByLastUpdatedTimestamp() throws IOException {
     int total = 4;
 
     given().queryParam("sort", "updated:ASC").expect().statusCode(HttpStatus.SC_OK)

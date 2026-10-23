@@ -37,7 +37,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.userdirectory.UserIdRoleProvider;
-import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -45,6 +44,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -66,7 +66,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
@@ -226,8 +225,9 @@ public class TobiraEndpoint {
       returnDescription = "JSON object with string field 'version'"
   )
   public Response version() {
-    var body = Jsons.obj(Jsons.p("version", VERSION));
-    return Response.ok(body.toJson()).build();
+    var body = new JsonObject();
+    body.addProperty("version", VERSION);
+    return Response.ok(body.toString()).build();
   }
 
   @GET
@@ -287,7 +287,7 @@ public class TobiraEndpoint {
           searchService, seriesService, authorizationService, securityService, playlistService, workspace);
 
       // TODO: encoding
-      return Response.ok(json.toJson()).build();
+      return Response.ok(json.toString()).build();
     } catch (Exception e) {
       logger.error("Unexpected exception in tobira/harvest", e);
       return Response.serverError().build();
@@ -331,29 +331,26 @@ public class TobiraEndpoint {
       user = userDirectoryService.loadUser(username.get(0));
     }
 
-    Jsons.Obj outcome;
+    JsonObject outcome = new JsonObject();
 
     if (user == null) {
-      outcome = Jsons.obj(
-        Jsons.p("outcome", "no-user")
-      );
+      outcome.addProperty("outcome", "no-user");
     } else {
-      outcome = Jsons.obj(
-          Jsons.p("outcome", "user"),
-          Jsons.p("username", user.getUsername()),
-          Jsons.p("displayName", user.getName()),
-          Jsons.p("email", user.getEmail()),
-          Jsons.p("userRole",UserIdRoleProvider.getUserIdRole(user.getUsername())),
-          Jsons.p("roles", Jsons.arr(
-            user.getRoles().stream()
-                .map(Role::getName)
-                .filter(allowedRolesPattern)
-                .map(Jsons::v)
-                .collect(Collectors.toList())))
-      );
+      final var roles = new JsonArray();
+      user.getRoles().stream()
+          .map(Role::getName)
+          .filter(allowedRolesPattern)
+          .forEach(roles::add);
+
+      outcome.addProperty("outcome", "user");
+      outcome.addProperty("username", user.getUsername());
+      outcome.addProperty("displayName", user.getName());
+      outcome.addProperty("email", user.getEmail());
+      outcome.addProperty("userRole", UserIdRoleProvider.getUserIdRole(user.getUsername()));
+      outcome.add("roles", roles);
     }
 
-    return Response.ok(outcome.toJson()).build();
+    return Response.ok(outcome.toString()).build();
   }
 
   private static Response badRequest(String msg) {

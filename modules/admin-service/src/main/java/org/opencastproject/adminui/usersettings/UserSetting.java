@@ -21,8 +21,7 @@
 
 package org.opencastproject.adminui.usersettings;
 
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Obj;
+import com.google.gson.JsonObject;
 
 /**
  * A class used to store a key-value pair for a user setting.
@@ -64,7 +63,11 @@ public class UserSetting {
   /**
    * @return The JSON representation of this user setting.
    */
-  public Obj toJson() {
-    return Jsons.obj(Jsons.p("id", id), Jsons.p("key", key), Jsons.p("value", value));
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
+    json.addProperty("id", id);
+    json.addProperty("key", key);
+    json.addProperty("value", value);
+    return json;
   }
 }

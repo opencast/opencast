@@ -50,17 +50,17 @@ import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.Jsons;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 
+import com.google.gson.JsonArray;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.ws.rs.DELETE;
@@ -108,7 +108,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       logger.info("No ACL with id '{}' could be found", aclId);
       throw new NotFoundException();
     }
-    return JsonConv.full(managedAcl.get()).toJson();
+    return JsonConv.full(managedAcl.get()).toString();
   }
 
   @POST
@@ -146,7 +146,7 @@ public abstract class AbstractAclServiceRestEndpoint {
     }
 
     AccessControlList acl = AccessControlUtil.extendAcl(parseAcl(accessControlList), role, action, allow);
-    return JsonConv.full(acl).toJson();
+    return JsonConv.full(acl).toString();
   }
 
   @POST
@@ -176,7 +176,7 @@ public abstract class AbstractAclServiceRestEndpoint {
     }
 
     AccessControlList acl = AccessControlUtil.reduceAcl(parseAcl(accessControlList), role, action);
-    return JsonConv.full(acl).toJson();
+    return JsonConv.full(acl).toString();
   }
 
   @GET
@@ -195,10 +195,11 @@ public abstract class AbstractAclServiceRestEndpoint {
       }
   )
   public String getAcls() {
-    List<Jsons.Val> acls = aclService().getAcls().stream()
+    JsonArray acls = new JsonArray();
+    aclService().getAcls().stream()
         .map(JsonConv.fullManagedAcl)
-        .toList();
-    return Jsons.arr(acls).toJson();
+        .forEach(acls::add);
+    return acls.toString();
   }
 
   @POST
@@ -229,7 +230,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       logger.info("An ACL with the same name '{}' already exists", name);
       throw new WebApplicationException(Response.Status.CONFLICT);
     }
-    return JsonConv.full(managedAcl.get()).toJson();
+    return JsonConv.full(managedAcl.get()).toString();
   }
 
   @PUT
@@ -265,7 +266,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       logger.info("No ACL with id '{}' could be found under organization '{}'", aclId, org.getId());
       throw new NotFoundException();
     }
-    return JsonConv.full(managedAcl).toJson();
+    return JsonConv.full(managedAcl).toString();
   }
 
   @DELETE

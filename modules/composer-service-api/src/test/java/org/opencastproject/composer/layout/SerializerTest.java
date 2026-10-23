@@ -24,7 +24,7 @@ package org.opencastproject.composer.layout;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.composer.layout.Offset.offset;
 
-import org.opencastproject.util.JsonObj;
+import com.google.gson.JsonParser;
 
 import org.junit.Test;
 
@@ -32,24 +32,25 @@ public class SerializerTest {
   @Test
   public void testSerialize() throws Exception {
     final Dimension d = new Dimension(10, 30);
-    assertEquals(d, Serializer.dimension(JsonObj.jsonObj(Serializer.json(d).toJson())));
+    assertEquals(d, Serializer.dimension(JsonParser.parseString(Serializer.json(d).toString()).getAsJsonObject()));
     final Anchor a = new Anchor(0.134, 0.982);
-    assertEquals(a, Serializer.anchor(JsonObj.jsonObj(Serializer.json(a).toJson())));
+    assertEquals(a, Serializer.anchor(JsonParser.parseString(Serializer.json(a).toString()).getAsJsonObject()));
     final AnchorOffset ao = new AnchorOffset(a, a, offset(10, 20));
-    assertEquals(ao, Serializer.anchorOffset(JsonObj.jsonObj(Serializer.json(ao).toJson())));
+    assertEquals(ao, Serializer.anchorOffset(JsonParser.parseString(Serializer.json(ao).toString()).getAsJsonObject()));
     final TwoShapeLayout tsl = new TwoShapeLayout(new Dimension(1200, 980),
                                                   new Layout(new Dimension(300, 200), new Offset(0, 0)),
                                                   new Layout(new Dimension(900, 780), new Offset(300, 200)));
-    final String tslSer = Serializer.json(tsl).toJson();
-    assertEquals(tsl, Serializer.twoShapeLayout(JsonObj.jsonObj(tslSer)));
+    final String tslSer = Serializer.json(tsl).toString();
+    assertEquals(tsl, Serializer.twoShapeLayout(JsonParser.parseString(tslSer).getAsJsonObject()));
     final HorizontalCoverageLayoutSpec hcls = new HorizontalCoverageLayoutSpec(
             new AnchorOffset(Anchors.TOP_LEFT, Anchors.BOTTOM_RIGHT, new Offset(10, 12)),
             0.34);
-    assertEquals(hcls, Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(Serializer.json(hcls).toJson())));
+    assertEquals(hcls, Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(Serializer.json(hcls).toString()).getAsJsonObject()));
   }
 
   @Test(expected = RuntimeException.class)
   public void testAccessFailure() {
-    JsonObj.jsonObj("{\"x\": [1, 2, 3]}").get(String.class, "x");
+    JsonParser.parseString("{\"x\": [1, 2, 3]}").getAsJsonObject().get("x").getAsString();
   }
 }

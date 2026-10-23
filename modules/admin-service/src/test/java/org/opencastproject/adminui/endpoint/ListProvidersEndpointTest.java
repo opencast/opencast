@@ -29,10 +29,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,14 +45,13 @@ import io.restassured.response.ResponseBody;
 public class ListProvidersEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestListProvidersEndpoint.class);
 
-  private JSONParser parser;
 
   @Test
-  public void testGetGeneric() throws ParseException {
-    JSONObject all = (JSONObject) parser.parse(given()
+  public void testGetGeneric() {
+    JsonObject all = JsonParser.parseString(given()
             .pathParam("id", TestListProvidersEndpoint.PROVIDER_NAME).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("2", containsString(TestListProvidersEndpoint.PROVIDER_VALUES[2]))
-            .body("", hasValue("z")).when().get(rt.host("/{id}.json")).asString());
+            .body("", hasValue("z")).when().get(rt.host("/{id}.json")).asString()).getAsJsonObject();
 
     assertEquals(TestListProvidersEndpoint.PROVIDER_VALUES.length, all.entrySet().size());
 
@@ -61,15 +60,15 @@ public class ListProvidersEndpointTest {
 
     int limit = 2;
     int offset = 2;
-    JSONObject limited = (JSONObject) parser.parse(given()
+    JsonObject limited = JsonParser.parseString(given()
             .pathParam("id", TestListProvidersEndpoint.PROVIDER_NAME).queryParam("limit", limit)
             .queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("/{id}.json"))
-            .asString());
+            .asString()).getAsJsonObject();
 
-    assertEquals(limit, limited.entrySet().size());
+    assertEquals(limit, limited.size());
 
-    Object[] allValues = all.values().toArray();
-    Object[] limitedValues = limited.values().toArray();
+    Object[] allValues = all.asMap().values().toArray();
+    Object[] limitedValues = limited.asMap().values().toArray();
 
     for (int i = 0; i < limitedValues.length; i++) {
       assertEquals(limitedValues[i], allValues[offset + i]);
@@ -77,20 +76,19 @@ public class ListProvidersEndpointTest {
   }
 
   @Test
-  public void testGetWithFilters() throws ParseException {
+  public void testGetWithFilters() {
     Response response = given().pathParam("id", "SERVERS").param("filter", "name=non existing name")
         .when().get(rt.host("/{id}.json"))
         .then().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
         .extract().response();
     ResponseBody body = response.getBody();
     String content = body.asString();
-    JSONObject json = (JSONObject) parser.parse(content);
+    JsonObject json = JsonParser.parseString(content).getAsJsonObject();
     assertEquals(1, json.entrySet().size());
   }
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass

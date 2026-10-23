@@ -27,11 +27,12 @@ import org.opencastproject.adminui.endpoint.SeriesEndpointTest;
 import org.opencastproject.kernel.mail.EmailAddress;
 import org.opencastproject.security.api.User;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -45,17 +46,17 @@ public class UserSettingsTest {
   public void toJsonInputEmptyExpectedEmptySettingsAndSignatures() throws Exception {
     InputStream stream = SeriesEndpointTest.class.getResourceAsStream("/user_settings_test_empty.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
 
     UserSettings userSetting = new UserSettings();
-    assertThat(expected.toJSONString(), SameJSONAs.sameJSONAs(userSetting.toJson().toJson()));
+    assertThat(expected.toString(), SameJSONAs.sameJSONAs(userSetting.toJson().toString()));
   }
 
   @Test
   public void toJsonInputSettingAndSignatureExpectedAllInJson() throws Exception {
     InputStream stream = SeriesEndpointTest.class.getResourceAsStream("/user_settings_test_example.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
 
     User creator = EasyMock.createMock(User.class);
     EasyMock.expect(creator.getName()).andReturn("Users Name").anyTimes();
@@ -71,6 +72,6 @@ public class UserSettingsTest {
     UserSettings userSettings = new UserSettings();
     userSettings.setTotal(1);
     userSettings.addUserSetting(userSetting);
-    assertThat(expected.toJSONString(), SameJSONAs.sameJSONAs(userSettings.toJson().toJson()));
+    assertThat(expected.toString(), SameJSONAs.sameJSONAs(userSettings.toJson().toString()));
   }
 }

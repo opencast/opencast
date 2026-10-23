@@ -25,9 +25,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.Test;
 
 import java.net.URI;
@@ -86,18 +87,17 @@ public class EditingDataTest {
 
   @Test
   public void testEditingInfoEncode() throws Exception {
-    JSONParser parser = new JSONParser();
     String originalJson = loadResource("/edit.json");
 
     EditingData editingInfo = EditingData.parse(originalJson);
-    JSONObject origJson = (JSONObject) parser.parse(originalJson);
-    JSONObject resultingJson = (JSONObject) parser.parse(editingInfo.toString());
+    JsonObject origJson = JsonParser.parseString(originalJson).getAsJsonObject();
+    JsonObject resultingJson = JsonParser.parseString(editingInfo.toString()).getAsJsonObject();
 
     assertEquals(origJson.get(TITLE), resultingJson.get(TITLE));
     assertEquals(origJson.get(DURATION), resultingJson.get(DURATION));
     assertEquals(origJson.get(DATE), resultingJson.get(DATE));
-    JSONObject origSeries = (JSONObject) origJson.get(SERIES);
-    JSONObject resultSeries = (JSONObject) resultingJson.get(SERIES);
+    JsonObject origSeries = origJson.getAsJsonObject(SERIES);
+    JsonObject resultSeries = resultingJson.getAsJsonObject(SERIES);
     assertEquals(origSeries.get(SERIES_ID), resultSeries.get(SERIES_ID));
     assertEquals(origSeries.get(SERIES_NAME), resultSeries.get(SERIES_NAME));
   }
