@@ -64,10 +64,13 @@ public class BasicStatisticsSecretRemote extends RemoteBase implements BasicStat
   @Override
   public byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException {
 
-    if (lastUpdated + CACHE_SECONDS > Instant.now().getEpochSecond()) {
+    Instant now = Instant.now();
+    Instant updated = Instant.ofEpochSecond(lastUpdated);
+    // The secret is replaced at a fixed time every day, which the cache must not hold on to
+    if (now.isBefore(updated.plusSeconds(CACHE_SECONDS))
+        && now.isBefore(BasicStatisticsSecretService.nextRotation(updated))) {
       return cachedSecret;
     }
-
 
     HttpGet get = new HttpGet("/daily-secret");
     HttpResponse response = getResponse(get);
