@@ -30,6 +30,9 @@ public interface EventPayload {
   record PageVisit(String url) implements EventPayload {
     public PageVisit {
       require(url != null, "missing 'url'");
+      // The query and the fragment often contain sensitive information, so they are not stored. Clients should not
+      // send them in the first place, this is the last protection.
+      url = url.split("[?#]", 2)[0];
     }
   }
 

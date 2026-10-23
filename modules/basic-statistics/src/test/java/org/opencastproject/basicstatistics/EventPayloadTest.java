@@ -55,8 +55,8 @@ public class EventPayloadTest {
 
   @Test
   public void testSerializedPayloadIsNotHtmlEscaped() {
-    EventPayload payload = parse(EventType.PAGE_VISIT, "{\"url\": \"/watch?id=1&x=<b>\"}");
-    assertEquals("{\"url\":\"/watch?id=1&x=<b>\"}", RawEvent.serializePayload(payload));
+    EventPayload payload = parse(EventType.PAGE_VISIT, "{\"url\": \"/watch/<b>&x='1'\"}");
+    assertEquals("{\"url\":\"/watch/<b>&x='1'\"}", RawEvent.serializePayload(payload));
   }
 
   @Test
