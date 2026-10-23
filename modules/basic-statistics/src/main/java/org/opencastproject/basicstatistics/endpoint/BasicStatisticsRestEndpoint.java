@@ -39,7 +39,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.common.net.InetAddresses;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
@@ -456,10 +455,9 @@ public class BasicStatisticsRestEndpoint {
     }
 
     // Parse the payload into its type, and store that, so that unknown fields from the request are not stored
-    String payloadJson = payloadToString(dto.getEventPayload());
     EventPayload payload;
     try {
-      payload = RawEvent.parsePayload(eventType, payloadJson).orElse(null);
+      payload = RawEvent.parsePayload(eventType, dto.getEventPayload()).orElse(null);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Event payload is malformed: " + e.getMessage());
     }
@@ -497,20 +495,6 @@ public class BasicStatisticsRestEndpoint {
    */
   private static String formatTimestamp(Instant timestamp) {
     return timestamp.toString();
-  }
-
-  /**
-   * @return the compact JSON text of the payload to store, or null if there is none
-   * @throws IllegalArgumentException if the payload is neither null nor a JSON object
-   */
-  private static String payloadToString(JsonElement payload) throws IllegalArgumentException {
-    if (payload == null || payload.isJsonNull()) {
-      return null;
-    }
-    if (!payload.isJsonObject()) {
-      throw new IllegalArgumentException("Event payload must be a JSON object or null");
-    }
-    return payload.toString();
   }
 
   private RejectedEvent validate(RawEvent event, int index, Instant now) {
