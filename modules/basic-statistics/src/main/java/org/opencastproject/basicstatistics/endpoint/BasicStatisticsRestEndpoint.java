@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 
 import org.opencastproject.basicstatistics.BasicStatisticsService;
+import org.opencastproject.basicstatistics.ClientPushRateLimiter;
 import org.opencastproject.basicstatistics.EventPayload;
 import org.opencastproject.basicstatistics.EventType;
 import org.opencastproject.basicstatistics.ItemType;
@@ -42,7 +43,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -241,9 +242,16 @@ public class BasicStatisticsRestEndpoint {
           .build();
     }
 
-    // Parse request body
+    // Parse request body, but only if it is within the limits. Requests that are not are ignored, and the client is not
+    // told, so that it cannot find out what the limits are.
+    ClientPushRateLimiter rateLimiter = basicStatisticsService.getClientPushRateLimiter();
     try {
-      String json = readInputStream(request);
+      byte[] body = readInputStream(request, rateLimiter.getMaxRequestBytes());
+      if (body != null && !rateLimiter.allow(ip, body.length)) {
+        logger.debug("Ignoring a client push of at least {} bytes, as a rate limit was reached", body.length);
+        return Response.ok(GSON.toJson(new PushResponse(0, List.of())), MediaType.APPLICATION_JSON).build();
+      }
+      String json = body == null ? null : new String(body, StandardCharsets.UTF_8);
 
       ClientPushRequest pushRequest = json == null ? null : GSON.fromJson(json, ClientPushRequest.class);
       if (pushRequest == null || pushRequest.getEvents() == null) {
@@ -349,7 +357,8 @@ public class BasicStatisticsRestEndpoint {
   )
   public Response trustedPush(@Context HttpServletRequest request) {
     try {
-      String json = readInputStream(request);
+      byte[] body = readInputStream(request, Long.MAX_VALUE);
+      String json = body == null ? null : new String(body, StandardCharsets.UTF_8);
 
       TrustedPushRequest pushRequest = json == null ? null : GSON.fromJson(json, TrustedPushRequest.class);
       if (pushRequest == null || pushRequest.getEvents() == null) {
@@ -527,15 +536,21 @@ public class BasicStatisticsRestEndpoint {
     ).build();
   }
 
-  protected String readInputStream(HttpServletRequest request) {
-    String details;
+  /**
+   * Read the body of a request, but not all of it if it is longer than allowed.
+   *
+   * @param maxBytes the allowed size of the body
+   * @return the bytes that were read, or null if the body could not be read
+   */
+  protected byte[] readInputStream(HttpServletRequest request, long maxBytes) {
     try (InputStream is = request.getInputStream()) {
-      details = IOUtils.toString(is, request.getCharacterEncoding());
+      // One byte more than allowed, to be able to tell that the body is longer. Not more than an int can hold.
+      int limit = (int) Math.min(maxBytes, Integer.MAX_VALUE - 1);
+      return is.readNBytes(limit + 1);
     } catch (IOException e) {
       logger.error("Error reading request body:", e);
       return null;
     }
-    return details;
   }
 
   @Reference

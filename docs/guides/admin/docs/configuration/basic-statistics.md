@@ -20,6 +20,12 @@ instead, set it in ISO format:
 
     completeness.threshold.date=2026-08-28
 
+Everybody can send statistics to Opencast, as they come from the browsers of the viewers. To keep anyone from filling up the database, there are limits for what one client can send, in bytes: for a single request, and for all the requests of one IP address within a minute and within an hour. Anything above a limit is ignored. A limit of 0 means there is no limit. These are the defaults:
+
+    ratelimit.request.bytes=8192
+    ratelimit.minute.bytes=524288
+    ratelimit.hour.bytes=8388608
+
 
 Requirements
 ------------
