@@ -62,7 +62,7 @@ public class BasicStatisticsSecretRemote extends RemoteBase implements BasicStat
   private static final long CACHE_SECONDS = 600;
 
   @Override
-  public byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException {
+  public synchronized byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException {
 
     Instant now = Instant.now();
     Instant updated = Instant.ofEpochSecond(lastUpdated);
