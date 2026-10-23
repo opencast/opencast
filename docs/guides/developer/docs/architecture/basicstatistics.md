@@ -11,7 +11,8 @@ Opencast offers two endpoints for adding events, `/basic-statistics/clientPush` 
 `POST /basic-statistics/clientPush`
 ----------------------------
 
-Can be used without authentication
+Can be used without authentication. To keep anyone from filling up the database, there are limits for the size of a
+request and for how much one IP address can send (see the admin documentation).
 
 The request must contain a body containing a JSON object with the following fields:
 - `events`: array of objects with the following fields, which correspond directly to the fields of a raw event with the same name:
