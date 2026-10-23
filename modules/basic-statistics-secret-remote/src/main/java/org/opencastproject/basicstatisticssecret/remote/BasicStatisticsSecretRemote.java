@@ -26,9 +26,9 @@ import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServic
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.osgi.service.component.annotations.Component;
@@ -57,39 +57,50 @@ public class BasicStatisticsSecretRemote extends RemoteBase implements BasicStat
     super(JOB_TYPE);
   }
 
-  private long lastUpdated = 0;
-  private byte[] cachedSecret = null;
   private static final long CACHE_SECONDS = 600;
 
-  @Override
-  public synchronized byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException {
+  /** A secret, and the time before it was fetched */
+  private record CachedSecret(byte[] secret, Instant fetched) { }
 
+  private volatile CachedSecret cached = null;
+
+  @Override
+  public byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException {
     Instant now = Instant.now();
-    Instant updated = Instant.ofEpochSecond(lastUpdated);
+    CachedSecret cache = cached;
     // The secret is replaced at a fixed time every day, which the cache must not hold on to
-    if (now.isBefore(updated.plusSeconds(CACHE_SECONDS))
-        && now.isBefore(BasicStatisticsSecretService.nextRotation(updated))) {
-      return cachedSecret;
+    if (cache != null
+        && now.isBefore(cache.fetched().plusSeconds(CACHE_SECONDS))
+        && now.isBefore(BasicStatisticsSecretService.nextRotation(cache.fetched()))) {
+      return cache.secret();
+    }
+
+    // Without a secret service, getResponse waits for one to show up, and that can be forever. This is called by
+    // threads that serve requests, so it is better to fail.
+    try {
+      if (remoteServiceManager.getServiceRegistrationsByLoad(JOB_TYPE).isEmpty()) {
+        throw new BasicStatisticsSecretServiceException("There is no basic statistics secret service");
+      }
+    } catch (ServiceRegistryException e) {
+      throw new BasicStatisticsSecretServiceException(e);
     }
 
     HttpGet get = new HttpGet("/daily-secret");
     HttpResponse response = getResponse(get);
-
-    int status = response.getStatusLine().getStatusCode();
-    if (status != HttpStatus.SC_OK) {
-      throw new BasicStatisticsSecretServiceException("Failed to fetch secret: HTTP " + status);
-    }
-
-    String secret;
     try {
-      secret = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8).trim();
-    } catch (IOException e) {
+      if (response != null) {
+        String secret = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8).trim();
+        byte[] decoded = Base64.getDecoder().decode(secret);
+        // The time from before the request is used, as the secret might have been replaced while it was running
+        cached = new CachedSecret(decoded, now);
+        return decoded;
+      }
+    } catch (IOException | IllegalArgumentException e) {
       throw new BasicStatisticsSecretServiceException(e);
+    } finally {
+      closeConnection(response);
     }
-    cachedSecret = Base64.getDecoder().decode(secret);
-    lastUpdated = Instant.now().getEpochSecond();
-
-    return cachedSecret;
+    throw new BasicStatisticsSecretServiceException("Unable to get the secret from the remote service");
   }
 
   @Reference
