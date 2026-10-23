@@ -26,9 +26,6 @@ import org.osgi.service.component.annotations.Component;
 
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 /**
  * A service for the rotating daily secret used in sessions hashes for Opencast basic statistics
@@ -59,15 +56,8 @@ public class BasicStatisticsSecretServiceImpl implements BasicStatisticsSecretSe
     if (!now.isBefore(validUntil)) {
       currentSecret = new byte[32];
       secureRandom.nextBytes(currentSecret);
-      validUntil = nextRotation(now);
+      validUntil = BasicStatisticsSecretService.nextRotation(now);
     }
     return currentSecret;
-  }
-
-  /** The next time it is 4am, which is when the secret is replaced every day */
-  private static Instant nextRotation(Instant now) {
-    ZonedDateTime time = now.atZone(ZoneId.systemDefault());
-    ZonedDateTime rotation = time.with(LocalTime.of(4, 0));
-    return (rotation.isAfter(time) ? rotation : rotation.plusDays(1)).toInstant();
   }
 }
