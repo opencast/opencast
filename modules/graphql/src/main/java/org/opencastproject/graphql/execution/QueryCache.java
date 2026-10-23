@@ -25,7 +25,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -39,19 +38,6 @@ public class QueryCache implements PreparsedDocumentProvider {
       .expireAfterWrite(1, TimeUnit.HOURS)
       .maximumSize(2048)
       .build();
-
-  // getDocument is deprecated in favor of getDocumentAsync, but PreparsedDocumentProvider still
-  // declares it abstract, so implementations must still provide it.
-  @Override
-  @SuppressWarnings("deprecation")
-  public PreparsedDocumentEntry getDocument(ExecutionInput executionInput,
-      Function<ExecutionInput, PreparsedDocumentEntry> parseAndValidateFunction) {
-    try {
-      return getDocumentAsync(executionInput, parseAndValidateFunction).get();
-    } catch (InterruptedException | ExecutionException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   @Override
   public CompletableFuture<PreparsedDocumentEntry> getDocumentAsync(ExecutionInput executionInput,
