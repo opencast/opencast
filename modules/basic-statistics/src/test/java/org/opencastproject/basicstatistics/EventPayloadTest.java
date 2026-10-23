@@ -26,12 +26,15 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import com.google.gson.JsonNull;
+import com.google.gson.JsonParser;
+
 import org.junit.Test;
 
 public class EventPayloadTest {
 
   private static EventPayload parse(EventType type, String json) {
-    return RawEvent.parsePayload(type, json).orElseThrow();
+    return RawEvent.parsePayload(type, JsonParser.parseString(json)).orElseThrow();
   }
 
   @Test
@@ -62,9 +65,11 @@ public class EventPayloadTest {
   @Test
   public void testEventWithoutPayload() {
     assertTrue(RawEvent.parsePayload(EventType.VIDEO_PLAY, null).isEmpty());
+    // JSON null is what a null payload in a request turns into, and counts as no payload
+    assertTrue(RawEvent.parsePayload(EventType.VIDEO_PLAY, JsonNull.INSTANCE).isEmpty());
     assertNull(RawEvent.serializePayload(null));
     // a payload for an event that has none is an error, not something to ignore
-    assertThrows(IllegalArgumentException.class, () -> RawEvent.parsePayload(EventType.VIDEO_PLAY, "{}"));
+    assertThrows(IllegalArgumentException.class, () -> parse(EventType.VIDEO_PLAY, "{}"));
   }
 
   @Test
@@ -72,7 +77,7 @@ public class EventPayloadTest {
     for (EventType type : EventType.values()) {
       if (type.getPayloadType().isPresent()) {
         assertThrows(type.getApiName(), IllegalArgumentException.class, () -> RawEvent.parsePayload(type, null));
-        assertThrows(type.getApiName(), IllegalArgumentException.class, () -> RawEvent.parsePayload(type, "{}"));
+        assertThrows(type.getApiName(), IllegalArgumentException.class, () -> parse(type, "{}"));
       }
     }
   }
@@ -81,21 +86,21 @@ public class EventPayloadTest {
   public void testPayloadMustBeAnObject() {
     for (String notAnObject : new String[]{"[]", "[1]", "\"x\"", "5", "true"}) {
       assertThrows(notAnObject, IllegalArgumentException.class,
-          () -> RawEvent.parsePayload(EventType.VIDEO_SEEK, notAnObject));
+          () -> parse(EventType.VIDEO_SEEK, notAnObject));
     }
   }
 
   @Test
   public void testRanges() {
     // timestamps and byte positions are not negative, and a range does not end before it starts
-    assertThrows(IllegalArgumentException.class, () -> RawEvent.parsePayload(EventType.VIDEO_PAUSE, "{\"at\": -1}"));
-    assertThrows(IllegalArgumentException.class, () -> RawEvent.parsePayload(EventType.VIDEO_SEEK, "{\"to\": -1}"));
+    assertThrows(IllegalArgumentException.class, () -> parse(EventType.VIDEO_PAUSE, "{\"at\": -1}"));
+    assertThrows(IllegalArgumentException.class, () -> parse(EventType.VIDEO_SEEK, "{\"to\": -1}"));
     assertThrows(IllegalArgumentException.class,
-        () -> RawEvent.parsePayload(EventType.VIDEO_WATCHED, "{\"from\": 5, \"to\": 4}"));
+        () -> parse(EventType.VIDEO_WATCHED, "{\"from\": 5, \"to\": 4}"));
     assertThrows(IllegalArgumentException.class,
-        () -> RawEvent.parsePayload(EventType.FETCH_FILE, "{\"elem\": \"a\", \"from\": 5, \"to\": 4}"));
+        () -> parse(EventType.FETCH_FILE, "{\"elem\": \"a\", \"from\": 5, \"to\": 4}"));
     assertThrows(IllegalArgumentException.class,
-        () -> RawEvent.parsePayload(EventType.FETCH_FILE, "{\"elem\": \"a\", \"from\": -1}"));
+        () -> parse(EventType.FETCH_FILE, "{\"elem\": \"a\", \"from\": -1}"));
     // the limits themselves are fine
     assertEquals(new EventPayload.VideoPause(0L), parse(EventType.VIDEO_PAUSE, "{\"at\": 0}"));
   }
