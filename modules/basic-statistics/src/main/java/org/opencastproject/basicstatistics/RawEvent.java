@@ -23,6 +23,7 @@ package org.opencastproject.basicstatistics;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 
 import java.time.Instant;
@@ -125,14 +126,19 @@ public class RawEvent {
    * Parse and validate the payload of an event.
    *
    * @param eventType the type of the event the payload belongs to
-   * @param eventPayload the payload as stored in the event, i.e. a JSON object or null
+   * @param eventPayload the payload, i.e. a JSON object or null. JSON null counts as null.
    * @return the payload, or empty if the event type has no payload
    * @throws IllegalArgumentException if the payload is not valid for the event type
    */
-  public static Optional<EventPayload> parsePayload(EventType eventType, String eventPayload) {
+  public static Optional<EventPayload> parsePayload(EventType eventType, JsonElement eventPayload) {
+    boolean absent = eventPayload == null || eventPayload.isJsonNull();
+    if (!absent && !eventPayload.isJsonObject()) {
+      throw new IllegalArgumentException("must be a JSON object or null");
+    }
+
     Class<? extends EventPayload> type = eventType.getPayloadType().orElse(null);
     if (type == null) {
-      if (eventPayload != null) {
+      if (!absent) {
         throw new IllegalArgumentException("unexpected payload");
       }
       return Optional.empty();
