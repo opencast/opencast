@@ -1,0 +1,15 @@
+meta {
+  name: get_group_invalid_id
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/groups/non-existent-group-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

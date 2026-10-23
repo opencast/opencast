@@ -1,0 +1,70 @@
+meta {
+  name: post_event
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/events
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  metadata: [{"flavor":"dublincore/episode","fields":[{"id":"title","value":"Lecture 1 - Introduction"}]}]
+  processing: {"workflow":"noop"}
+  acl: [{"allow":true,"action":"read","role":"ROLE_USER"},{"allow":true,"action":"write","role":"ROLE_ADMIN"}]
+}
+
+vars:post-response {
+  eventId: res.body.identifier
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    const axios = require('axios');
+    const id = res.getBody().identifier;
+    const base = bru.getEnvVar('baseUrl');
+    const auth = { username: bru.getEnvVar('username'), password: bru.getEnvVar('password') };
+    for (let i = 0; i < 30; i++) {
+      try {
+        const r = await axios.get(base + '/api/events/' + id, { auth });
+        if (['SUCCEEDED', 'FAILED', 'STOPPED'].includes(r.data.processing_state)) {
+          break;
+        }
+      } catch (e) {
+        // event not indexed yet, keep polling
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.identifier: isString
+}
+
+tests {
+  test("Create event response should have correct types", function() {
+    if (res.status === 201) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      expect(body.identifier).to.be.a('string');
+    } else if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(function(ev) {
+        expect(ev.identifier).to.be.a('string');
+      });
+    } else if (res.status === 409) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(function(conflict) {
+        expect(conflict.start).to.be.a('string');
+        expect(conflict.end).to.be.a('string');
+        expect(conflict.title).to.be.a('string');
+      });
+    }
+  });
+}

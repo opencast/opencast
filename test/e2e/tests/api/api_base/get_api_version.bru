@@ -1,0 +1,27 @@
+meta {
+  name: get_api_version
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/version
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.versions: isDefined
+  res.body.default: isString
+}
+
+tests {
+  test("Response versions array elements are strings", function() {
+    const responseData = res.getBody();
+    expect(responseData.versions).to.be.an('array');
+    responseData.versions.forEach(function(version) {
+      expect(version).to.be.a('string');
+    });
+  });
+}

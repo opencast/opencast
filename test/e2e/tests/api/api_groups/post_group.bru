@@ -1,0 +1,26 @@
+meta {
+  name: post_group
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/groups
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  name: Bruno_New_Group
+  description: A group created via Bruno test suite
+  roles: ROLE_USER
+  members: admin
+}
+
+vars:post-response {
+  groupId: "bruno_new_group"
+}
+
+assert {
+  res.status: in [201, 409]
+}

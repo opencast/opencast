@@ -1,0 +1,21 @@
+meta {
+  name: delete_event_acl_permission
+  type: http
+  seq: 20
+}
+
+delete {
+  url: {{baseUrl}}/api/events/:eventId/acl/:action/:role
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+  action: read
+  role: ROLE_USER
+}
+
+assert {
+  res.status: eq 204
+}

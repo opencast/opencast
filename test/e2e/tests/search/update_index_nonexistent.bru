@@ -1,0 +1,19 @@
+meta {
+  name: update_index_nonexistent
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{searchBaseUrl}}/search/updateIndex
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  id: nonexistent-event-123
+}
+
+assert {
+  res.status: eq 404
+}

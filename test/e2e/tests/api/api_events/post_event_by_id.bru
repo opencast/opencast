@@ -1,0 +1,41 @@
+meta {
+  name: post_event_by_id
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/api/events/:eventId
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:multipart-form {
+  metadata: [{"flavor":"dublincore/episode","fields":[{"id":"title","value":"Lecture 1 - Introduction (Updated)"}]}]
+}
+
+assert {
+  res.status: eq 204
+}
+
+tests {
+  test("Update event response should have correct types", function() {
+    if (res.status === 201) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      expect(body.identifier).to.be.a('string');
+    } else if (res.status === 409) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(function(conflict) {
+        expect(conflict.start).to.be.a('string');
+        expect(conflict.end).to.be.a('string');
+        expect(conflict.title).to.be.a('string');
+      });
+    }
+  });
+}

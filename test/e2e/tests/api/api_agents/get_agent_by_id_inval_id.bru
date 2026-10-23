@@ -1,0 +1,27 @@
+meta {
+  name: get_agent_by_id_inval_id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/agents/:agentId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  agentId: l|||
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Agent with illegal characters in the ID should not be found", function() {
+    // Currently fails: Opencast/Jetty returns 500 instead of 404 for
+    // unencoded illegal characters in the path.
+    expect(res.status).to.equal(404);
+  });
+}

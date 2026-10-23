@@ -1,0 +1,34 @@
+meta {
+  name: get_event_scheduling
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId/scheduling
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{scheduledEventId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Event scheduling properties should have correct types", function() {
+    const sched = res.getBody();
+    expect(sched).to.be.an('object');
+    expect(sched.agent_id).to.be.a('string');
+    expect(sched.agent_id).to.equal('bruno-sched-agent');
+    expect(sched.start).to.be.a('string');
+    expect(sched.end).to.be.a('string');
+    expect(sched.inputs).to.be.an('array');
+    sched.inputs.forEach(function(input) {
+      expect(input).to.be.a('string');
+    });
+  });
+}
