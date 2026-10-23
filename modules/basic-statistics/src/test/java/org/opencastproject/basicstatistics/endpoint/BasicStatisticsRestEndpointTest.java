@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Proxy;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -84,8 +85,8 @@ public class BasicStatisticsRestEndpointTest {
     };
     BasicStatisticsRestEndpoint endpoint = new BasicStatisticsRestEndpoint() {
       @Override
-      protected String readInputStream(HttpServletRequest request) {
-        return requestBody;
+      protected byte[] readInputStream(HttpServletRequest request, long maxBytes) {
+        return requestBody == null ? null : requestBody.getBytes(StandardCharsets.UTF_8);
       }
     };
     endpoint.setBasicStatisticsService(service);
@@ -314,6 +315,19 @@ public class BasicStatisticsRestEndpointTest {
     hashedIps.clear();
     responseBody(clientPush(null, event()));
     assertEquals(List.of(InetAddress.getByName("10.0.0.7")), hashedIps);
+  }
+
+  @Test
+  public void testClientPushIgnoresRequestsThatAreTooLargeWithoutSayingSo() {
+    JsonObject large = event();
+    large.addProperty("itemId", "x".repeat(9000));
+
+    // the answer is the same as for any request without events that are stored, there is no error
+    JsonObject response = responseBody(clientPush(null, large));
+
+    assertEquals(0, response.get("accepted").getAsInt());
+    assertEquals(0, response.getAsJsonArray("rejected").size());
+    assertTrue(stored.isEmpty());
   }
 
   @Test

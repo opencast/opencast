@@ -86,6 +86,9 @@ public class BasicStatisticsService implements FileFetchListener {
 
   private LocalDate configuredCompletenessThreshold;
 
+  /** Limits what clients can send to the client push endpoint. Until it is configured, the defaults are used. */
+  private volatile ClientPushRateLimiter clientPushRateLimiter = createClientPushRateLimiter(Map.of());
+
   /** Persistent storage */
   protected BasicStatisticsDatabaseService persistence;
 
@@ -145,6 +148,7 @@ public class BasicStatisticsService implements FileFetchListener {
   @Modified
   void modified(Map<String, Object> properties) {
     configuredCompletenessThreshold = parseCompletenessThreshold(properties);
+    clientPushRateLimiter = createClientPushRateLimiter(properties);
   }
 
   @Deactivate
@@ -159,6 +163,35 @@ public class BasicStatisticsService implements FileFetchListener {
       fileFetchExecutor.shutdownNow();
       Thread.currentThread().interrupt();
     }
+  }
+
+  public ClientPushRateLimiter getClientPushRateLimiter() {
+    return clientPushRateLimiter;
+  }
+
+  private ClientPushRateLimiter createClientPushRateLimiter(Map<String, Object> properties) {
+    // By default: 8 KiB per request, 512 KiB per minute and 8 MiB per hour
+    return new ClientPushRateLimiter(
+        parseLimit(properties, "ratelimit.request.bytes", 8 * 1024),
+        parseLimit(properties, "ratelimit.minute.bytes", 512 * 1024),
+        parseLimit(properties, "ratelimit.hour.bytes", 8 * 1024 * 1024));
+  }
+
+  private long parseLimit(Map<String, Object> properties, String key, long defaultValue) {
+    Object value = properties.get(key);
+    if (value == null) {
+      return defaultValue;
+    }
+    try {
+      long limit = Long.parseLong(value.toString().trim());
+      if (limit >= 0) {
+        return limit;
+      }
+    } catch (NumberFormatException e) {
+      // Handled like a negative number
+    }
+    logger.warn("Invalid {} '{}', using {}", key, value, defaultValue);
+    return defaultValue;
   }
 
   private LocalDate parseCompletenessThreshold(Map<String, Object> properties) {
