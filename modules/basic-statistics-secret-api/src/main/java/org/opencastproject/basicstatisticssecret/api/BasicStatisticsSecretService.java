@@ -20,10 +20,25 @@
  */
 package org.opencastproject.basicstatisticssecret.api;
 
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 public interface BasicStatisticsSecretService {
 
   /** Job type */
   String JOB_TYPE = "org.opencastproject.basicstatisticssecret";
 
   byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException;
+
+  /**
+   * The next time it is 4am, which is when the secret is replaced every day. A secret that was obtained at the given
+   * time must not be used anymore from the returned time on.
+   */
+  static Instant nextRotation(Instant now) {
+    ZonedDateTime time = now.atZone(ZoneId.systemDefault());
+    ZonedDateTime rotation = time.with(LocalTime.of(4, 0));
+    return (rotation.isAfter(time) ? rotation : rotation.plusDays(1)).toInstant();
+  }
 }
