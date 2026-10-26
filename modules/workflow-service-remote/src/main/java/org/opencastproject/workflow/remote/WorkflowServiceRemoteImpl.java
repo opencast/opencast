@@ -194,6 +194,10 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   public Optional<WorkflowInstance> getRunningWorkflowInstanceByMediaPackage(String mediaPackageId, String action)
           throws WorkflowException, UnauthorizedException {
 
+    // Without an action, the remote service would check a weaker permission (read) than the caller may expect
+    if (action == null) {
+      throw new IllegalArgumentException("The action must not be null");
+    }
     List<NameValuePair> queryStringParams = new ArrayList<>();
     queryStringParams.add(new BasicNameValuePair("action", action));
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/currentInstance.xml?"

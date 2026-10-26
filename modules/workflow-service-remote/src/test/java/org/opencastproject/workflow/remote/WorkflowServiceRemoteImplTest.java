@@ -91,6 +91,12 @@ public class WorkflowServiceRemoteImplTest {
     assertEquals("/mediaPackage/mp-1/currentInstance.xml?action=write", service.requestUri);
   }
 
+  // The remote service would use the default action (read) if there was none, and so check a weaker permission
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetRunningWorkflowInstanceWithoutActionIsRejected() throws Exception {
+    new CapturingWorkflowServiceRemoteImpl().getRunningWorkflowInstanceByMediaPackage("mp-1", null);
+  }
+
   @Test
   public void testGetRunningWorkflowInstanceNotFoundIsEmpty() throws Exception {
     CapturingWorkflowServiceRemoteImpl service = new CapturingWorkflowServiceRemoteImpl();
@@ -124,6 +130,7 @@ public class WorkflowServiceRemoteImplTest {
     } catch (UnauthorizedException e) {
       // expected
     }
+    assertEquals("/mediaPackage/mp-1/instances.xml", service.requestUri);
     assertTrue("403 must be accepted as a response", service.expectedStatuses.contains(SC_FORBIDDEN));
   }
 }

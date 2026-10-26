@@ -372,7 +372,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
       },
       responses = {
-          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package.")
+          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflows.")
       }
   )
   public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
@@ -389,7 +390,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
       },
       responses = {
-          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package.")
+          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflows.")
       }
   )
   public Response getWorkflowsOfMediaPackageAsXml(@PathParam("id") String mediaPackageId) {
@@ -421,6 +423,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unknown action."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflow."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.")
       }
   )
@@ -444,6 +447,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unknown action."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflow."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.")
       }
   )
@@ -467,7 +471,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       if (optWorkflowInstance.isPresent()) {
         return Response.ok(new JaxbWorkflowInstance(optWorkflowInstance.get())).build();
       } else {
-        return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.status(Status.NOT_FOUND).build();
       }
 
     } catch (UnauthorizedException e) {
