@@ -363,44 +363,26 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("mediaPackage/{id}/instances.json")
+  @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("mediaPackage/{id}/instances.{format:xml|json}")
   @RestQuery(name = "workflowsofmediapackage",
       description = "Returns the workflows for a media package",
-      returnDescription = "Returns the workflows that are associated with the media package as JSON.",
+      returnDescription = "Returns the workflows that are associated with the media package.",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING),
+          @RestParameter(name = "format", isRequired = true, type = STRING,
+              description = "The output format (json or xml) of the response body.")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflows.")
       }
   )
-  public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
-    return workflowsOfMediaPackage(mediaPackageId);
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("mediaPackage/{id}/instances.xml")
-  @RestQuery(name = "workflowsofmediapackagexml",
-      description = "Returns the workflows for a media package",
-      returnDescription = "Returns the workflows that are associated with the media package as XML.",
-      pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflows.")
-      }
-  )
-  public Response getWorkflowsOfMediaPackageAsXml(@PathParam("id") String mediaPackageId) {
-    return workflowsOfMediaPackage(mediaPackageId);
-  }
-
-  private Response workflowsOfMediaPackage(String mediaPackageId) {
+  public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId,
+      @PathParam("format") String format) {
     try {
-      return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
+      return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId)))
+          .type(toMediaType(format)).build();
     } catch (UnauthorizedException e) {
       return Response.status(Status.FORBIDDEN).build();
     } catch (WorkflowDatabaseException e) {
@@ -409,13 +391,16 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   }
 
   @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("mediaPackage/{id}/currentInstance.json")
+  @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("mediaPackage/{id}/currentInstance.{format:xml|json}")
   @RestQuery(name = "currentworkflowofmediapackage",
       description = "Returns the current workflow for a media package",
-      returnDescription = "Returns the currentworkflow that are associated with the media package as JSON.",
+      returnDescription = "Returns the current workflow that is associated with the media package.",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING),
+          @RestParameter(name = "format", isRequired = true, type = STRING,
+              description = "The output format (json or xml) of the response body.")
+      },
       restParameters = {
           @RestParameter(name = "action", isRequired = false, type = STRING, defaultValue = "read",
               description = "The permission the user needs on the workflow: read, write or contribute")
@@ -428,35 +413,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
   )
   public Response getRunningWorkflowOfMediaPackage(@PathParam("id") String mediaPackageId,
-      @QueryParam("action") String action) {
-    return runningWorkflowOfMediaPackage(mediaPackageId, action);
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("mediaPackage/{id}/currentInstance.xml")
-  @RestQuery(name = "currentworkflowofmediapackagexml",
-      description = "Returns the current workflow for a media package",
-      returnDescription = "Returns the current workflow that is associated with the media package as XML.",
-      pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
-      restParameters = {
-          @RestParameter(name = "action", isRequired = false, type = STRING, defaultValue = "read",
-              description = "The permission the user needs on the workflow: read, write or contribute")
-      },
-      responses = {
-          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unknown action."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not authorized to access the workflow."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.")
-      }
-  )
-  public Response getRunningWorkflowOfMediaPackageAsXml(@PathParam("id") String mediaPackageId,
-      @QueryParam("action") String action) {
-    return runningWorkflowOfMediaPackage(mediaPackageId, action);
-  }
-
-  private Response runningWorkflowOfMediaPackage(String mediaPackageId, String action) {
+      @PathParam("format") String format, @QueryParam("action") String action) {
     final Permissions.Action requiredAction;
     try {
       requiredAction = StringUtils.isBlank(action)
@@ -469,7 +426,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       Optional<WorkflowInstance> optWorkflowInstance = service
           .getRunningWorkflowInstanceByMediaPackage(mediaPackageId, requiredAction.toString());
       if (optWorkflowInstance.isPresent()) {
-        return Response.ok(new JaxbWorkflowInstance(optWorkflowInstance.get())).build();
+        return Response.ok(new JaxbWorkflowInstance(optWorkflowInstance.get())).type(toMediaType(format)).build();
       } else {
         return Response.status(Status.NOT_FOUND).build();
       }
@@ -479,6 +436,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (WorkflowException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /** The media type of a response in the given format, which is either "json" or "xml" */
+  private static String toMediaType(String format) {
+    return "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
   }
 
   @GET
