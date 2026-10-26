@@ -224,24 +224,25 @@ public final class UrlSupport {
   }
 
   /**
-   * Returns the URI as a string, without its query. A fragment is kept. The URI is not decoded or normalized, so that
-   * the result can be compared with other URIs, e.g. to look up a file. This is useful when the query is not part of
-   * the identity of a resource, like the signature that stream security adds to a URL.
+   * Returns the URI as a string, without its query and fragment. The URI is not decoded or normalized, so that the
+   * result can be compared with other URIs, e.g. to look up a file. This is useful when query and fragment are not part
+   * of the identity of a resource, like the signature that stream security adds to a URL.
    *
    * @param uri
    *          the uri
-   * @return the uri without the query
+   * @return the uri without query and fragment
    */
-  public static String withoutQuery(URI uri) {
+  public static String withoutQueryAndFragment(URI uri) {
     final String uriString = uri.toString();
-    if (uri.getRawQuery() == null) {
-      return uriString;
+    int end = uriString.length();
+    if (uri.getRawFragment() != null) {
+      end = uriString.indexOf('#');
     }
-    final int queryStart = uriString.indexOf('?');
-    final int fragmentStart = uriString.indexOf('#', queryStart);
-    return fragmentStart < 0
-        ? uriString.substring(0, queryStart)
-        : uriString.substring(0, queryStart) + uriString.substring(fragmentStart);
+    // A question mark after the start of the fragment is not a query
+    if (uri.getRawQuery() != null) {
+      end = Math.min(end, uriString.indexOf('?'));
+    }
+    return uriString.substring(0, end);
   }
 
 }

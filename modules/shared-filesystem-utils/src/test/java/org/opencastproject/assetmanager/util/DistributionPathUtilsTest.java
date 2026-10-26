@@ -63,12 +63,21 @@ public class DistributionPathUtilsTest {
     assertEquals(distributedFile.getAbsoluteFile(), getLocalFile(FILE_URL).getAbsoluteFile());
   }
 
-  // Stream security adds a query to the URLs, which is not part of the path of the file
+  // Stream security adds a query to the URLs, which is not part of the path of the file, and neither is a fragment
   @Test
-  public void testGetLocalFileIgnoresQuery() {
-    String signed = FILE_URL + "?policy=eyJTdGF0ZW1lbnQiOnt9fQ&keyId=mh_default_org&signature=abc123";
+  public void testGetLocalFileIgnoresQueryAndFragment() {
+    String query = "?policy=eyJTdGF0ZW1lbnQiOnt9fQ&keyId=mh_default_org&signature=abc123";
 
-    assertEquals(distributedFile.getAbsoluteFile(), getLocalFile(signed).getAbsoluteFile());
+    for (String uri : new String[]{FILE_URL + query, FILE_URL + "#t=10", FILE_URL + query + "#t=10"}) {
+      assertEquals(uri, distributedFile.getAbsoluteFile(), getLocalFile(uri).getAbsoluteFile());
+    }
+  }
+
+  // If only the download directory is configured, there is no local file, and the file has to be downloaded
+  @Test
+  public void testGetLocalFileWithoutDownloadUrl() {
+    assertNull(DistributionPathUtils.getLocalFile(downloadDirectory.getAbsolutePath(), null, ORGANIZATION,
+        URI.create(FILE_URL)));
   }
 
   @Test

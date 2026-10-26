@@ -99,11 +99,13 @@ public final class DistributionPathUtils {
 
 
   /**
-   * Splits up a distribution URI and returns a local path instead. A query of the URI, e.g. from stream security, is
-   * ignored, as it is not part of the path of the file.
+   * Splits up a distribution URI and returns a local path instead. A query of the URI, e.g. from stream security, and
+   * a fragment are ignored, as they are not part of the path of the file.
    *
    * @param localPath
    *          Path to the local distribution directory
+   * @param downloadUrl
+   *          URL of the distribution download. If it is not configured, there is no local file.
    * @param organizationId
    *          Organization identifier
    * @param uri
@@ -116,10 +118,11 @@ public final class DistributionPathUtils {
       final String organizationId,
       final URI uri
   ) {
-    // The query, e.g. the signature of stream security, is not part of the path of the file
-    final String uriString = UrlSupport.withoutQuery(uri);
+    // The query, e.g. the signature of stream security, and the fragment are not part of the path of the file
+    final String uriString = UrlSupport.withoutQueryAndFragment(uri);
 
     if (localPath == null
+            || downloadUrl == null
             || organizationId == null
             || !uriString.startsWith(downloadUrl)) {
       return null;

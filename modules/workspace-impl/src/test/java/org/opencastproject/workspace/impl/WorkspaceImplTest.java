@@ -27,6 +27,7 @@ import static org.easymock.EasyMock.expect;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.PathMappable;
@@ -52,6 +53,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -133,14 +135,18 @@ public class WorkspaceImplTest {
 
   /** Set up a working file repository on the file system with one file, from which no file may be downloaded */
   private void setUpWorkingFileRepositoryWithFile(String path, String content) throws Exception {
-    File repoDirectory = testFolder.newFolder("repository");
+    setUpWorkingFileRepositoryWithFile(path, content, "http://localhost:8080/files/");
+  }
+
+  private void setUpWorkingFileRepositoryWithFile(String path, String content, String urlPrefix) throws Exception {
+    File repoDirectory = testFolder.newFolder();
     File file = new File(repoDirectory, path);
     FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
 
     PathMappableRepository repo = EasyMock.createNiceMock(PathMappableRepository.class);
     EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
     EasyMock.expect(repo.getPathPrefix()).andReturn(repoDirectory.getAbsolutePath()).anyTimes();
-    EasyMock.expect(repo.getUrlPrefix()).andReturn("http://localhost:8080/files/").anyTimes();
+    EasyMock.expect(repo.getUrlPrefix()).andReturn(urlPrefix).anyTimes();
     EasyMock.replay(repo);
     workspace.setRepository(repo);
 
@@ -157,14 +163,19 @@ public class WorkspaceImplTest {
     workspace.setTrustedHttpClient(httpClient);
   }
 
-  // Stream security adds a query to the URLs, which is not part of the path of the file. The file must be taken from
-  // the working file repository directly, as it is without the query, and not be downloaded.
+  /** The URL, and the URL with a stream security query, a fragment, and both */
+  private static String[] withQueryAndFragment(String url) {
+    return new String[]{url, url + STREAM_SECURITY_QUERY, url + "#t=10", url + STREAM_SECURITY_QUERY + "#t=10"};
+  }
+
+  // Stream security adds a query to the URLs, which is not part of the path of the file, and neither is a fragment. The
+  // file must be taken from the working file repository directly, as it is without them, and not be downloaded.
   @Test
   public void testGetWithQueryUsesFileInWorkingFileRepository() throws Exception {
     setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>");
     String url = "http://localhost:8080/files/mediapackage/mp1/element1/xacml.xml";
 
-    for (String uri : new String[]{url, url + STREAM_SECURITY_QUERY}) {
+    for (String uri : withQueryAndFragment(url)) {
       File file = workspace.get(new URI(uri));
       Assert.assertEquals(uri, "<policy/>", FileUtils.readFileToString(file, StandardCharsets.UTF_8));
     }
@@ -175,11 +186,71 @@ public class WorkspaceImplTest {
     setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>");
     String url = "http://localhost:8080/files/mediapackage/mp1/element1/xacml.xml";
 
-    for (String uri : new String[]{url, url + STREAM_SECURITY_QUERY}) {
+    for (String uri : withQueryAndFragment(url)) {
       try (InputStream in = workspace.read(new URI(uri))) {
         Assert.assertEquals(uri, "<policy/>", IOUtils.toString(in, StandardCharsets.UTF_8));
       }
     }
+  }
+
+  /** Replace the HTTP client by one that records the request and fails the download, as there is no network */
+  private Capture<HttpUriRequest> expectFailingDownload() throws Exception {
+    Capture<HttpUriRequest> request = EasyMock.newCapture();
+    TrustedHttpClient httpClient = EasyMock.createMock(TrustedHttpClient.class);
+    EasyMock.expect(httpClient.execute(EasyMock.capture(request)))
+            .andThrow(new TrustedHttpClientException(new IOException("no network"))).once();
+    EasyMock.replay(httpClient);
+    workspace.setTrustedHttpClient(httpClient);
+    return request;
+  }
+
+  // The query is only left out when looking for a local file. A file that has to be downloaded is requested with it,
+  // as it contains the signature of stream security.
+  @Test
+  public void testGetOfMissingFileWithQueryDownloadsWithQuery() throws Exception {
+    setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>");
+    Capture<HttpUriRequest> request = expectFailingDownload();
+    String uri = "http://localhost:8080/files/mediapackage/mp1/element1/missing.xml" + STREAM_SECURITY_QUERY;
+
+    try {
+      workspace.get(new URI(uri));
+      Assert.fail("The file is not available, so the download should fail");
+    } catch (NotFoundException e) {
+      // expected
+    }
+    Assert.assertEquals(uri, request.getValue().getURI().toString());
+  }
+
+  @Test
+  public void testReadOfMissingFileWithQueryDownloadsWithQuery() throws Exception {
+    setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>");
+    Capture<HttpUriRequest> request = expectFailingDownload();
+    String uri = "http://localhost:8080/files/mediapackage/mp1/element1/missing.xml" + STREAM_SECURITY_QUERY;
+
+    try {
+      workspace.read(new URI(uri));
+      Assert.fail("The file is not available, so the download should fail");
+    } catch (NotFoundException e) {
+      // expected
+    }
+    Assert.assertEquals(uri, request.getValue().getURI().toString());
+  }
+
+  // If the working file repository has no URL prefix, its files cannot be found on the file system. Files have to be
+  // downloaded then, like in get(), instead of failing.
+  @Test
+  public void testReadWithoutUrlPrefixOfWorkingFileRepositoryDownloads() throws Exception {
+    setUpWorkingFileRepositoryWithFile("mediapackage/mp1/element1/xacml.xml", "<policy/>", null);
+    Capture<HttpUriRequest> request = expectFailingDownload();
+    String uri = "http://localhost:8080/files/mediapackage/mp1/element1/xacml.xml";
+
+    try {
+      workspace.read(new URI(uri));
+      Assert.fail("The file is not available, so the download should fail");
+    } catch (NotFoundException e) {
+      // expected
+    }
+    Assert.assertEquals(uri, request.getValue().getURI().toString());
   }
 
   // Calls to put() should put the file into the working file repository, but not in the local cache if there's a valid
