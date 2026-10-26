@@ -21,6 +21,8 @@
 
 package org.opencastproject.assetmanager.util;
 
+import org.opencastproject.util.UrlSupport;
+
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -115,11 +117,7 @@ public final class DistributionPathUtils {
       final URI uri
   ) {
     // The query, e.g. the signature of stream security, is not part of the path of the file
-    String uriString = uri.toString();
-    final int queryStart = uriString.indexOf('?');
-    if (queryStart >= 0) {
-      uriString = uriString.substring(0, queryStart);
-    }
+    final String uriString = UrlSupport.withoutQuery(uri);
 
     if (localPath == null
             || organizationId == null
