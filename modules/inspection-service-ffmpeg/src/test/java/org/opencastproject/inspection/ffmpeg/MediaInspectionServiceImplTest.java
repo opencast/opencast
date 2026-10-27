@@ -22,6 +22,7 @@
 package org.opencastproject.inspection.ffmpeg;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -119,6 +120,20 @@ public class MediaInspectionServiceImplTest {
       assertEquals(0, track.getStreams().length);
       assertEquals("mp4", track.getMimeType().getSubtype());
       assertEquals(null, track.getDuration());
+    }
+  }
+
+  /** Cover art in an audio file is a picture attached to it, not a video stream */
+  @Test
+  public void testInspectionIgnoresAttachedPicture() throws Exception {
+    final URI trackUri = getResource("/coverart.mp3");
+    Optional<MediaInspector> mi = init(trackUri);
+    if (mi.isPresent()) {
+      final Track track = mi.get().inspectTrack(trackUri, Options.NO_OPTION);
+      assertTrue(track.hasAudio());
+      assertFalse(track.hasVideo());
+      assertEquals(1, track.getStreams().length);
+      assertEquals("audio", track.getMimeType().getType());
     }
   }
 
