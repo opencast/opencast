@@ -1,7 +1,15 @@
 Opencast 19 Changelog
 ---------------------
 
-## Opencast 19.9 (2026-08-22)
+## Opencast 19.10 (2026-10-28)
+- [[#8159](https://github.com/opencast/opencast/pull/8159)] -
+  Opencast 19.10 release notes
+- [[#8129](https://github.com/opencast/opencast/pull/8129)] -
+  Switch graphql-ui to vite
+- [[#8063](https://github.com/opencast/opencast/pull/8063)] -
+  Update Karaf to v4.4.12
+
+## Opencast 19.9 (2026-09-22)
 - [[#8053](https://github.com/opencast/opencast/pull/8053)] -
   19.9 changelog
 - [[#7943](https://github.com/opencast/opencast/pull/7943)] -
@@ -20,7 +28,6 @@ Opencast 19 Changelog
   Fix intermittent SchedulerServiceImplTest failures
 - [[#7786](https://github.com/opencast/opencast/pull/7786)] -
   Adopter registration backend fixes
-
 
 ## Opencast 19.8 (2026-08-12)
 - [[#7912](https://github.com/opencast/opencast/pull/7912)] -
