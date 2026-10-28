@@ -40,14 +40,13 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
-import java.util.Dictionary;
+import java.util.Map;
 import java.util.Objects;
 
 /** OSGi bound implementation. */
@@ -274,13 +273,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   @Activate
   @Modified
-  public void modified(ComponentContext cc) {
-    Dictionary<String, Object> properties = cc.getProperties();
-    if (properties == null) {
-      logger.info("No configuration available, using defaults");
-      return;
-    }
-
+  public void modified(Map<String, Object> properties) {
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
