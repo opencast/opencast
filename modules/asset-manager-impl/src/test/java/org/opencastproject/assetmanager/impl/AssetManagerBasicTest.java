@@ -144,14 +144,14 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     assertTrue("The property should be set", am.setProperty(p.start(mpId, d1)));
     logger.info("Select all properties of the media package");
     {
-      List<Property> properties = am.selectProperties(mpId, null);
+      List<Property> properties = nonSecurityProperties(am.selectProperties(mpId, null));
       assertEquals("One property should be found", 1, properties.size());
       assertEquals("Value check", d1, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
     logger.info("Update the property");
     assertTrue("The property should be updated", am.setProperty(p.start(mpId, d2)));
     {
-      List<Property> properties = am.selectProperties(mpId, null);
+      List<Property> properties = nonSecurityProperties(am.selectProperties(mpId, null));
       assertEquals("One property should be found", 1, properties.size());
       assertEquals("Value check", d2, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
@@ -162,7 +162,7 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     assertTrue("The property should be updated", am.setProperty(p.start(mpId, d3)));
     {
       List<Snapshot> snapshots = am.getSnapshotsById(mpId);
-      List<Property> properties = am.selectProperties(mpId, null);
+      List<Property> properties = nonSecurityProperties(am.selectProperties(mpId, null));
       assertEquals("Two records should be found since there are now two versions of the media package and no"
                   + "version restriction has been applied",
                    2, snapshots.size());
