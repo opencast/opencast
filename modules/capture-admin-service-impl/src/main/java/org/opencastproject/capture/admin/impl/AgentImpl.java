@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -330,6 +331,153 @@ public class AgentImpl implements Agent {
     return deviceCaps;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#canCaptureLocal()
+   */
+  @Override
+  public boolean canCaptureLocal() {
+    if (getVersion().equals(AgentVersion.VERSION_1)) {
+      // Version 1.0 agents *must* support local capture
+      return true;
+    }
+    return capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, BOOLEAN_OFF).equals(BOOLEAN_ON);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#canStartLocalPaused()
+   */
+  @Override
+  public boolean canStartLocalPaused() {
+    return canCaptureLocal()
+        && capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_OFF).equals(BOOLEAN_ON);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#canStream()
+   */
+  @Override
+  public boolean canStream() {
+    return capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF).equals(BOOLEAN_ON);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#canStartStreamPaused()
+   */
+  @Override
+  public boolean canStartStreamPaused() {
+    return canStream()
+        && capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF).equals(BOOLEAN_ON);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#canStartStreamPaused()
+   */
+  @Override
+  public Set<String> getInputs() {
+    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "")
+        .split(","))
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#streamConfigurations()
+   */
+  @Override
+  public Set<String> streamConfigurations() {
+    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "")
+        .split(","))
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#devicePositions()
+   */
+  @Override
+  public Set<String> devicePositions() {
+    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "")
+        .split(","))
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#contentConfigurations()
+   */
+  @Override
+  public Set<String> contentConfigurations() {
+    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "")
+            .split(","))
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#vendorKeys()
+   */
+  @Override
+  public Map<String, String> vendorKeys() {
+    return capabilitiesProperties.stringPropertyNames().stream()
+        .filter(s -> s.startsWith(CaptureParameters.CAPTURE_EXTENSION_PREFIX))
+        .collect(Collectors.toUnmodifiableMap(
+            key -> key,
+            capabilitiesProperties::getProperty));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#getVendor()
+   */
+  @Override
+  public String getVendor() {
+    return configurationProperties.getProperty(CaptureParameters.VENDOR_NAME, "");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#getModel()
+   */
+  @Override
+  public String getModel() {
+    return configurationProperties.getProperty(CaptureParameters.VENDOR_MODEL, "");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#getHardware()
+   */
+  @Override
+  public String getHardware() {
+    return configurationProperties.getProperty(CaptureParameters.VENDOR_HARDWARE, "");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#getFirmware()
+   */
+  @Override
+  public String getFirmware() {
+    return configurationProperties.getProperty(CaptureParameters.VENDOR_FIRMWARE, "");
+  }
 
   /**
    * {@inheritDoc}
