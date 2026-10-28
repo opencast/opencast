@@ -1,5 +1,10 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.10
+
+This version contains minor updates for the admin, and editor submodules.  This release also updates Karaf to
+[4.4.12](https://lists.apache.org/thread/wc4nszwz0csvzc3hwmxsg36zldh1nxq3), which addresses some security issues.
+
 ## Opencast 19.9
 
 This version contains minor updates for the admin, editor, and studio submodules, along with the usual collection of
