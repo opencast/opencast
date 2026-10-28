@@ -43,9 +43,9 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +53,9 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import javax.persistence.EntityManager;
@@ -72,13 +72,12 @@ import javax.persistence.TypedQuery;
  */
 @Component(
     immediate = true,
-    service = { UserTrackingService.class,ManagedService.class },
+    service = { UserTrackingService.class },
     property = {
-        "service.description=User Tracking Service",
-        "service.pid=org.opencastproject.usertracking.impl.UserTrackingServiceImpl"
+        "service.description=User Tracking Service"
     }
 )
-public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
+public class UserTrackingServiceImpl implements UserTrackingService {
 
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.usertracking";
@@ -117,20 +116,19 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   /**
    * Activation callback to be executed once all dependencies are set
+   *
+   * @param props
+   *          the configuration properties
    */
   @Activate
-  public void activate() {
+  public void activate(Map<String, Object> props) throws ConfigurationException {
     logger.debug("activate()");
     db = dbSessionFactory.createSession(emf);
+    updated(props);
   }
 
-  @Override
-  public void updated(Dictionary props) throws ConfigurationException {
-    if (props == null) {
-      logger.debug("Null properties in user tracking service, not doing detailed logging");
-      return;
-    }
-
+  @Modified
+  public void updated(Map<String, Object> props) throws ConfigurationException {
     Object val = props.get(DETAILED_TRACKING);
     if (val != null && String.class.isInstance(val)) {
       detailedTracking = Boolean.valueOf((String) val);
