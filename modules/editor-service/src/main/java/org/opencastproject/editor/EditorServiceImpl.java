@@ -115,7 +115,6 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -295,12 +294,7 @@ public class EditorServiceImpl implements EditorService {
 
   @Activate
   @Modified
-  public void activate(ComponentContext cc) {
-    Dictionary<String, Object> properties = cc.getProperties();
-    if (properties == null) {
-      return;
-    }
-
+  public void activate(ComponentContext cc, Map<String, Object> properties) {
     expireSeconds =  UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,this.getClass().getSimpleName());
     // Preview tag
