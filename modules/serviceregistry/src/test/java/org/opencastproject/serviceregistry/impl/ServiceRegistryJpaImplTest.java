@@ -80,8 +80,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -150,7 +152,7 @@ public class ServiceRegistryJpaImplTest {
         logger.debug("Ignoring exception {}", e.getMessage());
       }
     }
-    serviceRegistryJpaImpl.activate(null);
+    serviceRegistryJpaImpl.activate(null, new HashMap<>());
     unregisterTestHostAndServices();
     registerTestHostAndService();
 
@@ -253,7 +255,7 @@ public class ServiceRegistryJpaImplTest {
     jobDispatcher.setUserDirectoryService(userDirectoryService);
     jobDispatcher.setTrustedHttpClient(trustedHttpClient);
     try {
-      serviceRegistryJpaImpl.activate(null);
+      serviceRegistryJpaImpl.activate(null, new HashMap<>());
       jobDispatcher.activate(cc);
     } catch (ConfigurationException e) {
       Assert.fail("Job dispatcher activation failed" + e);
@@ -336,7 +338,7 @@ public class ServiceRegistryJpaImplTest {
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
 
     // reactivate and expect local undispatchable job to be canceled, but not the remote job
-    serviceRegistryJpaImpl.activate(null);
+    serviceRegistryJpaImpl.activate(null, new HashMap<>());
     logger.info("Undispatachable job 1 " + undispatchableJob1.getId());
     undispatchableJob1 = serviceRegistryJpaImpl.getJob(undispatchableJob1.getId());
     assertEquals(Status.CANCELLED, undispatchableJob1.getStatus());
@@ -523,7 +525,7 @@ public class ServiceRegistryJpaImplTest {
   @Test
   public void testErrorState() throws Exception {
     // set max attempts to 1
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "1");
     serviceRegistryJpaImpl.updated(properties);
 
@@ -551,7 +553,7 @@ public class ServiceRegistryJpaImplTest {
   @Test
   public void testDisablingErrorState() throws Exception {
     // disable error states
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "-1");
     serviceRegistryJpaImpl.updated(properties);
 
@@ -579,7 +581,7 @@ public class ServiceRegistryJpaImplTest {
   @Test
   public void testDisablingErrorStateForService() throws Exception {
     // disable error states for one service
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "1");
     properties.put(ServiceRegistryJpaImpl.NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY,
         TEST_SERVICE_2 + ", " + TEST_SERVICE_3);

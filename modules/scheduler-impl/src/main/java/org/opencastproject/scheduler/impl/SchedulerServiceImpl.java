@@ -101,10 +101,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -123,7 +123,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -145,12 +144,12 @@ import java.util.stream.Collectors;
  * Implementation of {@link SchedulerService}.
  */
 @Component(
-    service = { ManagedService.class, SchedulerService.class, IndexProducer.class },
+    service = { SchedulerService.class, IndexProducer.class },
     property = {
         "service.description=Scheduler Service"
     }
 )
-public class SchedulerServiceImpl extends AbstractIndexProducer implements SchedulerService, ManagedService {
+public class SchedulerServiceImpl extends AbstractIndexProducer implements SchedulerService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
@@ -365,31 +364,30 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @throws Exception
    */
   @Activate
-  public void activate(ComponentContext cc) throws Exception {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws Exception {
     this.componentContext = cc;
     systemUserName = SecurityUtil.getSystemUserName(cc);
     logger.info("Activating Scheduler Service");
+    updated(properties);
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties != null) {
-      final Optional<Integer> cacheExpireDuration =
-          OsgiUtil.getOptCfgAsInt(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE);
-      if (cacheExpireDuration.isPresent()) {
-        lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
-                .build();
-        logger.info("Set last modified cache to {}", DateTimeSupport.humanReadableTime(cacheExpireDuration.get()));
-      } else {
-        logger.info("Set last modified cache to default {}", DateTimeSupport.humanReadableTime(DEFAULT_CACHE_EXPIRE));
-      }
-      final Optional<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
-      if (maintenance.orElse(false)) {
-        final String name = SchedulerServiceImpl.class.getName();
-        logger.warn("Putting scheduler into maintenance mode. This only makes sense when migrating data. If this is not"
-                + " intended, edit the config file '{}.cfg' accordingly and restart opencast.", name);
-        componentContext.disableComponent(name);
-      }
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
+    final Optional<Integer> cacheExpireDuration =
+        OsgiUtil.getOptCfgAsInt(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE);
+    if (cacheExpireDuration.isPresent()) {
+      lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
+              .build();
+      logger.info("Set last modified cache to {}", DateTimeSupport.humanReadableTime(cacheExpireDuration.get()));
+    } else {
+      logger.info("Set last modified cache to default {}", DateTimeSupport.humanReadableTime(DEFAULT_CACHE_EXPIRE));
+    }
+    final Optional<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
+    if (maintenance.orElse(false)) {
+      final String name = SchedulerServiceImpl.class.getName();
+      logger.warn("Putting scheduler into maintenance mode. This only makes sense when migrating data. If this is not"
+              + " intended, edit the config file '{}.cfg' accordingly and restart opencast.", name);
+      componentContext.disableComponent(name);
     }
   }
 
