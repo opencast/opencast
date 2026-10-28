@@ -129,12 +129,13 @@ public final class AssetPathUtils {
     final String mediaPackageElementID = assetPath[4];
     final String version = assetPath[5];
     final String filename = mediaPackageElementID + '.' + FilenameUtils.getExtension(assetPath[6]);
-    // Check under which path the mediapackage exists
+    // Check under which path the mediapackage exists. Like the asset store, use the first match.
     String localPath = null;
     for (String path : localPaths) {
       Path dirPath = Path.of(path, organizationId, mediaPackageID);
       if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
         localPath = path;
+        break;
       }
     }
     // if remote asset stores are used, localPath could be null (i.e. all snapshots live remotely)
