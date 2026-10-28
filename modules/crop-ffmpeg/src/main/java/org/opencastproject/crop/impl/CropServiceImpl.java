@@ -42,9 +42,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +57,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,12 +75,12 @@ import java.util.regex.Pattern;
  */
 @Component(
     immediate = true,
-    service = { CropService.class,ManagedService.class },
+    service = { CropService.class },
     property = {
         "service.description=Video Scale Service"
     }
 )
-public class CropServiceImpl extends AbstractJobProducer implements CropService, ManagedService {
+public class CropServiceImpl extends AbstractJobProducer implements CropService {
 
   /**
    * Resulting collection in the working file repository
@@ -204,12 +205,13 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     this.regexPattern = Pattern.compile(DEFAULT_CROP_FFMPEG_REGEX);
   }
 
-  @Override
-  public void activate(ComponentContext cc) {
+  @Activate
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
     this.binary = StringUtils.defaultIfBlank(path, FFMPEG_BINARY_DEFAULT);
     logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, binary);
+    updated(properties);
   }
 
   private Track startCropping(Track track) throws CropException {
@@ -378,15 +380,15 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   }
 
   /**
-   * {@inheritDoc}
+   * OSGi callback when the configuration is updated.
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * @param dictionary
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
-  public void updated(Dictionary<String, ?> dictionary) throws ConfigurationException {
-    if (dictionary == null) {
-      return;
-    }
+  @Modified
+  public void updated(Map<String, Object> dictionary) throws ConfigurationException {
     logger.debug("Configuring the cropper");
 
     if (dictionary.get(CROP_FFMPEG_GREYSCALE_LIMIT) != null) {
