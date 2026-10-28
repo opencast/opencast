@@ -63,11 +63,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,11 +81,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -97,12 +96,12 @@ import javax.xml.bind.JAXBException;
  */
 @Component(
     immediate = true,
-    service = { VideoEditorService.class,ManagedService.class },
+    service = { VideoEditorService.class },
     property = {
         "service.description=Video Editor Service"
     }
 )
-public class VideoEditorServiceImpl extends AbstractJobProducer implements VideoEditorService, ManagedService {
+public class VideoEditorServiceImpl extends AbstractJobProducer implements VideoEditorService {
 
   public static final String JOB_LOAD_KEY = "job.load.videoeditor";
 
@@ -602,12 +601,12 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     return organizationDirectoryService;
   }
 
-  @Override
   @Activate
-  public void activate(ComponentContext context) {
+  public void activate(ComponentContext context, Map<String, Object> properties) throws ConfigurationException {
     logger.debug("activating...");
     super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
+    updated(properties);
   }
 
   @Deactivate
@@ -615,19 +614,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("deactivating...");
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     this.properties = new Properties();
-    if (properties == null) {
-      logger.info("No configuration available, using defaults");
-      return;
-    }
-
-    Enumeration<String> keys = properties.keys();
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      this.properties.put(key, properties.get(key));
-    }
+    this.properties.putAll(properties);
     logger.debug("Properties updated!");
 
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);

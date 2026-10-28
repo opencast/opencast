@@ -26,6 +26,8 @@ import org.opencastproject.execute.api.ExecuteService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -43,8 +45,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test suite for the Execute Service
@@ -66,7 +69,8 @@ public class ExecuteServiceImplTest {
   private static String configKey2;
 
   @BeforeClass
-  public static void prepareTest() throws URISyntaxException, NotFoundException, IOException {
+  public static void prepareTest() throws URISyntaxException, NotFoundException, IOException,
+          ServiceRegistryException {
     // Get the base directory
     baseDirURI = ExecuteServiceImplTest.class.getResource("/").toURI();
     baseDir = new File(baseDirURI);
@@ -81,14 +85,17 @@ public class ExecuteServiceImplTest {
     EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     configKey2 = "edu.harvard.dce.param2";
     String configValue2 = baseDir.getAbsolutePath() + "/test.txt";
-    Hashtable<String, Object> props = new Hashtable<>();
+    Map<String, Object> props = new HashMap<>();
     props.put(configKey2, configValue2);
-    EasyMock.expect(cc.getProperties()).andReturn(props);
     EasyMock.replay(cc);
 
     // Create the executor service
+    ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(new ArrayList<>()).anyTimes();
+    EasyMock.replay(serviceRegistry);
     executor = new ExecuteServiceImpl();
-    executor.activate(cc);
+    executor.setServiceRegistry(serviceRegistry);
+    executor.activate(cc, props);
 
     // Create a mock workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);

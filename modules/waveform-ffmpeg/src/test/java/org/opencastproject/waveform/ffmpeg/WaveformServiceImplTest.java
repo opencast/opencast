@@ -48,8 +48,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -90,7 +90,7 @@ public class WaveformServiceImplTest {
    */
   @Test
   public void testUpdated() throws Exception {
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(WaveformServiceImpl.WAVEFORM_COLOR_CONFIG_KEY, "blue green 0x2A2A2A 323232CC");
     properties.put(WaveformServiceImpl.WAVEFORM_SPLIT_CHANNELS_CONFIG_KEY, "false");
     properties.put(WaveformServiceImpl.WAVEFORM_SCALE_CONFIG_KEY, "lin");

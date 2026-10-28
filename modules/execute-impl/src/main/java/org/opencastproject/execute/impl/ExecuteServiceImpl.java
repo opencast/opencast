@@ -47,7 +47,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -63,9 +62,9 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,13 +74,12 @@ import java.util.regex.Pattern;
  */
 @Component(
     immediate = true,
-    service = { ExecuteService.class,ManagedService.class },
+    service = { ExecuteService.class },
     property = {
-        "service.description=Execute Service",
-        "service.pid=org.opencastproject.execute.impl.ExecuteServiceImpl"
+        "service.description=Execute Service"
     }
 )
-public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteService, ManagedService {
+public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteService {
 
   public enum Operation {
     Execute_Element, Execute_Mediapackage
@@ -118,8 +116,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   private BundleContext bundleContext;
 
   /** To allow command-line parameter substitutions configured at the service level */
-  @SuppressWarnings("rawtypes")
-  private Dictionary properties = null;
+  private Map<String, Object> properties = null;
 
   /** The approximate load placed on the system by running an execute operation */
   public static final float DEFAULT_EXECUTE_JOB_LOAD = 0.1f;
@@ -140,24 +137,26 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * Activates this component with its properties once all of the collaborating services have been set
    *
    * @param cc
-   *          The component's context, containing the properties used for configuration
+   *          The component's context
+   * @param properties
+   *          The configuration properties
    */
-  @Override
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) {
     super.activate(cc);
 
-    properties = cc.getProperties();
+    this.properties = properties;
 
-    if (properties != null) {
-      String commandString = (String) properties.get(COMMANDS_ALLOWED_PROPERTY);
-      if (StringUtils.isNotBlank(commandString)) {
-        logger.info("Execute Service permitted commands: {}", commandString);
-        for (String command : commandString.split("\\s+")) {
-          allowedCommands.add(command);
-        }
+    String commandString = (String) properties.get(COMMANDS_ALLOWED_PROPERTY);
+    if (StringUtils.isNotBlank(commandString)) {
+      logger.info("Execute Service permitted commands: {}", commandString);
+      for (String command : commandString.split("\\s+")) {
+        allowedCommands.add(command);
       }
     }
+
+    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD,
+            serviceRegistry);
 
     this.bundleContext = cc.getBundleContext();
   }
@@ -677,13 +676,6 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties)
-          throws org.osgi.service.cm.ConfigurationException {
-    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD,
-            serviceRegistry);
   }
 
 }

@@ -55,8 +55,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CropServiceTest {
 
@@ -163,7 +163,7 @@ public class CropServiceTest {
   public void testEncoderProblem() throws Exception {
     Track track = createTrack(MEDIA_RESOURCE, MEDIA_DURATION);
     cropService.setWorkspace(createWorkspace(track));
-    Dictionary properties = new Hashtable();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(CropServiceImpl.CROP_FFMPEG_REGEX, "");
     cropService.updated(properties);
     Job receipt = cropService.crop(track);

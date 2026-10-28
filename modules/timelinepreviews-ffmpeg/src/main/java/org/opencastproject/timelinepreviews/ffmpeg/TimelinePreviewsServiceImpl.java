@@ -48,9 +48,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +64,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -73,13 +74,13 @@ import java.util.UUID;
  */
 @Component(
     immediate = true,
-    service = { TimelinePreviewsService.class,ManagedService.class },
+    service = { TimelinePreviewsService.class },
     property = {
         "service.description=TimelinePreviews Service"
     }
 )
 public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
-    TimelinePreviewsService, ManagedService {
+    TimelinePreviewsService {
 
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "timelinepreviews";
@@ -172,25 +173,26 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
     this.binary = FFMPEG_BINARY_DEFAULT;
   }
 
-  @Override
-  public void activate(ComponentContext cc) {
+  @Activate
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     logger.info("Activate ffmpeg timeline previews service");
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
     this.binary = path == null ? FFMPEG_BINARY_DEFAULT : path;
     logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
+    updated(properties);
   }
 
   /**
-   * {@inheritDoc}
+   * OSGi callback when the configuration is updated.
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties == null) {
-      return;
-    }
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     logger.debug("Configuring the timeline previews service");
 
     // Horizontal resolution
