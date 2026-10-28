@@ -25,18 +25,21 @@ import org.opencastproject.security.urlsigning.provider.UrlSigningProvider;
 import org.opencastproject.urlsigning.common.BasicResourceStrategyImpl;
 import org.opencastproject.urlsigning.common.ResourceStrategy;
 
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 @Component(
     immediate = true,
-    service = { ManagedService.class, UrlSigningProvider.class },
+    service = { UrlSigningProvider.class },
     property = {
-        "service.description=Generic Url Signing Provider",
-        "service.pid=org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider"
+        "service.description=Generic Url Signing Provider"
     }
 )
 public class GenericUrlSigningProvider extends AbstractUrlSigningProvider {
@@ -57,6 +60,13 @@ public class GenericUrlSigningProvider extends AbstractUrlSigningProvider {
   @Override
   public String toString() {
     return "Generic URL Signing Provider";
+  }
+
+  @Activate
+  @Modified
+  @Override
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
+    super.updated(properties);
   }
 
   @Reference

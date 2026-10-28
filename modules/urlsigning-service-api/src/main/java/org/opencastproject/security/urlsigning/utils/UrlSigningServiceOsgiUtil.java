@@ -23,7 +23,7 @@ package org.opencastproject.security.urlsigning.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 public final class UrlSigningServiceOsgiUtil {
   private static final Logger logger = LoggerFactory.getLogger(UrlSigningServiceOsgiUtil.class);
@@ -45,48 +45,28 @@ public final class UrlSigningServiceOsgiUtil {
   }
 
   /**
-   * Get the amount of seconds before a signed URL should expire from a {@link Dictionary}. Uses the
+   * Get the amount of seconds before a signed URL should expire from a configuration map. Uses the
    * {@link UrlSigningServiceOsgiUtil}'s default value and default key name.
    *
    * @param properties
-   *          The {@link Dictionary} to look through to get the expire duration.
+   *          The configuration map to look through to get the expire duration.
    * @param className
    *          The name of the class that is getting the expire duration for logging.
    * @return The duration that URLs expire from the properties if present, the default if it isn't.
    */
-  public static long getUpdatedSigningExpiration(@SuppressWarnings("rawtypes") Dictionary properties,
-          String className) {
-    return getUpdatedSigningExpiration(properties, className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY,
-            DEFAULT_URL_SIGNING_EXPIRE_DURATION);
-  }
-
-  /**
-   * Get the amount of seconds before a signed URL should expire from a {@link Dictionary}.
-   *
-   * @param properties
-   *          The {@link Dictionary} to look through to get the expire duration.
-   * @param className
-   *          The name of the class that is getting the expire duration for logging.
-   * @param key
-   *          The key in the dictionary that should contain the expire duration.
-   * @param defaultExpiry
-   *          The expire duration to use if one is not found in the {@link Dictionary}
-   * @return The duration that URLs expire from the properties if present, the default if it isn't.
-   */
-  public static long getUpdatedSigningExpiration(@SuppressWarnings("rawtypes") Dictionary properties, String className,
-          String key, long defaultExpiry) {
-    long expireSeconds = defaultExpiry;
-    Object dictionaryValue = properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY);
-    if (dictionaryValue != null) {
+  public static long getUpdatedSigningExpiration(Map<String, ?> properties, String className) {
+    long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+    Object configValue = properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY);
+    if (configValue != null) {
       try {
-        expireSeconds = Long.parseLong(dictionaryValue.toString());
+        expireSeconds = Long.parseLong(configValue.toString());
         logger.info("For the class {} the property '{}' has been configured to expire signed URLs in {} seconds.",
                 className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds);
       } catch (NumberFormatException e) {
         logger.warn(
                 "For the class {} unable to parse when a stream should expire from '{}' so using default '{}' because:",
-                className, dictionaryValue, defaultExpiry, e);
-        expireSeconds = defaultExpiry;
+                className, configValue, DEFAULT_URL_SIGNING_EXPIRE_DURATION, e);
+        expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
       }
     } else {
       logger.debug(
@@ -98,39 +78,20 @@ public final class UrlSigningServiceOsgiUtil {
   }
 
   /**
-   * Get whether a signed URL should contain the client's IP from a {@link Dictionary}. Uses the
+   * Get whether a signed URL should contain the client's IP from a configuration map. Uses the
    * {@link UrlSigningServiceOsgiUtil}'s default value and default key name.
    *
    * @param properties
-   *          The {@link Dictionary} to look through for whether the IP should be included.
+   *          The configuration map to look through for whether the IP should be included.
    * @param className
    *          The name of the class that is getting the value for logging.
    * @return Whether the URLs that are signed should contain the client's IP address
    */
-  public static boolean getUpdatedSignWithClientIP(@SuppressWarnings("rawtypes") Dictionary properties,
-          String className) {
-    return getUpdatedSignWithClientIP(properties, className, URL_SIGNING_USE_CLIENT_IP, DEFAULT_SIGN_WITH_CLIENT_IP);
-  }
-
-  /**
-   * Get whether a signed URL should contain the client's IP from a {@link Dictionary}.
-   *
-   * @param properties
-   *          The {@link Dictionary} to look through for whether the IP should be included.
-   * @param className
-   *          The name of the class that is getting the value for logging.
-   * @param key
-   *          The key in the dictionary that should contain the value.
-   * @param defaultSignWithIP
-   *          The default to use if the value is not found in the {@link Dictionary}
-   * @return true if signed URLs should contain the client IP, false if not.
-   */
-  public static boolean getUpdatedSignWithClientIP(@SuppressWarnings("rawtypes") Dictionary properties,
-          String className, String key, boolean defaultSignWithIP) {
-    boolean signWithClientIP = defaultSignWithIP;
-    Object dictionaryValue = properties.get(URL_SIGNING_USE_CLIENT_IP);
-    if (dictionaryValue != null) {
-      signWithClientIP = Boolean.parseBoolean(dictionaryValue.toString());
+  public static boolean getUpdatedSignWithClientIP(Map<String, ?> properties, String className) {
+    boolean signWithClientIP = DEFAULT_SIGN_WITH_CLIENT_IP;
+    Object configValue = properties.get(URL_SIGNING_USE_CLIENT_IP);
+    if (configValue != null) {
+      signWithClientIP = Boolean.parseBoolean(configValue.toString());
       if (signWithClientIP) {
         logger.info("For the class {} the property '{}' has been configured to sign urls with the client IP.",
                 className, URL_SIGNING_USE_CLIENT_IP);

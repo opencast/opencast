@@ -215,11 +215,10 @@ public class EditorServiceImplTest {
     replay(bundleContext);
 
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
-    expect(cc.getProperties()).andReturn(dictionary).anyTimes();
     expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     replay(cc);
 
-    editorService.activate(cc);
+    editorService.activate(cc, dictionary);
   }
 
   /** Test method for {@link EditorServiceImpl#getSegmentsFromSmil(Smil)} */

@@ -36,9 +36,10 @@ import org.opencastproject.security.api.UserProvider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +47,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -66,9 +65,9 @@ import java.util.stream.Collectors;
         "service.description=A user and role provider"
     },
     immediate = true,
-    service = { UserProvider.class, RoleProvider.class, ManagedService.class }
+    service = { UserProvider.class, RoleProvider.class }
 )
-public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, ManagedService {
+public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(InMemoryUserAndRoleProvider.class);
@@ -119,8 +118,13 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
    *
    * @param cc
    *          the declarative services component context
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  protected void activate(ComponentContext cc) {
+  @Activate
+  protected void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     digestUsername = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_USER_KEY));
     if (digestUsername == null) {
       logger.warn("Digest username has not been configured ({})", DIGEST_USER_KEY);
@@ -142,22 +146,14 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
               + "#                                                    #\n"
               + "######################################################");
     }
+    updated(properties);
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties == null) {
-      captureAgentUsers.clear();
-      // enforce reload of users if the configuration has changed
-      inMemoryUsers.clear();
-      return;
-    }
-
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     Map<String, List<List<String>>> newCAUsers = new ConcurrentHashMap<>();
 
-    Enumeration<String> keys = properties.keys();
-    while (keys.hasMoreElements()) {
-      final String key = keys.nextElement();
+    for (final String key : properties.keySet()) {
       // skip non user definition keys
       if (!key.startsWith(CAPTURE_AGENT_USER_PREFIX)) {
         continue;
