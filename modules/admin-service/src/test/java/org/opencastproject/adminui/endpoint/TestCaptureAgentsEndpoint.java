@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -146,6 +147,57 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
     }
 
+    public boolean canCaptureLocal() {
+      return true;
+    }
+
+    public boolean canStartLocalPaused() {
+      return false;
+    }
+
+    public boolean canStream() {
+      return false;
+    }
+
+    public boolean canStartStreamPaused() {
+      return false;
+    }
+
+    public Set<String> getInputs() {
+      return Set.of();
+    }
+
+    public Set<String> streamConfigurations() {
+      return Set.of();
+    }
+
+    public Set<String> devicePositions() {
+      return Set.of();
+    }
+
+    public Set<String> contentConfigurations() {
+      return Set.of();
+    }
+
+    public Map<String, String> vendorKeys() {
+      return Map.of();
+    }
+
+    public String getVendor() {
+      return "";
+    }
+
+    public String getModel() {
+      return "";
+    }
+
+    public String getHardware() {
+      return "";
+    }
+
+    public String getFirmware() {
+      return "";
+    }
   }
 
 }

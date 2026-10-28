@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -67,6 +68,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -324,63 +326,87 @@ public class CaptureAgentsEndpoint {
     json.addProperty("Name", agent.getName());
     json.addProperty("Update", safeString(toUTC(agent.getLastHeardFrom())));
     json.addProperty("URL", safeString(agent.getUrl()));
+    json.addProperty("Vendor", safeString(agent.getVendor()));
+    json.addProperty("Model", safeString(agent.getModel()));
+    json.addProperty("Hardware", safeString(agent.getHardware()));
+    json.addProperty("Firmware", safeString(agent.getFirmware()));
+    json.addProperty("Version", agent.getVersion().toString());
 
+    // This makes for a json structure that's (hopefully) much easier for the ui to parse
     if (withParsedCapabilities) {
       JsonObject parsedCapabilities = new JsonObject();
 
-      String inputs = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
+      /* Add the core agent configuration data */
+      JsonObject localCapabilities = new JsonObject();
+      JsonObject streamCapabilities = new JsonObject();
+      if (agent.canCaptureLocal()) {
+        localCapabilities.addProperty("capture", "1");
+        localCapabilities.addProperty("startpaused", agent.canStartLocalPaused() ? "1" : "0");
+      } else {
+        localCapabilities.addProperty("capture", "0");
+        localCapabilities.addProperty("startpaused", "0");
+      }
+      if (agent.canStream()) {
+        streamCapabilities.addProperty("stream", "1");
+        streamCapabilities.addProperty("startpaused", agent.canStartStreamPaused() ? "1" : "0");
+      } else {
+        streamCapabilities.addProperty("stream", "0");
+        streamCapabilities.addProperty("startpaused", "0");
+      }
+
+      JsonObject config = new JsonObject();
+      config.add("local", localCapabilities);
+      config.add("stream", streamCapabilities);
+      parsedCapabilities.add("config", config);
+
+      //NB: Even for a CA API 2.0+ agent, we still have the device names as a fallback, though agents may override them
+      Properties agentCaps = agent.getCapabilities();
+      String inputs = (String) agentCaps.get(CaptureParameters.CAPTURE_DEVICE_NAMES);
       if (inputs == null || inputs.isEmpty()) {
         parsedCapabilities.add("inputs", new JsonArray());
       } else {
-        String[] parsedInputs = Arrays.stream(inputs.split(","))
+        List<String> parsedInputs = Arrays.stream(inputs.split(","))
             .map(String::trim)
-            .toArray(String[]::new);
+            .toList();
         parsedCapabilities.add("inputs", generateJsonDevice(parsedInputs, TRANSLATION_KEY_PREFIX + "INPUTS."));
       }
 
-      String stream = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_STREAM);
-      if (stream == null || stream.isEmpty()) {
-        parsedCapabilities.add("stream", new JsonArray());
+      Set<String> streamConfigs = agent.streamConfigurations();
+      if (streamConfigs.isEmpty()) {
+        parsedCapabilities.add("streams", new JsonArray());
       } else {
-        String[] parsedStream = Arrays.stream(stream.split(","))
-            .map(String::trim)
-            .toArray(String[]::new);
-        parsedCapabilities.add("stream", generateJsonDevice(parsedStream, TRANSLATION_KEY_PREFIX + "STREAM."));
+        parsedCapabilities.add("streams", generateJsonDevice(streamConfigs, TRANSLATION_KEY_PREFIX + "STREAM."));
       }
 
-      String record = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_RECORD);
-      if (record == null || record.isEmpty()) {
-        parsedCapabilities.add("stream", new JsonArray());
+      Set<String> devicePositions = agent.devicePositions();
+      if (devicePositions.isEmpty()) {
+        parsedCapabilities.add("positions", new JsonArray());
       } else {
-        String[] parsedRecord = Arrays.stream(record.split(","))
-            .map(String::trim)
-            .toArray(String[]::new);
-        parsedCapabilities.add("record", generateJsonDevice(parsedRecord, TRANSLATION_KEY_PREFIX + "RECORD."));
+        parsedCapabilities.add("positions", generateJsonDevice(devicePositions, TRANSLATION_KEY_PREFIX + "RECORD."));
       }
 
-      String layout = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_LAYOUT);
-      if (layout == null || layout.isEmpty()) {
-        parsedCapabilities.add("stream", new JsonArray());
+      Set<String> contents = agent.contentConfigurations();
+      if (contents.isEmpty()) {
+        parsedCapabilities.add("contents", new JsonArray());
       } else {
-        String[] parsedLayout = Arrays.stream(layout.split(","))
-            .map(String::trim)
-            .toArray(String[]::new);
-        parsedCapabilities.add("layout", generateJsonDevice(parsedLayout, TRANSLATION_KEY_PREFIX + "LAYOUT."));
+        parsedCapabilities.add("contents", generateJsonDevice(contents, TRANSLATION_KEY_PREFIX + "LAYOUT."));
       }
 
-      String cameraPosition = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION);
-      if (cameraPosition == null || cameraPosition.isEmpty()) {
-        parsedCapabilities.add("cameraPosition", new JsonArray());
-      } else {
-        String[] parsedCameraPosition = Arrays.stream(cameraPosition.split(","))
-            .map(String::trim)
-            .toArray(String[]::new);
-        parsedCapabilities.add("cameraPosition", generateJsonDevice(parsedCameraPosition, TRANSLATION_KEY_PREFIX + "CAMERA_POSITION."));
-      }
+      Map<String, String> vendorKeys = agent.vendorKeys();
+
+      JsonArray vendorArray = new JsonArray();
+      vendorKeys.forEach((key, value) -> {
+        JsonObject vendorJson = new JsonObject();
+        vendorJson.addProperty("key", key);
+        vendorJson.addProperty("value", value);
+        vendorArray.add(vendorJson);
+      });
+      parsedCapabilities.add("vendorKeys", vendorArray);
 
       json.add("parsedCapabilities", parsedCapabilities);
     }
 
+    // This dumps out the raw config and capabilities blobs.  This is a *lot* of duplication.
     if (details) {
       json.add("configuration", generateJsonProperties(agent.getConfiguration()));
       json.add("capabilities", generateJsonProperties(agent.getCapabilities()));
@@ -418,7 +444,7 @@ public class CaptureAgentsEndpoint {
    *          an array of devices String
    * @return A {@link JsonArray} representing the devices
    */
-  private JsonArray generateJsonDevice(String[] devices, String translationPrefix) {
+  private JsonArray generateJsonDevice(Collection<String> devices, String translationPrefix) {
     JsonArray jsonDevices = new JsonArray();
 
     for (String device : devices) {

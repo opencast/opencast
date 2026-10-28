@@ -670,6 +670,71 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
 
       @Override
+      public boolean canCaptureLocal() {
+        return true;
+      }
+
+      @Override
+      public boolean canStartLocalPaused() {
+        return false;
+      }
+
+      @Override
+      public boolean canStream() {
+        return false;
+      }
+
+      @Override
+      public boolean canStartStreamPaused() {
+        return false;
+      }
+
+      @Override
+      public Set<String> getInputs() {
+        return Set.of();
+      }
+
+      @Override
+      public Set<String> streamConfigurations() {
+        return Set.of();
+      }
+
+      @Override
+      public Set<String> devicePositions() {
+        return Set.of();
+      }
+
+      @Override
+      public Set<String> contentConfigurations() {
+        return Set.of();
+      }
+
+      @Override
+      public Map<String, String> vendorKeys() {
+        return Map.of();
+      }
+
+      @Override
+      public String getVendor() {
+        return "";
+      }
+
+      @Override
+      public String getModel() {
+        return "";
+      }
+
+      @Override
+      public String getHardware() {
+        return "";
+      }
+
+      @Override
+      public String getFirmware() {
+        return "";
+      }
+
+      @Override
       public Long getLastHeardFrom() {
         return 13345L;
       }
