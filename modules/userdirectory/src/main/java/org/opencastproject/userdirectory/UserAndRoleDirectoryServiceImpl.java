@@ -57,18 +57,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,6 +93,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   private static final Logger logger = LoggerFactory.getLogger(UserAndRoleDirectoryServiceImpl.class);
 
   /** A non-obvious password to allow a Spring User to be instantiated for CAS authenticated users having no password */
+  /** Matches the combining marks that make up accents once text is decomposed */
+  private static final Pattern DIACRITICS = Pattern.compile("\\p{M}+");
+
   private static final String DEFAULT_PASSWORD = "4b3e4b30-718c-11e2-bcfd-0800200c9a66";
 
   /** The configuration property for the user cache size */
@@ -513,6 +520,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
     }
 
+    // Searching for user roles is a search for people: match what is shown to identify a user (username, name and
+    // email) and list them in that same order. Only do so if user info is not sanitized, otherwise the name and
+    // email must not be revealed through the search.
+    if (Boolean.TRUE.equals(hasUser) && target != Role.Target.USER && !UserIdRoleProvider.isSanitize()) {
+      return findUserRoles(org, query, offset, limit);
+    }
+
     // Instead of getting all roles from all providers, limit the providers by "limit" and "offset" if possible.
     // Intended to reduce computing time for low offset + limit requests.
     // This optimization cannot be applied when filtering by "hasUser", since that filter is applied after fetching
@@ -541,6 +555,130 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       return stream.limit(limit).collect(Collectors.toList());
     }
     return stream.collect(Collectors.toList());
+  }
+
+  /**
+   * Finds the user id roles of users matching the query, ordered by how the users are displayed.
+   *
+   * The query is matched against username, name and email. The users are sorted by name (case-insensitive, falling
+   * back to the username if the user has no name) and then by username, so that paging through the result with
+   * <code>offset</code> and <code>limit</code> is stable.
+   *
+   * @param org
+   *          the current organization
+   * @param query
+   *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
+   *          characters (including zero characters).
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit. 0 means no limit
+   * @return the user id roles
+   */
+  private List<Role> findUserRoles(Organization org, String query, int offset, int limit) {
+    // The same user may be known to more than one provider, each possibly with different details. Merge them the way
+    // loadUser() does, so that matching and sorting use the same name and email that are displayed for the user.
+    final Map<String, User> candidates = new LinkedHashMap<>();
+    for (UserProvider userProvider : userProviders) {
+      String providerOrgId = userProvider.getOrganization();
+      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
+        userProvider.findUsersByText(query, 0, 0).forEachRemaining(user -> {
+          // The digest user is not a person, the global ROLE_USER stands in for it.
+          if (!"system".equals(user.getProvider())) {
+            candidates.merge(user.getUsername(), user, UserAndRoleDirectoryServiceImpl::mergeUserDetails);
+          }
+        });
+      }
+    }
+
+    // Providers that cannot search (e.g. LDAP, which returns the current user, or those that echo the query back as a
+    // user) may return users that do not match the query, so do not rely on the providers to have filtered.
+    final String foldedQuery = fold(query);
+    final List<User> users = candidates.values().stream()
+        .filter(user -> matchesText(user, foldedQuery))
+        .collect(Collectors.toList());
+
+    // Only keep users that actually exist: some providers return users without verifying them. This is done
+    // lazily, after sorting, so it is only checked for as many users as are needed for the requested page.
+    Stream<User> stream = users.stream()
+        .sorted(Comparator.comparing(UserAndRoleDirectoryServiceImpl::displayName, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(User::getUsername))
+        .filter(user -> loadUser(user.getUsername()) != null);
+    stream = stream.skip(offset);
+    if (limit > 0) {
+      stream = stream.limit(limit);
+    }
+    return stream
+        .map(user -> UserIdRoleProvider.createUserIdRole(user.getUsername(), org))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Merges the details used to find and list a user, i.e. username, name and email. Unlike
+   * {@link #mergeUsers(User, User)} this leaves out the roles, which are not needed here and may be loaded lazily.
+   */
+  private static User mergeUserDetails(User user1, User user2) {
+    return new JaxbUser(user1.getUsername(), null,
+        StringUtils.defaultIfBlank(user1.getName(), user2.getName()),
+        StringUtils.defaultIfBlank(user1.getEmail(), user2.getEmail()),
+        user1.getProvider(), JaxbOrganization.fromOrganization(user1.getOrganization()), new HashSet<>());
+  }
+
+  /**
+   * Prepares text for case- and accent-insensitive comparison, e.g. "Müller" and "MULLER" both become "muller". The
+   * database may or may not ignore accents depending on its collation. Being lenient here makes sure that users it
+   * found are not dropped again, while still removing the users that providers returned regardless of the query.
+   */
+  private static String fold(String text) {
+    return DIACRITICS.matcher(Normalizer.normalize(text, Normalizer.Form.NFD)).replaceAll("")
+        .toLowerCase(Locale.ROOT);
+  }
+
+  /**
+   * Checks whether the username, name or email of the user matches the folded query.
+   */
+  private static boolean matchesText(User user, String foldedQuery) {
+    return Stream.of(user.getUsername(), user.getName(), user.getEmail())
+        .anyMatch(text -> text != null && like(fold(text), foldedQuery));
+  }
+
+  /**
+   * Matches text against a pattern with the wildcards "_" (any single character) and "%" (any number of characters,
+   * including zero), like SQL LIKE does. This does not use regular expressions on purpose: with many user supplied
+   * wildcards they can take a very long time to fail on long text. This takes at most time proportional to the
+   * product of the lengths of text and pattern.
+   */
+  static boolean like(String text, String pattern) {
+    int t = 0;
+    int p = 0;
+    int starP = -1;
+    int starT = 0;
+    while (t < text.length()) {
+      if (p < pattern.length() && pattern.charAt(p) == '%') {
+        starP = p++;
+        starT = t;
+      } else if (p < pattern.length() && (pattern.charAt(p) == '_' || pattern.charAt(p) == text.charAt(t))) {
+        p++;
+        t++;
+      } else if (starP >= 0) {
+        // Let the last wildcard consume one more character and try again
+        p = starP + 1;
+        t = ++starT;
+      } else {
+        return false;
+      }
+    }
+    while (p < pattern.length() && pattern.charAt(p) == '%') {
+      p++;
+    }
+    return p == pattern.length();
+  }
+
+  /**
+   * The name a user is listed under: their name, or their username if they have none.
+   */
+  private static String displayName(User user) {
+    return StringUtils.defaultIfBlank(user.getName(), user.getUsername());
   }
 
   /**
