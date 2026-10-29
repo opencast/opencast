@@ -30,7 +30,6 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
-import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.AgentsListQuery;
@@ -59,7 +58,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -360,16 +358,7 @@ public class CaptureAgentsEndpoint {
       parsedCapabilities.add("config", config);
 
       //NB: Even for a CA API 2.0+ agent, we still have the device names as a fallback, though agents may override them
-      Properties agentCaps = agent.getCapabilities();
-      String inputs = (String) agentCaps.get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-      if (inputs == null || inputs.isEmpty()) {
-        parsedCapabilities.add("inputs", new JsonArray());
-      } else {
-        List<String> parsedInputs = Arrays.stream(inputs.split(","))
-            .map(String::trim)
-            .toList();
-        parsedCapabilities.add("inputs", generateJsonDevice(parsedInputs, TRANSLATION_KEY_PREFIX + "INPUTS."));
-      }
+      parsedCapabilities.add("inputs", generateJsonDevice(agent.getInputs(), TRANSLATION_KEY_PREFIX + "INPUTS."));
 
       Set<String> streamConfigs = agent.streamConfigurations();
       if (streamConfigs.isEmpty()) {

@@ -164,7 +164,7 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     }
 
     public Set<String> getInputs() {
-      return Set.of();
+      return Set.of("microphone");
     }
 
     public Set<String> streamConfigurations() {

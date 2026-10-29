@@ -603,19 +603,27 @@ public class AgentImpl implements Agent {
     configurationProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
 
     // Parse names
-    String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
-    if (names == null) {
+    if (!configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_NAMES)) {
       log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
-    } else if (names.isBlank()) {
-      throw new RuntimeException("Agent provided devices key, but no devices");
-    } else if (names.length() > 256) {
-      throw new RuntimeException("Agent device names too long");
     } else {
-      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
+      Set<String> names = Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "")
+          .split(","))
+          .map(String::trim)
+          .collect(Collectors.toSet());
+      if (names.isEmpty()) {
+        throw new RuntimeException("Agent provided devices key, but no devices");
+      } else if (names.stream().anyMatch(String::isBlank)) {
+        throw new RuntimeException("Agent device names contains a blank name");
+      } else if (names.stream().anyMatch(s -> s.length() > 256)) {
+        throw new RuntimeException("Agent device names too long");
+      } else {
+        // We rebuild the string here since we need everything in this Properties to be string-able for sanity
+        capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, String.join(",", names));
 
-      Properties devices = parseCapabilities(configuration);
-      for (String key : devices.stringPropertyNames()) {
-        capabilitiesProperties.put(key, devices.getProperty(key));
+        Properties devices = parseCapabilities(configuration);
+        for (String key : devices.stringPropertyNames()) {
+          capabilitiesProperties.put(key, devices.getProperty(key));
+        }
       }
     }
 

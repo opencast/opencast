@@ -108,9 +108,10 @@ public class CaptureAgentsEndpointTest {
 
         if (checkInputs) {
           // Check inputs
-          JSONObject expectedInputs = (JSONObject) ((JSONArray) expected.get("inputs")).get(0);
-          JSONObject parseCapabilities = (JSONObject) captureAgentJson.get("parsedCapabilities");
-          JSONObject actualInputs = (JSONObject) ((JSONArray) parseCapabilities.get("inputs")).get(0);
+          JSONObject expectedCaps = (JSONObject) expected.get("parsedCapabilities");
+          JSONObject expectedInputs = (JSONObject) ((JSONArray) expectedCaps.get("inputs")).getFirst();
+          JSONObject actualCaps = (JSONObject) captureAgentJson.get("parsedCapabilities");
+          JSONObject actualInputs = (JSONObject) ((JSONArray) actualCaps.get("inputs")).getFirst();
           assertEquals(expectedInputs.get("id"), actualInputs.get("id"));
           assertEquals(expectedInputs.get("value"), actualInputs.get("value"));
         }
