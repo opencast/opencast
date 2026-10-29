@@ -31,7 +31,7 @@ jobs:
         java:
           - 21
     name: build (java ${{ matrix.java }})
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -125,7 +125,7 @@ jobs:
 
   deploy-mvn-site:
     name: generate github pages for reports
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: build-mvn-site
     concurrency:
       group: opencast-site-build
