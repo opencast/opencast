@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 3 * * 6' # at 03:00 on Saturday
 
+permissions:
+  contents: read
+
 jobs:
   cache-ffmpeg:
     strategy:

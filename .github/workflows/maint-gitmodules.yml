@@ -8,6 +8,9 @@ on:
     paths:
       - '.gitmodules'
 
+permissions:
+  contents: read
+
 jobs:
   mvn-check:
     name: Ensure correct module versions in .gitmodules

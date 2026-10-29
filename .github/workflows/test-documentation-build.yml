@@ -14,6 +14,9 @@ on:
       - 'docs/checkstyle/check-docs.sh'
       - '**.md'
 
+permissions:
+  contents: read
+
 jobs:
 
   # Check documentation with markdownlint and build it using mkdocs
