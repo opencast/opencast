@@ -6,6 +6,9 @@ on:
   schedule:
   - cron: "0 5 * * 1"
 
+permissions:
+  contents: read
+
 jobs:
   download-translations:
     if: github.repository_owner == 'opencast'

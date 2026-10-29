@@ -6,6 +6,10 @@ on:
     tags:
       - '*.*'
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   create-release-from-tag:
     name: Create release from tag
