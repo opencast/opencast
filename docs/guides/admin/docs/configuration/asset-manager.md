@@ -67,3 +67,59 @@ Please note:
   stored in it as missing.
 - Configure the same directories on all nodes which have the asset manager storage mounted.
   The workspace uses this configuration to access assets directly from the file system instead of downloading them.
+
+### Prefix Directories
+
+Within a storage directory, assets are stored as `<root>/<organization>/<media package>/<version>/<element>`.
+On large installations, the organization directory ends up containing hundreds of thousands of media package
+directories, which makes listing it, e.g. for backups, very slow.
+
+To avoid this, Opencast can group media packages in subdirectories named after the first characters of their
+identifier. Configure the number of characters to use by appending `.prefix.length` to the configuration key of a
+storage directory:
+
+```properties
+# Existing storage, flat layout (prefix length defaults to 0)
+org.opencastproject.episode.rootdir=/srv/opencast/archive
+
+# New storage: <root>/<organization>/<first 2 characters>/<media package>/…
+org.opencastproject.episode.rootdir.1=/mnt/archive-share-1
+org.opencastproject.episode.rootdir.1.prefix.length=2
+```
+
+`org.opencastproject.episode.rootdir.prefix.length` configures the base directory.
+It also applies if `org.opencastproject.episode.rootdir` is not set and the default directory is used.
+It is not a default for the other directories.
+Each directory has its own setting, so you can add a new directory using prefix directories while keeping an existing
+directory unchanged.
+
+The prefix is derived from the media package identifier as follows:
+
+- Take the first characters of the identifier and convert them to lower case.
+- Replace every character which is not an ASCII letter or digit (`a-z`, `0-9`) with `_`.
+- If the identifier is shorter than the prefix length, pad the prefix with `_`.
+
+Examples for a prefix length of 2:
+
+| Media package identifier               | Prefix |
+|----------------------------------------|--------|
+| `3f6e3c1a-8d0b-4b0e-9a64-0c2f0e8f7d21` | `3f`   |
+| `Lecture-2026`                         | `le`   |
+| `..abc`                                | `__`   |
+| `x`                                    | `x_`   |
+
+Please note:
+
+- The prefix length of a directory must not be changed once it contains data.
+  Opencast records the prefix length in a file called `.opencast-asset-store` in each storage directory when the
+  directory is first used and refuses to start if the configuration does not match.
+  To change the layout, add a new directory with the desired prefix length instead.
+- A directory without this file which already contains data is assumed to use the flat layout.
+  It can only be configured with a prefix length of 0.
+  Make sure to include this hidden file when backing up or copying a storage directory.
+- Older Opencast versions cannot read directories using prefix directories.
+  Once a directory uses them, downgrading is not possible without moving the data.
+- The prefix length can be at most 32.
+- Configure the same prefix lengths on all nodes.
+  Nodes with a different configuration will not read assets from the affected directory directly but download them.
+- Prefix directories are never deleted, even if they are empty.
