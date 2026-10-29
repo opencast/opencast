@@ -20,14 +20,15 @@
  */
 package org.opencastproject.transcription.googlespeech;
 
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.FileEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,13 +70,13 @@ public class GoogleSpeechTranscriptionServiceStorage {
     try {
       HttpPost httpPost = new HttpPost(GOOGLE_STORAGE_LINK + String.format(
               "%s/o?uploadType=resumable&name=%s.%s", bucket, mpId, fileExtension));
-      logger.debug("Url to store media file on Google Cloud Storage : {}", httpPost.getURI().toString());
+      logger.debug("Url to store media file on Google Cloud Storage : {}", httpPost.getRequestUri());
       httpPost.addHeader("Authorization", "Bearer " + accessToken);
       httpPost.addHeader("X-Upload-Content-Type", contentType);
       httpPost.addHeader("X-Upload-Content-Length", byteSize);
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
       postResponse = httpClient.execute(httpPost);
-      int postCode = postResponse.getStatusLine().getStatusCode();
+      int postCode = postResponse.getCode();
       if (postCode == HttpStatus.SC_OK) { // 200
         logger.info("Upload session has been successfully created");
         // Get upload session stored in location
@@ -88,10 +89,10 @@ public class GoogleSpeechTranscriptionServiceStorage {
         try {
           HttpPut httpPut = new HttpPut(location);
           httpPut.setHeader(HttpHeaders.CONTENT_TYPE, contentType);
-          FileEntity entity = new FileEntity(file);
+          FileEntity entity = new FileEntity(file, ContentType.APPLICATION_OCTET_STREAM);
           httpPut.setEntity(entity);
           putResponse = httpClient.execute(httpPut);
-          int putCode = putResponse.getStatusLine().getStatusCode();
+          int putCode = putResponse.getCode();
 
           switch (putCode) {
             case HttpStatus.SC_OK: // 200
@@ -145,10 +146,10 @@ public class GoogleSpeechTranscriptionServiceStorage {
     CloseableHttpResponse response = null;
     try {
       HttpDelete httpdelete = new HttpDelete(GOOGLE_STORAGE_MEDIA + String.format("%s/o/%s", bucket, objectName));
-      logger.debug("Url to delete media file from Google Cloud Storage : {}", httpdelete.getURI().toString());
+      logger.debug("Url to delete media file from Google Cloud Storage : {}", httpdelete.getRequestUri());
       httpdelete.addHeader("Authorization", "Bearer " + accessToken); // add the authorization header to the request;
       response = httpClient.execute(httpdelete);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_NO_CONTENT: // 204

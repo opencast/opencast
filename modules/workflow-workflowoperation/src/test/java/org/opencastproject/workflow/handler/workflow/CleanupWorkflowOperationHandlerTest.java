@@ -41,10 +41,9 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
 import org.junit.Assert;
@@ -52,6 +51,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -95,13 +95,11 @@ public class CleanupWorkflowOperationHandlerTest {
     cleanupWOH.setServiceRegistry(serviceRegistry);
 
     TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    HttpResponse httpResponse = EasyMock.createNiceMock(HttpResponse.class);
-    StatusLine responseStatusLine = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(responseStatusLine.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
-    EasyMock.expect(httpResponse.getStatusLine()).andReturn(responseStatusLine).anyTimes();
+    ClassicHttpResponse httpResponse = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(httpResponse.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
     EasyMock.expect(httpClient.execute(StoreUrisArgumentMatcher.createMatcher(deletedFilesURIs,
             UrlSupport.uri(HOSTNAME_NODE2, WFR_URL_PREFIX)))).andReturn(httpResponse).anyTimes();
-    EasyMock.replay(httpClient, httpResponse, responseStatusLine);
+    EasyMock.replay(httpClient, httpResponse);
     cleanupWOH.setTrustedHttpClient(httpClient);
   }
 
@@ -315,13 +313,18 @@ public class CleanupWorkflowOperationHandlerTest {
 
     @Override
     public boolean matches(Object arg) {
-      if (!(arg instanceof HttpUriRequest)) {
+      if (!(arg instanceof ClassicHttpRequest)) {
         return false;
       }
-      HttpUriRequest req = (HttpUriRequest) arg;
-      uriStore.add(req.getURI());
-      boolean result = Strings.CS.startsWith(req.getURI().toString(), matchBaseUri.toString());
-      return result;
+      ClassicHttpRequest req = (ClassicHttpRequest) arg;
+      final URI uri;
+      try {
+        uri = req.getUri();
+      } catch (URISyntaxException e) {
+        return false;
+      }
+      uriStore.add(uri);
+      return Strings.CS.startsWith(uri.toString(), matchBaseUri.toString());
     }
 
     @Override
@@ -335,7 +338,7 @@ public class CleanupWorkflowOperationHandlerTest {
      * @param matchUri base URI to test on passed URI's
      * @return null
      */
-    public static HttpUriRequest createMatcher(final List<URI> uriStore, final URI matchUri) {
+    public static ClassicHttpRequest createMatcher(final List<URI> uriStore, final URI matchUri) {
       EasyMock.reportMatcher(new StoreUrisArgumentMatcher(uriStore, matchUri));
       return null;
     }

@@ -77,10 +77,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -555,37 +554,33 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         URI uri = distributedElement.getURI();
         String distributedElementUriStr = uri.toString();
         int tries = 0;
-        CloseableHttpResponse response = null;
         boolean success = false;
-        while (tries < MAX_TRIES) {
-          try {
-            if (presignedUrl) {
-              // 5 minutes should be enough for check availability for presigned URL.
-              Date fiveMinutesLater = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
-              uri = s3.generatePresignedUrl(bucketName, objectName, fiveMinutesLater, HttpMethod.HEAD).toURI();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+          while (tries < MAX_TRIES) {
+            try {
+              if (presignedUrl) {
+                // 5 minutes should be enough for check availability for presigned URL.
+                Date fiveMinutesLater = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
+                uri = s3.generatePresignedUrl(bucketName, objectName, fiveMinutesLater, HttpMethod.HEAD).toURI();
+              }
+              logger.trace("Trying to access {}", uri);
+              final int status = httpClient.execute(new HttpHead(uri), response -> response.getCode());
+              if (status == HttpServletResponse.SC_OK) {
+                logger.trace("Successfully got {}", uri);
+                success = true;
+                break; // Exit the loop, response is closed
+              } else {
+                logger.debug("Http status code when checking distributed element {} is {}", objectName, status);
+              }
+            } catch (Exception e) {
+              logger.info("Checking availability of {} threw exception {}. Trying again.", objectName,
+                  e.getMessage());
+              // Just try again
             }
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            logger.trace("Trying to access {}", uri);
-            response = httpClient.execute(new HttpHead(uri));
-            if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
-              logger.trace("Successfully got {}", uri);
-              success = true;
-              break; // Exit the loop, response is closed
-            } else {
-              logger.debug("Http status code when checking distributed element {} is {}", objectName,
-                      response.getStatusLine().getStatusCode());
-            }
-          } catch (Exception e) {
-            logger.info("Checking availability of {} threw exception {}. Trying again.", objectName, e.getMessage());
-            // Just try again
-          } finally {
-            if (null != response) {
-              response.close();
-            }
+            tries++;
+            logger.trace("Sleeping for {} seconds...", SLEEP_INTERVAL / 1000);
+            Thread.sleep(SLEEP_INTERVAL);
           }
-          tries++;
-          logger.trace("Sleeping for {} seconds...", SLEEP_INTERVAL / 1000);
-          Thread.sleep(SLEEP_INTERVAL);
         }
         if (!success) {
           logger.warn("Could not check availability of distributed file {}", uri);

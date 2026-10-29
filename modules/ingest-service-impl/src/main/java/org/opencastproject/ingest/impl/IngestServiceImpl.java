@@ -103,17 +103,16 @@ import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -901,7 +900,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           mediaPackage.getIdentifier(), seriesCatalogs[0].getURI(), seriesCatalogs[0].getIdentifier());
     }
     // Parse series dublincore
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     InputStream in = null;
     boolean isUpdated = false;
     boolean isNew = false;
@@ -1704,7 +1703,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     CloseableHttpClient externalHttpClient = null;
     try {
       if (uri.toString().startsWith("http")) {
@@ -1732,7 +1731,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throw new IOException("Null response object from the http client, refer to code for explanation");
         }
 
-        int httpStatusCode = response.getStatusLine().getStatusCode();
+        int httpStatusCode = response.getCode();
         if (httpStatusCode != 200) {
           throw new IOException(uri + " returns http " + httpStatusCode);
         }
@@ -1763,7 +1762,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  private String getContentDispositionFileName(HttpResponse response) {
+  private String getContentDispositionFileName(ClassicHttpResponse response) {
     if (response == null) {
       return null;
     }
@@ -1950,14 +1949,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   protected CloseableHttpClient getAuthedHttpClient() {
     HttpClientBuilder cb = HttpClientBuilder.create();
-    CredentialsProvider provider = new BasicCredentialsProvider();
-    String schema = AuthSchemes.DIGEST;
+    BasicCredentialsProvider provider = new BasicCredentialsProvider();
+    String schema = StandardAuthScheme.DIGEST;
     if ("Basic".equals(downloadAuthMethod)) {
-      schema = AuthSchemes.BASIC;
+      schema = StandardAuthScheme.BASIC;
     }
     provider.setCredentials(
-        new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, schema),
-        new UsernamePasswordCredentials(downloadUser, downloadPassword));
+        new AuthScope(null, null, -1, null, schema),
+        new UsernamePasswordCredentials(downloadUser, downloadPassword.toCharArray()));
     return cb.setDefaultCredentialsProvider(provider).build();
   }
 

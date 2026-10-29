@@ -53,6 +53,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -63,19 +64,17 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -653,7 +652,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     try {
       FileBody fileBody = new FileBody(workspace.get(track.getURI()), ContentType.DEFAULT_BINARY);
       MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-      builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+      builder.setMode(HttpMultipartMode.LEGACY);
       builder.addPart("file", fileBody);
       HttpEntity multipartEntity = builder.build();
 
@@ -661,7 +660,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       httpPost.setEntity(multipartEntity);
 
       response = httpClient.execute(httpPost);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
       HttpEntity entity = response.getEntity();
 
       String jsonString = EntityUtils.toString(response.getEntity());
@@ -714,7 +713,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     try {
       HttpGet httpGet = new HttpGet(checkUrl);
       response = httpClient.execute(httpGet);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       HttpEntity entity = response.getEntity();
       String jsonString = EntityUtils.toString(entity);
@@ -759,7 +758,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
           throw new TranscriptionServiceException(
                   String.format("Captions job '%s' failed: Return Code %d", jobId, code), code);
       }
-    } catch (TranscriptionDatabaseException | IOException | ParseException e) {
+    } catch (TranscriptionDatabaseException | IOException | ParseException
+        | org.apache.hc.core5.http.ParseException e) {
       logger.warn("Error while checking status: {}", e.toString());
     } finally {
       try {
@@ -786,7 +786,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       HttpGet httpGet = new HttpGet(transcriptUrl);
 
       response = httpClient.execute(httpGet);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       logger.debug("AmberScript API {} http response {}", removePrivateInfo(transcriptUrl), code);
 
@@ -895,16 +895,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
    * @param socketTimeout http socket timeout value in milliseconds
    */
   protected CloseableHttpClient makeHttpClient(int socketTimeout) {
-    RequestConfig reqConfig = RequestConfig.custom()
-        .setConnectTimeout(AmberscriptTranscriptionService.CONNECTION_TIMEOUT)
-        .setSocketTimeout(socketTimeout)
-        .setConnectionRequestTimeout(AmberscriptTranscriptionService.CONNECTION_TIMEOUT)
-        .build();
-    CloseableHttpClient httpClient = HttpClientBuilder.create()
+    return HttpUtil.clientBuilder(AmberscriptTranscriptionService.CONNECTION_TIMEOUT, socketTimeout)
         .useSystemProperties()
-        .setDefaultRequestConfig(reqConfig)
         .build();
-    return httpClient;
   }
 
   // Called when a transcription job has been submitted

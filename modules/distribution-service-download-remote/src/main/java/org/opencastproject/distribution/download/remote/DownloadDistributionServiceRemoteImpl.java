@@ -40,7 +40,7 @@ import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
 
-import org.apache.http.client.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;

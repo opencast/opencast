@@ -22,9 +22,9 @@ package org.opencastproject.external.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;

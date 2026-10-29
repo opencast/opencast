@@ -34,15 +34,16 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,10 +83,10 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
       }
       params.add(new BasicNameValuePair("captionIds", StringUtils.join(captionIds, ",")));
     }
-    HttpPost post = new HttpPost();
-    HttpResponse response = null;
+    HttpPost post = new HttpPost("");
+    ClassicHttpResponse response = null;
     try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
       response = getResponse(post);
       if (response != null) {
         logger.info("Publishing {} to youtube", trackId);
@@ -106,9 +107,9 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     HttpPost post = new HttpPost("/retract");
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
       response = getResponse(post);
       if (response != null) {
         logger.info("Retracting {} from youtube", mediaPackage);
