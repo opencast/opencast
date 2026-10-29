@@ -1,6 +1,20 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.5 (2026-10-29)
+
+- [[#8123](https://github.com/opencast/opencast/pull/8123)] -
+  Sort roles ignoring case
+- [[#8122](https://github.com/opencast/opencast/pull/8122)] -
+  Replace anonymous curl calls to GH rest endpoints with authenticated gh-cli calls
+- [[#8038](https://github.com/opencast/opencast/pull/8038)] -
+  Fix ClassCastException when scheduling multiple events as non-admin
+
+### Admin Interface
+
+- [[#1685](https://github.com/opencast/admin-interface/pull/1685)] -
+  Fix tabbing between fields not working with mixed_text field
+
 ## Opencast 20.4 (2026-09-23)
 - [[#7958](https://github.com/opencast/opencast/pull/7958)] -
   Add "hasUser" to UserAndRoleDirectoryServiceImpl.findRoles([...])

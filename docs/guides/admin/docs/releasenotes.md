@@ -1,5 +1,10 @@
 # Opencast 20: Release Notes
 
+## Opencast 20.5
+
+This version contains minor updates for Opencast and the admin interface submodule.
+This release also updates Karaf to 4.4.12, which addresses some security issues.
+
 ## Opencast 20.4
 
 This version contains addition updates for the admin and editor submodules, along with the usual collection of
