@@ -32,15 +32,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,10 +96,10 @@ public class MicrosoftAzureSpeechServicesClient {
       HttpGet httpGet = new HttpGet(url.toString());
       httpGet.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_OK: // 200
@@ -142,10 +141,10 @@ public class MicrosoftAzureSpeechServicesClient {
       HttpGet httpGet = new HttpGet(url);
       httpGet.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_OK: // 200
@@ -206,10 +205,10 @@ public class MicrosoftAzureSpeechServicesClient {
       httpPost.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
       httpPost.setEntity(new StringEntity(gson.toJson(requestTranscription), ContentType.APPLICATION_JSON));
       try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_OK: // 200
@@ -250,10 +249,10 @@ public class MicrosoftAzureSpeechServicesClient {
       HttpGet httpGet = new HttpGet(url);
       httpGet.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_OK: // 200
@@ -283,10 +282,10 @@ public class MicrosoftAzureSpeechServicesClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(transcriptionUrl);
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_OK: // 200
@@ -347,10 +346,10 @@ public class MicrosoftAzureSpeechServicesClient {
       HttpDelete httpDelete = new HttpDelete(transcriptionDeleteUrl);
       httpDelete.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
       try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_OK: // 200

@@ -24,17 +24,17 @@ package org.opencastproject.transcription.microsoft.azure;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +92,8 @@ public class MicrosoftAzureStorageClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(containerUrl);
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getStatusLine().getStatusCode();
-        Map<String, String> headersMap = Arrays.stream(response.getAllHeaders())
+        int code = response.getCode();
+        Map<String, String> headersMap = Arrays.stream(response.getHeaders())
             .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
         switch (code) {
           case HttpStatus.SC_OK: // 200
@@ -128,7 +128,7 @@ public class MicrosoftAzureStorageClient {
       HttpPut httpPut = new HttpPut(containerUrl);
       httpPut.addHeader("x-ms-blob-public-access", "blob");
       try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         switch (code) {
           case HttpStatus.SC_CREATED: // 201
             EntityUtils.consume(response.getEntity());
@@ -170,7 +170,7 @@ public class MicrosoftAzureStorageClient {
           byte[] blockData = trackStream.readNBytes(blockSize);
           httpPut.setEntity(new ByteArrayEntity(blockData, ContentType.APPLICATION_OCTET_STREAM));
           try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-            int code = response.getStatusLine().getStatusCode();
+            int code = response.getCode();
             switch (code) {
               case HttpStatus.SC_CREATED: // 201
                 blockIds.add(blockId);
@@ -201,7 +201,7 @@ public class MicrosoftAzureStorageClient {
         httpPut.setEntity(new StringEntity(blockList.toString(),
             ContentType.create("application/xml", StandardCharsets.UTF_8)));
         try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-          int code = response.getStatusLine().getStatusCode();
+          int code = response.getCode();
           switch (code) {
             case HttpStatus.SC_CREATED: // 201
               EntityUtils.consume(response.getEntity());
@@ -227,10 +227,10 @@ public class MicrosoftAzureStorageClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpDelete httpDelete = new HttpDelete(deleteUrl);
       try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
-        int code = response.getStatusLine().getStatusCode();
+        int code = response.getCode();
         String responseString = "";
         if (response.getEntity() != null) {
-          responseString = EntityUtils.toString(response.getEntity());
+          responseString = HttpUtils.entityToString(response.getEntity());
         }
         switch (code) {
           case HttpStatus.SC_ACCEPTED:  // 202
@@ -238,11 +238,11 @@ public class MicrosoftAzureStorageClient {
             break;
           case HttpStatus.SC_FORBIDDEN: // 403
             throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to delete storage blob %s. "
-                + "Microsoft Azure Storage Service response: %s", httpDelete.getURI().toASCIIString(), responseString));
+                + "Microsoft Azure Storage Service response: %s", httpDelete.getRequestUri(), responseString));
           default:
             throw new MicrosoftAzureStorageClientException(String.format("Deleting Azure storage blob '%s' failed "
                     + "with HTTP response code %d. Microsoft Azure Storage Service response: %s",
-                httpDelete.getURI().toASCIIString(), code, responseString));
+                httpDelete.getRequestUri(), code, responseString));
         }
       }
     }

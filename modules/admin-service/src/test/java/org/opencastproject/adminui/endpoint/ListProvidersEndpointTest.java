@@ -32,7 +32,7 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
