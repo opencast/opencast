@@ -23,6 +23,8 @@ jobs:
     steps:
     - uses: actions/checkout@v7
 
+    - uses: ./.github/actions/setup-node-from-pom
+
     - name: set up python
       uses: actions/setup-python@v7
       with:
