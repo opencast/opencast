@@ -8,6 +8,7 @@ module.exports = [
   {
     'languageOptions': {
       'ecmaVersion': 2022,
+      'sourceType': 'script',
       'globals': {
         ...globals.browser
       }
