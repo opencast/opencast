@@ -223,4 +223,26 @@ public final class UrlSupport {
     return protocol + path;
   }
 
+  /**
+   * Returns the URI as a string, without its query and fragment. The URI is not decoded or normalized, so that the
+   * result can be compared with other URIs, e.g. to look up a file. This is useful when query and fragment are not part
+   * of the identity of a resource, like the signature that stream security adds to a URL.
+   *
+   * @param uri
+   *          the uri
+   * @return the uri without query and fragment
+   */
+  public static String withoutQueryAndFragment(URI uri) {
+    final String uriString = uri.toString();
+    int end = uriString.length();
+    if (uri.getRawFragment() != null) {
+      end = uriString.indexOf('#');
+    }
+    // A question mark after the start of the fragment is not a query
+    if (uri.getRawQuery() != null) {
+      end = Math.min(end, uriString.indexOf('?'));
+    }
+    return uriString.substring(0, end);
+  }
+
 }
