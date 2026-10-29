@@ -19,6 +19,7 @@
  *
  */
 
+
 package org.opencastproject.kernel.security;
 
 import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;
@@ -34,7 +35,6 @@ import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.security.util.HttpResponseWrapper;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -42,24 +42,50 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.auth.DigestScheme;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.BasicHttpContext;
+import org.apache.hc.client5.http.auth.AuthChallenge;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.AuthenticationException;
+import org.apache.hc.client5.http.auth.ChallengeType;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.MalformedChallengeException;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.Configurable;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.auth.AuthChallengeParser;
+import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
+import org.apache.hc.client5.http.impl.auth.DigestScheme;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.Method;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
+import org.apache.hc.core5.http.message.ParserCursor;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.io.CloseMode;
+import org.apache.hc.core5.net.URIAuthority;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -72,12 +98,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -92,7 +120,7 @@ import java.util.stream.Collectors;
 )
 public class TrustedHttpClientImpl implements TrustedHttpClient {
   /** Header name used to request a new nonce from a server a request is sent to. */
-  public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
+  public static final String AUTHORIZATION_HEADER_NAME = HttpHeaders.AUTHORIZATION;
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(TrustedHttpClientImpl.class);
@@ -123,6 +151,13 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
   public static final String NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY =
       "org.opencastproject.security.digest.nonce.variable.time";
 
+  /** The configuration property specifying the maximum number of pooled connections per target host. */
+  public static final String MAX_CONNECTIONS_PER_ROUTE_KEY =
+      "org.opencastproject.security.http.max.connections.per.route";
+
+  /** The configuration property specifying the maximum number of pooled connections in total. */
+  public static final String MAX_CONNECTIONS_TOTAL_KEY = "org.opencastproject.security.http.max.connections";
+
   /** The default time until a connection attempt fails */
   public static final int DEFAULT_CONNECTION_TIMEOUT = 60 * 1000;
 
@@ -141,6 +176,12 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
   /** Default maximum amount of time in a random range between 0 and this value to add to the base time. */
   public static final int DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME = 300;
 
+  /** The default maximum number of pooled connections per target host. */
+  public static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 100;
+
+  /** The default maximum number of pooled connections in total. */
+  public static final int DEFAULT_MAX_CONNECTIONS_TOTAL = 400;
+
   /**
    * The default time before a piece of signed content expires. 1 Minute. These are internal calls to another server, if
    * we can't make the request in under a minute something has gone horribly wrong.
@@ -156,19 +197,20 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
   /** The number of times to retry a request after a nonce timeout. */
   private int nonceTimeoutRetries = DEFAULT_NONCE_TIMEOUT_RETRIES;
 
-  /**
-   * The map of open responses to their http clients, which need to be closed after we are finished with the response
-   */
-  protected Map<HttpResponse, CloseableHttpClient> responseMap = new ConcurrentHashMap<>();
-
   /** Used to add a random amount of time up to retryMaximumVariableTime to retry a request after a nonce timeout. */
   private final Random generator = new Random();
 
   /** The amount of time in seconds to wait until trying the request again. */
-  private int retryBaseDelay = 300;
+  private int retryBaseDelay = DEFAULT_RETRY_BASE_TIME;
 
   /** The maximum amount of time in seconds to wait in addition to the RETRY_BASE_DELAY. */
-  private int retryMaximumVariableTime = 300;
+  private int retryMaximumVariableTime = DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME;
+
+  /** The maximum number of pooled connections per target host. */
+  private int maxConnectionsPerRoute = DEFAULT_MAX_CONNECTIONS_PER_ROUTE;
+
+  /** The maximum number of pooled connections in total. */
+  private int maxConnectionsTotal = DEFAULT_MAX_CONNECTIONS_TOTAL;
 
   /** The duration a signed url will remain valid for. */
   private long signedUrlExpiresDuration = DEFAULT_URL_SIGNING_EXPIRES_DURATION;
@@ -188,6 +230,14 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
   /** A regularly emptying cache of hosts in the cluster */
   private HostCache hosts = null;
 
+  /** The connection pool backing the shared http client */
+  protected PoolingHttpClientConnectionManager connectionManager = null;
+
+  /** The shared http client used for all requests */
+  private CloseableHttpClient httpClient = null;
+
+  /** The digest credentials of this node, handed to the client per request when talking to cluster nodes */
+  private CredentialsProvider digestCredentials = null;
 
   @Activate
   public void activate(ComponentContext cc) {
@@ -201,6 +251,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
     getRetryNumber(cc);
     getRetryBaseTime(cc);
     getRetryMaximumVariableTime(cc);
+    maxConnectionsPerRoute = getIntFromComponentContext(cc, MAX_CONNECTIONS_PER_ROUTE_KEY,
+        DEFAULT_MAX_CONNECTIONS_PER_ROUTE);
+    maxConnectionsTotal = getIntFromComponentContext(cc, MAX_CONNECTIONS_TOTAL_KEY, DEFAULT_MAX_CONNECTIONS_TOTAL);
 
     final Long expiration = NumberUtils.createLong(StringUtils.trimToNull(
         cc.getBundleContext().getProperty(INTERNAL_URL_SIGNING_DURATION_KEY)));
@@ -210,6 +263,27 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
       signedUrlExpiresDuration = DEFAULT_URL_SIGNING_EXPIRES_DURATION;
     }
     logger.debug("Expire signed URLs in {} seconds.", signedUrlExpiresDuration);
+
+    getHttpClient();
+  }
+
+  @Deactivate
+  public synchronized void deactivate() {
+    logger.debug("deactivate");
+    if (httpClient != null) {
+      httpClient.close(CloseMode.GRACEFUL);
+      httpClient = null;
+      connectionManager = null;
+    }
+  }
+
+  public TrustedHttpClientImpl() {
+
+  }
+
+  public TrustedHttpClientImpl(String user, String pass) {
+    this.user = user;
+    this.pass = pass;
   }
 
   private HostCache getHostCache() {
@@ -339,325 +413,329 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
     return result;
   }
 
-  @Deactivate
-  public void deactivate() {
-    logger.debug("deactivate");
-  }
-
-  public TrustedHttpClientImpl() {
-
-  }
-
-  public TrustedHttpClientImpl(String user, String pass) {
-    this.user = user;
-    this.pass = pass;
-  }
-
-  /** Creates a new HttpClientBuilder to use for making requests. */
-  public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-    RequestConfig config = RequestConfig.custom()
-        .setConnectionRequestTimeout(connectionTimeout)
-        .setSocketTimeout(socketTimeout).build();
-    return HttpClientBuilder.create().setDefaultRequestConfig(config);
-  }
-
   /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest)
+   * Creates the builder for the shared http client. This is called exactly once; the timeouts of individual requests
+   * are configured per request.
    */
-  @Override
-  public HttpResponse execute(HttpUriRequest httpUriRequest) throws TrustedHttpClientException {
-    return execute(httpUriRequest, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+  public HttpClientBuilder makeHttpClientBuilder() {
+    connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+        .useSystemProperties()
+        .setMaxConnPerRoute(maxConnectionsPerRoute)
+        .setMaxConnTotal(maxConnectionsTotal)
+        .setDefaultConnectionConfig(ConnectionConfig.custom()
+            .setConnectTimeout(Timeout.ofMilliseconds(DEFAULT_CONNECTION_TIMEOUT))
+            .setSocketTimeout(Timeout.ofMilliseconds(DEFAULT_SOCKET_TIMEOUT))
+            .setValidateAfterInactivity(TimeValue.ofSeconds(2))
+            .setTimeToLive(TimeValue.ofMinutes(5))
+            .build())
+        .build();
+    return HttpClientBuilder.create()
+        .setConnectionManager(connectionManager)
+        .evictIdleConnections(TimeValue.ofMinutes(1))
+        .evictExpiredConnections()
+        .disableCookieManagement()
+        // The default strategy also retries requests answered with 429 or 503 after a delay. Remote services rely on
+        // seeing a 503 immediately, and a non-idempotent request must never be sent twice.
+        .setRetryStrategy(new DefaultHttpRequestRetryStrategy(3, TimeValue.ZERO_MILLISECONDS) {
+          @Override
+          public boolean retryRequest(HttpResponse response, int execCount, HttpContext context) {
+            return false;
+          }
+        })
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(DEFAULT_CONNECTION_TIMEOUT))
+            .setResponseTimeout(Timeout.ofMilliseconds(DEFAULT_SOCKET_TIMEOUT))
+            .build());
+  }
+
+  /** Returns the shared http client, creating it on first use. */
+  protected synchronized CloseableHttpClient getHttpClient() {
+    if (httpClient == null) {
+      digestCredentials = CredentialsProviderBuilder.create()
+          .add(new AuthScope(null, null, -1, null, StandardAuthScheme.DIGEST), user, pass.toCharArray())
+          .build();
+      httpClient = makeHttpClientBuilder().build();
+    }
+    return httpClient;
   }
 
   @Override
-  public HttpResponse execute(HttpUriRequest httpUriRequest, int connectionTimeout, int socketTimeout)
+  public ClassicHttpResponse execute(ClassicHttpRequest request) throws TrustedHttpClientException {
+    return execute(request, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+  }
+
+  @Override
+  public <T> T execute(ClassicHttpRequest request, HttpClientResponseHandler<? extends T> handler)
+          throws TrustedHttpClientException {
+    try (ClassicHttpResponse response = execute(request)) {
+      return handler.handleResponse(response);
+    } catch (IOException | HttpException e) {
+      throw new TrustedHttpClientException(e);
+    }
+  }
+
+  @Override
+  public ClassicHttpResponse execute(ClassicHttpRequest request, int connectionTimeout, int socketTimeout)
           throws TrustedHttpClientException {
     if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null) {
-      httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
+      request.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
     }
 
-    boolean enableDigest = getHostCache().contains(httpUriRequest.getURI().getHost());
-    logger.debug("Digest auth enabled for this request: " + enableDigest);
+    final URIAuthority authority = request.getAuthority();
+    final boolean enableDigest = authority != null && getHostCache().contains(authority.getHostName());
+    logger.debug("Digest auth enabled for this request: {}", enableDigest);
     if (enableDigest) {
       // Add the request header to elicit a digest auth response
-      httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
+      request.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
     }
 
     // If a security service has been set, use it to pass the current security context on
     logger.debug("Adding security context to request");
     final Organization organization = securityService.getOrganization();
     if (organization != null) {
-      httpUriRequest.setHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
+      request.setHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
       final User currentUser = securityService.getUser();
       if (enableDigest && currentUser != null) {
-        httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUsername());
+        request.setHeader(SecurityConstants.USER_HEADER, currentUser.getUsername());
       }
     }
 
-    final HttpClientBuilder clientBuilder = makeHttpClientBuilder(connectionTimeout, socketTimeout);
-    if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
-      final CloseableHttpClient httpClient;
-      if (enableDigest) {
-        // Set the user/pass
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        provider.setCredentials(
-            new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
-            new UsernamePasswordCredentials(user, pass));
-        httpClient = clientBuilder.setDefaultCredentialsProvider(provider).build();
-      } else {
-        httpClient = clientBuilder.build();
-      }
-      // Run the request (the http client handles the multiple back-and-forth requests)
-      try {
-        httpUriRequest = getSignedUrl(httpUriRequest);
-        HttpResponse response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
-        responseMap.put(response, httpClient);
-        return response;
-      } catch (IOException e) {
-        try {
-          httpClient.close();
-        } catch (IOException ioException) {
-          throw new TrustedHttpClientException(e);
-        }
-        throw new TrustedHttpClientException(e);
-      }
-    } else if (enableDigest) {
-      final CloseableHttpClient httpClient = clientBuilder.build();
-      // HttpClient doesn't handle the request dynamics for other verbs (especially when sending a streamed multipart
-      // request), so we need to handle the details of the digest auth back-and-forth manually
-      manuallyHandleDigestAuthentication(httpUriRequest, httpClient);
-      HttpResponse response = null;
-      try {
-        response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
-        if (nonceTimeoutRetries > 0 && hadNonceTimeoutResponse(response)) {
-          httpClient.close();
-          response = retryAuthAndRequestAfterNonceTimeout(httpUriRequest, response);
-        }
-        responseMap.put(response, httpClient);
-        return response;
-      } catch (Exception e) {
-        // if we have a response, remove it from the map
-        if (response != null) {
-          responseMap.remove(response);
-        }
-        // close the http connection(s)
-        try {
-          httpClient.close();
-        } catch (IOException ioException) {
-          throw new TrustedHttpClientException(e);
-        }
-        throw new TrustedHttpClientException(e);
-      }
-    } else {
-      final CloseableHttpClient httpClient = clientBuilder.build();
-      HttpResponse response = null;
-      try {
-        response = httpClient.execute(httpUriRequest);
-        return response;
-      } catch (Exception e) {
-        // close the http connection(s)
-        try {
-          httpClient.close();
-        } catch (IOException ioException) {
-          throw new TrustedHttpClientException(e);
-        }
-        throw new TrustedHttpClientException(e);
-      }
-    }
-  }
+    final HttpClientContext context = HttpClientContext.create();
+    context.setRequestConfig(RequestConfig.custom()
+        .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionTimeout))
+        .setResponseTimeout(Timeout.ofMilliseconds(socketTimeout))
+        .build());
 
-  /**
-   * If the request is a GET, sign the URL and return a new {@link HttpUriRequest} that is signed.
-   *
-   * @param httpUriRequest
-   *          The possible URI to sign.
-   * @return HttpUriRequest if the request is a GET and is configured to be signed.
-   * @throws TrustedHttpClientException
-   *           Thrown if there is a problem signing the URL.
-   */
-  protected HttpUriRequest getSignedUrl(HttpUriRequest httpUriRequest) throws TrustedHttpClientException {
-    if (("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod()))
-            && ResourceRequestUtil.isNotSigned(httpUriRequest.getURI())
-            && urlSigningService.accepts(httpUriRequest.getURI().toString())) {
-      logger.trace("Signing request with method: {} and URI: {}", httpUriRequest.getMethod(), httpUriRequest.getURI());
-      try {
-        final String signedUrl = urlSigningService
-            .sign(httpUriRequest.getURI().toString(), signedUrlExpiresDuration, null, null);
-        HttpRequestBase signedRequest;
-        if ("GET".equalsIgnoreCase(httpUriRequest.getMethod())) {
-          signedRequest = new HttpGet(signedUrl);
-        } else {
-          signedRequest = new HttpHead(signedUrl);
-        }
-        signedRequest.setProtocolVersion(httpUriRequest.getProtocolVersion());
-        for (Header header : httpUriRequest.getAllHeaders()) {
-          signedRequest.addHeader(header);
-        }
-        return signedRequest;
-      } catch (UrlSigningException e) {
-        throw new TrustedHttpClientException(e);
-      }
-    }
-    return httpUriRequest;
-  }
-
-  /**
-   * Retries a request if the nonce timed out during the request.
-   *
-   * @param httpUriRequest
-   *         The request to be made that isn't a GET, those are handled automatically.
-   * @param response
-   *         The response with the bad nonce timeout in it.
-   * @return A new response for the request if it was successful without the nonce timing out again or just the same
-   * response it got if it ran out of attempts.
-   * @throws TrustedHttpClientException
-   * @throws IOException
-   * @throws ClientProtocolException
-   */
-  private HttpResponse retryAuthAndRequestAfterNonceTimeout(HttpUriRequest httpUriRequest, HttpResponse response)
-          throws TrustedHttpClientException, IOException, ClientProtocolException {
-    // Get rid of old security headers with the old nonce.
-    httpUriRequest.removeHeaders(AUTHORIZATION_HEADER_NAME);
-
-    for (int i = 0; i < nonceTimeoutRetries; i++) {
-      CloseableHttpClient httpClient = makeHttpClientBuilder(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT)
-          .build();
-      int variableDelay = 0;
-      // Make sure that we have a variable delay greater than 0.
-      if (retryMaximumVariableTime > 0) {
-        variableDelay = generator.nextInt(retryMaximumVariableTime * MILLISECONDS_IN_SECONDS);
-      }
-
-      long totalDelay = (retryBaseDelay * MILLISECONDS_IN_SECONDS + variableDelay);
-      if (totalDelay > 0) {
-        logger.info("Sleeping " + totalDelay + "ms before trying request " + httpUriRequest.getURI()
-                            + " again due to a " + response.getStatusLine());
-        try {
-          Thread.sleep(totalDelay);
-        } catch (InterruptedException e) {
-          logger.error("Suffered InteruptedException while trying to sleep until next retry.", e);
-        }
-      }
-      manuallyHandleDigestAuthentication(httpUriRequest, httpClient);
-      response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
-      if (!hadNonceTimeoutResponse(response)) {
-        responseMap.put(response, httpClient);
-        break;
-      }
-      httpClient.close();
-    }
-    return response;
-  }
-
-  /**
-   * Determines if the nonce has timed out before a request could be performed.
-   *
-   * @param response
-   *         The response to test to see if it has timed out.
-   * @return true if it has time out, false if it hasn't
-   */
-  private boolean hadNonceTimeoutResponse(HttpResponse response) {
-    return (401 == response.getStatusLine().getStatusCode())
-            && ("Nonce has expired/timed out".equals(response.getStatusLine().getReasonPhrase()));
-  }
-
-  /**
-   * Handles the necessary handshake for digest authenticaion in the case where it isn't a GET operation.
-   *
-   * @param httpUriRequest
-   *         The request location to get the digest authentication for.
-   * @param httpClient
-   *         The client to send the request through.
-   * @throws TrustedHttpClientException
-   *         Thrown if the client cannot be shutdown.
-   */
-  private void manuallyHandleDigestAuthentication(HttpUriRequest httpUriRequest, CloseableHttpClient httpClient)
-          throws TrustedHttpClientException {
-    HttpRequestBase digestRequest;
     try {
-      digestRequest = (HttpRequestBase) httpUriRequest.getClass().getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
-      throw new IllegalStateException("Can not create a new " + httpUriRequest.getClass().getName());
-    }
-    digestRequest.setURI(httpUriRequest.getURI());
-    digestRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
-    String[] realmAndNonce = getRealmAndNonce(digestRequest);
-
-    if (realmAndNonce != null) {
-      // Set the user/pass
-      UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user, pass);
-
-      // Set up the digest authentication with the required values
-      DigestScheme digestAuth = new DigestScheme();
-      digestAuth.overrideParamter("realm", realmAndNonce[0]);
-      digestAuth.overrideParamter("nonce", realmAndNonce[1]);
-
-      // Add the authentication header
-      try {
-        httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest, new BasicHttpContext()));
-      } catch (Exception e) {
-        // close the http connection(s)
-        try {
-          httpClient.close();
-        } catch (IOException ex) {
-          throw new TrustedHttpClientException(ex);
+      if (Method.isSafe(request.getMethod())) {
+        // GET and HEAD carry no body, so the http client can handle the digest challenge itself
+        request = getSignedUrl(request);
+        if (enableDigest) {
+          context.setCredentialsProvider(digestCredentials);
         }
-        throw new TrustedHttpClientException(e);
+        return send(request, context);
       }
+
+      if (!enableDigest) {
+        return send(request, context);
+      }
+
+      // The http client can not repeat a request with a streamed body after a challenge, so the digest handshake is
+      // done manually before sending the actual request
+      addDigestAuthorization(request, context);
+      ClassicHttpResponse response = send(request, context);
+      for (int i = 0; i < nonceTimeoutRetries && isStaleNonceResponse(response) && isRepeatable(request); i++) {
+        response = retryAfterNonceTimeout(request, context, response);
+      }
+      return response;
+    } catch (IOException e) {
+      throw new TrustedHttpClientException(e);
     }
   }
 
   /**
-   * {@inheritDoc}
+   * Executes the request on the shared client. This is the single place requests are sent from.
    *
-   * @see org.opencastproject.security.api.TrustedHttpClient#close(org.apache.http.HttpResponse)
+   * @param request
+   *         The request to send
+   * @param context
+   *         The context holding the request configuration and credentials
+   * @return The response, which must be closed by the caller
    */
+  protected ClassicHttpResponse send(ClassicHttpRequest request, HttpClientContext context) throws IOException {
+    return getHttpClient().executeOpen(null, request, context);
+  }
+
   @Override
-  public void close(HttpResponse response) throws IOException {
+  public void close(ClassicHttpResponse response) throws IOException {
     if (response != null) {
-      CloseableHttpClient httpClient = responseMap.remove(response);
-      if (httpClient != null) {
-        httpClient.close();
-      }
+      response.close();
     } else {
       logger.debug("Can not close a null response");
     }
   }
 
   /**
-   * Perform a request, and extract the realm and nonce values
+   * If the request is a GET or HEAD, sign the URL and return a new request that is signed.
    *
    * @param request
-   *         The request to execute in order to obtain the realm and nonce
-   * @return A String[] containing the {realm, nonce}
+   *          The possible request to sign.
+   * @return The signed request if the request is a GET or HEAD and is configured to be signed, the request otherwise.
+   * @throws TrustedHttpClientException
+   *           Thrown if there is a problem signing the URL.
    */
-  protected String[] getRealmAndNonce(HttpRequestBase request) throws TrustedHttpClientException {
-    CloseableHttpClient httpClient = makeHttpClientBuilder(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT).build();
-    HttpResponse response;
+  protected ClassicHttpRequest getSignedUrl(ClassicHttpRequest request) throws TrustedHttpClientException {
+    final URI uri;
     try {
+      uri = request.getUri();
+    } catch (URISyntaxException e) {
+      throw new TrustedHttpClientException(e);
+    }
+    if (Method.isSafe(request.getMethod())
+            && ResourceRequestUtil.isNotSigned(uri)
+            && urlSigningService.accepts(uri.toString())) {
+      logger.trace("Signing request with method: {} and URI: {}", request.getMethod(), uri);
       try {
-        response = new HttpResponseWrapper(httpClient.execute(request));
-        Header[] headers = response.getHeaders("WWW-Authenticate");
-        if (headers == null || headers.length == 0) {
-          logger.warn("URI {} does not support digest authentication", request.getURI());
-          return null;
+        final String signedUrl = urlSigningService.sign(uri.toString(), signedUrlExpiresDuration, null, null);
+        final HttpUriRequestBase signedRequest;
+        if (Method.GET.isSame(request.getMethod())) {
+          signedRequest = new HttpGet(signedUrl);
+        } else {
+          signedRequest = new HttpHead(signedUrl);
         }
-        Header authRequiredResponseHeader = headers[0];
-        String nonce = null;
-        String realm = null;
-        for (HeaderElement element : authRequiredResponseHeader.getElements()) {
-          if ("nonce".equals(element.getName())) {
-            nonce = element.getValue();
-          } else if ("Digest realm".equals(element.getName())) {
-            realm = element.getValue();
+        signedRequest.setVersion(request.getVersion());
+        signedRequest.setHeaders(request.getHeaders());
+        if (request instanceof Configurable) {
+          signedRequest.setConfig(((Configurable) request).getConfig());
+        }
+        return signedRequest;
+      } catch (UrlSigningException e) {
+        throw new TrustedHttpClientException(e);
+      }
+    }
+    return request;
+  }
+
+  /**
+   * Retries a request once after the nonce timed out during the request, waiting the configured delay first.
+   *
+   * @param request
+   *         The request to be made that isn't a GET or HEAD, those are handled automatically.
+   * @param context
+   *         The request context
+   * @param response
+   *         The response with the stale nonce in it. It is closed by this method.
+   * @return The new response
+   */
+  private ClassicHttpResponse retryAfterNonceTimeout(ClassicHttpRequest request, HttpClientContext context,
+          ClassicHttpResponse response) throws TrustedHttpClientException, IOException {
+    final String status = new StatusLine(response).toString();
+    close(response);
+
+    int variableDelay = 0;
+    // Make sure that we have a variable delay greater than 0.
+    if (retryMaximumVariableTime > 0) {
+      variableDelay = generator.nextInt(retryMaximumVariableTime * MILLISECONDS_IN_SECONDS);
+    }
+    final long totalDelay = (retryBaseDelay * (long) MILLISECONDS_IN_SECONDS + variableDelay);
+    if (totalDelay > 0) {
+      logger.info("Sleeping {}ms before trying request {} again due to a stale nonce ({})", totalDelay,
+          request.getRequestUri(), status);
+      try {
+        Thread.sleep(totalDelay);
+      } catch (InterruptedException e) {
+        logger.error("Suffered InteruptedException while trying to sleep until next retry.", e);
+      }
+    }
+
+    // Get rid of old security headers with the old nonce.
+    request.removeHeaders(AUTHORIZATION_HEADER_NAME);
+    addDigestAuthorization(request, context);
+    return send(request, context);
+  }
+
+  /**
+   * Determines if the nonce has timed out before a request could be performed, i.e. if the server answered with a
+   * digest challenge marked as stale.
+   *
+   * @param response
+   *         The response to test to see if it has timed out.
+   * @return true if it has time out, false if it hasn't
+   */
+  private static boolean isStaleNonceResponse(ClassicHttpResponse response) {
+    if (response.getCode() != HttpStatus.SC_UNAUTHORIZED) {
+      return false;
+    }
+    for (AuthChallenge challenge : parseDigestChallenges(response)) {
+      for (NameValuePair param : challenge.getParams()) {
+        if ("stale".equalsIgnoreCase(param.getName()) && "true".equalsIgnoreCase(param.getValue())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /** Whether the request can be sent a second time. */
+  private static boolean isRepeatable(ClassicHttpRequest request) {
+    final HttpEntity entity = request.getEntity();
+    return entity == null || entity.isRepeatable();
+  }
+
+  /** Extracts all digest challenges from the WWW-Authenticate headers of a response. */
+  private static List<AuthChallenge> parseDigestChallenges(HttpResponse response) {
+    final List<AuthChallenge> challenges = new ArrayList<>();
+    for (Header header : response.getHeaders(HttpHeaders.WWW_AUTHENTICATE)) {
+      final String value = header.getValue();
+      if (value == null) {
+        continue;
+      }
+      try {
+        for (AuthChallenge challenge : AuthChallengeParser.INSTANCE.parse(ChallengeType.TARGET, value,
+                new ParserCursor(0, value.length()))) {
+          if (StandardAuthScheme.DIGEST.equalsIgnoreCase(challenge.getSchemeName())) {
+            challenges.add(challenge);
           }
         }
-        return new String[]{realm, nonce};
-      } finally {
-        httpClient.close();
+      } catch (ParseException e) {
+        logger.warn("Ignoring malformed authentication challenge '{}'", value);
       }
+    }
+    return challenges;
+  }
+
+  /**
+   * Handles the necessary handshake for digest authentication in the case where it isn't a GET or HEAD operation: a
+   * request without body is sent to obtain the challenge, from which the authorization header of the actual request
+   * is computed.
+   *
+   * @param request
+   *         The request to add the authorization header to.
+   * @param context
+   *         The request context.
+   */
+  private void addDigestAuthorization(ClassicHttpRequest request, HttpClientContext context)
+          throws TrustedHttpClientException {
+    final AuthChallenge challenge = probeDigestChallenge(request);
+    if (challenge == null) {
+      return;
+    }
+    try {
+      final HttpHost host = HttpHost.create(request.getUri());
+      final DigestScheme digestAuth = new DigestScheme();
+      digestAuth.processChallenge(challenge, context);
+      if (!digestAuth.isResponseReady(host, digestCredentials, context)) {
+        throw new TrustedHttpClientException(new IllegalStateException("No digest credentials available for " + host));
+      }
+      request.setHeader(AUTHORIZATION_HEADER_NAME, digestAuth.generateAuthResponse(host, request, context));
+    } catch (URISyntaxException | MalformedChallengeException | AuthenticationException e) {
+      throw new TrustedHttpClientException(e);
+    }
+  }
+
+  /**
+   * Perform a request without body in order to obtain the digest challenge of the server.
+   *
+   * @param request
+   *         The request whose target to obtain the challenge for
+   * @return The digest challenge, or null if the server did not ask for digest authentication
+   */
+  protected AuthChallenge probeDigestChallenge(ClassicHttpRequest request) throws TrustedHttpClientException {
+    final BasicClassicHttpRequest probe;
+    try {
+      probe = new BasicClassicHttpRequest(request.getMethod(), request.getUri());
+    } catch (URISyntaxException e) {
+      throw new TrustedHttpClientException(e);
+    }
+    probe.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
+    try (ClassicHttpResponse response = send(probe, HttpClientContext.create())) {
+      EntityUtils.consumeQuietly(response.getEntity());
+      final List<AuthChallenge> challenges = parseDigestChallenges(response);
+      if (challenges.isEmpty()) {
+        logger.warn("URI {} does not support digest authentication", probe.getRequestUri());
+        return null;
+      }
+      return challenges.get(0);
     } catch (IOException e) {
       throw new TrustedHttpClientException(e);
     }

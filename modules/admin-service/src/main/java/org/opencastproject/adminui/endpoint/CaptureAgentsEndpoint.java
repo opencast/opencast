@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;

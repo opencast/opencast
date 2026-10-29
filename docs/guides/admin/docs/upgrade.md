@@ -22,6 +22,12 @@ git diff origin/r/{{ opencast_major_version() | int - 1 }}.x origin/r/{{ opencas
 
 The most important changes are:
 
+- Opencast now uses Apache HttpClient 5 instead of the end-of-life HttpClient 4 for all internal HTTP communication.
+  Requests between nodes share a connection pool whose size can be configured with the new options
+  `org.opencastproject.security.http.max.connections.per.route` and `org.opencastproject.security.http.max.connections`
+  in `etc/custom.properties`. The digest nonce retry options `org.opencastproject.security.digest.nonce.*` keep their
+  meaning but now trigger on a stale nonce reported by the server. External plugins using the `TrustedHttpClient`
+  service must be migrated to the HttpClient 5 API (`ClassicHttpRequest`, `ClassicHttpResponse`, `getCode()`).
 - Paella 8 is now the default Paella version.  Paella 7 is scheduled for removal in Opencast 21. [[#7214](https://github.com/opencast/opencast/pull/7214)]
 - The circular dependency between index and list providers has been eliminated. The configuration for the ACL additional
   actions list provider has been moved to the organization configuration. [#7128](https://github.com/opencast/opencast/pull/7128)

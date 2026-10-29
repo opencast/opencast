@@ -53,3 +53,18 @@ updates:
   schedule:
     interval: monthly
   open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: /modules/elasticsearch-impl
+  schedule:
+    interval: monthly
+  groups:
+    # httpclient5, httpcore5, httpcore5-h2 and httpcore5-reactive are released
+    # in lockstep and must be bumped together
+    httpcomponents:
+      patterns:
+        - "org.apache.httpcomponents.*"
+    httpcomponents-security:
+      applies-to: security-updates
+      patterns:
+        - "org.apache.httpcomponents.*"
+  open-pull-requests-limit: 10

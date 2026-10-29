@@ -184,6 +184,8 @@
               !org.jaxen.*,
               !sun.security.util,
               !org.osgi.service.log,
+              <!-- optional Apache HttpClient 4 transport of the Google client, not used -->
+              !org.apache.http.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *

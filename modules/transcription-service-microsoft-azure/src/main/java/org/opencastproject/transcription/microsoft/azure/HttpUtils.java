@@ -21,12 +21,16 @@
 
 package org.opencastproject.transcription.microsoft.azure;
 
+import org.opencastproject.util.HttpUtil;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.util.Timeout;
 
 import java.io.IOException;
 
@@ -41,21 +45,28 @@ public final class HttpUtils {
 
   public static CloseableHttpClient makeHttpClient(int conectionTimeout, int socketTimeout,
       int connectionRequestTimeout) {
-    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(conectionTimeout)
-        .setSocketTimeout(socketTimeout)
-        .setConnectionRequestTimeout(connectionRequestTimeout)
-        .build();
-    CloseableHttpClient httpClient = HttpClientBuilder.create()
+    return HttpUtil.clientBuilder(conectionTimeout, socketTimeout)
         .useSystemProperties()
-        .setDefaultRequestConfig(reqConfig)
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionRequestTimeout))
+            .setResponseTimeout(Timeout.ofMilliseconds(socketTimeout))
+            .build())
         .build();
-    return httpClient;
   }
 
-  public static String formatResponseErrorString(HttpResponse response, String message) throws IOException {
+  /** Reads the entity into a string, treating malformed content as an I/O problem. */
+  public static String entityToString(HttpEntity entity) throws IOException {
+    try {
+      return EntityUtils.toString(entity);
+    } catch (ParseException e) {
+      throw new IOException(e);
+    }
+  }
+
+  public static String formatResponseErrorString(ClassicHttpResponse response, String message) throws IOException {
     String responseString = "";
     if (response.getEntity() != null) {
-      responseString = EntityUtils.toString(response.getEntity());
+      responseString = entityToString(response.getEntity());
     }
     if (StringUtils.isNotBlank(message)) {
       return String.format("%s Microsoft response: %s", message, responseString);

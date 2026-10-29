@@ -53,9 +53,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -442,10 +442,10 @@ public final class WorkspaceImpl implements Workspace {
    * @throws IOException
    *           in case of any IO related issues
    */
-  private Either<String, Optional<File>> handleDownloadResponse(HttpResponse response, URI src, File dst)
+  private Either<String, Optional<File>> handleDownloadResponse(ClassicHttpResponse response, URI src, File dst)
           throws IOException {
     final String url = src.toString();
-    final int status = response.getStatusLine().getStatusCode();
+    final int status = response.getCode();
     switch (status) {
       case HttpServletResponse.SC_NOT_FOUND:
         return right(Optional.empty());
@@ -494,7 +494,7 @@ public final class WorkspaceImpl implements Workspace {
     while (true) {
       // run the http request and handle its response
       try {
-        HttpResponse response = null;
+        ClassicHttpResponse response = null;
         final Either<String, Optional<File>> result;
         try {
           response = trustedHttpClient.execute(get);
@@ -543,7 +543,7 @@ public final class WorkspaceImpl implements Workspace {
    *
    * @return the destination file
    */
-  private static File downloadTo(final HttpResponse response, final File dst) throws IOException {
+  private static File downloadTo(final ClassicHttpResponse response, final File dst) throws IOException {
     // ignore return value
     dst.createNewFile();
     try (InputStream in = response.getEntity().getContent()) {

@@ -28,7 +28,7 @@ import org.opencastproject.urlsigning.common.Policy;
 import org.opencastproject.urlsigning.common.ResourceRequest;
 import org.opencastproject.urlsigning.common.ResourceRequest.Status;
 
-import org.apache.http.NameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;

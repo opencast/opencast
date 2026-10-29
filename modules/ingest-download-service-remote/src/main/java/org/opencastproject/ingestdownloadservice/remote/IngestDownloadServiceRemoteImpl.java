@@ -31,17 +31,18 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +86,7 @@ public class IngestDownloadServiceRemoteImpl extends RemoteBase implements Inges
   @Override
   public Job ingestDownload(MediaPackage mediaPackage, String sourceFlavors, String sourceTags, boolean deleteExternal,
           boolean tagsAndFlavor) throws ServiceRegistryException {
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
 
     try {
       final String mediaPackageStr = MediaPackageParser.getAsXml(mediaPackage);
@@ -99,7 +100,7 @@ public class IngestDownloadServiceRemoteImpl extends RemoteBase implements Inges
       logger.info("Downloading Source form mediapackge: {} to workspace", mediaPackage.getIdentifier());
 
       final HttpPost post = new HttpPost("/ingestdownload");
-      post.setEntity(new UrlEncodedFormEntity(formStringParams, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(formStringParams, StandardCharsets.UTF_8));
       response = getResponse(post);
 
       if (response != null) {

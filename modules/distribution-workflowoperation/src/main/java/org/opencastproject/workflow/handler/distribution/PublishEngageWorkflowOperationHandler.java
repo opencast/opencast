@@ -68,7 +68,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -524,7 +523,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @return the assembled player URI for this mediapackage
    */
   URI createEngageUri(URI engageUri, MediaPackage mp) {
-    return URIUtils.resolve(engageUri, PLAYER_PATH + mp.getIdentifier().toString());
+    return engageUri.resolve(PLAYER_PATH + mp.getIdentifier().toString());
   }
 
   /**

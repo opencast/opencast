@@ -33,13 +33,9 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -106,13 +102,11 @@ public class WorkspaceImplTest {
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     HttpEntity entity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(entity.getContent()).andReturn(new FileInputStream(source));
-    StatusLine statusLine = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_OK);
-    HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
     EasyMock.expect(response.getEntity()).andReturn(entity);
-    EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
-    EasyMock.replay(response, entity, statusLine);
-    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpUriRequest.class))).andReturn(response);
+    EasyMock.expect(response.getCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
+    EasyMock.replay(response, entity);
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(ClassicHttpRequest.class))).andReturn(response);
     EasyMock.replay(httpClient);
     workspace.setTrustedHttpClient(httpClient);
     Assert.assertTrue(urlToSource.toString().length() > 255);
@@ -260,13 +254,11 @@ public class WorkspaceImplTest {
 
     HttpEntity httpEntity = EasyMock.createMock(HttpEntity.class);
     expect(httpEntity.getContent()).andAnswer(() -> IOUtils.toInputStream("", "UTF-8"));
-    CloseableHttpResponse response = EasyMock.createMock(CloseableHttpResponse.class);
-    expect(response.getStatusLine())
-        .andReturn(new BasicStatusLine(new ProtocolVersion("Http", 1, 1), 200, "Good to go"))
-        .anyTimes();
+    ClassicHttpResponse response = EasyMock.createMock(ClassicHttpResponse.class);
+    expect(response.getCode()).andReturn(200).anyTimes();
     expect(response.getEntity()).andReturn(httpEntity);
     TrustedHttpClient trustedHttpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    expect(trustedHttpClient.execute(anyObject(HttpUriRequest.class))).andReturn(response).anyTimes();
+    expect(trustedHttpClient.execute(anyObject(ClassicHttpRequest.class))).andReturn(response).anyTimes();
     EasyMock.replay(httpEntity, response, trustedHttpClient);
     workspace.setTrustedHttpClient(trustedHttpClient);
 

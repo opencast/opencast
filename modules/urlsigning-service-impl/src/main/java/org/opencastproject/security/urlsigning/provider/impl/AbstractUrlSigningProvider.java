@@ -30,8 +30,8 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -287,13 +287,13 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       URI uri = new URI(url);
       List<NameValuePair> queryStringParameters = new ArrayList<>();
       if (uri.getQuery() != null) {
-        queryStringParameters = URLEncodedUtils.parse(uri.getQuery(), StandardCharsets.UTF_8);
+        queryStringParameters = WWWFormCodec.parse(uri.getQuery(), StandardCharsets.UTF_8);
       }
-      queryStringParameters.addAll(URLEncodedUtils.parse(
+      queryStringParameters.addAll(WWWFormCodec.parse(
               ResourceRequestUtil.policyToResourceRequestQueryString(policy, key.id, key.secret),
               StandardCharsets.UTF_8));
       return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
-              URLEncodedUtils.format(queryStringParameters, StandardCharsets.UTF_8), null).toString();
+              WWWFormCodec.format(queryStringParameters, StandardCharsets.UTF_8), null).toString();
     } catch (Exception e) {
       getLogger().error("Unable to create signed URL because {}", ExceptionUtils.getStackTrace(e));
       throw new UrlSigningException(e);

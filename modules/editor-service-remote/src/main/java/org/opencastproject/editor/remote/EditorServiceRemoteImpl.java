@@ -29,23 +29,23 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,13 +105,13 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
           throws EditorServiceException {
     logger.debug("Editor Remote Lock POST Request for mediaPackage : '{}'", mediaPackageId);
     HttpDelete delete = new HttpDelete(mediaPackageId + urlSuffix);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = getResponse(delete, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_CONFLICT);
-      if (response == null || response.getStatusLine() == null) {
+      if (response == null) {
         throw new EditorServiceException("Editor Remote call failed to respond", ErrorStatus.UNKNOWN);
       }
-      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+      if (response.getCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
       }
       return null;
@@ -126,14 +126,14 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
           throws EditorServiceException {
     logger.debug("Editor Remote GET Request for mediaPackage: '{}' to url: '{}'", mediaPackageId, urlSuffix);
     HttpGet get = new HttpGet(mediaPackageId + urlSuffix);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = getResponse(get, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_CONFLICT,
         HttpStatus.SC_BAD_REQUEST);
-      if (response == null || response.getStatusLine() == null) {
+      if (response == null) {
         throw new EditorServiceException("HTTP Request failed", ErrorStatus.UNKNOWN);
       }
-      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+      if (response.getCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
         return null;
       } else {
@@ -144,7 +144,7 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
           throw new EditorServiceException("Editor Remote call failed", ErrorStatus.UNKNOWN);
         }
       }
-    } catch (IOException e) {
+    } catch (IOException | ParseException e) {
       throw new EditorServiceException("Editor Remote call failed", ErrorStatus.UNKNOWN, e);
     } finally {
       closeConnection(response);
@@ -155,17 +155,17 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
           throws EditorServiceException {
     logger.debug("Editor Remote POST Request for mediaPackage : '{}' to url: '{}'", mediaPackageId, urlSuffix);
     HttpPost post = new HttpPost(mediaPackageId + urlSuffix);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       StringEntity editJson = new StringEntity(data, StandardCharsets.UTF_8);
       post.setEntity(editJson);
       post.setHeader("Content-type", "application/json");
       response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_BAD_REQUEST,
               HttpStatus.SC_CONFLICT);
-      if (response == null || response.getStatusLine() == null) {
+      if (response == null) {
         throw new EditorServiceException("No response for setEditData", ErrorStatus.UNKNOWN);
       }
-      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+      if (response.getCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
       }
     } finally {
@@ -178,30 +178,28 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
           throws EditorServiceException {
     logger.debug("Editor Remote POST Request for mediaPackage : '{}' to url: '{}'", mediaPackageId, urlSuffix);
     HttpPost post = new HttpPost(mediaPackageId + urlSuffix);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       List<BasicNameValuePair> formParams = new ArrayList<>();
       for (String field : params.keySet()) {
         formParams.add(new BasicNameValuePair(field, params.get(field)));
       }
-      post.setEntity(new UrlEncodedFormEntity(formParams, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(formParams, StandardCharsets.UTF_8));
       response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NOT_FOUND, HttpStatus.SC_BAD_REQUEST,
               HttpStatus.SC_CONFLICT);
-      if (response == null || response.getStatusLine() == null) {
+      if (response == null) {
         throw new EditorServiceException("No response for setEditData", ErrorStatus.UNKNOWN);
       }
-      if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+      if (response.getCode() != HttpStatus.SC_OK) {
         evaluateResponseCode(response);
       }
-    } catch (UnsupportedEncodingException e) {
-      throw new EditorServiceException(e.getMessage(), ErrorStatus.UNKNOWN);
     } finally {
       closeConnection(response);
     }
   }
 
-  protected void evaluateResponseCode(HttpResponse response) throws EditorServiceException {
-    switch (response.getStatusLine().getStatusCode()) {
+  protected void evaluateResponseCode(ClassicHttpResponse response) throws EditorServiceException {
+    switch (response.getCode()) {
       case HttpStatus.SC_NOT_FOUND:
         throw new EditorServiceException("MediaPackage not found", ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
       case HttpStatus.SC_CONFLICT:

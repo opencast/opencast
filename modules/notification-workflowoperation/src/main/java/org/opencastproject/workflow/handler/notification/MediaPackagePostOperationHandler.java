@@ -36,17 +36,15 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -54,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -133,7 +132,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
       // construct POST
       HttpPost post = new HttpPost(config.getUrl());
-      post.setEntity(new UrlEncodedFormEntity(data, config.getEncoding()));
+      post.setEntity(new UrlEncodedFormEntity(data, Charset.forName(config.getEncoding())));
 
       // execute POST
       HttpClientBuilder clientBuilder = HttpClientBuilder.create();
@@ -141,18 +140,18 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       // Handle authentication
       if (config.authenticate()) {
         URL targetUrl = config.getUrl().toURL();
-        CredentialsProvider provider = new BasicCredentialsProvider();
+        BasicCredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(
             new AuthScope(targetUrl.getHost(), targetUrl.getPort()),
             config.getCredentials());
         clientBuilder.setDefaultCredentialsProvider(provider);
       }
-      CloseableHttpClient client = clientBuilder.build();
-
-      HttpResponse response = client.execute(post);
+      final int status;
+      try (CloseableHttpClient client = clientBuilder.build()) {
+        status = client.execute(post, response -> response.getCode());
+      }
 
       // throw Exception if target host did not return 200
-      int status = response.getStatusLine().getStatusCode();
       if ((status >= 200) && (status < 300)) {
         if (config.debug()) {
           logger.info("Successfully submitted '{}' ({}) to {}: {}", mp.getTitle(), mp.getIdentifier(),
@@ -234,7 +233,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
             if (username == null || password == null) {
               throw new WorkflowOperationException("Username and Password must be provided for authentication!");
             }
-            credentials = new UsernamePasswordCredentials(username, password);
+            credentials = new UsernamePasswordCredentials(username, password.toCharArray());
             authenticate = true;
           }
         }

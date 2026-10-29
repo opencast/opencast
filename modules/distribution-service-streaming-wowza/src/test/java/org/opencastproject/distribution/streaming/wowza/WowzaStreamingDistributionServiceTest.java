@@ -49,9 +49,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;
@@ -136,16 +135,12 @@ public class WowzaStreamingDistributionServiceTest {
     orgDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     streamingService.setOrganizationDirectoryService(orgDirectoryService);
 
-    StatusLine statusLine = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
-    EasyMock.replay(statusLine);
-
-    HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
     EasyMock.replay(response);
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute((ClassicHttpRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
     streamingService.setTrustedHttpClient(httpClient);
 

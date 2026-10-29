@@ -35,17 +35,18 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       float load)
           throws ExecuteException {
     HttpPost post = null;
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
 
     try {
       String inElementStr = MediaPackageElementParser.getAsXml(inElement);
@@ -100,7 +101,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       logger.info("Executing command {} using a remote execute service", exec);
 
       post = new HttpPost("/" + ExecuteService.ENDPOINT_NAME);
-      post.setEntity(new UrlEncodedFormEntity(formStringParams, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(formStringParams, StandardCharsets.UTF_8));
       response = getResponse(post);
 
       if (response != null) {
@@ -132,7 +133,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type type, float load)
           throws ExecuteException {
     HttpPost post = null;
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
 
     try {
       String mpStr = MediaPackageParser.getAsXml(mp);
@@ -151,7 +152,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       logger.info("Executing command {} using a remote execute service", exec);
 
       post = new HttpPost("/" + ExecuteService.ENDPOINT_NAME);
-      post.setEntity(new UrlEncodedFormEntity(formStringParams, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(formStringParams, StandardCharsets.UTF_8));
       response = getResponse(post);
 
       if (response != null) {

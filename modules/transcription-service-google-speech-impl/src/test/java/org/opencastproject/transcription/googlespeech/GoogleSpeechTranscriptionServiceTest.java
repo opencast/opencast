@@ -55,13 +55,13 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.json.simple.JSONObject;
@@ -237,20 +237,19 @@ public class GoogleSpeechTranscriptionServiceTest {
     HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(httpEntity.getContent()).andReturn(stream);
 
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status1 = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status1).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
     EasyMock.expect(response.getEntity()).andReturn(httpEntity).anyTimes();
-    EasyMock.expect(status1.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
-    EasyMock.replay(httpEntity, response, status1);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(httpEntity, response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
     Assert.assertEquals("https://speech.googleapis.com/v1/speech:longrunningrecognize",
-            capturedPost.getValue().getURI().toString());
+            capturedPost.getValue().getUri().toString());
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
     Assert.assertNotNull(j);
@@ -264,13 +263,12 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
     EasyMock.replay(workspace);
 
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
-    EasyMock.replay(response, status);
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
@@ -337,15 +335,14 @@ public class GoogleSpeechTranscriptionServiceTest {
     HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(httpEntity.getContent()).andReturn(stream);
 
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
     EasyMock.expect(response.getEntity()).andReturn(httpEntity).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
-    EasyMock.replay(httpEntity, response, status);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     long before = System.currentTimeMillis();
@@ -353,7 +350,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     long after = System.currentTimeMillis();
     // Check if correct url was invoked
     Assert.assertEquals(RESULT_URL + JOB_ID,
-            capturedGet.getValue().getURI().toString());
+            capturedGet.getValue().getUri().toString());
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
     Assert.assertNotNull(job);
@@ -367,33 +364,31 @@ public class GoogleSpeechTranscriptionServiceTest {
 
   @Test
   public void testRefreshAccessTokenURL() throws Exception {
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_NOT_FOUND).anyTimes();
-    EasyMock.replay(response, status);
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_NOT_FOUND).anyTimes();
+    EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     String token = service.refreshAccessToken(CLIENT_ID, CLIENT_SECRET, CLIENT_TOKEN);
     Assert.assertEquals("client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET
             + "&refresh_token=" + CLIENT_TOKEN + "&grant_type=refresh_token",
-            capturedPost.getValue().getURI().getQuery());
+            capturedPost.getValue().getUri().getQuery());
     Assert.assertEquals("-1", token);
   }
 
   @Test
   public void testGetAndSaveJobResultsError503() throws Exception {
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_SERVICE_UNAVAILABLE).anyTimes();
-    EasyMock.replay(response, status);
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_SERVICE_UNAVAILABLE).anyTimes();
+    EasyMock.replay(response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     try {
@@ -450,14 +445,13 @@ public class GoogleSpeechTranscriptionServiceTest {
     HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(httpEntity.getContent()).andReturn(stream);
 
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
     EasyMock.expect(response.getEntity()).andReturn(httpEntity).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
-    EasyMock.replay(httpEntity, response, status);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(httpEntity, response);
 
-    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID, Track.TYPE);
@@ -511,15 +505,13 @@ public class GoogleSpeechTranscriptionServiceTest {
     HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(httpEntity.getContent()).andReturn(stream);
 
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
     EasyMock.expect(response.getEntity()).andReturn(httpEntity).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
-    EasyMock.replay(httpEntity, response, status);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response);
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(CloseableHttpResponse.adapt(response));
     EasyMock.replay(httpClient);
 
     Capture<Set<String>> capturedMpIds
@@ -530,7 +522,7 @@ public class GoogleSpeechTranscriptionServiceTest {
 
     // Check if it called the external service to get the results
     Assert.assertEquals(RESULT_URL + JOB_ID,
-            capturedGet.getValue().getURI().toString());
+            capturedGet.getValue().getUri().toString());
     // Check if only one mp has a workflow created for it
     Assert.assertEquals(1, capturedMpIds.getValue().size());
     // And if it was the correct one

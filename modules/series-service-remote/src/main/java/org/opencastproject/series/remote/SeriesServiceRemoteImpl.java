@@ -26,12 +26,12 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.hc.core5.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.hc.core5.http.HttpStatus.SC_CREATED;
+import static org.apache.hc.core5.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -52,17 +52,17 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -170,10 +170,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesId, e);
     }
 
-    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getCode();
         if (SC_NO_CONTENT == statusCode) {
           logger.info("Successfully updated series {} in the series service", seriesId);
           return null;
@@ -215,10 +215,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       throw new SeriesException("Unable to assemble a remote series request for updating an ACL " + accessControl, e);
     }
 
-    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        int status = response.getStatusLine().getStatusCode();
+        int status = response.getCode();
         if (SC_NOT_FOUND == status) {
           throw new NotFoundException("Series not found: " + seriesID);
         } else if (SC_NO_CONTENT == status) {
@@ -240,10 +240,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public void deleteSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpDelete del = new HttpDelete(seriesID);
-    HttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getCode();
         if (SC_NOT_FOUND == statusCode) {
           throw new NotFoundException("Series not found: " + seriesID);
         } else if (SC_UNAUTHORIZED == statusCode) {
@@ -296,12 +296,12 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + ".xml");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Series " + seriesID + " not found in remote series index!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           throw new UnauthorizedException("Not authorized to get series " + seriesID);
         } else {
           DublinCoreCatalog dublinCoreCatalog = DublinCores.read(response.getEntity().getContent());
@@ -334,19 +334,19 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     if (to.isPresent()) {
       queryParams.add(new BasicNameValuePair("to", Long.toString(to.get().getTime())));
     }
-    url.append(URLEncodedUtils.format(queryParams, StandardCharsets.UTF_8));
+    url.append(WWWFormCodec.format(queryParams, StandardCharsets.UTF_8));
     HttpGet get = new HttpGet(url.toString());
 
     // Send HTTP request
-    HttpResponse response = getResponse(get, SC_OK, SC_BAD_REQUEST, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_BAD_REQUEST, SC_UNAUTHORIZED);
     try {
       if (response == null) {
         throw new SeriesException("Unable to get series from remote series index");
       }
 
-      if (response.getStatusLine().getStatusCode() == SC_BAD_REQUEST) {
+      if (response.getCode() == SC_BAD_REQUEST) {
         throw new SeriesException("internal server error when fetching /allInRangeAdministrative.json");
-      } else if (response.getStatusLine().getStatusCode() == SC_UNAUTHORIZED) {
+      } else if (response.getCode() == SC_UNAUTHORIZED) {
         throw new UnauthorizedException("got UNAUTHORIZED when fetching /allInRangeAdministrative.json");
       } else {
         // Retrieve and deserialize data
@@ -363,10 +363,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public AccessControlList getSeriesAccessControl(String seriesID) throws NotFoundException, SeriesException {
     HttpGet get = new HttpGet(seriesID + "/acl.xml");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Series ACL " + seriesID + " not found on remote series index!");
         } else {
           AccessControlList acl = AccessControlParser.parseAcl(response.getEntity().getContent());
@@ -387,7 +387,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public int getSeriesCount() throws SeriesException {
     HttpGet get = new HttpGet("/count");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         int count = Integer.parseInt(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
@@ -406,13 +406,13 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   public Map<String, String> getSeriesProperties(String seriesID)
           throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + "/properties.json");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     JSONParser parser = new JSONParser();
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Series " + seriesID + " not found in remote series index!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           throw new UnauthorizedException("Not authorized to get series " + seriesID);
         } else {
           logger.debug("Successfully received series {} properties from the remote series index", seriesID);
@@ -446,12 +446,12 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   public String getSeriesProperty(String seriesID, String propertyName)
           throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + "/property/" + propertyName + ".json");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Series " + seriesID + " not found in remote series index!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           throw new UnauthorizedException("Not authorized to get series " + seriesID);
         } else {
           logger.debug("Successfully received series {} property {} from the remote series index", seriesID,
@@ -487,10 +487,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
               + " series property " + propertyName + ":" + propertyValue, e);
     }
 
-    HttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(post, SC_NO_CONTENT, SC_CREATED, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getCode();
         if (SC_NO_CONTENT == statusCode) {
           logger.info("Successfully updated series {} with property name {} and value {} in the series service",
                   seriesID, propertyName, propertyValue);
@@ -514,10 +514,10 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   public void deleteSeriesProperty(String seriesID, String propertyName)
           throws SeriesException, NotFoundException, UnauthorizedException {
     HttpDelete del = new HttpDelete("/" + seriesID + "/property/" + propertyName);
-    HttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        int statusCode = response.getStatusLine().getStatusCode();
+        int statusCode = response.getCode();
         if (SC_NOT_FOUND == statusCode) {
           throw new NotFoundException("Series not found: " + seriesID);
         } else if (SC_UNAUTHORIZED == statusCode) {
@@ -545,13 +545,13 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
               + seriesId, e);
     }
 
-    HttpResponse response = getResponse(put, SC_NO_CONTENT, SC_CREATED, SC_INTERNAL_SERVER_ERROR);
+    ClassicHttpResponse response = getResponse(put, SC_NO_CONTENT, SC_CREATED, SC_INTERNAL_SERVER_ERROR);
     try {
       if (response == null) {
         throw new SeriesException(format("Error while updating extended metadata catalog of type '%s' for series '%s'",
                 type, seriesId));
       } else {
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         switch (statusCode) {
           case SC_NO_CONTENT:
           case SC_CREATED:
@@ -572,14 +572,14 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public Optional<Map<String, byte[]>> getSeriesElements(String seriesID) throws SeriesException {
     HttpGet get = new HttpGet("/" + seriesID + "/elements.json");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
     JSONParser parser = new JSONParser();
 
     try {
       if (response == null) {
         throw new SeriesException(format("Error while retrieving elements from series '%s'", seriesID));
       } else {
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         switch (statusCode) {
           case SC_OK:
             JSONArray elementArray = (JSONArray) parser.parse(
@@ -614,14 +614,14 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public Optional<byte[]> getSeriesElementData(String seriesID, String type) throws SeriesException {
     HttpGet get = new HttpGet("/" + seriesID + "/elements/" + type);
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
 
     try {
       if (response == null) {
         throw new SeriesException(
                 format("Error while retrieving element of type '%s' from series '%s'", type, seriesID));
       } else {
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         switch (statusCode) {
           case SC_OK:
             return Optional.of(IOUtils.toByteArray(response.getEntity().getContent()));
@@ -647,12 +647,12 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     HttpPut put = new HttpPut("/" + seriesID + "/elements/" + type);
     put.setEntity(new ByteArrayEntity(data, ContentType.DEFAULT_BINARY));
 
-    HttpResponse response = getResponse(put, SC_CREATED, SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR);
+    ClassicHttpResponse response = getResponse(put, SC_CREATED, SC_NO_CONTENT, SC_INTERNAL_SERVER_ERROR);
     try {
       if (response == null) {
         throw new SeriesException(format("Error while updating element of type '%s' in series '%s'", type, seriesID));
       } else {
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         switch (statusCode) {
           case SC_NO_CONTENT:
           case SC_CREATED:
@@ -679,12 +679,12 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     }
 
     HttpDelete del = new HttpDelete("/" + seriesID + "/elements/" + type);
-    HttpResponse response = getResponse(del, SC_NO_CONTENT, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
+    ClassicHttpResponse response = getResponse(del, SC_NO_CONTENT, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
     try {
       if (response == null) {
         throw new SeriesException("Unable to remove " + seriesID + " from a remote series index");
       } else {
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         switch (statusCode) {
           case SC_NO_CONTENT:
             return true;

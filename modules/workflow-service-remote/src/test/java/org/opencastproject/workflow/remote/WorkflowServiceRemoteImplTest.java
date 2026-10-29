@@ -21,13 +21,12 @@
 
 package org.opencastproject.workflow.remote;
 
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
 import static org.junit.Assert.assertEquals;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.junit.Test;
 
 public class WorkflowServiceRemoteImplTest {
@@ -40,13 +39,13 @@ public class WorkflowServiceRemoteImplTest {
     private String requestUri;
 
     @Override
-    protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
-      requestUri = httpRequest.getURI().toString();
-      return new BasicHttpResponse(HttpVersion.HTTP_1_1, SC_NO_CONTENT, "No Content");
+    protected ClassicHttpResponse getResponse(ClassicHttpRequest httpRequest, Integer... expectedHttpStatus) {
+      requestUri = httpRequest.getRequestUri();
+      return new BasicClassicHttpResponse(SC_NO_CONTENT, "No Content");
     }
 
     @Override
-    protected void closeConnection(HttpResponse response) {
+    protected void closeConnection(ClassicHttpResponse response) {
     }
   }
 
