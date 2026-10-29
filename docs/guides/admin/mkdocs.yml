@@ -136,6 +136,7 @@ nav:
           - Paella player 7:
               - Configuration: "configuration/player/paella.player7/configuration.md"
               - URL Parameters: "configuration/player/paella.player7/url.parameter.md"
+              - Embedding with JWT: "configuration/player/paella.player7/jwt.md"
               - Paella plugins:
                   - Overview: "configuration/player/paella.player7/plugins.md"
                   - org.opencast.paella.cookieconsent: "configuration/player/paella.player7/plugins/org.opencast.paella.cookieconsent.md"
