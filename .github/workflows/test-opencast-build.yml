@@ -24,6 +24,9 @@ on:
     branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
+permissions:
+  contents: read
+
 jobs:
   test-opencast:
     strategy:

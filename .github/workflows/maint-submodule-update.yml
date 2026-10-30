@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 1 * * *' #1AM UTC, before the QA boxes reboot, but after everyone's done for the day
 
+permissions:
+  contents: write
+
 jobs:
   determine-current-branches:
     name: determine which opencast branches to update submodules on

@@ -12,6 +12,9 @@ on:
       - 'mvnw'
       - '.mvn/**'
 
+permissions:
+  contents: read
+
 jobs:
   mvn-check:
     name: Ensure mvn isn't being used

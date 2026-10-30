@@ -10,6 +10,9 @@ concurrency:
   group: crowdin-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   upload-translations-keys:
     if: github.repository_owner == 'opencast'

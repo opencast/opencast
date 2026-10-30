@@ -10,6 +10,9 @@ concurrency:
   group: docs-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   deploy-documentation:
     if: github.repository_owner == 'opencast'

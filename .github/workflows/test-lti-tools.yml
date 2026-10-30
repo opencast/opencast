@@ -10,6 +10,9 @@ on:
       - .github/workflows/test-lti-tools.yml
       - modules/lti/**
 
+permissions:
+  contents: read
+
 jobs:
   test-lti:
     runs-on: ubuntu-24.04
