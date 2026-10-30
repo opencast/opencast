@@ -28,6 +28,9 @@ jobs:
   test-opencast:
     strategy:
       matrix:
+        # Java 21 is the supported version. Java 23 is the newest version
+        # the Karaf 4.4.x line runs on. Java 25 needs Karaf 4.5.0 and
+        # should replace 23 once that is released and integrated.
         java:
           - 21
           - 23
