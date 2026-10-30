@@ -123,6 +123,11 @@ public class EventsEndpointTest {
   }
 
   @Test
+  public void testGetEventsWithTooLargeLimit() {
+    given().queryParam("limit", 10001).expect().statusCode(SC_BAD_REQUEST).when().get(env.host("/"));
+  }
+
+  @Test
   public void testUpdateEventMetadata() throws IOException {
     String jsonString = IOUtils.toString(getClass().getResource("/event-update.json"), UTF_8);
     String expectedJson = IOUtils.toString(getClass().getResource("/event-update-expected.json"), UTF_8);
