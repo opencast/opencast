@@ -21,14 +21,12 @@
 
 package org.opencastproject.adminui.usersettings;
 
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.Jsons.Val;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,12 +105,16 @@ public class UserSettings {
   /**
    * @return The JSON representation of these user settings.
    */
-  public Obj toJson() {
-    List<Val> settingsArr = new ArrayList<Val>();
+  public JsonObject toJson() {
+    JsonArray settingsArr = new JsonArray();
     for (UserSetting userSetting : getUserSettingsCollection()) {
       settingsArr.add(userSetting.toJson());
     }
-    return Jsons.obj(Jsons.p("offset", offset), Jsons.p("limit", limit), Jsons.p("total", total),
-        Jsons.p("results", Jsons.arr(settingsArr)));
+    JsonObject json = new JsonObject();
+    json.addProperty("offset", offset);
+    json.addProperty("limit", limit);
+    json.addProperty("total", total);
+    json.add("results", settingsArr);
+    return json;
   }
 }

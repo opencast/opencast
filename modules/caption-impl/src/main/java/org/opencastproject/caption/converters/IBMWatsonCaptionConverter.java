@@ -29,10 +29,12 @@ import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.GsonUtil;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,43 +66,42 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
   @Override
   public List<Caption> importCaption(InputStream inputStream, String language) throws CaptionConverterException {
     List<Caption> captionList = new ArrayList<Caption>();
-    JSONParser jsonParser = new JSONParser();
 
     try {
-      JSONObject resultsObj = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream));
+      JsonObject resultsObj = GsonUtil.parse(new InputStreamReader(inputStream)).getAsJsonObject();
       String jobId = "Unknown";
       if (resultsObj.get("id") != null) {
-        jobId = (String) resultsObj.get("id");
+        jobId = resultsObj.get("id").getAsString();
       }
 
       // Log warnings
       if (resultsObj.get("warnings") != null) {
-        JSONArray warningsArray = (JSONArray) resultsObj.get("warnings");
-        if (warningsArray != null) {
-          for (Object w : warningsArray) {
-            logger.warn("Warning from Speech-To-Text service: {}", w);
-          }
+        JsonArray warningsArray = resultsObj.getAsJsonArray("warnings");
+        for (JsonElement w : warningsArray) {
+          logger.warn("Warning from Speech-To-Text service: {}", GsonUtil.asText(w));
         }
       }
 
-      JSONArray outerResultsArray = (JSONArray) resultsObj.get("results");
-      JSONObject obj = (JSONObject) outerResultsArray.get(0);
-      JSONArray resultsArray = (JSONArray) obj.get("results");
+      JsonArray outerResultsArray = resultsObj.getAsJsonArray("results");
+      JsonObject obj = outerResultsArray.get(0).getAsJsonObject();
+      JsonArray resultsArray = obj.getAsJsonArray("results");
 
       resultsLoop:
       for (int i = 0; i < resultsArray.size(); i++) {
-        JSONObject resultElement = (JSONObject) resultsArray.get(i);
+        JsonObject resultElement = resultsArray.get(i).getAsJsonObject();
         // Ignore results that are not final
-        if (!(Boolean) resultElement.get("final")) {
+        if (!resultElement.get("final").getAsBoolean()) {
           continue;
         }
 
-        JSONArray alternativesArray = (JSONArray) resultElement.get("alternatives");
+        JsonArray alternativesArray = resultElement.getAsJsonArray("alternatives");
         if (alternativesArray != null && alternativesArray.size() > 0) {
-          JSONObject alternativeElement = (JSONObject) alternativesArray.get(0);
-          String transcript = (String) alternativeElement.get("transcript");
+          JsonObject alternativeElement = alternativesArray.get(0).getAsJsonObject();
+          String transcript = alternativeElement.has("transcript")
+              ? alternativeElement.get("transcript").getAsString()
+              : null;
           if (transcript != null) {
-            JSONArray timestampsArray = (JSONArray) alternativeElement.get("timestamps");
+            JsonArray timestampsArray = alternativeElement.getAsJsonArray("timestamps");
             if (timestampsArray == null || timestampsArray.size() == 0) {
               logger.warn("Could not build caption object for job {}, result index {}: timestamp data not found",
                       jobId, i);
@@ -124,16 +125,16 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
                 double end = -1;
                 if (indexLast < timestampsArray.size()) {
                   // Get start time of first element
-                  JSONArray wordTsArray = (JSONArray) timestampsArray.get(indexFirst);
+                  JsonArray wordTsArray = timestampsArray.get(indexFirst).getAsJsonArray();
                   if (wordTsArray.size() == 3) {
                     start = NumberFormat.getInstance(Locale.US)
-                        .parse(removeEndCharacter((wordTsArray.get(1).toString()), "s")).doubleValue();
+                        .parse(removeEndCharacter(GsonUtil.asText(wordTsArray.get(1)), "s")).doubleValue();
                   }
                   // Get end time of last element
-                  wordTsArray = (JSONArray) timestampsArray.get(indexLast);
+                  wordTsArray = timestampsArray.get(indexLast).getAsJsonArray();
                   if (wordTsArray.size() == 3) {
                     end = NumberFormat.getInstance(Locale.US)
-                        .parse(removeEndCharacter((wordTsArray.get(2).toString()), "s")).doubleValue();
+                        .parse(removeEndCharacter(GsonUtil.asText(wordTsArray.get(2)), "s")).doubleValue();
                   }
                 }
                 if (start == -1 || end == -1) {

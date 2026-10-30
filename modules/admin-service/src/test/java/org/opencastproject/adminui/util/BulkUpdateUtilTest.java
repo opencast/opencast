@@ -26,14 +26,17 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.easymock.EasyMock;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
@@ -55,52 +58,53 @@ public class BulkUpdateUtilTest {
 
   @Test
   public void testToNonTechnicalMetadataJson() {
-    final JSONObject scheduling = loadJsonObject("metadata.json");
-    final JSONObject expected = loadJsonObject("metadata-expected.json");
-    final JSONObject actual = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
-    assertThat(actual.toJSONString(), SameJSONAs.sameJSONAs(expected.toJSONString()));
+    final JsonObject scheduling = loadJsonObject("metadata.json");
+    final JsonObject expected = loadJsonObject("metadata-expected.json");
+    final JsonObject actual = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
+    assertThat(actual.toString(), SameJSONAs.sameJSONAs(expected.toString()));
   }
 
   @Test
   public void testMergeMetadataFields() {
-    final JSONObject metadata1 = loadJsonObject("merge1.json");
-    final JSONObject metadata2 = loadJsonObject("merge2.json");
-    final JSONObject expected = loadJsonObject("metadata-expected.json");
-    final JSONObject actual = BulkUpdateUtil.mergeMetadataFields(metadata1, metadata2);
-    assertThat(actual.toJSONString(), SameJSONAs.sameJSONAs(expected.toJSONString()));
+    final JsonObject metadata1 = loadJsonObject("merge1.json");
+    final JsonObject metadata2 = loadJsonObject("merge2.json");
+    final JsonObject expected = loadJsonObject("metadata-expected.json");
+    final JsonObject actual = BulkUpdateUtil.mergeMetadataFields(metadata1, metadata2);
+    assertThat(actual.toString(), SameJSONAs.sameJSONAs(expected.toString()));
   }
 
   @Test
   public void testMergeMetadataFieldsFirstNull() {
-    final JSONObject metadata1 = null;
-    final JSONObject metadata2 = loadJsonObject("merge2.json");
-    final JSONObject expected = loadJsonObject("merge2.json");
-    final JSONObject actual = BulkUpdateUtil.mergeMetadataFields(metadata1, metadata2);
-    assertThat(actual.toJSONString(), SameJSONAs.sameJSONAs(expected.toJSONString()));
+    final JsonObject metadata1 = null;
+    final JsonObject metadata2 = loadJsonObject("merge2.json");
+    final JsonObject expected = loadJsonObject("merge2.json");
+    final JsonObject actual = BulkUpdateUtil.mergeMetadataFields(metadata1, metadata2);
+    assertThat(actual.toString(), SameJSONAs.sameJSONAs(expected.toString()));
   }
 
   @Test
   public void testMergeMetadataFieldsSecondNull() {
-    final JSONObject metadata1 = loadJsonObject("merge1.json");
-    final JSONObject metadata2 = null;
-    final JSONObject expected = loadJsonObject("merge1.json");
-    final JSONObject actual = BulkUpdateUtil.mergeMetadataFields(metadata1, metadata2);
-    assertThat(actual.toJSONString(), SameJSONAs.sameJSONAs(expected.toJSONString()));
+    final JsonObject metadata1 = loadJsonObject("merge1.json");
+    final JsonObject metadata2 = null;
+    final JsonObject expected = loadJsonObject("merge1.json");
+    final JsonObject actual = BulkUpdateUtil.mergeMetadataFields(metadata1, metadata2);
+    assertThat(actual.toString(), SameJSONAs.sameJSONAs(expected.toString()));
   }
 
   @Test
   public void testBulkUpdateInstructions() {
-    final JSONArray jsonArray = loadJsonArray("instructions.json");
+    final JsonArray jsonArray = loadJsonArray("instructions.json");
     assertEquals(jsonArray.size(), 1);
-    final JSONObject json = (JSONObject) jsonArray.get(0);
+    final JsonObject json = jsonArray.get(0).getAsJsonObject();
     final BulkUpdateUtil.BulkUpdateInstructions actual = new BulkUpdateUtil.BulkUpdateInstructions(
-        jsonArray.toJSONString());
-    final List<String> expectedIds = (JSONArray) json.get("events");
-    final JSONObject expectedScheduling = (JSONObject) json.get("scheduling");
-    final JSONObject expectedMetadata = (JSONObject) json.get("metadata");
+        jsonArray.toString());
+    final List<String> expectedIds = new ArrayList<>();
+    json.getAsJsonArray("events").forEach(id -> expectedIds.add(id.getAsString()));
+    final JsonObject expectedScheduling = json.getAsJsonObject("scheduling");
+    final JsonObject expectedMetadata = json.getAsJsonObject("metadata");
     final BulkUpdateUtil.BulkUpdateInstructionGroup firstGroup = actual.getGroups().get(0);
-    assertThat(firstGroup.getMetadata().toJSONString(), SameJSONAs.sameJSONAs(expectedMetadata.toJSONString()));
-    assertThat(firstGroup.getScheduling().toJSONString(), SameJSONAs.sameJSONAs(expectedScheduling.toJSONString()));
+    assertThat(firstGroup.getMetadata().toString(), SameJSONAs.sameJSONAs(expectedMetadata.toString()));
+    assertThat(firstGroup.getScheduling().toString(), SameJSONAs.sameJSONAs(expectedScheduling.toString()));
     assertEquals(expectedIds, firstGroup.getEventIds());
   }
 
@@ -110,26 +114,26 @@ public class BulkUpdateUtilTest {
   }
 
   private void testAddSchedulingDates(final String filename, final Event event) {
-    final JSONObject scheduling = loadJsonObject(filename + ".json");
-    final JSONObject expected = loadJsonObject(filename + "-expected.json");
-    final JSONObject actual = BulkUpdateUtil.addSchedulingDates(event, scheduling);
-    assertThat(actual.toJSONString(), SameJSONAs.sameJSONAs(expected.toJSONString()));
+    final JsonObject scheduling = loadJsonObject(filename + ".json");
+    final JsonObject expected = loadJsonObject(filename + "-expected.json");
+    final JsonObject actual = BulkUpdateUtil.addSchedulingDates(event, scheduling);
+    assertThat(actual.toString(), SameJSONAs.sameJSONAs(expected.toString()));
   }
 
-  private static Object loadJson(String filename) {
+  private static JsonElement loadJson(String filename) {
     final String fullName = "/bulkupdate/" +  filename;
     try (InputStream in = BulkUpdateUtil.class.getResourceAsStream(fullName)) {
-      return new JSONParser().parse(new InputStreamReader(in));
+      return JsonParser.parseReader(new InputStreamReader(in));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static JSONObject loadJsonObject(String filename) {
-    return (JSONObject)loadJson(filename);
+  private static JsonObject loadJsonObject(String filename) {
+    return loadJson(filename).getAsJsonObject();
   }
 
-  private static JSONArray loadJsonArray(String filename) {
-    return (JSONArray)loadJson(filename);
+  private static JsonArray loadJsonArray(String filename) {
+    return loadJson(filename).getAsJsonArray();
   }
 }

@@ -51,10 +51,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonParser;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -373,15 +374,18 @@ public class ComposerServiceTest {
     Dimension outputDimension = new Dimension(500, 500);
 
     List<HorizontalCoverageLayoutSpec> layouts = new ArrayList<HorizontalCoverageLayoutSpec>();
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
-                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}")));
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}")));
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
+                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}").getAsJsonObject()));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}").getAsJsonObject()));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}").getAsJsonObject()));
 
     List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<>();
     shapes.add(0, Tuple.tuple(new Dimension(300, 300), layouts.get(0)));
@@ -430,15 +434,18 @@ public class ComposerServiceTest {
     Dimension outputDimension = new Dimension(500, 500);
 
     List<HorizontalCoverageLayoutSpec> layouts = new ArrayList<HorizontalCoverageLayoutSpec>();
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
-                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}")));
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}")));
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
+                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}").getAsJsonObject()));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}").getAsJsonObject()));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}").getAsJsonObject()));
 
     List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<>();
     shapes.add(0, Tuple.tuple(new Dimension(300, 300), layouts.get(0)));
@@ -470,15 +477,18 @@ public class ComposerServiceTest {
     Dimension outputDimension = new Dimension(500, 500);
 
     List<HorizontalCoverageLayoutSpec> layouts = new ArrayList<HorizontalCoverageLayoutSpec>();
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
-                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}")));
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}")));
-    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
-            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
+                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}").getAsJsonObject()));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}").getAsJsonObject()));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}").getAsJsonObject()));
 
     List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<>();
     shapes.add(0, Tuple.tuple(new Dimension(300, 300), layouts.get(0)));
@@ -496,9 +506,10 @@ public class ComposerServiceTest {
     Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
     List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes =
         new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
-    AbsolutePositionLayoutSpec layout = Serializer.absolutePositionLayoutSpec((JsonObj
-            .jsonObj("{\"horizontalCoverage\":0.1,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
-                + "\"offset\":{\"y\":0,\"x\":0},\"reference\":{\"left\":0.010,\"top\":0.01}}}")));
+    AbsolutePositionLayoutSpec layout = Serializer.absolutePositionLayoutSpec((
+            JsonParser.parseString(
+                "{\"horizontalCoverage\":0.1,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
+                + "\"offset\":{\"y\":0,\"x\":0},\"reference\":{\"left\":0.010,\"top\":0.01}}}").getAsJsonObject()));
     watermarkShapes.add(0, Tuple.tuple(imageDimension, layout));
     MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(outputDimension,
             watermarkShapes);

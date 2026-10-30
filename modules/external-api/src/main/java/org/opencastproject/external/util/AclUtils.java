@@ -24,19 +24,16 @@ import static org.opencastproject.index.service.util.JSONUtils.safeString;
 
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 public final class AclUtils {
   private static final String ACTION_JSON_KEY = "action";
@@ -56,27 +53,22 @@ public final class AclUtils {
    * @return An {@link AccessControlList} representation of the Json
    * @throws IllegalArgumentException
    *           Thrown if essential parts of an access control element is missing.
-   * @throws ParseException
    *           Thrown if unable to parse the json value of the acl.
    */
   public static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow)
-          throws IllegalArgumentException, ParseException {
-    JSONParser parser = new JSONParser();
-    JSONArray aclJson = (JSONArray) parser.parse(json);
-    @SuppressWarnings("unchecked")
-    ListIterator<Object> iterator = aclJson.listIterator();
-    JSONObject aceJson;
+          throws IllegalArgumentException {
+    JsonArray aclJson = GsonUtil.parse(json).getAsJsonArray();
     List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
-    while (iterator.hasNext()) {
-      aceJson = (JSONObject) iterator.next();
-      String action = aceJson.get(ACTION_JSON_KEY) != null ? aceJson.get(ACTION_JSON_KEY).toString() : "";
+    for (JsonElement element : aclJson) {
+      JsonObject aceJson = element.getAsJsonObject();
+      String action = GsonUtil.asText(aceJson.get(ACTION_JSON_KEY), "");
       String allow;
       if (assumeAllow) {
         allow = "true";
       } else {
-        allow = aceJson.get(ALLOW_JSON_KEY) != null ? aceJson.get(ALLOW_JSON_KEY).toString() : "";
+        allow = GsonUtil.asText(aceJson.get(ALLOW_JSON_KEY), "");
       }
-      String role = aceJson.get(ROLE_JSON_KEY) != null ? aceJson.get(ROLE_JSON_KEY).toString() : "";
+      String role = GsonUtil.asText(aceJson.get(ROLE_JSON_KEY), "");
       if (StringUtils.trimToNull(action) != null && StringUtils.trimToNull(allow) != null
               && StringUtils.trimToNull(role) != null) {
         AccessControlEntry ace = new AccessControlEntry(role, action, Boolean.parseBoolean(allow));

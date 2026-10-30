@@ -25,12 +25,12 @@ import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.provider.matomo.StatisticsProviderMatomoService;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -336,7 +336,7 @@ public class BatchMatomoRequest {
           String responseBody = response.body();
 
           try {
-            JsonElement rootElement = JsonParser.parseString(responseBody);
+            JsonElement rootElement = GsonUtil.parse(responseBody);
             if (rootElement.isJsonObject()) {
               apiResponse = rootElement.getAsJsonObject();
             } else {

@@ -21,92 +21,104 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
-
-import org.opencastproject.util.JsonObj;
-import org.opencastproject.util.Jsons;
+import com.google.gson.JsonObject;
 
 public final class Serializer {
   private Serializer() {
   }
 
-  public static Jsons.Obj json(Dimension a) {
-    return obj(p("w", a.getWidth()),
-               p("h", a.getHeight()));
+  public static JsonObject json(Dimension a) {
+    JsonObject json = new JsonObject();
+    json.addProperty("w", a.getWidth());
+    json.addProperty("h", a.getHeight());
+    return json;
   }
 
-  public static Dimension dimension(JsonObj json) {
-    return new Dimension(json.get(Integer.class, "w"), json.get(Integer.class, "h"));
+  public static Dimension dimension(JsonObject json) {
+    return new Dimension(json.get("w").getAsInt(), json.get("h").getAsInt());
   }
 
-  public static Jsons.Obj json(Anchor a) {
-    return obj(p("left", a.getLeft()),
-               p("top", a.getTop()));
+  public static JsonObject json(Anchor a) {
+    JsonObject json = new JsonObject();
+    json.addProperty("left", a.getLeft());
+    json.addProperty("top", a.getTop());
+    return json;
   }
 
-  public static Anchor anchor(JsonObj json) {
-    return new Anchor(json.get(Double.class, "left"), json.get(Double.class, "top"));
+  public static Anchor anchor(JsonObject json) {
+    return new Anchor(json.get("left").getAsDouble(), json.get("top").getAsDouble());
   }
 
-  public static Jsons.Obj json(Offset a) {
-    return obj(p("x", a.getX()),
-               p("y", a.getY()));
+  public static JsonObject json(Offset a) {
+    JsonObject json = new JsonObject();
+    json.addProperty("x", a.getX());
+    json.addProperty("y", a.getY());
+    return json;
   }
 
-  public static Offset offset(JsonObj json) {
-    return new Offset(json.get(Integer.class, "x"), json.get(Integer.class, "y"));
+  public static Offset offset(JsonObject json) {
+    return new Offset(json.get("x").getAsInt(), json.get("y").getAsInt());
   }
 
-  public static Jsons.Obj json(AnchorOffset a) {
-    return obj(p("offset", json(a.getOffset())),
-               p("reference", json(a.getReferenceAnchor())),
-               p("referring", json(a.getReferringAnchor())));
+  public static JsonObject json(AnchorOffset a) {
+    JsonObject json = new JsonObject();
+    json.add("offset", json(a.getOffset()));
+    json.add("reference", json(a.getReferenceAnchor()));
+    json.add("referring", json(a.getReferringAnchor()));
+    return json;
   }
 
-  public static AnchorOffset anchorOffset(JsonObj json) {
-    return new AnchorOffset(anchor(json.getObj("reference")),
-                            anchor(json.getObj("referring")),
-                            offset(json.getObj("offset")));
+  public static AnchorOffset anchorOffset(JsonObject json) {
+    return new AnchorOffset(anchor(json.getAsJsonObject("reference")),
+                            anchor(json.getAsJsonObject("referring")),
+                            offset(json.getAsJsonObject("offset")));
   }
 
-  public static Jsons.Obj json(TwoShapeLayout a) {
-    return obj(p("canvas", json(a.getCanvas())),
-               p("upper", json(a.getUpper())),
-               p("lower", json(a.getLower())));
+  public static JsonObject json(TwoShapeLayout a) {
+    JsonObject json = new JsonObject();
+    json.add("canvas", json(a.getCanvas()));
+    json.add("upper", json(a.getUpper()));
+    json.add("lower", json(a.getLower()));
+    return json;
   }
 
-  public static TwoShapeLayout twoShapeLayout(JsonObj json) {
-    return new TwoShapeLayout(dimension(json.getObj("canvas")),
-                              layout(json.getObj("upper")),
-                              layout(json.getObj("lower")));
+  public static TwoShapeLayout twoShapeLayout(JsonObject json) {
+    return new TwoShapeLayout(dimension(json.getAsJsonObject("canvas")),
+                              layout(json.getAsJsonObject("upper")),
+                              layout(json.getAsJsonObject("lower")));
   }
 
-  public static Jsons.Obj json(Layout a) {
-    return obj(p("dimension", json(a.getDimension())),
-               p("offset", json(a.getOffset())));
+  public static JsonObject json(Layout a) {
+    JsonObject json = new JsonObject();
+    json.add("dimension", json(a.getDimension()));
+    json.add("offset", json(a.getOffset()));
+    return json;
   }
 
-  public static Layout layout(JsonObj json) {
-    return new Layout(dimension(json.getObj("dimension")),
-                      offset(json.getObj("offset")));
+  public static Layout layout(JsonObject json) {
+    return new Layout(dimension(json.getAsJsonObject("dimension")),
+                      offset(json.getAsJsonObject("offset")));
   }
 
-  public static Jsons.Obj json(HorizontalCoverageLayoutSpec a) {
-    return obj(p("anchorOffset", json(a.getAnchorOffset())),
-               p("horizontalCoverage", a.getHorizontalCoverage()));
+  public static JsonObject json(HorizontalCoverageLayoutSpec a) {
+    JsonObject json = new JsonObject();
+    json.add("anchorOffset", json(a.getAnchorOffset()));
+    json.addProperty("horizontalCoverage", a.getHorizontalCoverage());
+    return json;
   }
 
-  public static HorizontalCoverageLayoutSpec horizontalCoverageLayoutSpec(JsonObj json) {
-    return new HorizontalCoverageLayoutSpec(anchorOffset(json.getObj("anchorOffset")),
-                                            json.get(Double.class, "horizontalCoverage"));
+  public static HorizontalCoverageLayoutSpec horizontalCoverageLayoutSpec(JsonObject json) {
+    return new HorizontalCoverageLayoutSpec(anchorOffset(json.getAsJsonObject("anchorOffset")),
+                                            json.get("horizontalCoverage").getAsDouble());
   }
 
-  public static Jsons.Obj json(AbsolutePositionLayoutSpec a) {
-    return obj(p("anchorOffset", json(a.getAnchorOffset())));
+  public static JsonObject json(AbsolutePositionLayoutSpec a) {
+    JsonObject json = new JsonObject();
+    json.add("anchorOffset", json(a.getAnchorOffset()));
+    return json;
   }
 
-  public static AbsolutePositionLayoutSpec absolutePositionLayoutSpec(JsonObj json) {
-    return new AbsolutePositionLayoutSpec(anchorOffset(json.obj("anchorOffset")));
+  public static AbsolutePositionLayoutSpec absolutePositionLayoutSpec(JsonObject json) {
+    return new AbsolutePositionLayoutSpec(anchorOffset(json.getAsJsonObject("anchorOffset")));
   }
 }

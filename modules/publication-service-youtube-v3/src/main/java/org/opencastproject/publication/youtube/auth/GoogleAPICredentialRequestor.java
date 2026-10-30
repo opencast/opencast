@@ -25,8 +25,6 @@ package org.opencastproject.publication.youtube.auth;
 import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.util.store.DataStore;
 
-import org.json.simple.parser.ParseException;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -58,7 +56,7 @@ public final class GoogleAPICredentialRequestor {
    * @param args
    *          override parameters
    */
-  public static void main(final String[] args) throws IOException, ParseException {
+  public static void main(final String[] args) throws IOException {
     int size = (args == null) ? 0 : args.length;
     if (size != 3) {
       throw new IllegalArgumentException('\n' + "[ERROR] Wrong number of arguments: " + size + '\n');
@@ -72,10 +70,9 @@ public final class GoogleAPICredentialRequestor {
    * @param credentialDataStore Null not allowed.
    * @param dataStoreDirectory Null not allowed.
    * @throws IOException when file not available
-   * @throws ParseException when file is not JSON
    */
   private static void registerOAuth2Credential(final File clientSecrets, final String credentialDataStore,
-                                               final String dataStoreDirectory) throws IOException, ParseException {
+                                               final String dataStoreDirectory) throws IOException {
     if (clientSecrets.exists()) {
       final ClientCredentials c = new ClientCredentials();
       c.setClientSecrets(clientSecrets);

@@ -22,7 +22,7 @@ package org.opencastproject.external.util.statistics;
 
 import org.opencastproject.statistics.api.DataResolution;
 
-import org.json.simple.JSONArray;
+import com.google.gson.JsonArray;
 
 import java.util.Optional;
 import java.util.Set;
@@ -32,8 +32,8 @@ public final class DataResolutionUtils {
   private DataResolutionUtils() {
   }
 
-  public static JSONArray toJson(Set<DataResolution> dataResolutions) {
-    JSONArray result = new JSONArray();
+  public static JsonArray toJson(Set<DataResolution> dataResolutions) {
+    JsonArray result = new JsonArray();
     for (DataResolution resolution : dataResolutions) {
       result.add(toString(resolution));
     }

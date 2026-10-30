@@ -43,6 +43,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -70,11 +71,11 @@ import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.util.concurrent.Striped;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -771,20 +772,19 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
   )
   public Response getOperationHandlers() {
-    JSONArray jsonArray = new JSONArray();
+    JsonArray jsonArray = new JsonArray();
     for (HandlerRegistration reg : ((WorkflowServiceImpl) service).getRegisteredHandlers()) {
       WorkflowOperationHandler handler = reg.getHandler();
-      JSONObject jsonHandler = new JSONObject();
-      jsonHandler.put("id", handler.getId());
-      jsonHandler.put("description", handler.getDescription());
+      JsonObject jsonHandler = new JsonObject();
+      jsonHandler.addProperty("id", handler.getId());
+      jsonHandler.addProperty("description", handler.getDescription());
       jsonArray.add(jsonHandler);
     }
-    return Response.ok(jsonArray.toJSONString()).header("Content-Type", MediaType.APPLICATION_JSON).build();
+    return Response.ok(jsonArray.toString()).header("Content-Type", MediaType.APPLICATION_JSON).build();
   }
 
   @GET
   @Path("statemappings.json")
-  @SuppressWarnings("unchecked")
   @RestQuery(name = "statemappings",
       description = "Get all workflow state mappings",
       returnDescription = "A JSON representation of the workflow state mappings.",
@@ -793,7 +793,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
   )
   public Response getStateMappings() {
-    return Response.ok(new JSONObject(service.getWorkflowStateMappings()).toJSONString())
+    return Response.ok(GsonUtil.gson().toJson(service.getWorkflowStateMappings()))
         .header("Content-Type", MediaType.APPLICATION_JSON).build();
   }
 

@@ -67,7 +67,6 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/2.12.1_1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/${jettison.version}</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
-    <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
     <bundle>wrap:mvn:com.cronutils/cron-utils/9.2.1</bundle>
 
     <!-- Used by the Lti filter -->

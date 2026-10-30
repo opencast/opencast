@@ -36,8 +36,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -161,7 +162,7 @@ public class StatisticsRestService {
   )
   public Response getProviders() {
     try {
-      return Response.ok(providersToJson(statisticsService.getProviders()).toJSONString()).build();
+      return Response.ok(providersToJson(statisticsService.getProviders()).toString()).build();
     } catch (Exception e) {
       logger.error("Could not retrieve providers: {}", e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -231,45 +232,43 @@ public class StatisticsRestService {
           DataResolution.fromString(resolution),
           ZoneId.of(zoneId)
       );
-      return Response.ok(timeSeriesToJson(timeSeries).toJSONString()).build();
+      return Response.ok(timeSeriesToJson(timeSeries).toString()).build();
     } catch (Exception e) {
       logger.error("Could not retrieve time series data for provider {}: {}", providerId, e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static JSONObject timeSeriesToJson(final TimeSeries timeSeries) {
-    final JSONObject json = new JSONObject();
-    final JSONArray jsonLabels = new JSONArray();
-    final JSONArray jsonValues = new JSONArray();
+  private static JsonObject timeSeriesToJson(final TimeSeries timeSeries) {
+    final JsonObject json = new JsonObject();
+    final JsonArray jsonLabels = new JsonArray();
+    final JsonArray jsonValues = new JsonArray();
     for (int i = 0; i < timeSeries.getValues().size(); i++) {
       jsonLabels.add(timeSeries.getLabels().get(i));
       jsonValues.add(timeSeries.getValues().get(i));
     }
-    json.put("labels", jsonLabels);
-    json.put("values", jsonValues);
+    json.add("labels", jsonLabels);
+    json.add("values", jsonValues);
     if (timeSeries.getTotal().isPresent()) {
-      json.put("total", timeSeries.getTotal().getAsDouble());
+      json.addProperty("total", timeSeries.getTotal().getAsDouble());
     }
     return json;
   }
 
-  @SuppressWarnings("unchecked")
-  private static JSONArray providersToJson(final Set<StatisticsProvider> providers) {
-    final JSONArray json = new JSONArray();
+  private static JsonArray providersToJson(final Set<StatisticsProvider> providers) {
+    final JsonArray json = new JsonArray();
     for (StatisticsProvider provider : providers) {
-      final JSONObject jsonProvider = new JSONObject();
-      final JSONArray jsonResolutions = new JSONArray();
-      jsonProvider.put("id", provider.getId());
-      jsonProvider.put("title", provider.getTitle());
-      jsonProvider.put("description", provider.getDescription());
-      jsonProvider.put("resourceType", provider.getResourceType().name());
+      final JsonObject jsonProvider = new JsonObject();
+      final JsonArray jsonResolutions = new JsonArray();
+      jsonProvider.addProperty("id", provider.getId());
+      jsonProvider.addProperty("title", provider.getTitle());
+      jsonProvider.addProperty("description", provider.getDescription());
+      jsonProvider.addProperty("resourceType", provider.getResourceType().name());
       if (provider instanceof TimeSeriesProvider) {
         for (DataResolution resolution : ((TimeSeriesProvider) provider).getDataResolutions()) {
           jsonResolutions.add(resolution.name());
         }
-        jsonProvider.put("dataResolutions", jsonResolutions);
+        jsonProvider.add("dataResolutions", jsonResolutions);
       }
       json.add(jsonProvider);
     }

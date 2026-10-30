@@ -43,8 +43,8 @@
       <artifactId>httpcore-osgi</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -118,11 +118,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <!-- REST test environment -->
-    <dependency>
-      <groupId>io.rest-assured</groupId>
-      <artifactId>json-path</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>xml-path</artifactId>

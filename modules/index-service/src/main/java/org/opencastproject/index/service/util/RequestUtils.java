@@ -23,19 +23,19 @@ package org.opencastproject.index.service.util;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.common.net.MediaType;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -44,7 +44,6 @@ public final class RequestUtils {
   public static final String ID_JSON_KEY = "id";
   public static final String VALUE_JSON_KEY = "value";
   public static final String REQUIRED_JSON_KEY = "required";
-  private static final JSONParser parser = new JSONParser();
 
   private RequestUtils() {
   }
@@ -55,20 +54,17 @@ public final class RequestUtils {
    * @param json
    *          The json input.
    * @return A {@link Map} of the metadata fields ids and values.
-   * @throws ParseException
+   * @throws com.google.gson.JsonSyntaxException
    *           Thrown if the json is malformed.
    */
-  public static Map<String, String> getKeyValueMap(String json) throws ParseException {
-    JSONArray updatedFields = (JSONArray) parser.parse(json);
+  public static Map<String, String> getKeyValueMap(String json) {
+    JsonArray updatedFields = GsonUtil.parse(json).getAsJsonArray();
     Map<String, String> fieldMap = new TreeMap<String, String>();
-    JSONObject field;
-    @SuppressWarnings("unchecked")
-    ListIterator<Object> iterator = updatedFields.listIterator();
-    while (iterator.hasNext()) {
-      field = (JSONObject) iterator.next();
-      String id = field.get(ID_JSON_KEY) != null ? field.get(ID_JSON_KEY).toString() : "";
-      String value = field.get(VALUE_JSON_KEY) != null ? field.get(VALUE_JSON_KEY).toString() : "";
-      String requiredStr = field.get(REQUIRED_JSON_KEY) != null ? field.get(REQUIRED_JSON_KEY).toString() : "false";
+    for (JsonElement element : updatedFields) {
+      JsonObject field = element.getAsJsonObject();
+      String id = GsonUtil.asText(field.get(ID_JSON_KEY), "");
+      String value = GsonUtil.asText(field.get(VALUE_JSON_KEY), "");
+      String requiredStr = GsonUtil.asText(field.get(REQUIRED_JSON_KEY), "false");
       boolean required = Boolean.parseBoolean(requiredStr);
 
       if (StringUtils.trimToNull(id) != null && (StringUtils.trimToNull(value) != null || !required)) {
@@ -116,10 +112,9 @@ public final class RequestUtils {
           // Ignore non-json-values
           continue;
         }
-        @SuppressWarnings("unchecked")
-        final Map<String, String> assetUpload = (Map<String, String>) parser.parse(assetUploadJson);
-        if (assetUploadId.equals(assetUpload.get("id"))) {
-          final List<String> accepts = Arrays.stream(assetUpload.getOrDefault("accept", "*/*").split(","))
+        final JsonObject assetUpload = GsonUtil.parse(assetUploadJson).getAsJsonObject();
+        if (assetUploadId.equals(GsonUtil.asText(assetUpload.get("id"), null))) {
+          final List<String> accepts = Arrays.stream(GsonUtil.asText(assetUpload.get("accept"), "*/*").split(","))
               .map(String::trim).collect(Collectors.toList());
           for (String accept : accepts) {
             if (accept.contains("/") && mediaType.is(MediaType.parse(accept))) {
@@ -133,7 +128,7 @@ public final class RequestUtils {
       }
     } catch (ListProviderException e) {
       throw new IllegalArgumentException("Invalid assetUploadId: " + assetUploadId);
-    } catch (org.json.simple.parser.ParseException e) {
+    } catch (JsonParseException e) {
       throw new IllegalStateException("cannot parse json list provider for asset upload Id " + assetUploadId, e);
     }
     throw new IllegalArgumentException("Invalid assetUploadId: " + assetUploadId);

@@ -29,11 +29,11 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,23 +49,23 @@ import io.restassured.http.ContentType;
 public class UsersEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestUsersEndpoint.class);
 
-  private JSONParser parser;
 
   @Test
-  public void testGetAllUsers() throws ParseException, IOException {
+  public void testGetAllUsers() throws IOException {
     InputStream stream = UsersEndpointTest.class.getResourceAsStream("/users.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
 
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
+    JsonObject actual = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(4)).body("offset", equalTo(0))
-            .body("limit", equalTo(100)).body("results", hasSize(4)).when().get(rt.host("/users.json")).asString());
+            .body("limit", equalTo(100)).body("results", hasSize(4)).when().get(rt.host("/users.json")).asString()
+                ).getAsJsonObject();
 
     ServiceEndpointTestsUtil.testJSONObjectEquality(expected, actual);
   }
 
   @Test
-  public void testGetAllWithParams() throws ParseException, IOException {
+  public void testGetAllWithParams() throws IOException {
     int limit = 100;
     int offset = 2;
     int total = 4;
@@ -93,24 +93,23 @@ public class UsersEndpointTest {
 
   @Test
   public void testSorting() throws Exception {
-    JSONObject actual = (JSONObject) parser.parse(given().queryParam("sort", "name:ASC").expect()
+    JsonObject actual = JsonParser.parseString(given().queryParam("sort", "name:ASC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("total", equalTo(4))
             .body("offset", equalTo(0)).body("limit", equalTo(100)).body("results", hasSize(4)).when()
-            .get(rt.host("/users.json")).asString());
-    JSONArray users = (JSONArray) actual.get("results");
-    JSONObject user1 = (JSONObject) users.get(0);
-    JSONObject user2 = (JSONObject) users.get(1);
-    JSONObject user3 = (JSONObject) users.get(2);
-    JSONObject user4 = (JSONObject) users.get(3);
-    Assert.assertEquals("User1", user1.get("name"));
-    Assert.assertEquals("user2", user2.get("name"));
-    Assert.assertEquals("User3", user3.get("name"));
-    Assert.assertEquals("user4", user4.get("name"));
+            .get(rt.host("/users.json")).asString()).getAsJsonObject();
+    JsonArray users = actual.getAsJsonArray("results");
+    JsonObject user1 = users.get(0).getAsJsonObject();
+    JsonObject user2 = users.get(1).getAsJsonObject();
+    JsonObject user3 = users.get(2).getAsJsonObject();
+    JsonObject user4 = users.get(3).getAsJsonObject();
+    Assert.assertEquals("User1", user1.get("name").getAsString());
+    Assert.assertEquals("user2", user2.get("name").getAsString());
+    Assert.assertEquals("User3", user3.get("name").getAsString());
+    Assert.assertEquals("user4", user4.get("name").getAsString());
   }
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass

@@ -63,12 +63,11 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -966,10 +965,10 @@ public class SeriesRestService {
     }
     try {
       Map<String, String> properties = seriesService.getSeriesProperties(seriesId);
-      JSONArray jsonProperties = new JSONArray();
+      JsonArray jsonProperties = new JsonArray();
       for (String name : properties.keySet()) {
-        JSONObject property = new JSONObject();
-        property.put(name, properties.get(name));
+        JsonObject property = new JsonObject();
+        property.addProperty(name, properties.get(name));
         jsonProperties.add(property);
       }
       return Response.ok(jsonProperties.toString()).build();

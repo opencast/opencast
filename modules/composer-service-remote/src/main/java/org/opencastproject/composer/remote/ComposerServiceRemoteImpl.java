@@ -528,19 +528,19 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     HttpPost post = new HttpPost("/composite");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("compositeSize", Serializer.json(compositeTrackSize).toJson()));
+      params.add(new BasicNameValuePair("compositeSize", Serializer.json(compositeTrackSize).toString()));
       params.add(new BasicNameValuePair("lowerTrack", MediaPackageElementParser.getAsXml(lowerTrack.getElement())));
-      params.add(new BasicNameValuePair("lowerLayout", Serializer.json(lowerTrack.getLayout()).toJson()));
+      params.add(new BasicNameValuePair("lowerLayout", Serializer.json(lowerTrack.getLayout()).toString()));
       if (upperTrack.isPresent()) {
         params.add(new BasicNameValuePair("upperTrack", MediaPackageElementParser.getAsXml(upperTrack.get()
                 .getElement())));
-        params.add(new BasicNameValuePair("upperLayout", Serializer.json(upperTrack.get().getLayout()).toJson()));
+        params.add(new BasicNameValuePair("upperLayout", Serializer.json(upperTrack.get().getLayout()).toString()));
       }
 
       if (watermark.isPresent()) {
         params.add(new BasicNameValuePair("watermarkAttachment", MediaPackageElementParser.getAsXml(watermark.get()
                 .getElement())));
-        params.add(new BasicNameValuePair("watermarkLayout", Serializer.json(watermark.get().getLayout()).toJson()));
+        params.add(new BasicNameValuePair("watermarkLayout", Serializer.json(watermark.get().getLayout()).toString()));
       }
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("background", background));
@@ -586,7 +586,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("profileId", profileId));
       if (outputDimension != null) {
-        params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
+        params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toString()));
       }
       params.add(new BasicNameValuePair("outputFrameRate", String.format(Locale.US, "%f", outputFrameRate)));
       params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(

@@ -21,8 +21,10 @@
 
 package org.opencastproject.adminui.util;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.junit.Assert;
 
 import java.util.Iterator;
@@ -39,7 +41,7 @@ public final class ServiceEndpointTestsUtil {
   private ServiceEndpointTestsUtil() {
   }
 
-  public static void testJSONObjectEquality(JSONObject expected, JSONObject actual) {
+  public static void testJSONObjectEquality(JsonObject expected, JsonObject actual) {
     Assert.assertEquals(expected.size(), actual.size());
     testSimpleProperty(COUNT, expected, actual);
     testSimpleProperty(TOTAL, expected, actual);
@@ -48,29 +50,29 @@ public final class ServiceEndpointTestsUtil {
     testArrayProperty(RESULTS, expected, actual);
   }
 
-  private static void testSimpleProperty(String key, JSONObject expected, JSONObject actual) {
+  private static void testSimpleProperty(String key, JsonObject expected, JsonObject actual) {
     Assert.assertEquals(expected.get(key), actual.get(key));
   }
 
-  private static void testArrayProperty(String key, JSONObject expected, JSONObject actual) {
-    JSONArray expectedArray = (JSONArray) expected.get(key);
-    JSONArray actualArray = (JSONArray) actual.get(key);
+  private static void testArrayProperty(String key, JsonObject expected, JsonObject actual) {
+    JsonArray expectedArray = expected.getAsJsonArray(key);
+    JsonArray actualArray = actual.getAsJsonArray(key);
 
     Assert.assertEquals(expectedArray.size(), actualArray.size());
-    JSONObject exObject;
-    JSONObject acObject;
+    JsonObject exObject;
+    JsonObject acObject;
 
     for (int i = 0; i < expectedArray.size(); i++) {
-      exObject = (JSONObject) expectedArray.get(i);
-      acObject = (JSONObject) actualArray.get(i);
+      exObject = expectedArray.get(i).getAsJsonObject();
+      acObject = actualArray.get(i).getAsJsonObject();
       Set<String> exEntrySet = exObject.keySet();
       Assert.assertEquals(exEntrySet.size(), acObject.size());
       Iterator<String> exIter = exEntrySet.iterator();
 
       while (exIter.hasNext()) {
         String item = exIter.next();
-        Object exValue = exObject.get(item);
-        Object acValue = acObject.get(item);
+        JsonElement exValue = exObject.get(item);
+        JsonElement acValue = acObject.get(item);
         Assert.assertEquals(exValue, acValue);
       }
     }

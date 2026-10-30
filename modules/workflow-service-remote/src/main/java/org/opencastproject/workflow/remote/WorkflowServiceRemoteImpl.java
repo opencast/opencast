@@ -33,6 +33,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -42,6 +43,8 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
+
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -55,7 +58,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -663,8 +665,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        return (Map<String, Map<String, String>>) new JSONParser().parse(
-            IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+        return GsonUtil.gson().fromJson(IOUtils.toString(response.getEntity().getContent(), "utf-8"),
+            new TypeToken<Map<String, Map<String, String>>>() { }.getType());
       }
     } catch (Exception e) {
       throw new IllegalStateException("Unable to parse workflow state mappings");
