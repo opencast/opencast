@@ -37,7 +37,7 @@ public interface HelloWorldService {
    * Outputs "Hello!" or "Hello " + name
    *
    * @param name
-   *          name of the person to greet
+   *          name of the person to greet, may be null or blank
    * @return String with the text
    */
   String helloName(String name);

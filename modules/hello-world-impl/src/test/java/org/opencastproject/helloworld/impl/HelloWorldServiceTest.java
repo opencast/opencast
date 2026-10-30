@@ -53,6 +53,11 @@ public class HelloWorldServiceTest {
   }
 
   @Test
+  public void testHelloNameMissing() throws Exception {
+    Assert.assertEquals("Hello!", service.helloName(null));
+  }
+
+  @Test
   public void testHelloName() throws Exception {
     Assert.assertEquals("Hello Johannes!", service.helloName("Johannes"));
   }
