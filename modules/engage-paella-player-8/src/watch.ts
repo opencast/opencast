@@ -1,6 +1,6 @@
 
-import { defaultGetVideoIdFunc, defaultLoadConfigFunc, defaultLoadVideoManifestFunc, OpencastPaellaPlayer, type OpencastInitParams } from '@asicupv/paella-opencast-core';
-import { Events } from '@asicupv/paella-core';
+import { defaultGetVideoIdFunc, defaultLoadConfigFunc, defaultLoadVideoManifestFunc, OpencastPaellaPlayer, type OpencastInitParams, type OpencastPaellaConfig } from '@asicupv/paella-opencast-core';
+import { Events, type Paella } from '@asicupv/paella-core';
 import { applyQueryParams } from './applyQueryParams';
 
 
@@ -47,6 +47,17 @@ function getOcPresentationUrl(): string {
     return url;
 }
 
+// Loads `config.json`, which is used by Paella and contains our own settings
+// under `opencast`. It's only fetched once; every caller gets its own copy, as
+// Paella modifies the config (e.g. with skin overrides).
+let opencastConfig: Promise<OpencastPaellaConfig> | null = null;
+async function loadOpencastConfig(configUrl: string, player: Paella): Promise<OpencastPaellaConfig> {
+    if (!opencastConfig) {
+        opencastConfig = defaultLoadConfigFunc(configUrl, player);
+    }
+    return structuredClone(await opencastConfig);
+}
+
 
 
 window.addEventListener("load", async () => {  
@@ -54,7 +65,7 @@ window.addEventListener("load", async () => {
     configResourcesUrl: CONFIG_FOLDER_URL,
     configUrl: `${CONFIG_FOLDER_URL}config.json`,
 
-    loadConfig: defaultLoadConfigFunc,
+    loadConfig: loadOpencastConfig,
     getVideoId: defaultGetVideoIdFunc,
     loadVideoManifest: defaultLoadVideoManifestFunc,
     plugins: [
