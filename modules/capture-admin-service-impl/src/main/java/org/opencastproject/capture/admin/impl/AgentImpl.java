@@ -275,12 +275,12 @@ public class AgentImpl implements Agent {
     this.organization = organization;
   }
 
-  private boolean getKeyBinary(Properties properties, String key) {
-    // This is a binary 1/0, so max length is 1.  More than one character is incorrect and should throw an error.
+  private boolean getKeyBoolean(Properties properties, String key) {
     if (!properties.containsKey(key)) {
       return false;
     }
-    String value = getKey(properties, key, 1);
+    // we support true, or false.  No quotes.
+    String value = getKey(properties, key, 5);
     // If the key is defined, it *must* have a value, and it *must* be one of the two things
     if (value.isEmpty() || !(BOOLEAN_ON.equals(value) || BOOLEAN_OFF.equals(value))) {
       throw new RuntimeException("Invalid value for " + key);
@@ -627,12 +627,12 @@ public class AgentImpl implements Agent {
       }
     }
 
-    boolean supportLocalCapture = getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_CAPABLE);
+    boolean supportLocalCapture = getKeyBoolean(configuration, CaptureParameters.CAPTURE_LOCAL_CAPABLE);
     boolean supportLocalStartPaused =
-        supportLocalCapture && getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED);
-    boolean supportStreaming = getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_CAPABLE);
+        supportLocalCapture && getKeyBoolean(configuration, CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED);
+    boolean supportStreaming = getKeyBoolean(configuration, CaptureParameters.CAPTURE_STREAM_CAPABLE);
     boolean supportStreamStartPaused =
-        supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED);
+        supportStreaming && getKeyBoolean(configuration, CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED);
 
     capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, supportLocalCapture ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportLocalCapture) {

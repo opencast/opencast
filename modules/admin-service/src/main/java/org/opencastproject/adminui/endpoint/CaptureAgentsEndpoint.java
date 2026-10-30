@@ -338,20 +338,10 @@ public class CaptureAgentsEndpoint {
       /* Add the core agent configuration data */
       JsonObject localCapabilities = new JsonObject();
       JsonObject streamCapabilities = new JsonObject();
-      if (agent.canCaptureLocal()) {
-        localCapabilities.addProperty("capture", "1");
-        localCapabilities.addProperty("startpaused", agent.canStartLocalPaused() ? "1" : "0");
-      } else {
-        localCapabilities.addProperty("capture", "0");
-        localCapabilities.addProperty("startpaused", "0");
-      }
-      if (agent.canStream()) {
-        streamCapabilities.addProperty("stream", "1");
-        streamCapabilities.addProperty("startpaused", agent.canStartStreamPaused() ? "1" : "0");
-      } else {
-        streamCapabilities.addProperty("stream", "0");
-        streamCapabilities.addProperty("startpaused", "0");
-      }
+      localCapabilities.addProperty("capture", agent.canCaptureLocal());
+      localCapabilities.addProperty("startpaused", agent.canStartLocalPaused());
+      streamCapabilities.addProperty("stream", agent.canStream());
+      streamCapabilities.addProperty("startpaused", agent.canStartStreamPaused());
 
       JsonObject config = new JsonObject();
       config.add("local", localCapabilities);
