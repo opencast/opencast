@@ -15,8 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # On pull requests, check against the target branch. On pushes, check against the pushed branch.
       - name: check .gitmodules has correct versions, the correct number of times
+        env:
+          BRANCH: ${{ github.base_ref || github.ref_name }}
         run: |
-          if [ 3 -ne "$(grep 'branch = ${{ github.base_ref }}' .gitmodules | wc -l)" ]; then
+          if [ 3 -ne "$(grep "branch = ${BRANCH}$" .gitmodules | wc -l)" ]; then
+            echo "Expected all three submodules to track branch ${BRANCH}:"
+            grep 'branch = ' .gitmodules
             exit 1
           fi
