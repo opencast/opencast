@@ -1,7 +1,7 @@
 {
-   "total":4,
+   "total":5,
    "offset":0,
-   "count":4,
+   "count":5,
    "limit":0,
    "results":[
       {
@@ -59,6 +59,90 @@
          "Update":"2014-05-26T15:37:02Z",
          "roomId":12,
          "Name":"agent1"
+      },
+      {
+         "Status": "AGENTS.STATUS.OK",
+         "Name": "pyca-2.x",
+         "Update": "2026-10-30T20:36:46Z",
+         "Vendor": "pyca",
+         "Model": "pyca",
+         "Hardware": "git_sha",
+         "Firmware": "git_sha",
+         "Version": "2",
+         "parsedCapabilities": {
+            "config": {
+               "local": {
+                  "capture": true,
+                  "startpaused": false
+               },
+               "stream": {
+                  "stream": true,
+                  "startpaused": false
+               }
+            },
+            "inputs": [
+               {
+                  "id": "alpha",
+                  "value": "CAPTURE_AGENT.DEVICE.INPUTS.ALPHA"
+               },
+               {
+                  "id": "beta",
+                  "value": "CAPTURE_AGENT.DEVICE.INPUTS.BETA"
+               }
+            ],
+            "streams": [
+               {
+                  "id": "a",
+                  "value": "CAPTURE_AGENT.DEVICE.STREAM.A"
+               },
+               {
+                  "id": "b",
+                  "value": "CAPTURE_AGENT.DEVICE.STREAM.B"
+               },
+               {
+                  "id": "c",
+                  "value": "CAPTURE_AGENT.DEVICE.STREAM.C"
+               }
+            ],
+            "positions": [
+               {
+                  "id": "d",
+                  "value": "CAPTURE_AGENT.DEVICE.RECORD.D"
+               },
+               {
+                  "id": "e",
+                  "value": "CAPTURE_AGENT.DEVICE.RECORD.E"
+               },
+               {
+                  "id": "f",
+                  "value": "CAPTURE_AGENT.DEVICE.RECORD.F"
+               }
+            ],
+            "contents": [
+               {
+                  "id": "g",
+                  "value": "CAPTURE_AGENT.DEVICE.LAYOUT.G"
+               },
+               {
+                  "id": "h",
+                  "value": "CAPTURE_AGENT.DEVICE.LAYOUT.H"
+               },
+               {
+                  "id": "i",
+                  "value": "CAPTURE_AGENT.DEVICE.LAYOUT.I"
+               }
+            ],
+            "vendorKeys": [
+               {
+                  "key": "X-pyca.needsonly",
+                  "value": "X- prefix"
+               },
+               {
+                  "key": "X-pyca-thing1",
+                  "value": "vendor extensions woo"
+               }
+            ]
+         }
       }
    ]
 }

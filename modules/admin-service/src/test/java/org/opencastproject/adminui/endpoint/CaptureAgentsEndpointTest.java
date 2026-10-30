@@ -129,13 +129,13 @@ public class CaptureAgentsEndpointTest {
             .getResource("/capture_agents_noinputs.json"), "utf-8");
 
     String result = given().queryParam("withParsedCapabilities", true).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("total", equalTo(4)).body("offset", equalTo(0))
-            .body("limit", equalTo(0)).body("results", hasSize(4)).when().get(rt.host("/agents.json")).asString();
+            .contentType(ContentType.JSON).body("total", equalTo(5)).body("offset", equalTo(0))
+            .body("limit", equalTo(0)).body("results", hasSize(5)).when().get(rt.host("/agents.json")).asString();
 
     checkCaptureAgentResults(expectedWithInputs, result, true);
 
-    result = given().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("total", equalTo(4))
-            .body("offset", equalTo(0)).body("limit", equalTo(0)).body("results", hasSize(4)).when()
+    result = given().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("total", equalTo(5))
+            .body("offset", equalTo(0)).body("limit", equalTo(0)).body("results", hasSize(5)).when()
             .get(rt.host("/agents.json")).asString();
 
     checkCaptureAgentResults(expectedWithoutInputs, result, false);
@@ -145,7 +145,7 @@ public class CaptureAgentsEndpointTest {
   public void testGetAllWithParams() throws ParseException, IOException {
     int limit = 0;
     int offset = 2;
-    int total = 4;
+    int total = 5;
 
     given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
@@ -171,7 +171,7 @@ public class CaptureAgentsEndpointTest {
 
   @Test
   public void testSortAgentsByLastUpdatedTimestamp() throws ParseException, IOException {
-    int total = 4;
+    int total = 5;
 
     given().queryParam("sort", "updated:ASC").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total))
@@ -180,16 +180,18 @@ public class CaptureAgentsEndpointTest {
             .body("results[1].Update", equalTo("2016-05-26T07:07:07Z"))
             .body("results[2].Update", equalTo("2016-06-09T06:00:00Z"))
             .body("results[3].Update", equalTo("2016-06-09T18:00:00Z"))
+            .body("results[4].Update", equalTo("2026-10-30T20:36:46Z"))
             .when().get(rt.host("/agents.json"));
 
     given().queryParam("sort", "updated:DESC").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total))
             .body("results", hasSize(total))
-            .body("results[3].Update", equalTo("2014-05-26T15:37:02Z"))
-            .body("results[2].Update", equalTo("2016-05-26T07:07:07Z"))
-            .body("results[1].Update", equalTo("2016-06-09T06:00:00Z"))
-            .body("results[0].Update", equalTo("2016-06-09T18:00:00Z"))
-            .when().get(rt.host("/agents.json"));
+            .body("results[4].Update", equalTo("2014-05-26T15:37:02Z"))
+            .body("results[3].Update", equalTo("2016-05-26T07:07:07Z"))
+            .body("results[2].Update", equalTo("2016-06-09T06:00:00Z"))
+            .body("results[1].Update", equalTo("2016-06-09T18:00:00Z"))
+            .body("results[0].Update", equalTo("2026-10-30T20:36:46Z"))
+        .when().get(rt.host("/agents.json"));
   }
 
   @BeforeClass

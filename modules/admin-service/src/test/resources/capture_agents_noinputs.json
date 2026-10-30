@@ -1,7 +1,7 @@
 {
-   "total":4,
+   "total":5,
    "offset":0,
-   "count":4,
+   "count":5,
    "limit":0,
    "results":[
       {
@@ -27,6 +27,17 @@
          "Update":"2014-05-26T15:37:02Z",
          "roomId":12,
          "Name":"agent1"
+      },
+      {
+         "Status": "AGENTS.STATUS.OK",
+         "Name": "pyca-2.x",
+         "Update": "2026-10-30T20:36:46Z",
+         "URL": "127.0.0.1",
+         "Vendor": "pyca",
+         "Model": "pyca",
+         "Hardware": "git_sha",
+         "Firmware": "git_sha",
+         "Version": "2"
       }
    ]
 }
