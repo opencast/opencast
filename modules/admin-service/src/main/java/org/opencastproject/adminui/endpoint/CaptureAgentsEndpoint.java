@@ -66,7 +66,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -358,31 +359,33 @@ public class CaptureAgentsEndpoint {
       parsedCapabilities.add("config", config);
 
       //NB: Even for a CA API 2.0+ agent, we still have the device names as a fallback, though agents may override them
-      parsedCapabilities.add("inputs", generateJsonDevice(agent.getInputs(), TRANSLATION_KEY_PREFIX + "INPUTS."));
+      parsedCapabilities.add("inputs",
+          generateJsonDevice(agent.getInputs()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "INPUTS."));
 
-      Set<String> streamConfigs = agent.streamConfigurations();
-      if (streamConfigs.isEmpty()) {
-        parsedCapabilities.add("streams", new JsonArray());
-      } else {
-        parsedCapabilities.add("streams", generateJsonDevice(streamConfigs, TRANSLATION_KEY_PREFIX + "STREAM."));
-      }
+      parsedCapabilities.add("streams",
+          generateJsonDevice(agent.streamConfigurations()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "STREAM."));
 
-      Set<String> devicePositions = agent.devicePositions();
-      if (devicePositions.isEmpty()) {
-        parsedCapabilities.add("positions", new JsonArray());
-      } else {
-        parsedCapabilities.add("positions", generateJsonDevice(devicePositions, TRANSLATION_KEY_PREFIX + "RECORD."));
-      }
+      parsedCapabilities.add("positions",
+          generateJsonDevice(agent.devicePositions()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "RECORD."));
 
-      Set<String> contents = agent.contentConfigurations();
-      if (contents.isEmpty()) {
-        parsedCapabilities.add("contents", new JsonArray());
-      } else {
-        parsedCapabilities.add("contents", generateJsonDevice(contents, TRANSLATION_KEY_PREFIX + "LAYOUT."));
-      }
+      parsedCapabilities.add("contents",
+          generateJsonDevice(agent.contentConfigurations()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "LAYOUT."));
 
       Map<String, String> vendorKeys = agent.vendorKeys();
 
+      //This is handled differently than above because it's a (potentially empty) map rather than a set
       JsonArray vendorArray = new JsonArray();
       vendorKeys.forEach((key, value) -> {
         JsonObject vendorJson = new JsonObject();
