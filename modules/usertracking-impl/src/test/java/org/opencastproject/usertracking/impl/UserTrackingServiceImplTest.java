@@ -39,7 +39,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserTrackingServiceImplTest {
   private UserTrackingServiceImpl service = null;
@@ -50,7 +51,7 @@ public class UserTrackingServiceImplTest {
     service = new UserTrackingServiceImpl();
     service.setEntityManagerFactory(newEntityManagerFactory(UserTrackingServiceImpl.PERSISTENCE_UNIT));
     service.setDBSessionFactory(getDbSessionFactory());
-    service.activate();
+    service.activate(new HashMap<>());
   }
 
   /**
@@ -59,19 +60,16 @@ public class UserTrackingServiceImplTest {
    */
   @Test
   public void testDetailedTracking() throws Exception {
-    Properties props = new Properties();
-
-    service.updated(null);
-    Assert.assertFalse(service.getUserTrackingEnabled());
+    Map<String, Object> props = new HashMap<>();
 
     service.updated(props);
     Assert.assertFalse(service.getUserTrackingEnabled());
 
-    props.setProperty("org.opencastproject.usertracking.detailedtrack", "true");
+    props.put("org.opencastproject.usertracking.detailedtrack", "true");
     service.updated(props);
     Assert.assertTrue(service.getUserTrackingEnabled());
 
-    props.setProperty("org.opencastproject.usertracking.detailedtrack", "false");
+    props.put("org.opencastproject.usertracking.detailedtrack", "false");
     service.updated(props);
     Assert.assertFalse(service.getUserTrackingEnabled());
   }

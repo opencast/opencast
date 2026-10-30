@@ -52,11 +52,11 @@ import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,12 +80,12 @@ import java.util.stream.Stream;
 
 @Component(
     immediate = true,
-    service = { ManagedService.class,StatisticsExportService.class },
+    service = { StatisticsExportService.class },
     property = {
         "service.description=Statistics Export Service"
     }
 )
-public class StatisticsExportServiceImpl implements StatisticsExportService, ManagedService {
+public class StatisticsExportServiceImpl implements StatisticsExportService {
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(StatisticsExportServiceImpl.class);
@@ -107,8 +106,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   private StatisticsService statisticsService;
   private AssetManager assetManager;
 
-  @Override
-  public void updated(Dictionary<String, ?> dictionary) {
+  @Modified
+  public void updated(Map<String, Object> dictionary) {
     final String seriesToEventProviderMappings = (String) dictionary.get(CFG_KEY_SERIES_TO_EVENT_PROVIDER_MAPPINGS);
     if (seriesToEventProviderMappings != null) {
       this.seriesToEventProviderMapping = getMapping(seriesToEventProviderMappings);
@@ -138,8 +137,9 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) {
     logger.info("Activating Statistics Service");
+    updated(properties);
   }
 
   @Deactivate

@@ -50,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ServiceRegistrationTest {
@@ -74,7 +75,7 @@ public class ServiceRegistrationTest {
     serviceRegistry = new ServiceRegistryJpaImpl();
     serviceRegistry.setEntityManagerFactory(newEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT));
     serviceRegistry.setDBSessionFactory(getDbSessionFactory());
-    serviceRegistry.activate(null);
+    serviceRegistry.activate(null, new HashMap<>());
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);

@@ -28,8 +28,10 @@ import org.opencastproject.urlsigning.common.Policy;
 import org.opencastproject.urlsigning.common.ResourceStrategy;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +45,9 @@ import java.util.TreeMap;
 
 @Component(
     immediate = true,
-    service = { ManagedService.class, UrlSigningProvider.class },
+    service = { UrlSigningProvider.class },
     property = {
-        "service.description=Wowza Url Signing Provider",
-        "service.pid=org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider"
+        "service.description=Wowza Url Signing Provider"
     }
 )
 public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
@@ -242,6 +243,13 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     base64Hash = base64Hash.replaceAll("/", "_");
 
     return base64Hash;
+  }
+
+  @Activate
+  @Modified
+  @Override
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
+    super.updated(properties);
   }
 
   @Reference

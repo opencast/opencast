@@ -29,15 +29,16 @@ import org.opencastproject.metadata.mpeg7.TextualImpl;
 import org.opencastproject.util.ReadinessIndicator;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,13 +49,12 @@ import java.util.regex.Pattern;
  */
 @Component(
     immediate = true,
-    service = { DictionaryService.class,ManagedService.class },
+    service = { DictionaryService.class },
     property = {
-        "service.description=Dictionary Service (Regular Expressions)",
-        "service.pid=org.opencastproject.dictionary.regexp.DictionaryServiceImpl"
+        "service.description=Dictionary Service (Regular Expressions)"
     }
 )
-public class DictionaryServiceImpl implements DictionaryService, ManagedService {
+public class DictionaryServiceImpl implements DictionaryService {
 
   /** The logging facility */
   private static final Logger logger =
@@ -84,9 +84,9 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
   /**
    * Load configuration
    */
-  @Override
-  public synchronized void updated(Dictionary<String, ?> properties) {
-    if (properties != null && properties.get(PATTERN_CONFIG_KEY) != null) {
+  @Modified
+  public synchronized void updated(Map<String, Object> properties) {
+    if (properties.get(PATTERN_CONFIG_KEY) != null) {
       String pattern = properties.get(PATTERN_CONFIG_KEY).toString();
       logger.info("Setting pattern for regexp based DictionaryService to '{}'", pattern);
       setPattern(pattern);
@@ -97,14 +97,16 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
    * OSGi callback on component activation.
    *
    * @param  ctx  the bundle context
+   * @param  config  the configuration properties
    */
   @Activate
-  void activate(BundleContext ctx) {
+  void activate(BundleContext ctx, Map<String, Object> config) {
     logger.info("Activating regexp based DictionaryService");
     Dictionary<String, String> properties = new Hashtable<String, String>();
     properties.put(ARTIFACT, "dictionary");
     ctx.registerService(ReadinessIndicator.class.getName(),
         new ReadinessIndicator(), properties);
+    updated(config);
   }
 
   /**

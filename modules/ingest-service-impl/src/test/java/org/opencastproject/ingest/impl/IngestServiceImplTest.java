@@ -100,9 +100,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -345,7 +343,7 @@ public class IngestServiceImplTest {
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
     serviceRegistry.registerService(service);
-    Dictionary<String, String> p = new Hashtable<>();
+    Map<String, Object> p = new HashMap<>();
     p.put(IngestServiceImpl.DOWNLOAD_SOURCE, "http://localhost.*|http://www.test.com/.*");
     service.updated(p);
     service.testMode = true;
@@ -361,7 +359,7 @@ public class IngestServiceImplTest {
     MediaPackage mediaPackage = null;
 
     // Use default properties
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     service.updated(properties);
 
     mediaPackage = service.createMediaPackage();
@@ -467,7 +465,7 @@ public class IngestServiceImplTest {
 
     MediaPackage mediaPackage = service.createMediaPackage();
 
-    Dictionary<String, String> props = new Hashtable<>();
+    Map<String, Object> props = new HashMap<>();
     props.put(IngestServiceImpl.DOWNLOAD_SOURCE, regex);
     props.put(IngestServiceImpl.DOWNLOAD_USER, "user");
     props.put(IngestServiceImpl.DOWNLOAD_PASSWORD, "password");
@@ -572,7 +570,7 @@ public class IngestServiceImplTest {
     MediaPackage ingestMediaPackage = MediaPackageParser
             .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest-partial.xml"), "UTF-8"));
 
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(IngestServiceImpl.SKIP_ATTACHMENTS_KEY, "false");
     properties.put(IngestServiceImpl.SKIP_CATALOGS_KEY, "false");
     properties.put(IngestServiceImpl.ADD_ONLY_NEW_FLAVORS_KEY, "false");
@@ -625,7 +623,7 @@ public class IngestServiceImplTest {
     EasyMock.expect(dcService.load(EasyMock.anyObject())).andReturn(dcCatalog).anyTimes();
     EasyMock.replay(dcService);
     service.setDublinCoreService(dcService);
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     MediaPackage mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
     // check element skipping
     properties.put(IngestServiceImpl.SKIP_ATTACHMENTS_KEY, "true");
@@ -640,7 +638,7 @@ public class IngestServiceImplTest {
 
   @Test
   public void testVaryEpisodeWithOnlyNewFlavorsFalse() throws Exception {
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     boolean isAddOnlyNew;
     // Test with properties and key is false
     properties.put(IngestServiceImpl.ADD_ONLY_NEW_FLAVORS_KEY, "false");
@@ -660,10 +658,10 @@ public class IngestServiceImplTest {
 
   @Test
   public void testVaryEpisodeWithOnlyNewFlavorsMissingParam() throws Exception {
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     boolean isAddOnlyNew;
     // Test with properties file but no overwrite param
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     properties.put("blahblah", "blahblah");
     service.updated(properties);
     isAddOnlyNew = service.isAddOnlyNew;
@@ -673,9 +671,9 @@ public class IngestServiceImplTest {
 
   @Test
   public void testNoPropertiesEpisodeOverwriteParam() throws Exception {
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     boolean isAddOnlyNew;
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     service.updated(properties);
     isAddOnlyNew = service.isAddOnlyNew;
     Assert.assertTrue("Overwrite property defaults to true when param is commented out", isAddOnlyNew);
@@ -730,7 +728,7 @@ public class IngestServiceImplTest {
   @Test
   public void testVarySeriesOverwriteConfiguration() throws Exception {
     boolean isAddOnlyNewSeries;
-    Dictionary<String, String> properties = makeIngestProperties();
+    Map<String, Object> properties = makeIngestProperties();
 
     // Test with no properties
     // NOTE: This test only works if the serivce.update() was not triggered by any previous tests
@@ -922,8 +920,8 @@ public class IngestServiceImplTest {
    *
    * @return default properties
    */
-  private Dictionary<String, String> makeIngestProperties() {
-    Dictionary<String, String> properties = new Hashtable<>();
+  private Map<String, Object> makeIngestProperties() {
+    Map<String, Object> properties = new HashMap<>();
     String downloadPassword = "CHANGE_ME";
     String downloadSource = "http://localhost";
     String downloadUser = "opencast_system_account";
@@ -939,7 +937,7 @@ public class IngestServiceImplTest {
    * Test method for {@link org.opencastproject.ingest.impl.IngestServiceImpl#updateSeries(
    * org.opencastproject.mediapackage.MediaPackage)}
    */
-  private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
+  private void testSeriesUpdateNewAndExisting(Map<String, Object> properties) throws Exception {
 
     // default expectation for series overwrite
     boolean isUpdateSeries = IngestServiceImpl.DEFAULT_ALLOW_SERIES_MODIFICATIONS;
@@ -947,8 +945,8 @@ public class IngestServiceImplTest {
     if (properties != null) {
       service.updated(properties);
       try {
-        boolean testForValue = Boolean.parseBoolean(properties.get(IngestServiceImpl.MODIFY_OPENCAST_SERIES_KEY)
-            .trim());
+        boolean testForValue = Boolean.parseBoolean(
+            ((String) properties.get(IngestServiceImpl.MODIFY_OPENCAST_SERIES_KEY)).trim());
         isUpdateSeries = testForValue;
       } catch (Exception e) {
         // If key or value not found or not boolean, use the default overwrite expectation

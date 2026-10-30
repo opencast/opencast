@@ -51,9 +51,10 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class YouTubeV3PublicationServiceImplTest {
@@ -114,7 +115,7 @@ public class YouTubeV3PublicationServiceImplTest {
     service.publish(mediaPackage, mediaPackage.getTracks()[0], null, null);
   }
 
-  private Dictionary getServiceProperties() throws IOException {
+  private Map<String, Object> getServiceProperties() throws IOException {
     final Properties p = new Properties();
     YouTubeUtils.put(p, YouTubeKey.credentialDatastore, "credentialDatastore");
     final String absolutePath = UnitTestUtils.getMockClientSecretsFile("clientId",
@@ -125,7 +126,9 @@ public class YouTubeV3PublicationServiceImplTest {
     YouTubeUtils.put(p, YouTubeKey.defaultPlaylist, "foo");
     YouTubeUtils.put(p, YouTubeKey.makeVideosPrivate, "true");
     // maxFieldLength is optional so we skip
-    return p;
+    final Map<String, Object> properties = new HashMap<>();
+    p.forEach((key, value) -> properties.put((String) key, value));
+    return properties;
   }
 
 }

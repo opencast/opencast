@@ -33,7 +33,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 
 import java.net.URI;
@@ -42,8 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +51,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, ManagedService {
+public abstract class AbstractUrlSigningProvider implements UrlSigningProvider {
   /** The prefix for key configuration keys */
   public static final String KEY_PROPERTY_PREFIX = "key";
 
@@ -155,13 +152,16 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     return null;
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  /**
+   * Updates the configuration of this provider. Subclasses are expected to register this as their DS lifecycle method.
+   *
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
+   */
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     getLogger().info("Updating {}", toString());
-    if (properties == null) {
-      getLogger().warn("{} is unconfigured", toString());
-      return;
-    }
 
     // Collect configuration in a new map so we don't partially override the old one in case of error
     TreeMap<String, Key> urls = new TreeMap<>();
@@ -170,10 +170,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     // Temporary list of key entries to simplify building up the keys
     Map<String, Key> keys = new HashMap<>();
 
-    Enumeration<String> propertyKeys = properties.keys();
-    while (propertyKeys.hasMoreElements()) {
-      String propertyKey = propertyKeys.nextElement();
-
+    for (String propertyKey : properties.keySet()) {
       if (propertyKey.startsWith(KEY_PROPERTY_PREFIX + ".")) {
 
         // We expected the parts [KEY_PROPERTY_PREFIX, id, attribute] or [KEY_PROPERTY_PREFIX, id, URL, name]

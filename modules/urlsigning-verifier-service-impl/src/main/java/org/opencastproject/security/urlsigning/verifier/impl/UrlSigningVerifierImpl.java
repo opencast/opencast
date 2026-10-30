@@ -27,25 +27,24 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
-import java.util.Enumeration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
 @Component(
     immediate = true,
-    service = { ManagedService.class,UrlSigningVerifier.class },
+    service = { UrlSigningVerifier.class },
     property = {
-        "service.description=Url Signing Verifier",
-        "service.pid=org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl"
+        "service.description=Url Signing Verifier"
     }
 )
-public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedService {
+public class UrlSigningVerifierImpl implements UrlSigningVerifier {
   /** Prefix for key entry configuration keys */
   public static final String KEY_PREFIX = "key.";
   /** The logging facility */
@@ -67,21 +66,15 @@ public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedServic
     return keys;
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     logger.info("Updating UrlSigningVerifierImpl");
 
     // Clear the current set of keys
     keys.clear();
 
-    if (properties == null) {
-      logger.warn("UrlSigningVerifierImpl has no keys to verify urls");
-      return;
-    }
-
-    Enumeration<String> ids = properties.keys();
-    while (ids.hasMoreElements()) {
-      String propertyKey = ids.nextElement();
+    for (String propertyKey : properties.keySet()) {
       String id = Strings.CS.removeStart(propertyKey, KEY_PREFIX);
       if (id != propertyKey) {
         String key = StringUtils.trimToNull(Objects.toString(properties.get(propertyKey), null));

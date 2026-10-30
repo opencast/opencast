@@ -83,7 +83,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -106,7 +105,6 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -123,13 +121,12 @@ import java.util.stream.Collectors;
 /** FFMPEG based implementation of the composer service api. */
 @Component(
     property = {
-        "service.description=Composer (Encoder) Local Service",
-        "service.pid=org.opencastproject.composer.impl.ComposerServiceImpl"
+        "service.description=Composer (Encoder) Local Service"
     },
     immediate = true,
-    service = { ComposerService.class, ManagedService.class }
+    service = { ComposerService.class }
 )
-public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService, ManagedService {
+public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService {
   /**
    * The indexes the composite job uses to create a Job
    */
@@ -265,15 +262,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *
    * @param cc
    *          the component context
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
             FFMPEG_BINARY_DEFAULT);
     logger.debug("ffmpeg binary: {}", ffmpegBinary);
     logger.info("Activating composer service");
+    updated(properties);
   }
 
   /**
@@ -2172,22 +2173,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   /**
-   * OSGI callback when the configuration is updated. This method is only here to prevent the
-   * configuration admin service from calling the service deactivate and activate methods
-   * for a config update. It does not have to do anything as the updates are handled by updated().
+   * OSGi callback when the configuration is updated.
    */
   @Modified
-  public void modified(Map<String, Object> config) throws ConfigurationException {
-    logger.debug("Modified");
-  }
-
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties == null) {
-      logger.info("No configuration available, using defaults");
-      return;
-    }
-
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     maxMultipleProfilesJobLoad = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_MAX_MULTIPLE_PROFILES,
             DEFAULT_JOB_LOAD_MAX_MULTIPLE_PROFILES, serviceRegistry);
     processSmilJobLoadFactor = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_FACTOR_PROCESS_SMIL,

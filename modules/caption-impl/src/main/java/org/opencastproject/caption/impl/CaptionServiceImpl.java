@@ -52,10 +52,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +68,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.FileTypeMap;
 
@@ -82,13 +82,12 @@ import javax.activation.FileTypeMap;
  */
 @Component(
     immediate = true,
-    service = { CaptionService.class,ManagedService.class },
+    service = { CaptionService.class },
     property = {
-        "service.description=Caption Converter Service",
-        "service.pid=org.opencastproject.caption.impl.CaptionServiceImpl"
+        "service.description=Caption Converter Service"
     }
 )
-public class CaptionServiceImpl extends AbstractJobProducer implements CaptionService, ManagedService {
+public class CaptionServiceImpl extends AbstractJobProducer implements CaptionService {
 
   /**
    * Creates a new caption service.
@@ -140,12 +139,17 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    *
    * @param componentContext
    *          the component context
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
   @Activate
-  public void activate(ComponentContext componentContext) {
+  public void activate(ComponentContext componentContext, Map<String, Object> properties)
+          throws ConfigurationException {
     super.activate(componentContext);
     this.componentContext = componentContext;
+    updated(properties);
   }
 
   /**
@@ -598,8 +602,8 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
     return serviceRegistry;
   }
 
-  @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD,
         serviceRegistry);
   }

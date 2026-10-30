@@ -35,8 +35,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WowzaUrlSigningProviderTest {
   private static final String KEY_ID = "wowza";
@@ -45,7 +45,7 @@ public class WowzaUrlSigningProviderTest {
   private static final String ORGANIZATION_ID = "mh_default_org";
 
   private static WowzaUrlSigningProvider signer;
-  private static Dictionary<String, String> properties;
+  private static Map<String, Object> properties;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
@@ -59,12 +59,12 @@ public class WowzaUrlSigningProviderTest {
     signer = new WowzaUrlSigningProvider();
     signer.setSecurityService(securityService);
 
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
   }
 
   @Before
   public void setUp() throws Exception {
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     signer.updated(properties);
   }
 

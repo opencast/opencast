@@ -53,10 +53,10 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -81,14 +80,14 @@ import java.util.stream.Collectors;
  */
 @Component(
     immediate = true,
-    service = { ManagedService.class,YouTubePublicationService.class },
+    service = { YouTubePublicationService.class },
     property = {
         "service.description=Publication Service (YouTube API Version 3)"
     }
 )
 public class YouTubeV3PublicationServiceImpl
     extends AbstractJobProducer
-    implements YouTubePublicationService, ManagedService {
+    implements YouTubePublicationService {
 
   /** The load on the system introduced by creating a publish job */
   public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 0.1f;
@@ -190,25 +189,26 @@ public class YouTubeV3PublicationServiceImpl
   /**
    * Called when service activates. Defined in OSGi resource file.
    */
-  @Override
   @Activate
-  public synchronized void activate(final ComponentContext cc) {
+  public synchronized void activate(final ComponentContext cc, final Map<String, Object> props)
+          throws ConfigurationException {
     super.activate(cc);
     properties.setBundleContext(cc.getBundleContext());
 
     logger.debug("Activated YouTube Publication Service");
+    updated(props);
   }
 
-  @Override
-  public void updated(final Dictionary props) throws ConfigurationException {
-    properties.merge(props);
+  @Modified
+  public void updated(final Map<String, Object> props) throws ConfigurationException {
+    properties.putAll(props);
 
     enabled = Boolean.valueOf((String) properties.get(YOUTUBE_ENABLED_KEY));
 
-    final String dataStore = YouTubeUtils.get(properties, YouTubeKey.credentialDatastore);
-
+    String dataStore = null;
     try {
       if (enabled) {
+        dataStore = YouTubeUtils.get(properties, YouTubeKey.credentialDatastore);
         final ClientCredentials clientCredentials = new ClientCredentials();
         clientCredentials.setCredentialDatastore(dataStore);
         final String path = YouTubeUtils.get(properties, YouTubeKey.clientSecretsV3);

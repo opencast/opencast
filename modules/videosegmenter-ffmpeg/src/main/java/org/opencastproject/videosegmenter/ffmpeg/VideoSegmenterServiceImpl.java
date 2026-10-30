@@ -55,9 +55,10 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,9 +73,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,13 +93,13 @@ import java.util.stream.Collectors;
  */
 @Component(
     immediate = true,
-    service = { VideoSegmenterService.class,ManagedService.class },
+    service = { VideoSegmenterService.class },
     property = {
         "service.description=VideoSegmenter Service"
     }
 )
 public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
-    VideoSegmenterService, ManagedService {
+    VideoSegmenterService {
 
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "videosegments";
@@ -249,25 +250,26 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     this.binary = FFMPEG_BINARY_DEFAULT;
   }
 
-  @Override
-  public void activate(ComponentContext cc) {
+  @Activate
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     /* Configure segmenter */
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
     this.binary = path == null ? FFMPEG_BINARY_DEFAULT : path;
     logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
+    updated(properties);
   }
 
   /**
-   * {@inheritDoc}
+   * OSGi callback when the configuration is updated.
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties == null) {
-      return;
-    }
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     logger.debug("Configuring the videosegmenter");
 
     // Stability threshold
