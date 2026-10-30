@@ -235,3 +235,16 @@ import io.restassured.http.ContentType;
   (line 3, the copyright year line, is exempt from matching). Copy it from a neighbouring file when
   creating a new one.
 - Modifier order per JLS; no redundant modifiers (e.g. `public` on interface methods).
+
+## Release notes
+
+Changes that admins should know about (new features, changed behaviour or configuration, anything relevant for
+upgrading) need a release note: one plain text file per change in `docs/guides/admin/docs/releasenotes/`. Read the
+`readme.txt` there first. Things that are easy to get wrong:
+
+- Markdown content is fine, but use a `.txt` extension, never `.md` (mkdocs would pick it up as a page).
+  Name it after the change in kebab-case, e.g. `whisper-async.txt`.
+- State explicitly if the change includes a database schema change or an index change.
+- Steps admins must take when upgrading additionally belong in `docs/guides/admin/docs/upgrade.md`.
+
+Pure refactorings, internal cleanups and minor bugfixes don't need a note.
