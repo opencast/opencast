@@ -43,7 +43,8 @@ import javax.ws.rs.Path;
     title = "Transcription Service REST Endpoint (uses Amberscript services)",
     abstractText = "Uses external service to generate transcriptions of recordings.",
     notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)",
+        "This service has no endpoints for clients. It only provides the internal endpoints Opencast nodes use to"
+            + " dispatch jobs to each other.",
     }
 )
 
