@@ -88,6 +88,18 @@ public class SeriesEndpointTest {
     assertEquals("Topic", subjects.get(0));
   }
 
+  @Test
+  public void testGetSeriesListWithTooLargeLimit() throws Exception {
+    given().queryParam("limit", 10001).expect().statusCode(SC_BAD_REQUEST).when().get(env.host("/"));
+    given().queryParam("limit", 10000).expect().statusCode(SC_OK).when().get(env.host("/"));
+  }
+
+  @Test
+  public void testGetSeriesListWithLargeLimitOlderVersion() throws Exception {
+    given().accept("application/v1.12.0+json").queryParam("limit", 10001).expect().statusCode(SC_OK).when()
+        .get(env.host("/"));
+  }
+
   /** Unit test for {@link SeriesEndpoint#getSeries(String, String, Boolean)} */
   @Test
   public void testGetSeriesJson() throws Exception {

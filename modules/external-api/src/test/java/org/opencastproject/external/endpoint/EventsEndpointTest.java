@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -119,6 +120,11 @@ public class EventsEndpointTest {
     } catch (IllegalArgumentException e) {
       assertNotNull(e);
     }
+  }
+
+  @Test
+  public void testGetEventsWithTooLargeLimit() {
+    given().queryParam("limit", 10001).expect().statusCode(SC_BAD_REQUEST).when().get(env.host("/"));
   }
 
   @Test
