@@ -32,19 +32,20 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -114,9 +115,9 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
     List<NameValuePair> params = new ArrayList<NameValuePair>();
     params.add(new BasicNameValuePair("uri", uri.toString()));
     params.add(new BasicNameValuePair("options", Options.toJson(options)));
-    String url = "/inspect?" + URLEncodedUtils.format(params, "UTF-8");
+    String url = "/inspect?" + WWWFormCodec.format(params, StandardCharsets.UTF_8);
     logger.info("Inspecting media file at {} using a remote media inspection service", uri);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       HttpGet get = new HttpGet(url);
       response = getResponse(get);
@@ -157,10 +158,10 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
       throw new MediaInspectionException(e);
     }
     logger.info("Enriching {} using a remote media inspection service", original);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       HttpPost post = new HttpPost("/enrich");
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
       response = getResponse(post);
       if (response != null) {
         Job receipt = JobParser.parseJob(response.getEntity().getContent());

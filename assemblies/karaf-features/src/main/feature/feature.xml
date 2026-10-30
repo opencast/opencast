@@ -21,9 +21,11 @@
     <feature>cxf-http-jetty</feature>
     <feature>opencast-jax-rs-whiteboard</feature>
 
-    <!-- httpclient needs to start before common so that it can get org.apache.commons.logging -->
-    <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
-    <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
+    <!-- Apache HttpComponents 5. The jars are no OSGi bundles, hence wrapped. Core must resolve before client. -->
+    <bundle start-level="55">wrap:mvn:org.apache.httpcomponents.core5/httpcore5/${httpcomponents-core5.version}$Bundle-SymbolicName=org.apache.httpcomponents.core5.httpcore5&amp;Bundle-Version=${httpcomponents-core5.version}&amp;Export-Package=org.apache.hc.core5.*;version=${httpcomponents-core5.version}&amp;Import-Package=org.conscrypt;resolution:=optional,*</bundle>
+    <bundle start-level="55">wrap:mvn:org.apache.httpcomponents.core5/httpcore5-h2/${httpcomponents-core5.version}$Bundle-SymbolicName=org.apache.httpcomponents.core5.httpcore5-h2&amp;Bundle-Version=${httpcomponents-core5.version}&amp;Export-Package=org.apache.hc.core5.http2.*;version=${httpcomponents-core5.version}&amp;Import-Package=org.conscrypt;resolution:=optional,org.apache.hc.core5.*;version="[5.4,6)",*</bundle>
+    <bundle start-level="55">wrap:mvn:org.apache.httpcomponents.client5/httpclient5/${httpcomponents-client5.version}$Bundle-SymbolicName=org.apache.httpcomponents.client5.httpclient5&amp;Bundle-Version=${httpcomponents-client5.version}&amp;Export-Package=org.apache.hc.client5.*;version=${httpcomponents-client5.version}&amp;Import-Package=org.conscrypt;resolution:=optional,org.apache.commons.compress.*;resolution:=optional,com.github.luben.zstd;resolution:=optional,com.aayushatharva.brotli4j.*;resolution:=optional,org.brotli.dec;resolution:=optional,org.newsclub.net.unix;resolution:=optional,org.apache.hc.core5.*;version="[5.4,6)",org.slf4j,*</bundle>
+    <bundle start-level="55">wrap:mvn:org.apache.httpcomponents.client5/httpclient5-fluent/${httpcomponents-client5.version}$Bundle-SymbolicName=org.apache.httpcomponents.client5.httpclient5-fluent&amp;Bundle-Version=${httpcomponents-client5.version}&amp;Export-Package=org.apache.hc.client5.http.fluent;version=${httpcomponents-client5.version}&amp;Import-Package=org.apache.hc.*;version="[5.4,6)",*</bundle>
     <bundle start-level="55">mvn:commons-codec/commons-codec/${commons-codec.version}</bundle>
 
     <!-- JPA -->

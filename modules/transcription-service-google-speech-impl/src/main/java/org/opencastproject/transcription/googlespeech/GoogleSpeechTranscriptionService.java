@@ -48,6 +48,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
@@ -61,17 +62,16 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -527,13 +527,13 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
     try {
       HttpPost httpPost = new HttpPost(UrlSupport.concat(GOOGLE_SPEECH_URL, REQUEST_METHOD));
-      logger.debug("Url to invoke Google speech service: {}", httpPost.getURI().toString());
-      StringEntity params = new StringEntity(container.toJSONString());
+      logger.debug("Url to invoke Google speech service: {}", httpPost.getRequestUri());
+      StringEntity params = new StringEntity(container.toJSONString(), ContentType.APPLICATION_JSON);
       httpPost.addHeader("Authorization", "Bearer " + token); // add the authorization header to the request;
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
       httpPost.setEntity(params);
       response = httpClient.execute(httpPost);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
       HttpEntity entity = response.getEntity();
       String jsonString = EntityUtils.toString(response.getEntity());
       JSONParser jsonParser = new JSONParser();
@@ -602,11 +602,11 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     try {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(GOOGLE_SPEECH_URL, RESULT_PATH, jobId));
-      logger.debug("Url to invoke Google speech service: {}", httpGet.getURI().toString());
+      logger.debug("Url to invoke Google speech service: {}", httpGet.getRequestUri());
       // add the authorization header to the request;
       httpGet.addHeader("Authorization", "Bearer " + token);
       response = httpClient.execute(httpGet);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -688,11 +688,11 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     try {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(GOOGLE_SPEECH_URL, RESULT_PATH, jobId));
-      logger.debug("Url to invoke Google speech service: {}", httpGet.getURI().toString());
+      logger.debug("Url to invoke Google speech service: {}", httpGet.getRequestUri());
       // add the authorization header to the request;
       httpGet.addHeader("Authorization", "Bearer " + token);
       response = httpClient.execute(httpGet);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -787,12 +787,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   }
 
   protected CloseableHttpClient makeHttpClient() throws IOException {
-    RequestConfig reqConfig = RequestConfig.custom()
-            .setConnectTimeout(CONNECTION_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT)
-            .setConnectionRequestTimeout(CONNECTION_TIMEOUT)
-            .build();
-    return HttpClients.custom().setDefaultRequestConfig(reqConfig).build();
+    return HttpUtil.clientBuilder(CONNECTION_TIMEOUT, SOCKET_TIMEOUT).build();
   }
 
   protected String refreshAccessToken(String clientId, String clientSecret, String refreshToken)
@@ -806,7 +801,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
               clientId, clientSecret, refreshToken));
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
       response = httpClient.execute(httpPost);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
       String jsonString = EntityUtils.toString(response.getEntity());
       JSONParser jsonParser = new JSONParser();
       JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);

@@ -35,14 +35,14 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.HostRegistrationInMemory;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.hc.client5.http.auth.AuthChallenge;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -122,7 +122,7 @@ public class OaiPmhPublicationRestServiceTest {
      * Override method with a no-op. In a test environment where the Opencast servlet filter chain is not in place
      * this will result in an inadvertent call to the REST endpoint which will most likely cause exceptions.
      */
-    @Override protected String[] getRealmAndNonce(HttpRequestBase request) throws TrustedHttpClientException {
+    @Override protected AuthChallenge probeDigestChallenge(ClassicHttpRequest request) {
       return null;
     }
   }

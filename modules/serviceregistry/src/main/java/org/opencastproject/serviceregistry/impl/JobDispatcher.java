@@ -48,11 +48,11 @@ import org.opencastproject.util.UrlSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -594,7 +594,7 @@ public class JobDispatcher {
         post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
         // Post the request
-        HttpResponse response = null;
+        ClassicHttpResponse response = null;
         int responseStatusCode;
         try {
           logger.debug("Trying to dispatch {} type '{}' load {} to {}", job, job.getJobType(), job.getJobLoad(),
@@ -603,7 +603,7 @@ public class JobDispatcher {
             serviceRegistry.setCurrentJob(job.toJob());
           }
           response = client.execute(post);
-          responseStatusCode = response.getStatusLine().getStatusCode();
+          responseStatusCode = response.getCode();
           if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
             return registration.getHost();
           } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {

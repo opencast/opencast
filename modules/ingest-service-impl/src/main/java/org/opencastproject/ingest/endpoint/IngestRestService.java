@@ -75,8 +75,8 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -1215,12 +1215,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    */
   private void updateMediaPackageID(MediaPackage mp, URI uri) throws IOException {
     InputStream in = null;
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
         response = httpClient.execute(get);
-        int httpStatusCode = response.getStatusLine().getStatusCode();
+        int httpStatusCode = response.getCode();
         if (httpStatusCode != 200) {
           throw new IOException(uri + " returns http " + httpStatusCode);
         }

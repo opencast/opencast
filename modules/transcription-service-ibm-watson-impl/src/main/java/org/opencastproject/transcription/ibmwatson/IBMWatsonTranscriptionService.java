@@ -50,6 +50,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -63,27 +64,26 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.FileEntity;
+import org.apache.hc.core5.util.TimeValue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -233,7 +233,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
   // For preemptive basic authentication
   private AuthCache authCache;
-  private CredentialsProvider credentialsProvider;
+  private BasicCredentialsProvider credentialsProvider;
 
   public IBMWatsonTranscriptionService() {
     super(JOB_TYPE);
@@ -272,11 +272,14 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         // We will use preemptive basic auth
         try {
           URI uri = new URI(watsonServiceUrl);
-          HttpHost targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+          HttpHost targetHost = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
           credentialsProvider = new BasicCredentialsProvider();
-          credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, psw));
+          credentialsProvider.setCredentials(new AuthScope(targetHost),
+              new UsernamePasswordCredentials(user, psw.toCharArray()));
+          BasicScheme basicScheme = new BasicScheme();
+          basicScheme.initPreemptive(new UsernamePasswordCredentials(user, psw.toCharArray()));
           authCache = new BasicAuthCache();
-          authCache.put(targetHost, new BasicScheme());
+          authCache.put(targetHost, basicScheme);
         } catch (URISyntaxException e) {
           throw new RuntimeException("Watson STT service url is not valid: " + watsonServiceUrl, e);
         }
@@ -551,7 +554,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
     try {
       response = httpClient.execute(httpPost, context);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -630,13 +633,12 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       HttpPost httpPost = new HttpPost(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS)
               + String.format(
                       "?inactivity_timeout=-1&timestamps=true&smart_formatting=true%s", additionalParms));
-      logger.debug("Url to invoke ibm watson service: {}", httpPost.getURI().toString());
+      logger.debug("Url to invoke ibm watson service: {}", httpPost.getRequestUri());
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, track.getMimeType().toString());
-      FileEntity fileEntity = new FileEntity(audioFile);
-      fileEntity.setChunked(true);
+      FileEntity fileEntity = new FileEntity(audioFile, ContentType.APPLICATION_OCTET_STREAM);
       httpPost.setEntity(fileEntity);
       response = httpClient.execute(httpPost, context);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_CREATED: // 201
@@ -709,7 +711,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     try {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS, jobId));
       response = httpClient.execute(httpGet, context);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -811,10 +813,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   protected CloseableHttpClient makeHttpClient() {
-    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT).setConnectionRequestTimeout(CONNECTION_TIMEOUT).build();
-    return HttpClients.custom().setDefaultRequestConfig(reqConfig)
-            .setRetryHandler(new DefaultHttpRequestRetryHandler(3, true)).build();
+    return HttpUtil.clientBuilder(CONNECTION_TIMEOUT, SOCKET_TIMEOUT)
+            .setRetryStrategy(new DefaultHttpRequestRetryStrategy(3, TimeValue.ZERO_MILLISECONDS)).build();
   }
 
   protected void retryOrError(String jobId, String mpId, String errorMsg) throws TranscriptionDatabaseException {

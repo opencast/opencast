@@ -51,7 +51,7 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

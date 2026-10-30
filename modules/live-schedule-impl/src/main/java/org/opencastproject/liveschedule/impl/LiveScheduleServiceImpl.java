@@ -73,7 +73,6 @@ import com.google.common.cache.CacheBuilder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Equator;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -755,7 +754,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
     try {
       // Create new distribution element
-      URI engageUri = URIUtils.resolve(new URI(engageUrlString), PLAYER_PATH + mp.getIdentifier().toString());
+      URI engageUri = new URI(engageUrlString).resolve(PLAYER_PATH + mp.getIdentifier().toString());
       Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID, engageUri,
               MimeTypes.parseMimeType("text/html"));
       mp.add(publicationElement);

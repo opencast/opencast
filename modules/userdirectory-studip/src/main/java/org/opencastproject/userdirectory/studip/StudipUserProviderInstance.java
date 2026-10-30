@@ -31,6 +31,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
@@ -40,12 +41,10 @@ import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -337,18 +336,14 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
     get.setHeader("User-Agent", OC_USERAGENT);
 
     // Don't wait for responses indefinitely
-    RequestConfig config = RequestConfig.custom()
-        .setConnectTimeout(5000)
-        .setSocketTimeout(10000).build();
-
-    try (CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();) {
+    try (CloseableHttpClient client = HttpUtil.clientBuilder(5000, 10000).build()) {
       try (CloseableHttpResponse resp = client.execute(get)) {
-        var statusCode = resp.getStatusLine().getStatusCode();
+        var statusCode = resp.getCode();
         if (statusCode == 404) {
           // Stud.IP does not know about the user
           return null;
         } else if (statusCode / 100 != 2) {
-          throw new IOException("HttpRequest unsuccessful, reason: " + resp.getStatusLine().getReasonPhrase());
+          throw new IOException("HttpRequest unsuccessful, reason: " + resp.getReasonPhrase());
         }
 
         // Parse response

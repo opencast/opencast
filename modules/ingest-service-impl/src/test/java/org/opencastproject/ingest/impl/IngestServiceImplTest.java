@@ -73,13 +73,12 @@ import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -112,7 +111,7 @@ public class IngestServiceImplTest {
   private WorkflowService workflowService = null;
   private WorkflowInstance workflowInstance = null;
   private WorkingFileRepository wfr = null;
-  private CloseableHttpResponse httpResponse = null;
+  private ClassicHttpResponse httpResponse = null;
   private CloseableHttpClient customClient = null;
   private TrustedHttpClient httpClient;
   private static URI baseDir;
@@ -266,16 +265,12 @@ public class IngestServiceImplTest {
     EasyMock.expect(entity.getContent()).andReturn(new ByteArrayInputStream(movie)).anyTimes();
     EasyMock.replay(entity);
 
-    StatusLine statusLine = EasyMock.createMock(StatusLine.class);
-    EasyMock.expect(statusLine.getStatusCode()).andReturn(200).anyTimes();
-    EasyMock.replay(statusLine);
-
     Header contentDispositionHeader = EasyMock.createMock(Header.class);
     EasyMock.expect(contentDispositionHeader.getValue()).andReturn("attachment; filename=fname.mp4").anyTimes();
     EasyMock.replay(contentDispositionHeader);
 
-    httpResponse = EasyMock.createMock(CloseableHttpResponse.class);
-    EasyMock.expect(httpResponse.getStatusLine()).andReturn(statusLine).anyTimes();
+    httpResponse = EasyMock.createMock(ClassicHttpResponse.class);
+    EasyMock.expect(httpResponse.getCode()).andReturn(200).anyTimes();
     EasyMock.expect(httpResponse.getFirstHeader("Content-Disposition")).andReturn(contentDispositionHeader).anyTimes();
     EasyMock.expect(httpResponse.getEntity()).andReturn(entity).anyTimes();
     EasyMock.replay(httpResponse);
@@ -315,7 +310,8 @@ public class IngestServiceImplTest {
         protected CloseableHttpClient getAuthedHttpClient() {
           CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
           try {
-            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
+            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject()))
+                .andReturn(CloseableHttpResponse.adapt(httpResponse)).anyTimes();
             client.close();
             EasyMock.expectLastCall().once();
           } catch (Exception e) { }
@@ -445,12 +441,13 @@ public class IngestServiceImplTest {
     //There's one case (accessing the filesystem) where we *don't* expect the mocks to be used
     if (shouldTouchMocks) {
       if (shouldSendAuth) {
-        EasyMock.expect(customClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
+        EasyMock.expect(customClient.execute(EasyMock.anyObject()))
+            .andReturn(CloseableHttpResponse.adapt(httpResponse)).once();
         customClient.close();
         EasyMock.expectLastCall().once();
       } else {
         EasyMock.expect(httpClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
-        httpClient.close(EasyMock.anyObject(HttpResponse.class));
+        httpClient.close(EasyMock.anyObject(ClassicHttpResponse.class));
         EasyMock.expectLastCall().once();
       }
     }

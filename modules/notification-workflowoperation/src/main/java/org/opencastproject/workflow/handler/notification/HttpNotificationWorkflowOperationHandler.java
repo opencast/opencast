@@ -23,12 +23,13 @@
 package org.opencastproject.workflow.handler.notification;
 
 import static java.lang.String.format;
-import static org.apache.http.HttpStatus.SC_ACCEPTED;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_ACCEPTED;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -37,24 +38,21 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,7 +153,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
     }
 
     // Figure out which request method to use
-    HttpEntityEnclosingRequestBase request = null;
+    HttpUriRequestBase request = null;
     if (Strings.CI.equals("post", method)) {
       request = new HttpPost(urlPath);
     } else if (Strings.CI.equals("put", method)) {
@@ -166,31 +164,26 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
     logger.debug("Request will be sent using the '{}' method", method);
 
     // Add event parameters as form parameters
-    try {
-      List<BasicNameValuePair> params = new ArrayList<>();
+    List<BasicNameValuePair> params = new ArrayList<>();
 
-      // Add the subject (if specified)
-      if (notificationSubject != null) {
-        params.add(new BasicNameValuePair(HTTP_PARAM_SUBJECT, notificationSubject));
-      }
-
-      // Add the message (if specified)
-      if (notificationMessage != null) {
-        params.add(new BasicNameValuePair(HTTP_PARAM_MESSAGE, notificationMessage));
-      }
-
-      // Add the workflow instance id
-      params.add(new BasicNameValuePair(HTTP_PARAM_WORKFLOW, Long.toString(workflowInstance.getId())));
-
-      // Add the mediapackage id
-      params.add(new BasicNameValuePair(HTTP_PARAM_MEDIAPACKAGE,
-              workflowInstance.getMediaPackage().getIdentifier().toString()));
-
-      request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new WorkflowOperationException(
-              "Error happened during the encoding of the event parameter as form parameter:", e);
+    // Add the subject (if specified)
+    if (notificationSubject != null) {
+      params.add(new BasicNameValuePair(HTTP_PARAM_SUBJECT, notificationSubject));
     }
+
+    // Add the message (if specified)
+    if (notificationMessage != null) {
+      params.add(new BasicNameValuePair(HTTP_PARAM_MESSAGE, notificationMessage));
+    }
+
+    // Add the workflow instance id
+    params.add(new BasicNameValuePair(HTTP_PARAM_WORKFLOW, Long.toString(workflowInstance.getId())));
+
+    // Add the mediapackage id
+    params.add(new BasicNameValuePair(HTTP_PARAM_MEDIAPACKAGE,
+            workflowInstance.getMediaPackage().getIdentifier().toString()));
+
+    request.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
     // Execute the request
     if (!executeRequest(request, maxRetry, timeout, INITIAL_SLEEP_TIME)) {
@@ -212,33 +205,27 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
    *          The wait time in milliseconds at which a connection attempt will throw
    * @return true if the request has been executed successfully
    */
-  private boolean executeRequest(HttpUriRequest request, int maxAttempts, int timeout, int sleepTime) {
+  private boolean executeRequest(ClassicHttpRequest request, int maxAttempts, int timeout, int sleepTime) {
 
-    logger.debug("Executing notification request on target {}, {} attempts left", request.getURI(), maxAttempts);
+    logger.debug("Executing notification request on target {}, {} attempts left", request.getRequestUri(), maxAttempts);
 
-    RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(timeout)
-            .setConnectionRequestTimeout(timeout)
-            .setSocketTimeout(timeout).build();
-    CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-
-    HttpResponse response;
-    try {
-      response = httpClient.execute(request);
+    final int statusCode;
+    try (CloseableHttpClient httpClient = HttpUtil.clientBuilder(timeout, timeout).build()) {
+      statusCode = httpClient.execute(request, response -> response.getCode());
     } catch (ClientProtocolException e) {
-      logger.error("Protocol error during execution of query on target {}: {}", request.getURI(), e.getMessage());
+      logger.error("Protocol error during execution of query on target {}: {}", request.getRequestUri(),
+          e.getMessage());
       return false;
     } catch (IOException e) {
-      logger.error("I/O error during execution of query on target {}: {}", request.getURI(), e.getMessage());
+      logger.error("I/O error during execution of query on target {}: {}", request.getRequestUri(), e.getMessage());
       return false;
     }
 
-    Integer statusCode = response.getStatusLine().getStatusCode();
     if (statusCode == SC_OK || statusCode == SC_NO_CONTENT || statusCode == SC_ACCEPTED) {
-      logger.debug("Request successfully executed on target {}, status code: {}", request.getURI(), statusCode);
+      logger.debug("Request successfully executed on target {}, status code: {}", request.getRequestUri(), statusCode);
       return true;
     } else if (maxAttempts > 1) {
-      logger.debug("Request failed on target {}, status code: {}, will retry in {} seconds", request.getURI(),
+      logger.debug("Request failed on target {}, status code: {}, will retry in {} seconds", request.getRequestUri(),
               statusCode, sleepTime / 1000);
       try {
         Thread.sleep(sleepTime);
@@ -248,7 +235,8 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
         return false;
       }
     } else {
-      logger.warn("Request failed on target {}, status code: {}, no more attempt.", request.getURI(), statusCode);
+      logger.warn("Request failed on target {}, status code: {}, no more attempt.", request.getRequestUri(),
+          statusCode);
       return false;
     }
   }

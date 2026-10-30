@@ -43,8 +43,8 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
+import org.apache.hc.client5.http.fluent.Content;
+import org.apache.hc.client5.http.fluent.Request;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -396,7 +396,7 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
   }
 
   private JsonNode getRequestJson(String urlString) throws IOException {
-    Content content = Request.Get(urlString).addHeader("Authorization", "Bearer " + token)
+    Content content = Request.get(urlString).addHeader("Authorization", "Bearer " + token)
         .execute().returnContent();
     ObjectMapper mapper = new ObjectMapper();
     return mapper.readTree(content.asStream());

@@ -39,10 +39,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import com.google.gson.Gson;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -88,7 +88,7 @@ public class ConfigurablePublicationServiceRemoteImpl extends RemoteBase impleme
     params.add(new BasicNameValuePair("retractElements", gson.toJson(retractElementIds)));
 
     final HttpPost post = new HttpPost("/replace");
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
       response = getResponse(post);
@@ -123,7 +123,7 @@ public class ConfigurablePublicationServiceRemoteImpl extends RemoteBase impleme
     params.add(new BasicNameValuePair("retractElements", gson.toJson(retractElementIds)));
 
     final HttpPost post = new HttpPost("/replacesync");
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
       response = getResponse(post);
