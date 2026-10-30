@@ -1,0 +1,64 @@
+meta {
+  name: post_scheduled_event
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/events
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  metadata: [{"flavor":"dublincore/episode","fields":[{"id":"title","value":"Scheduled Test Event"}]}]
+  processing: {"workflow":"noop"}
+  acl: [{"allow":true,"action":"read","role":"ROLE_USER"},{"allow":true,"action":"write","role":"ROLE_ADMIN"}]
+  scheduling: {"agent_id":"bruno-sched-agent","start":"{{schedStart}}","end":"{{schedEnd}}","inputs":["default"]}
+}
+
+script:pre-request {
+  // Randomized far-future capture window so repeated runs cannot conflict (409)
+  const dayOffset = 30 + Math.floor(Math.random() * 300);
+  const minuteOffset = Math.floor(Math.random() * 1440);
+  const start = new Date(Date.now() + dayOffset * 86400000 + minuteOffset * 60000);
+  start.setUTCSeconds(0, 0);
+  const end = new Date(start.getTime() + 3600000);
+  bru.setVar('schedStart', start.toISOString().replace('.000Z', 'Z'));
+  bru.setVar('schedEnd', end.toISOString().replace('.000Z', 'Z'));
+}
+
+vars:post-response {
+  scheduledEventId: res.body.identifier
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    const axios = require('axios');
+    const id = res.getBody().identifier;
+    const base = bru.getEnvVar('baseUrl');
+    const auth = { username: bru.getEnvVar('username'), password: bru.getEnvVar('password') };
+    for (let i = 0; i < 30; i++) {
+      try {
+        const r = await axios.get(base + '/api/events/' + id, { auth });
+        if (r.status === 200) break;
+      } catch (e) {
+        // event not indexed yet, keep polling
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.identifier: isString
+}
+
+tests {
+  test("Create scheduled event response should have correct types", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.identifier).to.be.a('string');
+  });
+}

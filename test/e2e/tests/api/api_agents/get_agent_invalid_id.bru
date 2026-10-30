@@ -1,0 +1,15 @@
+meta {
+  name: get_agent_invalid_id
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/agents/non-existent-agent-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

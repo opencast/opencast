@@ -1,0 +1,41 @@
+meta {
+  name: get_users_json
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/users/users.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains json
+}
+
+tests {
+  test("Users list response should have correct structure", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body.users).to.be.an('object');
+    expect(body.users.user).to.exist;
+    
+    const usersList = body.users.user;
+    const firstUser = Array.isArray(usersList) ? usersList[0] : usersList;
+    expect(firstUser.username).to.be.a('string');
+    expect(firstUser.name).to.be.a('string');
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  if (body && body.users && body.users.user) {
+    const usersList = body.users.user;
+    const firstUser = Array.isArray(usersList) ? usersList[0] : usersList;
+    if (firstUser && firstUser.username) {
+      bru.setVar("uUsername", firstUser.username);
+    }
+  }
+}

@@ -1,0 +1,15 @@
+meta {
+  name: get_playlist_invalid_id
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/playlists/non-existent-playlist-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

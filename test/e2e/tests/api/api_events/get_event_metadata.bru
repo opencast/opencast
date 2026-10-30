@@ -1,0 +1,44 @@
+meta {
+  name: get_event_metadata
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId/metadata
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Metadata catalogs should be an array", function() {
+    if (res.status === 200) {
+      expect(res.getBody()).to.be.an('array');
+    }
+  });
+  
+  test("Metadata catalog properties should have correct types", function() {
+    if (res.status === 200) {
+      const catalogs = res.getBody();
+      catalogs.forEach(function(cat) {
+        expect(cat.flavor).to.be.a('string');
+        expect(cat.fields).to.be.an('array');
+        cat.fields.forEach(function(field) {
+          expect(field.id).to.be.a('string');
+          if (field.label !== undefined) expect(field.label).to.be.a('string');
+          expect(field.type).to.be.a('string');
+          if (field.readOnly !== undefined) expect(field.readOnly).to.be.a('boolean');
+          if (field.required !== undefined) expect(field.required).to.be.a('boolean');
+        });
+      });
+    }
+  });
+}

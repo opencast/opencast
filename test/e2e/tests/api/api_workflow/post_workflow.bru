@@ -1,0 +1,40 @@
+meta {
+  name: post_workflow
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/workflows
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  event_identifier: {{workflowEventId}}
+  workflow_definition_identifier: partial-error
+}
+
+vars:post-response {
+  workflowId: res.body.identifier
+}
+
+assert {
+  res.status: eq 201
+}
+
+tests {
+  test("Create workflow response should have correct types", function() {
+    if (res.status === 201) {
+      const item = res.getBody();
+      expect(item).to.be.an('object');
+      expect(item.identifier).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+      if (item.title !== undefined) expect(item.title).to.be.a('string');
+      if (item.description !== undefined) expect(item.description).to.be.a('string');
+      expect(item.state).to.be.a('string');
+      if (item.event_identifier !== undefined) expect(item.event_identifier).to.be.a('string');
+      if (item.tags !== undefined) expect(item.tags).to.be.an('array');
+      if (item.operations !== undefined) expect(item.operations).to.be.an('array');
+    }
+  });
+}

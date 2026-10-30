@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "name": "Opencast API - Develop",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0.00396728515625,
+  "filesCount": 12,
+  "presets": {
+    "requestType": "http",
+    "requestUrl": "{{baseUrl}}/api"
+  }
+}

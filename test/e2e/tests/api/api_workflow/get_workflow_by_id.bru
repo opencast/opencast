@@ -1,0 +1,35 @@
+meta {
+  name: get_workflow_by_id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/workflows/:workflowInstanceId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  workflowInstanceId: {{workflowId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Workflow instance properties should have correct types", function() {
+    if (res.status === 200) {
+      const item = res.getBody();
+      expect(item).to.be.an('object');
+      expect(item.identifier).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+      if (item.title !== undefined) expect(item.title).to.be.a('string');
+      if (item.description !== undefined) expect(item.description).to.be.a('string');
+      expect(item.state).to.be.a('string');
+      if (item.event_identifier !== undefined) expect(item.event_identifier).to.be.a('string');
+      if (item.tags !== undefined) expect(item.tags).to.be.an('array');
+      if (item.operations !== undefined) expect(item.operations).to.be.an('array');
+    }
+  });
+}
