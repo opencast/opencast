@@ -1,0 +1,12 @@
+The External API now limits the number of results returned by the events endpoint (`/api/events`). Previously, a
+request without a limit tried to load all events at once, which failed with a server error for installations with a
+large number of events. Since API version 1.13.0:
+
+- A request without a limit (or with a limit smaller than 1) returns at most 100 events, like `/api/series` already did.
+- A request with a limit larger than 10000 is rejected with `400 Bad Request`. This limit also applies to
+  `/api/series`.
+- Use the `limit` and `offset` parameters to retrieve more results.
+
+Clients that request an older API version are not affected. Since this changes the behavior of clients which do not
+request a specific version, the API version was increased to 1.13.0.
+[[#3536](https://github.com/opencast/opencast/issues/3536)]

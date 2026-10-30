@@ -35,11 +35,12 @@ public enum ApiVersion {
   VERSION_1_9_0(1, 9, 0),
   VERSION_1_10_0(1, 10, 0),
   VERSION_1_11_0(1, 11, 0),
-  VERSION_1_12_0(1, 12, 0);
+  VERSION_1_12_0(1, 12, 0),
+  VERSION_1_13_0(1, 13, 0);
 
 
   /** The most recent version of the External API */
-  public static final ApiVersion CURRENT_VERSION = VERSION_1_12_0;
+  public static final ApiVersion CURRENT_VERSION = VERSION_1_13_0;
 
   private int major;
   private int minor;

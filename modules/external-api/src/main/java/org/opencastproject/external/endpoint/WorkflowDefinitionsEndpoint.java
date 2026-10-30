@@ -78,7 +78,7 @@ import javax.ws.rs.core.Response;
             ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
             ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0 })
+            ApiMediaType.VERSION_1_12_0, ApiMediaType.VERSION_1_13_0 })
 @RestService(
     name = "externalapiworkflowdefinitions",
     title = "External API Workflow Definitions Service",
