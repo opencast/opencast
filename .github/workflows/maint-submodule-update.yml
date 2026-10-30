@@ -58,7 +58,9 @@ jobs:
         run: |
           git submodule update --remote --recursive
 
+      # Push with the deploy key rather than the workflow token. Pushes made with the token never
+      # trigger workflows, so the updated submodules would not get a CI run.
       - name: Committing changes
         run: |
           git commit -a -m "Updating submodules" || true
-          git push origin
+          git push "git@github.com:${{ github.repository }}.git" "HEAD:${{ matrix.branch }}"
