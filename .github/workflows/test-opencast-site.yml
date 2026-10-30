@@ -10,7 +10,7 @@ on:
       - 'assemblies/**'
       - '.github/**'
       - 'mvnw'
-      - '.mvn'
+      - '.mvn/**'
   push:
     paths:
       - 'pom.xml'
@@ -20,7 +20,7 @@ on:
       - 'assemblies/**'
       - '.github/**'
       - 'mvnw'
-      - '.mvn'
+      - '.mvn/**'
     branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
