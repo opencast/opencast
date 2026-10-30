@@ -24,9 +24,9 @@ Configuration
 The resolution, the output format and the mimetype can be configured in
 `etc/org.opencastproject.timelinepreviews.ffmpeg.TimelinePreviewsServiceImpl.cfg`.
 
-Width of the resolution of a single preview image in pixels (defaults to 160).
+Width of the resolution of a single preview image in pixels (defaults to 320).
 
-    resolutionX = 160
+    resolutionX = 320
 
 Height of the resolution of a single preview image in pixels (defaults to -1).
 If not set or set to -1, it will be set automatically to preserve the original aspect ratio.
