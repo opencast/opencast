@@ -1,13 +1,20 @@
 name: Maintenance » Auto-update npm libraries
 
-# Be carefuly for which modules you activate auto-updates.
-# Braking changes *MUST* be caught in the CI or they will cause errors.
-# Updating test libraries like eslint should be safe however.
+# This workflow keeps the JavaScript test and lint tooling of a few locations up to date without the
+# need for Dependabot pull requests. It only ever updates devDependencies. Libraries which end up in
+# Opencast itself must never be touched here: the only check before the result is pushed is running
+# the npm scripts of the updated location, and commits pushed with the GitHub token do not trigger
+# the regular CI.
+#
+# To add a location, append it to the list in the "update test libraries" step. All of its
+# devDependencies are bumped to their latest versions and all of its npm scripts are run as a check.
+# Only add locations whose devDependencies are pure test/lint tooling and whose scripts are checks.
 
 # Perform updates at 3am every day
 on:
   schedule:
   - cron: "0 3 * * *"
+  workflow_dispatch:
 
 jobs:
   update-npm-libs:
@@ -21,29 +28,68 @@ jobs:
           git config --global user.email 'update-bot@opencast.org'
           git config --global user.name 'Update Bot'
 
+      # Use the same Node.js version the Maven build uses
+      - name: determine node.js version
+        id: node
+        run: |
+          set -eu
+          version="$(sed -n 's/.*<node\.version>v\([0-9.]*\)<.*/\1/p' pom.xml | head -n1)"
+          test -n "${version}"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
       - name: use node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 20.x
+          node-version: ${{ steps.node.outputs.version }}
 
-      - name: update engage-ui test libraries
-        working-directory: modules/engage-ui
+      # The shared ESLint configuration is pulled into the modules below as a `file:` dependency.
+      # Its dependencies are the actual linter toolchain, so update them first.
+      - name: update shared eslint configuration
+        working-directory: docs/checkstyle/eslint-config
         run: |
           set -eu
-          npm update --save --dev eslint eslint-plugin-header
-          npm audit fix || true
-          npm run eslint
+          npm install --no-audit --no-fund --save \
+            $(jq -r '.dependencies | keys[] | . + "@latest"' package.json)
           git add package.json package-lock.json
 
-      - name: update runtime-info-ui test libraries
-        working-directory: modules/runtime-info-ui
+      - name: update test libraries
         run: |
           set -eu
-          npm install --save --dev eslint@latest eslint-plugin-header@latest html-linter@latest
-          npm audit fix || true
-          npm run eslint
-          npm run html-linter
-          git add package.json package-lock.json
+          for module in \
+            modules/engage-ui \
+            modules/runtime-info-ui \
+            docs/guides
+          do
+            echo "::group::${module}"
+            (
+              cd "${module}"
+
+              # Bump all devDependencies to their latest version, except for local `file:` packages
+              npm install --no-audit --no-fund --install-links --save-dev \
+                $(jq -r '.devDependencies | to_entries[] | select(.value | startswith("file:") | not)
+                         | .key + "@latest"' package.json)
+
+              # npm records a copy of the manifest of local `file:` packages in the lockfile and never
+              # re-reads it, so the shared ESLint configuration updated above would stay stale here.
+              # Drop those entries (and anything nested below them) so npm resolves them again.
+              jq '[.packages | to_entries[] | select(.value.resolved // "" | startswith("file:")) | .key]
+                    as $local
+                  | .packages |= with_entries(select(.key as $key
+                      | $local | any(. as $l | $key == $l or ($key | startswith($l + "/"))) | not))
+                  | del(.dependencies)' package-lock.json > package-lock.json.new
+              mv package-lock.json.new package-lock.json
+              npm install --no-audit --no-fund --install-links
+
+              # Make sure the tests and linters still work with the updated libraries
+              for script in $(jq -r '.scripts | keys[]' package.json)
+              do
+                npm run "${script}"
+              done
+
+              git add package.json package-lock.json
+            )
+            echo "::endgroup::"
+          done
 
       #NB: The || true after the commit ensures that the pipeline doesn't fail
       # (and send emails) if there are no updates available

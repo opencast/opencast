@@ -616,7 +616,7 @@ function($, bootbox, _, alertify, jsyaml) {
 
   function buildGrid(data) {
     if (data) {
-      var epId = 0;
+      var epId;
 
       if (data.mediapackage == undefined || data.mediapackage['id'] == undefined) {
         log('Error: Episode with no ID.');
@@ -638,7 +638,7 @@ function($, bootbox, _, alertify, jsyaml) {
 
       // append thumbnail
       var thumb = '';
-      var time = 0;
+      var time;
       var creator = '<br>';
       var seriestitle = '<br>';
       var date = '<br>';
