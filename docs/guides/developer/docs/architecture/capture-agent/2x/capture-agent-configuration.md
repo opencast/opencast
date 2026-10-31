@@ -20,7 +20,7 @@ Agent which do not populate all of these keys will be treated as CA API 1.x agen
 Capture Mode Keys
 -----------------
 
-Your agent *MUST* populate at least one of the following keys with a `1`
+Your agent *MUST* populate at least one of the following keys with a `true`
 
 - `capture.local.capable`: Whether the CA is capable of capturing to local storage
 - `capture.stream.capable`: Whether the CA is capable of streaming its inputs to a remote server
@@ -32,7 +32,7 @@ Capture Autostart
 -----------------
 
 Agents which support priming their capture pipline(s), but not actually storing/streaming data at event start can
-indicate such support by setting a `1` for the flag `capture.local.canstartpaused` for local capture, and
+indicate such support by setting `true` for the flag `capture.local.canstartpaused` for local capture, and
 `capture.stream.canstartpaused` for streaming.  Both flags require their respective `capable` flags to be set, and will
 otherwise be ignored.
 
