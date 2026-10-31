@@ -23,12 +23,14 @@ package org.opencastproject.external.util;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 
-import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class CaptureAgentUtils {
 
@@ -37,7 +39,13 @@ public final class CaptureAgentUtils {
   private static final String JSON_KEY_URL = "url";
   private static final String JSON_KEY_INPUTS = "inputs";
   private static final String JSON_KEY_UPDATE = "update";
-
+  private static final String JSON_KEY_VERSION = "version";
+  private static final String JSON_KEY_VENDOR = "vendor";
+  private static final String JSON_KEY_MODEL = "model";
+  private static final String JSON_KEY_HARDWARE = "hardware";
+  private static final String JSON_KEY_FIRMWARE = "firmware";
+  private static final String JSON_KEY_LOCAL = "local";
+  private static final String JSON_KEY_STREAM = "stream";
 
   private CaptureAgentUtils() {
   }
@@ -51,18 +59,60 @@ public final class CaptureAgentUtils {
    */
   public static JsonObject generateJsonAgent(Agent agent) {
     JsonObject json = new JsonObject();
-    String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
     json.addProperty(JSON_KEY_STATUS, safeString(agent.getState()));
     json.addProperty(JSON_KEY_AGENT_ID, agent.getName());
     json.addProperty(JSON_KEY_UPDATE, safeString(toUTC(agent.getLastHeardFrom())));
     json.addProperty(JSON_KEY_URL, safeString(agent.getUrl()));
+    json.addProperty(JSON_KEY_VENDOR, safeString(agent.getVendor()));
+    json.addProperty(JSON_KEY_MODEL, safeString(agent.getModel()));
+    json.addProperty(JSON_KEY_HARDWARE, safeString(agent.getHardware()));
+    json.addProperty(JSON_KEY_FIRMWARE, safeString(agent.getFirmware()));
+    json.addProperty(JSON_KEY_VERSION, agent.getVersion().toString());
+
+    /* Add the core agent configuration data */
+    JsonObject localCapabilities = new JsonObject();
+    JsonObject streamCapabilities = new JsonObject();
+    localCapabilities.addProperty("capture", agent.canCaptureLocal());
+    localCapabilities.addProperty("startpaused", agent.canStartLocalPaused());
+    streamCapabilities.addProperty("stream", agent.canStream());
+    streamCapabilities.addProperty("startpaused", agent.canStartStreamPaused());
+
+    JsonObject config = new JsonObject();
+    config.add("local", localCapabilities);
+    config.add("stream", streamCapabilities);
+
     JsonArray inputs = new JsonArray();
-    if (devices != null && !devices.trim().isEmpty()) {
-      for (String device : devices.split(",")) {
-        inputs.add(new JsonPrimitive(device.trim()));
-      }
-    }
-    json.add("inputs", inputs);
+    agent.getInputs().forEach(inputs::add);
+    config.add(JSON_KEY_INPUTS, inputs);
+
+    Gson gson = new Gson();
+    config.add("streams", gson.toJsonTree(
+        agent.streamConfigurations()
+            .stream()
+            .filter(Predicate.not(String::isBlank))
+            .collect(Collectors.toSet())
+    ).getAsJsonArray());
+
+    config.add("positions", gson.toJsonTree(
+        agent.devicePositions()
+            .stream()
+            .filter(Predicate.not(String::isBlank))
+            .collect(Collectors.toSet())
+    ).getAsJsonArray());
+
+    config.add("contents", gson.toJsonTree(
+        agent.contentConfigurations()
+            .stream()
+            .filter(Predicate.not(String::isBlank))
+            .collect(Collectors.toSet())
+    ).getAsJsonArray());
+
+    JsonObject vendorKeys = new JsonObject();
+    agent.vendorKeys().forEach(vendorKeys::addProperty);
+    config.add("vendorKeys", vendorKeys);
+
+    json.add("config", config);
+
     return json;
   }
 }

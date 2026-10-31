@@ -26,9 +26,9 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_NAMES;
 
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 
 import org.json.simple.JSONArray;
@@ -43,9 +43,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
@@ -61,7 +61,23 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
   private static final String JSON_KEY_AGENT_ID = "agent_id";
   private static final String JSON_KEY_STATUS = "status";
   private static final String JSON_KEY_URL = "url";
+
+  private static final String JSON_KEY_VERSION = "version";
+  private static final String JSON_KEY_VENDOR = "vendor";
+  private static final String JSON_KEY_MODEL = "model";
+  private static final String JSON_KEY_HARDWARE = "hardware";
+  private static final String JSON_KEY_FIRMWARE = "firmware";
+
+  private static final String JSON_KEY_CONFIG = "config";
+  private static final String JSON_KEY_LOCAL = "local";
+  private static final String JSON_KEY_CAPTURE = "capture";
+  private static final String JSON_KEY_STARTPAUSED = "startpaused";
+  private static final String JSON_KEY_STREAM = "stream";
   private static final String JSON_KEY_INPUTS = "inputs";
+  private static final String JSON_KEY_STREAMS = "streams";
+  private static final String JSON_KEY_POSITIONS = "positions";
+  private static final String JSON_KEY_CONTENTS = "contents";
+  private static final String JSON_KEY_VENDORS = "vendorKeys";
 
   public TestCaptureAgentsEndpoint() throws Exception {
     final CaptureAgentStateService agentStateService = createMock(CaptureAgentStateService.class);
@@ -94,9 +110,44 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     result.put(JSON_KEY_AGENT_ID, agent.getName());
     result.put(JSON_KEY_STATUS, agent.getState());
     result.put(JSON_KEY_URL, agent.getUrl());
+    result.put(JSON_KEY_VENDOR, agent.getVendor());
+    result.put(JSON_KEY_MODEL, agent.getModel());
+    result.put(JSON_KEY_HARDWARE, agent.getHardware());
+    result.put(JSON_KEY_FIRMWARE, agent.getFirmware());
+    result.put(JSON_KEY_VERSION, agent.getVersion().toString());
+    JSONObject config =  new JSONObject();
+
+    JSONObject local = new JSONObject();
+    local.put(JSON_KEY_CAPTURE, agent.canCaptureLocal());
+    local.put(JSON_KEY_STARTPAUSED, agent.canStartLocalPaused());
+    config.put(JSON_KEY_LOCAL, local);
+    JSONObject stream = new JSONObject();
+    stream.put(JSON_KEY_STREAM, agent.canStream());
+    stream.put(JSON_KEY_STARTPAUSED, agent.canStartStreamPaused());
+    config.put(JSON_KEY_STREAM, stream);
+
     JSONArray inputs = new JSONArray();
-    inputs.addAll(Arrays.asList(agent.getCapabilities().getProperty(CAPTURE_DEVICE_NAMES).split(",")));
-    result.put(JSON_KEY_INPUTS, inputs);
+    inputs.addAll(agent.getInputs());
+    config.put(JSON_KEY_INPUTS, inputs);
+
+    JSONArray streamConfigs = new JSONArray();
+    streamConfigs.addAll(agent.streamConfigurations());
+    config.put(JSON_KEY_STREAMS, streamConfigs);
+
+    JSONArray positions = new JSONArray();
+    positions.addAll(agent.devicePositions());
+    config.put(JSON_KEY_POSITIONS, positions);
+
+    JSONArray content = new JSONArray();
+    content.addAll(agent.contentConfigurations());
+    config.put(JSON_KEY_CONTENTS, content);
+
+    JSONObject vendorkeys = new JSONObject();
+    vendorkeys.putAll(agent.vendorKeys());
+
+    config.put(JSON_KEY_VENDORS, vendorkeys);
+    result.put(JSON_KEY_CONFIG, config);
+
     return result;
   }
 
@@ -112,13 +163,45 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     long updateMillis = Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(update)).toEpochMilli();
     expect(agent.getName()).andReturn((String) json.get(JSON_KEY_AGENT_ID)).anyTimes();
     expect(agent.getState()).andReturn((String) json.get(JSON_KEY_STATUS)).anyTimes();
+    expect(agent.getVendor()).andReturn((String) json.getOrDefault(JSON_KEY_VENDOR, "")).anyTimes();
+    expect(agent.getModel()).andReturn((String) json.getOrDefault(JSON_KEY_MODEL, "")).anyTimes();
+    expect(agent.getHardware()).andReturn((String) json.getOrDefault(JSON_KEY_HARDWARE, "")).anyTimes();
+    expect(agent.getFirmware()).andReturn((String) json.getOrDefault(JSON_KEY_FIRMWARE, "")).anyTimes();
     expect(agent.getLastHeardFrom()).andReturn(updateMillis).anyTimes();
     expect(agent.getUrl()).andReturn((String) json.get(JSON_KEY_URL)).anyTimes();
-    Properties capabilities = new Properties();
-    capabilities.setProperty(CAPTURE_DEVICE_NAMES, String.join(",", ((JSONArray) json.get(JSON_KEY_INPUTS))));
-    expect(agent.getCapabilities()).andReturn(capabilities).anyTimes();
+    expect(agent.getVersion()).andReturn(AgentVersion.fromVersion((String) json.get(JSON_KEY_VERSION))).anyTimes();
+    JSONObject config = (JSONObject) json.get(JSON_KEY_CONFIG);
+
+    JSONObject local = (JSONObject) config.getOrDefault(JSON_KEY_LOCAL, new JSONObject());
+    // Agents can by default capture locally (ie, 1.x agents), so we assume if this is missing that it's *true*
+    // since 1.x agents do not send this data at all and thus it won't be in our input json here
+    expect(agent.canCaptureLocal()).andReturn(
+        (Boolean) local.getOrDefault(JSON_KEY_CAPTURE ,true)).anyTimes();
+    expect(agent.canStartLocalPaused()).andReturn(
+        (Boolean) local.getOrDefault(JSON_KEY_STARTPAUSED ,false)).anyTimes();
+    JSONObject stream = (JSONObject) config.getOrDefault(JSON_KEY_STREAM, new JSONObject());
+    expect(agent.canStream()).andReturn(
+        (Boolean) stream.getOrDefault(JSON_KEY_STREAM ,false)).anyTimes();
+    expect(agent.canStartStreamPaused()).andReturn(
+        (Boolean) stream.getOrDefault(JSON_KEY_STARTPAUSED ,false)).anyTimes();
+
+    expect(agent.getInputs())
+        .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_INPUTS, new JSONArray()))).anyTimes();
+    expect(agent.streamConfigurations())
+        .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_STREAMS, new JSONArray()))).anyTimes();
+    expect(agent.devicePositions())
+        .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_POSITIONS, new JSONArray()))).anyTimes();
+    expect(agent.contentConfigurations())
+        .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_CONTENTS, new JSONArray()))).anyTimes();
+    expect(agent.vendorKeys()).andReturn(Map.of()).anyTimes();
     replay(agent);
     return agent;
+  }
+
+  private static Set<String> setify(JSONArray array) {
+    return (Set<String>) array.stream()
+        .map(obj -> (String) obj)
+        .collect(Collectors.toSet());
   }
 
   private static String readResource(String path) throws URISyntaxException, IOException {

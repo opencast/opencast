@@ -1,16 +1,72 @@
 [
   {
-    "agent_id": "ca24",
-    "status": "offline",
-    "inputs": ["default"],
-    "update": "2018-03-12T18:17:25Z",
-    "url": "127.0.0.1"
-  },
-  {
     "agent_id": "ca25",
     "status": "online",
-    "inputs": ["default1", "default2"],
     "update": "2018-01-11T14:12:00Z",
-    "url": "127.1.0.1"
+    "url": "127.1.0.1",
+    "version": "1",
+    "config": {
+      "inputs": [
+        "default1",
+        "default2"
+      ]
+    }
+  },
+  {
+    "agent_id": "ca24",
+    "status": "offline",
+    "update": "2018-03-12T18:17:25Z",
+    "url": "127.0.0.1",
+    "version": "1",
+    "config": {
+      "inputs": [
+        "default"
+      ]
+    }
+  },
+  {
+    "status": "online",
+    "agent_id": "pyca-2.x",
+    "update": "2026-10-30T21:53:16Z",
+    "url": "127.0.0.1",
+    "vendor": "pyca",
+    "model": "pyca",
+    "hardware": "git_sha",
+    "firmware": "git_sha",
+    "version": "2",
+    "config": {
+      "local": {
+        "capture": true,
+        "startpaused": false
+      },
+      "stream": {
+        "stream": true,
+        "startpaused": false
+      },
+      "inputs": [
+        "alpha",
+        "beta"
+      ],
+      "streams": [
+        "a",
+        "b",
+        "c"
+      ],
+      "positions": [
+        "d",
+        "e",
+        "f"
+      ],
+      "contents": [
+        "g",
+        "h",
+        "i"
+      ],
+      "vendorKeys": {
+        "X-pyca-thing1": "vendor extensions woo",
+        "X-pyca.needsonly": "X- prefix"
+      }
+    }
   }
+
 ]
