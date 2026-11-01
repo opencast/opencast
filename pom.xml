@@ -27,7 +27,7 @@
     <commons-text.version>1.15.0</commons-text.version>
     <cxf.version>3.6.12</cxf.version>
     <eclipselink.version>2.7.15</eclipselink.version>
-    <eclipselink.asm.version>9.7.1</eclipselink.asm.version>
+    <eclipselink.asm.version>9.10.0</eclipselink.asm.version>
     <elasticsearch.version>7.10.2</elasticsearch.version>
     <failureaccess.version>1.0.3</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
