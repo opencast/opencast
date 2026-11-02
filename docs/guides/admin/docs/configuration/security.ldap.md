@@ -274,3 +274,76 @@ at the bottom of the file. Please see the example below:
 Then, a separate `.cfg` must be generated for each of the configured providers, as explained in [LDAP Service Configuration](#ldap-service-configuration). Please make
 sure to configure the `org.opencastproject.userdirectory.ldap.id` parameter correctly. In this case, the values should
 be `theId` and `theId2`, respectively.
+
+
+Example: Public LDAP Test Server
+--------------------------------
+
+This is a complete, tested configuration using the
+[Online LDAP Test Server](https://www.forumsys.com/2022/05/10/online-ldap-test-server/) kindly provided by Forum
+Systems. It is useful for trying out LDAP with Opencast, but do not use it in production: the server is public, its
+credentials are publicly known and it only supports unencrypted connections.
+
+All users on the test server, e.g. `einstein`, `newton` or `tesla`, have the password `password`.
+
+In `etc/org.opencastproject.kernel.security.SpringSecurityConfigurationArtifactInstaller.cfg`:
+
+```properties
+ldap.instances.mh_default_org=forumsys
+```
+
+In `etc/security/mh_default_org.xml`, uncomment the LDAP sections and set:
+
+```xml
+<bean id="contextSource"
+  class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+  <constructor-arg value="ldap://ldap.forumsys.com:389" />
+  <property name="userDn" value="cn=read-only-admin,dc=example,dc=com" />
+  <property name="password" value="password" />
+</bean>
+
+<bean id="userDetailsMapper" class="org.opencastproject.security.ldap.OpencastUserDetailsMapper">
+  <constructor-arg ref="userDetailsService" />
+</bean>
+
+<bean id="ldapAuthProvider"
+  class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+  <constructor-arg>
+    <bean class="org.springframework.security.ldap.authentication.BindAuthenticator">
+      <constructor-arg ref="contextSource" />
+      <property name="userDnPatterns">
+        <list>
+          <value>uid={0},dc=example,dc=com</value>
+        </list>
+      </property>
+    </bean>
+  </constructor-arg>
+  <property name="userDetailsContextMapper" ref="userDetailsMapper"/>
+</bean>
+```
+
+…and enable the provider in the `sec:authentication-manager`:
+
+```xml
+<sec:authentication-provider ref="ldapAuthProvider" />
+```
+
+Create `etc/org.opencastproject.userdirectory.ldap-forumsys.cfg`:
+
+```properties
+org.opencastproject.userdirectory.ldap.id=forumsys
+org.opencastproject.userdirectory.ldap.url=ldap://ldap.forumsys.com:389
+org.opencastproject.userdirectory.ldap.userDn=cn=read-only-admin,dc=example,dc=com
+org.opencastproject.userdirectory.ldap.password=password
+org.opencastproject.userdirectory.ldap.searchbase=dc=example,dc=com
+org.opencastproject.userdirectory.ldap.searchfilter=(uid={0})
+org.opencastproject.userdirectory.ldap.roleattributes=uid
+org.opencastproject.userdirectory.ldap.userattributes.name=cn
+org.opencastproject.userdirectory.ldap.userattributes.mail=mail
+# Grants every LDAP user full access. Only acceptable for testing.
+org.opencastproject.userdirectory.ldap.extra.roles=ROLE_ADMIN
+```
+
+After a restart, you can log in as `einstein` with the password `password`. `/info/me.json` then shows the name
+`Albert Einstein`, the email address `einstein@ldap.forumsys.com` and, among others, the roles `ROLE_EINSTEIN` (from the
+`uid` attribute) and `ROLE_ADMIN` (from `extra.roles`).
