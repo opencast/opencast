@@ -180,8 +180,7 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide logger and database for testing -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
+            <!-- provide a database for testing -->
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-core</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>

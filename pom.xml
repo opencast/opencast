@@ -830,6 +830,10 @@
               </goals>
               <configuration>
                 <failOnWarning>true</failOnWarning>
+                <ignoredDependencies>
+                  <!-- modules declare this to provide a logger for tests -->
+                  <ignoredDependency>org.slf4j:slf4j-reload4j</ignoredDependency>
+                </ignoredDependencies>
               </configuration>
             </execution>
           </executions>

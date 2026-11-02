@@ -119,8 +119,6 @@
             <!-- Required for tests -->
             <ignoredUnusedDeclaredDependency>net.sf.saxon:Saxon-HE</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

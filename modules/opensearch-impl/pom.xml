@@ -208,7 +208,6 @@
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queries</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-reactive</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>io.projectreactor:reactor-core</ignoredUnusedDeclaredDependency>
