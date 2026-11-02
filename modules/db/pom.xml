@@ -24,11 +24,6 @@
     </dependency>
     <!-- Database Drivers and Connection Pooling -->
     <dependency>
-      <groupId>com.typesafe</groupId>
-      <artifactId>config</artifactId>
-      <version>1.4.4</version>
-    </dependency>
-    <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>mchange-commons-java</artifactId>
       <version>0.6.1</version>
@@ -86,7 +81,6 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- this module provides database driver as runtime dependencies -->
-            <ignoredUnusedDeclaredDependency>com.typesafe:config</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.mchange:mchange-commons-java</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.mariadb.jdbc:mariadb-java-client</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.postgresql:postgresql</ignoredUnusedDeclaredDependency>
@@ -118,6 +112,7 @@
             <Import-Package>
               !com.ibm.*,
               !com.sun.*,
+              !com.typesafe.config.*,
               !com.vividsolutions.jts.*,
               !org.apache.lucene.*,
               !org.apache.logging.*,
@@ -134,7 +129,6 @@
             </Import-Package>
             <Embed-Dependency>
               c3p0;inline=true,
-              config;inline=true,
               h2;inline=true,
               mchange-commons-java;inline=true,
               mariadb-java-client;inline=true,
