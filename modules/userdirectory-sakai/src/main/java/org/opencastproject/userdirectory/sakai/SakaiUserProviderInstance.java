@@ -528,6 +528,12 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     }
 
+    // Only exact usernames can be looked up. A query starting with a wildcard cannot match anything, so do not
+    // bother the external system with it.
+    if (query.startsWith("%")) {
+      return Collections.emptyIterator();
+    }
+
     if (query.endsWith("%")) {
       query = query.substring(0, query.length() - 1);
     }
@@ -606,6 +612,12 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
     boolean exact = true;
     boolean ltirole = false;
+
+    // Only exact names can be looked up. A query starting with a wildcard cannot match anything, so do not
+    // bother the external system with it.
+    if (query.startsWith("%")) {
+      return Collections.emptyIterator();
+    }
 
     if (query.endsWith("%")) {
       exact = false;

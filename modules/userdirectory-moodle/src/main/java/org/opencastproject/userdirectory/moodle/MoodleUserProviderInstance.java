@@ -267,6 +267,12 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     }
 
+    // Only exact usernames can be looked up. A query starting with a wildcard cannot match anything, so do not
+    // bother the external system with it.
+    if (query.startsWith("%")) {
+      return Collections.emptyIterator();
+    }
+
     if (query.endsWith("%")) {
       query = query.substring(0, query.length() - 1);
     }
