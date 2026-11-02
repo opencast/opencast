@@ -16,7 +16,6 @@
     <feature>http-whiteboard</feature>
     <feature>pax-web-http-whiteboard</feature>
     <feature>scr</feature>
-    <feature>cxf</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
     <feature>opencast-jax-rs-whiteboard</feature>
@@ -58,6 +57,8 @@
          selects them as the JAXP TransformerFactory, DocumentBuilderFactory and SAXParserFactory,
          and etc/branding/coverimage.xsl uses Xalan's extension namespace. -->
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3</bundle>
+    <!-- Xalan has a mandatory import of org.apache.bcel. -->
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_4</bundle>
     <!-- cglib and wsdl4j have no Opencast users; both are optional imports of CXF
          (net.sf.cglib.proxy from cxf-core, javax.wsdl from cxf-rt-transports-http). -->
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/3.2.4_1</bundle>
@@ -88,6 +89,8 @@
     <!-- Spring Security 5: LDAP has NOT been tested -->
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/${spring-security-ldap-servicemix.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-ldap/2.4.1_1</bundle>
+    <!-- spring-security-ldap has a mandatory import of org.apache.mina.transport.socket. -->
+    <bundle>mvn:org.apache.mina/mina-core/2.1.13</bundle>
 
     <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
     <bundle>wrap:mvn:com.google.crypto.tink/tink/1.16.0$Bundle-SymbolicName=com.google.crypto.tink;Bundle-Version=1.16.0</bundle>
