@@ -49,11 +49,6 @@
           </instructions>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
     </plugins>
   </build>
 </project>
