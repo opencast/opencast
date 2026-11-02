@@ -116,6 +116,17 @@
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/2.12.1_1;type:=boot;export:=true</library>
             </libraries>
+            <!-- Third-party features (e.g. CXF's cxf-jackson) bring their own, older Jackson bundles which
+                 nothing is wired to, since the resolver prefers our ${jackson.version}. Drop them.
+                 jackson-annotations is versioned differently (e.g. 2.22) and must not be matched. -->
+            <blacklistedBundles>
+              <bundle>mvn:com.fasterxml.jackson.core/jackson-core/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.dataformat/*/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.datatype/*/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.jaxrs/*/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.module/*/[2,${jackson.version})</bundle>
+            </blacklistedBundles>
             <archiveZip>false</archiveZip>
             <archiveTarGz>false</archiveTarGz>
             <installedFeatures>
