@@ -44,9 +44,6 @@
     <bundle>mvn:com.sun.mail/jakarta.mail/${jakarta.mail.version}</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/${commons-fileupload.version}</bundle>
     <bundle>mvn:commons-io/commons-io/${commons-io.version}</bundle>
-    <!-- FIXME: commons-lang 2.6 is not imported by any Opencast bundle; it is believed to be
-         needed only by the org.apache.servicemix.bundles.spring-ldap bundle installed below. -->
-    <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
     <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
     <bundle>mvn:org.apache.commons/commons-collections4/${commons-collections.version}</bundle>
