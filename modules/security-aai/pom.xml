@@ -110,7 +110,6 @@
                 <ignoredUsedUndeclaredDependency>jakarta.annotation:jakarta.annotation-api</ignoredUsedUndeclaredDependency>
               </ignoredUsedUndeclaredDependencies>
               <ignoredUnusedDeclaredDependencies>
-                <ignoredUnusedDeclaredDependency>org.springframework:org.springframework.context</ignoredUnusedDeclaredDependency>
                 <ignoredUnusedUndeclaredDependency>org.hamcrest:hamcrest</ignoredUnusedUndeclaredDependency>
               </ignoredUnusedDeclaredDependencies>
             </configuration>

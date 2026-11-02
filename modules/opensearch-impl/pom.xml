@@ -203,7 +203,6 @@
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>org.opensearch.plugin:lang-mustache-client</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opensearch.plugin:rank-eval-client</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-common</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.reactivestreams:reactive-streams</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.snakeyaml:snakeyaml-engine</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>tools.jackson.core:jackson-core</ignoredUnusedDeclaredDependency>

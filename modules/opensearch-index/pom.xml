@@ -157,7 +157,6 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.cm</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
