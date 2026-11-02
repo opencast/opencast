@@ -107,7 +107,7 @@ Option | Description
 -------|------------
 `-DtrimStackTrace=false` | Do not trim stack traces in the logs
 `-DskipTests=true` | Skip tests
-`-T 1.0C` | Use multiple threads for building (Experimental)
+`-T 1.0C` | Use multiple threads for building
 
 ### Build Single Modules
 
@@ -135,18 +135,19 @@ correctly be restored after the new bundle has been deployed.
 
 
 ### Examples
-#### Build enabling multiple threads (Experimental)
+#### Build enabling multiple threads
 
 Building with multiple threads decreases the build time significantly.
 If you want to enable multiple threads, you can use the following command:
 
-    $ ./mvnw clean install -T 1.0C -DskipTests -Pnone
-    && cd assemblies && ./mvnw install -T 1.0C -Dskiptests -Pdev
-    && cd ..
-    $ ./build/opencast-dist-develop-*/start-opencast
+    $ ./mvnw clean install -T 1.0C -DskipTests -Pdev
+    $ ./build/opencast-dist-develop-*/bin/start-opencast
 
-Multiple threads build have not been thoroughly tested and may cause runtime problems or unexpected behavior.
-We don't advise using this feature for production.
+Maven builds all Opencast modules before it creates the distributions, since the Karaf features module
+(`assemblies/karaf-features`) declares every bundle from its `feature.xml` as dependency.
+If you add a new bundle to the `feature.xml`, add it to the dependencies in `assemblies/karaf-features/pom.xml` as well.
+Otherwise, a parallel build may put an outdated version of that bundle from your local Maven repository into the
+distribution.
 
 #### Useful Commands for Testing Purposes
 
