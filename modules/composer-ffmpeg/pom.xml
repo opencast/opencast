@@ -129,8 +129,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- used for tests -->
             <ignoredUnusedDeclaredDependency>org.apache.cxf:cxf-rt-frontend-jaxrs</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
