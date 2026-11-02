@@ -371,6 +371,10 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>3.6.3</version>
         <executions>
@@ -834,6 +838,12 @@
                   <!-- modules declare this to provide a logger for tests -->
                   <ignoredDependency>org.slf4j:slf4j-reload4j</ignoredDependency>
                 </ignoredDependencies>
+                <ignoredPackagings>
+                  <ignoredPackaging>pom</ignoredPackaging>
+                  <ignoredPackaging>ear</ignoredPackaging>
+                  <!-- distributions contain no code to analyze -->
+                  <ignoredPackaging>karaf-assembly</ignoredPackaging>
+                </ignoredPackagings>
               </configuration>
             </execution>
           </executions>
