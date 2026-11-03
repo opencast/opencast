@@ -7,16 +7,6 @@ updates:
 
 # JavaScript dependencies
 - package-ecosystem: npm
-  directory: "/docs/guides"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
-  directory: "/docs/checkstyle/eslint-config"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
   directory: "/modules/engage-ui"
   schedule:
     interval: monthly
