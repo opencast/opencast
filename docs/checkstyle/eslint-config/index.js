@@ -7,10 +7,10 @@ module.exports = [
   js.configs.recommended,
   {
     'languageOptions': {
-      'ecmaVersion': 2017,
+      'ecmaVersion': 2022,
+      'sourceType': 'script',
       'globals': {
-        ...globals.browser,
-        ...globals.es2015
+        ...globals.browser
       }
     },
     'plugins': {
