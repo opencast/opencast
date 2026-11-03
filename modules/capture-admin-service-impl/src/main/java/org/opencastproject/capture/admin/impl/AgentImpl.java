@@ -279,7 +279,7 @@ public class AgentImpl implements Agent {
     String value = getKey(properties, key, 5);
     // If the key is defined, it *must* have a value, and it *must* be one of the two things
     if (value.isEmpty() || !(BOOLEAN_ON.equals(value) || BOOLEAN_OFF.equals(value))) {
-      throw new RuntimeException("Invalid value for " + key);
+      throw new IllegalArgumentException("Invalid value for " + key);
     }
     return BOOLEAN_ON.equals(value);
   }
@@ -291,7 +291,7 @@ public class AgentImpl implements Agent {
   private String getKey(Properties properties, String key, int maxLength) {
     String value = properties.getProperty(key);
     if (value != null && value.length() > maxLength) {
-      throw new RuntimeException("Maximum length of " + maxLength + " exceeded for key " + key);
+      throw new IllegalArgumentException("Maximum length of " + maxLength + " exceeded for key " + key);
     }
     return value;
   }
@@ -606,11 +606,11 @@ public class AgentImpl implements Agent {
           .map(String::trim)
           .collect(Collectors.toSet());
       if (names.isEmpty()) {
-        throw new RuntimeException("Agent provided devices key, but no devices");
+        throw new IllegalArgumentException("Agent provided devices key, but no devices");
       } else if (names.stream().anyMatch(String::isBlank)) {
-        throw new RuntimeException("Agent device names contains a blank name");
+        throw new IllegalArgumentException("Agent device names contains a blank name");
       } else if (names.stream().anyMatch(s -> s.length() > 256)) {
-        throw new RuntimeException("Agent device names too long");
+        throw new IllegalArgumentException("Agent device names too long");
       } else {
         // We rebuild the string here since we need everything in this Properties to be string-able for sanity
         capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, String.join(",", names));
@@ -661,9 +661,9 @@ public class AgentImpl implements Agent {
               .collect(Collectors.toCollection(TreeSet::new));
       // If someone passes a blank string, the length here is still 1...
       if (agentStreamConfigs.stream().anyMatch(String::isEmpty)) {
-        throw new RuntimeException("Stream configs have a configuration which is empty");
+        throw new IllegalArgumentException("Stream configs have a configuration which is empty");
       } else if (agentStreamConfigs.stream().anyMatch(s -> s.length() > 32)) {
-        throw new RuntimeException("Stream configs have a configuration which is too long");
+        throw new IllegalArgumentException("Stream configs have a configuration which is too long");
       }
       capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION,
           String.join(",", agentStreamConfigs));
@@ -678,9 +678,9 @@ public class AgentImpl implements Agent {
               .collect(Collectors.toCollection(TreeSet::new));
       // If someone passes a blank string, the length here is still 1...
       if (agentDevicePositions.stream().anyMatch(String::isEmpty)) {
-        throw new RuntimeException("Position configs have a configuration which is empty");
+        throw new IllegalArgumentException("Position configs have a configuration which is empty");
       } else if (agentDevicePositions.stream().anyMatch(s -> s.length() > 256)) {
-        throw new RuntimeException("Position configs have a configuration which is too long");
+        throw new IllegalArgumentException("Position configs have a configuration which is too long");
       }
       capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS,
           String.join(",", agentDevicePositions));
@@ -695,9 +695,9 @@ public class AgentImpl implements Agent {
               .collect(Collectors.toCollection(TreeSet::new));
       // If someone passes a blank string, the length here is still 1...
       if (agentContent.stream().anyMatch(String::isEmpty)) {
-        throw new RuntimeException("Content configs have a configuration which is empty");
+        throw new IllegalArgumentException("Content configs have a configuration which is empty");
       } else if (agentContent.stream().anyMatch(s -> s.length() > 256)) {
-        throw new RuntimeException("Content configs have a configuration which is too long");
+        throw new IllegalArgumentException("Content configs have a configuration which is too long");
       }
       capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT,
           String.join(",", agentContent));
@@ -711,9 +711,9 @@ public class AgentImpl implements Agent {
     for (String key : vendorKeys) {
       String value = configuration.getProperty(key);
       if (value.isEmpty()) {
-        throw new RuntimeException("Vendor extension keys have an empty value");
+        throw new IllegalArgumentException("Vendor extension keys have an empty value");
       } else if (value.length() > 256) {
-        throw new RuntimeException("Vendor extension key value is too long");
+        throw new IllegalArgumentException("Vendor extension key value is too long");
       }
       capabilitiesProperties.setProperty(key, value.trim());
     }
