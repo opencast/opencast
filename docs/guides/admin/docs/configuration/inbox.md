@@ -26,6 +26,10 @@ Each configured inbox directory may result in digest for a separate organization
 The inbox can process media files directly, or can work on zipped media packages containing multiple files and
 additional metadata.
 
+Note that the ingest of zipped media packages is disabled by default. Zip files placed in an inbox are ignored unless
+you set `zip.ingest.enabled=true` in `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`. This feature is
+assumed to be no longer in use. If you need it, please let the Opencast community know.
+
 
 Step 1: Configure an Inbox Scanner
 ----------------------------------
