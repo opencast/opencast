@@ -1,7 +1,8 @@
 
-import { defaultGetVideoIdFunc, defaultLoadConfigFunc, defaultLoadVideoManifestFunc, OpencastPaellaPlayer, type OpencastInitParams, type OpencastPaellaConfig } from '@asicupv/paella-opencast-core';
-import { Events, type Paella } from '@asicupv/paella-core';
+import { defaultGetVideoIdFunc, defaultLoadConfigFunc, opencastSearchResultToPaellaManifest, OpencastPaellaPlayer, type OpencastInitParams, type OpencastPaellaConfig } from '@asicupv/paella-opencast-core';
+import { Events, type Manifest, type Paella } from '@asicupv/paella-core';
 import { applyQueryParams } from './applyQueryParams';
+import { jwt, setUpStaticFileAuth, withJwt } from './jwt';
 
 
 // Importing plugins
@@ -31,6 +32,7 @@ const USE_OC_SERVER_FROM_URL = import.meta.env.USE_OC_SERVER_FROM_URL === 'true'
 const OC_PRESENTATION_URL = getOcPresentationUrl();
 // const OC_PAELLA8_BASE_URL = import.meta.env.OC_PAELLA8_BASE_URL || '/paella8/ui/';
 const CONFIG_FOLDER_URL = import.meta.env.CONFIG_FOLDER || '/ui/config/paella8/';
+const CONFIG_URL = `${CONFIG_FOLDER_URL}config.json`;
 
 
 function getOcPresentationUrl(): string {
@@ -58,16 +60,46 @@ async function loadOpencastConfig(configUrl: string, player: Paella): Promise<Op
     return structuredClone(await opencastConfig);
 }
 
+// Like `defaultLoadVideoManifestFunc`, but attaches the JWT given to this page
+// (if any) to the request. In that case, there is also no redirect to the
+// login page if the episode can't be loaded, as the user can't log in anyway.
+async function loadVideoManifest(_manifestUrl: string, _config: OpencastPaellaConfig, player: Paella): Promise<Manifest> {
+    const ocPlayer = player as OpencastPaellaPlayer;
+    if (ocPlayer.videoId === null) {
+        throw new Error('video-id not defined.');
+    }
+    const url = ocPlayer.getUrlFromOpencastServer(`/search/episode.json?id=${ocPlayer.videoId}&limit=1`);
+    if (url === null) {
+        throw new Error('opencast-presentation-url not defined.');
+    }
+
+    let episode;
+    try {
+        episode = await fetch(withJwt(url)).then(async (response) => await response.json());
+    } catch {
+        throw new Error('Error fetching opencast episode');
+    }
+
+    if (episode?.total !== 1 || !episode.result?.[0]) {
+        if (!jwt && await ocPlayer.opencastAuth.getLoggedUserName() === null) {
+            ocPlayer.log.info('User not authenticated. Redirecting to authentication...', 'engage-paella-player');
+            await ocPlayer.opencastAuth.auth(window.location.href);
+        }
+        throw new Error('Error loading video manifest.');
+    }
+    return await opencastSearchResultToPaellaManifest(ocPlayer, episode.result[0]);
+}
+
 
 
 window.addEventListener("load", async () => {  
   const opencastInitParams: OpencastInitParams = {
     configResourcesUrl: CONFIG_FOLDER_URL,
-    configUrl: `${CONFIG_FOLDER_URL}config.json`,
+    configUrl: CONFIG_URL,
 
     loadConfig: loadOpencastConfig,
     getVideoId: defaultGetVideoIdFunc,
-    loadVideoManifest: defaultLoadVideoManifestFunc,
+    loadVideoManifest,
     plugins: [
       ...basicPlugins,
       ...slidePlugins,
@@ -84,6 +116,10 @@ window.addEventListener("load", async () => {
   };
 
   const ocPlayer = new OpencastPaellaPlayer('playerContainer', opencastInitParams);
+  // Start setting up the service worker for JWT static file auth right away, as
+  // it needs the config and may take a moment. If loading the config fails,
+  // Paella fails to load as well and logs that.
+  const swReady = loadOpencastConfig(CONFIG_URL, ocPlayer).catch(() => null).then(setUpStaticFileAuth);
   // Load default dictionaries
   Object.entries(defaultDictionaries).forEach(([lang, dict]) =>  ocPlayer.addDictionary(lang, dict));
   
@@ -102,6 +138,8 @@ window.addEventListener("load", async () => {
   });
 
   await ocPlayer.applyOpencastTheme();
+  // Requests to static files are only made after loading the manifest.
+  await swReady;
   await ocPlayer.loadManifest();
   ocPlayer.log.info('Paella player loaded successfully!', 'opencast-engage-player');
   // window.ocPlayer = ocPlayer;

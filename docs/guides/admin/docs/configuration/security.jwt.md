@@ -83,7 +83,8 @@ An external application wants a user to load a protected static file from Openca
 }
 ```
 
-To embed the Paella 7 player with such a JWT, see [Embedding with JWT](player/paella.player7/jwt.md).
+To embed the Paella player with such a JWT, see "Embedding with JWT" for [Paella 7](player/paella.player7/jwt.md)
+or [Paella 8](player/paella.player8/jwt.md).
 
 #### Opencast Studio
 

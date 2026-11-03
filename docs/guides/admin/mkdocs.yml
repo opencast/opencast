@@ -152,6 +152,7 @@ nav:
           - Paella player 8:
               - Configuration: "configuration/player/paella.player8/configuration.md"
               - URL Parameters: "configuration/player/paella.player8/url.parameter.md"
+              - Embedding with JWT: "configuration/player/paella.player8/jwt.md"
               - Paella plugins: "configuration/player/paella.player8/plugins.md"
       - Playlists: configuration/playlists.md
       - Plugin Management: configuration/plugin-management.md

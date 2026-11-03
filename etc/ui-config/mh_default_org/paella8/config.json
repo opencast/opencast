@@ -95,6 +95,10 @@
         },
         "hideTimeLineOnLive": false,
         "theme": "custom_theme",
+        "jwt": {
+            "authStaticFiles": false,
+            "trustedOrigins": []
+        },
 
         "__mainAudioContent": "presenter",
         "__preventVideoDownload": false
