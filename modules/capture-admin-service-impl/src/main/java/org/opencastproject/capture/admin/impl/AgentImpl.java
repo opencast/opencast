@@ -558,7 +558,7 @@ public class AgentImpl implements Agent {
 
     // Parse record
     String record = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_RECORD);
-    if (stream == null) {
+    if (record == null) {
       log.debug("Capture agent '{}' failed to provide record ({})", name, CaptureParameters.CAPTURE_DEVICE_RECORD);
     } else {
       // Validate
