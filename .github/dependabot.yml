@@ -53,3 +53,16 @@ updates:
   schedule:
     interval: monthly
   open-pull-requests-limit: 10
+
+# Development dependency containers
+- package-ecosystem: docker-compose
+  directory: /docs/scripts/devel-dependency-containers
+  schedule:
+    interval: monthly
+  ignore:
+    # Built locally from opensearch.Containerfile, not pulled from a registry
+    - dependency-name: opencast/opensearch
+- package-ecosystem: docker
+  directory: /docs/scripts/devel-dependency-containers
+  schedule:
+    interval: monthly
