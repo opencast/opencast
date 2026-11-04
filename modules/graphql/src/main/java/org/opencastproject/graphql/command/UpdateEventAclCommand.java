@@ -23,8 +23,6 @@ package org.opencastproject.graphql.command;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.event.GqlEvent;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
@@ -35,6 +33,8 @@ import org.opencastproject.graphql.type.input.AccessControlListInput;
 import org.opencastproject.graphql.util.GraphQLObjectMapper;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
@@ -53,7 +53,7 @@ public class UpdateEventAclCommand extends AbstractCommand<GqlEvent> {
   @Override
   public GqlEvent execute() {
     OpencastContext context = OpencastContextManager.getCurrentContext();
-    final ElasticsearchIndex index = context.getService(ElasticsearchIndex.class);
+    final OpenSearchIndex index = context.getService(OpenSearchIndex.class);
     final IndexService indexService = context.getService(IndexService.class);
 
     final AccessControlListInput aclInput = GraphQLObjectMapper.newInstance()

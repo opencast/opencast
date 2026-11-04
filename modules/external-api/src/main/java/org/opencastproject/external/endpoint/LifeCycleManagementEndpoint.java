@@ -28,8 +28,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.index.service.api.IndexService;
@@ -44,6 +42,8 @@ import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyAccessControlEntryImpl;
 import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyImpl;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;

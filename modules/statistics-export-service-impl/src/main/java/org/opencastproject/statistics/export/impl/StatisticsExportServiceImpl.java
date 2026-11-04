@@ -24,19 +24,19 @@ package org.opencastproject.statistics.export.impl;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchQuery;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -199,7 +199,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      ElasticsearchIndex index,
+      OpenSearchIndex index,
       ZoneId zoneId
   ) throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
@@ -245,7 +245,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
 
   @Override
   public String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution
-          dataResolution, ElasticsearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel,
+          dataResolution, OpenSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel,
           int limit, int offset, Map<String, String> filters)
           throws SearchIndexException, UnauthorizedException, NotFoundException {
     if (!(provider instanceof TimeSeriesProvider)) {
@@ -302,7 +302,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      ElasticsearchIndex index,
+      OpenSearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetaData,
@@ -326,7 +326,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   private void printSeries(StatisticsProvider provider, String resourceId, Instant from, Instant to,
-                           DataResolution dataResolution, ElasticsearchIndex index, ZoneId zoneId, CSVPrinter printer,
+                           DataResolution dataResolution, OpenSearchIndex index, ZoneId zoneId, CSVPrinter printer,
                            boolean fullMetadata, int limit, int offset)
           throws SearchIndexException, NotFoundException, IOException {
     if (offset != 0) {
@@ -352,7 +352,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      ElasticsearchIndex index,
+      OpenSearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -415,7 +415,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      ElasticsearchIndex index,
+      OpenSearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,
@@ -461,7 +461,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       Instant from,
       Instant to,
       DataResolution dataResolution,
-      ElasticsearchIndex index,
+      OpenSearchIndex index,
       ZoneId zoneId,
       CSVPrinter printer,
       boolean fullMetadata,

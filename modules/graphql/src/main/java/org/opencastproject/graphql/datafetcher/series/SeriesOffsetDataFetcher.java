@@ -21,17 +21,17 @@
 
 package org.opencastproject.graphql.datafetcher.series;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.graphql.datafetcher.ElasticsearchDataFetcher;
+import org.opencastproject.graphql.datafetcher.OpenSearchDataFetcher;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.series.GqlSeriesList;
 import org.opencastproject.graphql.type.input.SeriesOrderByInput;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -40,7 +40,7 @@ import java.util.Objects;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class SeriesOffsetDataFetcher extends ElasticsearchDataFetcher<GqlSeriesList> {
+public class SeriesOffsetDataFetcher extends OpenSearchDataFetcher<GqlSeriesList> {
 
   private User user;
   private boolean writeOnly;
@@ -58,7 +58,7 @@ public class SeriesOffsetDataFetcher extends ElasticsearchDataFetcher<GqlSeriesL
   @Override
   public GqlSeriesList get(OpencastContext opencastContext, DataFetchingEnvironment dataFetchingEnvironment) {
     SecurityService securityService = opencastContext.getService(SecurityService.class);
-    ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
+    OpenSearchIndex searchIndex = opencastContext.getService(OpenSearchIndex.class);
 
     SeriesSearchQuery seriesSearchQuery = new SeriesSearchQuery(
         securityService.getOrganization().getId(),

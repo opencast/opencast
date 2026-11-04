@@ -21,9 +21,6 @@
 
 package org.opencastproject.graphql.datafetcher.event;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.event.GqlEvent;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
@@ -36,6 +33,9 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 
 import java.text.ParseException;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public class CommonEventMetadataV2DataFetcher implements ContextDataFetcher<Map<
   public Map<String, GqlMetadataFieldInterface> get(OpencastContext opencastContext,
       DataFetchingEnvironment dataFetchingEnvironment) {
     String eventId = ((GqlEvent)dataFetchingEnvironment.getSource()).id();
-    ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
+    OpenSearchIndex searchIndex = opencastContext.getService(OpenSearchIndex.class);
     IndexService indexService = opencastContext.getService(IndexService.class);
     try {
       Optional<Event> opt = indexService.getEvent(eventId, searchIndex);
