@@ -35,6 +35,7 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -87,6 +88,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public static final String UNAUTHORIZED_TYPE = "unauthorizedcatalog";
   public static final String UPDATE_EVENT = "updateevent";
   public static final String METADATA_UPDATE_EVENT = "metadataupdateevent";
+  public static final String METADATA_VALIDATION_EVENT = "metadatavalidationevent";
   public static final String METADATA_GET_EVENT = "metadatagetevent";
   public static final String SCHEDULING_GET_EVENT = "schedulinggetevent";
   public static final String SCHEDULING_UPDATE_EVENT = "schedulingupdateevent";
@@ -231,6 +233,21 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_UPDATE_EVENT), capture(capturedMetadataList2),
         eq(elasticsearchIndex))).andReturn(null).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
+
+    /**
+     * Update event metadata failing validation while storing the catalog. The offending field is 'title', so a request
+     * updating the title is the client's fault while any other request hits a title which was already empty in the
+     * stored catalog.
+     */
+    Event metadataValidationEvent = new Event(METADATA_VALIDATION_EVENT, defaultOrg.getId());
+    metadataValidationEvent.setRecordingStartDate("2017-08-29T00:05:00.000Z");
+    EasyMock.expect(indexService.getEvent(METADATA_VALIDATION_EVENT, elasticsearchIndex))
+        .andReturn(Optional.of(metadataValidationEvent)).anyTimes();
+    EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_VALIDATION_EVENT),
+        EasyMock.anyObject(MetadataList.class), eq(elasticsearchIndex)))
+        .andThrow(new MetadataValidationException("title", "The event metadata field with id 'title' and the "
+            + "metadata type 'TEXT' is required and can not be empty!.")).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(metadataValidationEvent)).andReturn(null).anyTimes();
 
     /**
      * Update event track data
