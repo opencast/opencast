@@ -257,7 +257,9 @@
               !javax.activation.*,
               !javax.annotation,
               !javax.annotation.meta,
-              !jdk.net,
+              <!-- httpcore5 ReflectionUtils needs jdk.net on TLS connections (https);
+                   excluding it hangs the OpenSearch client -->
+              jdk.net;resolution:=optional,
               !jdk.incubator.vector,
               !java.lang.foreign,
               !java.nio.file.spi.*,
