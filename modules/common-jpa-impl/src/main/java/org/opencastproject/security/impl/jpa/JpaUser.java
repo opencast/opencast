@@ -65,6 +65,11 @@ import javax.persistence.UniqueConstraint;
         query = "select u from JpaUser u where UPPER(u.username) like :query and u.organization.id = :org"
     ),
     @NamedQuery(
+        name = "User.findByTextQuery",
+        query = "select u from JpaUser u where (UPPER(u.username) like :query or UPPER(u.name) like :query"
+            + " or UPPER(u.email) like :query) and u.organization.id = :org"
+    ),
+    @NamedQuery(
         name = "User.findByIdAndOrg",
         query = "select u from JpaUser u where u.id=:id and u.organization.id = :org"
     ),

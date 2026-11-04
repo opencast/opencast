@@ -205,6 +205,23 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
         .iterator();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.UserProvider#findUsersByText(String, int, int)
+   */
+  @Override
+  public Iterator<User> findUsersByText(String query, int offset, int limit) {
+    if (query == null) {
+      throw new IllegalArgumentException("Query must be set");
+    }
+    String orgId = securityService.getOrganization().getId();
+    return db.exec(UserDirectoryPersistenceUtil.findUsersByTextQuery(orgId, query, limit, offset)).stream()
+        .map(JpaUserAndRoleProvider::addProviderName)
+        .collect(Collectors.toList())
+        .iterator();
+  }
+
   @Override
   public Iterator<User> findUsers(Collection<String> userNames) {
     String orgId = securityService.getOrganization().getId();
