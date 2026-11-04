@@ -19,13 +19,12 @@
  *
  */
 
-import { getUrlFromOpencastConfig, getUrlFromOpencastPaella } from './js/PaellaOpencast';
+import { getUrlFromOpencastConfig, getUrlFromOpencastPaella, loadOpencastConfig } from './js/PaellaOpencast';
 
 
 export async function applyOpencastTheme(paella) {
   //// Load custom theme
-  const config = await fetch(getUrlFromOpencastConfig('config.json'));
-  const configJson = await config.json();
+  const configJson = await loadOpencastConfig();
 
   const u = new URL(window.location.href);
   const ocTheme = u.searchParams.get('oc.theme')

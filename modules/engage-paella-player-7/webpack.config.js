@@ -33,7 +33,13 @@ module.exports = function (env) {
   };
 
   return {
-    entry: './src/index.js',
+    entry: {
+      main: './src/index.js',
+      sw: {
+        import: './src/js/sw/index.js',
+        filename: 'sw.js',
+      },
+    },
     output: {
       path: path.join(__dirname,'target/paella-build'),
       filename: 'paella-player.js',
