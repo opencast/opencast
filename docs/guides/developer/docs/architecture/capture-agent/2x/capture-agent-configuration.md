@@ -1,9 +1,11 @@
 Capture Agent Configuration
 ===========================
 
-The configuration your agent sends to the core must accurately reflect both the agent's *current* state, as well as its
-*possible* states.  These configuration options will be used to present the Opencast administrative user(s) with
-capture options, depending on agent configuration.
+The configuration your agent sends to the core defines the possibilties presented to an admin in the Opencast user
+admin interface, especially when scheduling.  As such, it is vital that your agent's configuration be complete, and
+accurate.  This configuration information *MUST* be sent at least once on agent start, as outlined in the
+[core agent docs](capture-agent.md), and *SHOULD* be sent any time the agent's configuration has changed.
+
 
 Required Configuration Keys
 ---------------------------
