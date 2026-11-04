@@ -42,6 +42,7 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -87,7 +88,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
@@ -343,10 +343,10 @@ public final class WorkspaceImpl implements Workspace {
       logger.debug("Created unique filename: {}", inWs);
     }
 
-    if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
-            && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
-      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
-        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+    final String lookupUri = UrlSupport.withoutQueryAndFragment(uri);
+    if (hasPathMappable()) {
+      if (lookupUri.startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = lookupUri.substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist and is it up to date?
         logger.trace("Looking up {} at {}", uri.toString(), wfrCopy.getAbsolutePath());
@@ -388,9 +388,10 @@ public final class WorkspaceImpl implements Workspace {
   public InputStream read(final URI uri) throws NotFoundException, IOException {
 
     // Check if we can get the file from the working file repository directly
-    if (pathMappable != null) {
-      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
-        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+    final String lookupUri = UrlSupport.withoutQueryAndFragment(uri);
+    if (hasPathMappable()) {
+      if (lookupUri.startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = lookupUri.substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist?
         logger.trace("Looking up {} at {} for read", uri, wfrCopy);
@@ -792,7 +793,7 @@ public final class WorkspaceImpl implements Workspace {
   File toWorkspaceFile(URI uri) {
     // MH-11497: Fix for compatibility with stream security: the query parameters are deleted.
     // TODO Refactor this class to use the URI class and methods instead of String for handling URIs
-    String uriString = UriBuilder.fromUri(uri).replaceQuery(null).build().toString();
+    String uriString = UrlSupport.withoutQueryAndFragment(uri);
     String wfrPrefix = wfr.getBaseUri().toString();
     String serverPath = FilenameUtils.getPath(uriString);
     if (uriString.startsWith(wfrPrefix)) {
@@ -814,6 +815,16 @@ public final class WorkspaceImpl implements Workspace {
   /** Return a file object pointing into the workspace. */
   private File workspaceFile(String... path) {
     return Paths.get(wsRoot, path).toFile();
+  }
+
+  /**
+   * Whether files of the working file repository can be accessed directly on the file system, which needs a path and
+   * a URL prefix.
+   */
+  private boolean hasPathMappable() {
+    return pathMappable != null
+        && StringUtils.isNotBlank(pathMappable.getPathPrefix())
+        && StringUtils.isNotBlank(pathMappable.getUrlPrefix());
   }
 
   /** Return a file object pointing into the working file repository. */
