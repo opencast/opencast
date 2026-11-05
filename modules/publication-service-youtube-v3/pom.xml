@@ -51,6 +51,10 @@
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>osgi.core</artifactId>
     </dependency>
@@ -136,6 +140,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.checkerframework</groupId>
       <artifactId>checker-qual</artifactId>
       <version>3.4.1</version>
@@ -155,6 +164,8 @@
             <ignoredUnusedDeclaredDependency>org.osgi:osgi.core</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.checkerframework:checker-qual</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.felix:org.apache.felix.http.bundle</ignoredUnusedDeclaredDependency>
+            <!-- only needed to provide a javax.ws.rs.core.Response RuntimeDelegate via ServiceLoader in tests -->
+            <ignoredUnusedDeclaredDependency>org.apache.cxf:cxf-rt-frontend-jaxrs</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
