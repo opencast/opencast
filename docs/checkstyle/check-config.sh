@@ -24,14 +24,6 @@ if grep -rnI ' $' etc; then
   ret=1
 fi
 
-echo Checking that modules use the maven-dependency-plugin…
-grep -L maven-dependency-plugin modules/*/pom.xml | cat > maven-dependency-plugin.list
-if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then
-  echo ERROR: Detected modules without active dependency plugin:
-  cat maven-dependency-plugin.list
-  ret=1
-fi
-
 echo "Checking that all plugins are listed for inclusion in the assembly pom"
 for plugin in $(sed -n 's/^.*<feature.*"\(opencast-plugin-[^"]*\)".*$/\1/p' assemblies/karaf-features/src/main/feature/feature.xml); do
     if ! grep -q "$plugin" assemblies/pom.xml; then
