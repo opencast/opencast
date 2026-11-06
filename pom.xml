@@ -70,7 +70,7 @@
     <spotless.version>3.10.3</spotless.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
-    <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
+    <spring-security-cas.version>5.8.16_1</spring-security-cas.version>
     <!-- Compile-time artifact and the ServiceMix OSGi repackage installed by feature.xml must stay in
          sync; the suffixed version is the ServiceMix rebuild of the same upstream release. -->
     <spring-security-ldap.version>5.8.6</spring-security-ldap.version>
