@@ -35,7 +35,7 @@ jobs:
       - name: Get the version
         id: get_version
         run: |
-          xpath -e '/project/version/text()' pom.xml | sed 's/^\([0-9]*\)-SNAPSHOT$/::set-output name=VERSION::\1/'
+          echo "VERSION=$(xpath -e '/project/version/text()' pom.xml | sed 's/-SNAPSHOT$//')" >> "$GITHUB_OUTPUT"
 
       - name: Configure s3cmd
         uses: lkiesow/configure-s3cmd@v1
