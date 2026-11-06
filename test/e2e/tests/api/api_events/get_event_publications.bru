@@ -1,0 +1,34 @@
+meta {
+  name: get_event_publications
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId/publications
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Event publications list should have correct types", function() {
+    if (res.status === 200) {
+      const pubs = res.getBody();
+      expect(pubs).to.be.an('array');
+      pubs.forEach(function(pub) {
+        expect(pub.id).to.be.a('string');
+        expect(pub.channel).to.be.a('string');
+        expect(pub.mediatype).to.be.a('string');
+        expect(pub.url).to.be.a('string');
+      });
+    }
+  });
+}

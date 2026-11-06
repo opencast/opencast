@@ -1,0 +1,19 @@
+meta {
+  name: post_event_invalid
+  type: http
+  seq: 21
+}
+
+post {
+  url: {{baseUrl}}/api/events
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  metadata: malformed_json_metadata
+}
+
+assert {
+  res.status: eq 400
+}

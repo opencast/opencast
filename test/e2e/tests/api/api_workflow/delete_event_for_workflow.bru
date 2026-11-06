@@ -1,0 +1,19 @@
+meta {
+  name: delete_event_for_workflow
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/events/:eventId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{workflowEventId}}
+}
+
+assert {
+  res.status: eq 204
+}

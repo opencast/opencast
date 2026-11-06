@@ -1,0 +1,19 @@
+meta {
+  name: get_api_info_organization
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/info/organization
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.id: isString
+  res.body.name: isString
+  res.body.adminRole: isString
+  res.body.anonymousRole: isString
+}

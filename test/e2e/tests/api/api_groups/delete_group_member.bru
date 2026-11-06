@@ -1,0 +1,20 @@
+meta {
+  name: delete_group_member
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/groups/:groupId/members/:memberId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  groupId: {{groupId}}
+  memberId: admin2
+}
+
+assert {
+  res.status: eq 200
+}

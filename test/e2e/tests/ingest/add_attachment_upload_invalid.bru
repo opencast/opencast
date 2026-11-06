@@ -1,0 +1,27 @@
+meta {
+  name: add_attachment_upload_invalid
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/ingest/addAttachment
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  flavor: attachment/notes
+  mediaPackage: invalid-xml-string
+  BODY: @file(test.mp4) @contentType(video/mp4)
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Add attachment with invalid XML should return 400", function() {
+    expect(res.status).to.equal(400);
+  });
+}

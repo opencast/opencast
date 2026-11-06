@@ -1,0 +1,16 @@
+meta {
+  name: get_api_info_organization_properties_engageuiurl
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/info/organization/properties/engageuiurl
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body['org.opencastproject.engage.ui.url']: isString
+}
