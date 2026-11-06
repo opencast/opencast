@@ -3,6 +3,9 @@ name: Release » Cut Release Tag
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   cut-release-tag:
     runs-on: ubuntu-24.04

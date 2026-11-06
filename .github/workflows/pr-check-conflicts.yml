@@ -6,6 +6,10 @@ on:
       - opened
       - synchronize
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   check-conflicts:
     runs-on: ubuntu-latest
