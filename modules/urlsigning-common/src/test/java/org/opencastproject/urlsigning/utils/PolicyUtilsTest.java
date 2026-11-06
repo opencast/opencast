@@ -38,14 +38,50 @@ public class PolicyUtilsTest {
     DateTime before = new DateTime(2015, 03, 01, 00, 46, 17, 0, DateTimeZone.UTC);
     Policy policy = Policy.mkSimplePolicy("http://mh-allinone/", before);
     assertEquals("{\"Statement\":{\"Condition\":{\"DateLessThan\":" + before.getMillis()
-            + "},\"Resource\":\"http:\\/\\/mh-allinone\\/\"}}", PolicyUtils.toJson(policy).toJSONString());
+            + "},\"Resource\":\"http:\\/\\/mh-allinone\\/\"}}", PolicyUtils.toJson(policy));
     // With optional parameters
     policy = Policy.mkPolicyValidFromWithIP("http://mh-allinone/", before, new DateTime(2015, 02, 28, 00, 46, 19, 0,
             DateTimeZone.UTC), EXAMPLE_IP);
     assertEquals(
         "{\"Statement\":{\"Condition\":{\"DateGreaterThan\":1425084379000,\"DateLessThan\":"
             + "1425170777000,\"IpAddress\":\"10.0.0.1\"},\"Resource\":\"http:\\/\\/mh-allinone\\/\"}}",
-        PolicyUtils.toJson(policy).toJSONString());
+        PolicyUtils.toJson(policy));
+  }
+
+  /**
+   * The bytes of the rendered policy are what gets signed, so the escaping is a contract rather than a formatting
+   * preference. Escaping the forward slash and the U+2000-U+20FF block is optional per the JSON specification, and
+   * leaving characters such as &amp; and = unescaped is a choice a JSON library might not make by default; changing
+   * any of it would invalidate every signed URL already handed out. These cases exist so that such a change fails
+   * here rather than in production.
+   */
+  @Test
+  public void testToJsonEscapingIsStable() {
+    DateTime before = new DateTime(2015, 03, 01, 00, 46, 17, 0, DateTimeZone.UTC);
+
+    // Query strings are common in signed URLs: & = and ' must stay literal.
+    assertEquals(
+        "{\"Statement\":{\"Condition\":{\"DateLessThan\":1425170777000},"
+            + "\"Resource\":\"http:\\/\\/host\\/a.mp4?b=c&d=e'f\"}}",
+        PolicyUtils.toJson(Policy.mkSimplePolicy("http://host/a.mp4?b=c&d=e'f", before)));
+
+    // Quotes and backslashes are escaped, the forward slash included.
+    assertEquals(
+        "{\"Statement\":{\"Condition\":{\"DateLessThan\":1425170777000},"
+            + "\"Resource\":\"a\\\"b\\\\c\\/d\"}}",
+        PolicyUtils.toJson(Policy.mkSimplePolicy("a\"b\\c/d", before)));
+
+    // Control characters use their short escape, other low code points an uppercase four digit \\u escape.
+    assertEquals(
+        "{\"Statement\":{\"Condition\":{\"DateLessThan\":1425170777000},"
+            + "\"Resource\":\"tab\\tesc\\u001Bx\"}}",
+        PolicyUtils.toJson(Policy.mkSimplePolicy("tab\tesc" + ((char) 0x1B) + "x", before)));
+
+    // U+2028 is inside the escaped block, U+00A0 sits just outside it and stays literal.
+    assertEquals(
+        "{\"Statement\":{\"Condition\":{\"DateLessThan\":1425170777000},"
+            + "\"Resource\":\"a\\u2028b" + ((char) 0x00A0) + "c\"}}",
+        PolicyUtils.toJson(Policy.mkSimplePolicy("a" + ((char) 0x2028) + "b" + ((char) 0x00A0) + "c", before)));
   }
 
   @Test

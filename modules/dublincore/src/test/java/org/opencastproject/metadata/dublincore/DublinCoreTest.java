@@ -57,12 +57,13 @@ import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -190,16 +191,15 @@ public class DublinCoreTest {
 
     String jsonString = dc.toJson();
 
-    JSONParser parser = new JSONParser();
-    JSONObject jsonObject = (JSONObject) parser.parse(jsonString);
+    JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
 
-    JSONObject dcTerms = (JSONObject) jsonObject.get(TERMS_NS_URI);
+    JsonObject dcTerms = jsonObject.getAsJsonObject(TERMS_NS_URI);
     assertNotNull(dcTerms);
 
-    JSONArray titleArray = (JSONArray) dcTerms.get("title");
+    JsonArray titleArray = dcTerms.getAsJsonArray("title");
     assertEquals("Three titles should be present", 3, titleArray.size());
 
-    JSONArray subjectArray = (JSONArray) dcTerms.get("subject");
+    JsonArray subjectArray = dcTerms.getAsJsonArray("subject");
     assertEquals("The subject should be present", 1, subjectArray.size());
 
     DublinCoreCatalog fromJson = DublinCores.read(IOUtils.toInputStream(jsonString));

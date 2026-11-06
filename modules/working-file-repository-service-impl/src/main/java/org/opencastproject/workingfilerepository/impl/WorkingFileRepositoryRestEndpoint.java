@@ -45,14 +45,15 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -572,11 +573,11 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   )
   public Response restGetCollectionContents(@PathParam("collectionId") String collectionId) throws NotFoundException {
     URI[] uris = super.getCollectionContents(collectionId);
-    JSONArray jsonArray = new JSONArray();
+    JsonArray jsonArray = new JsonArray();
     for (URI uri : uris) {
       jsonArray.add(uri.toString());
     }
-    return Response.ok(jsonArray.toJSONString()).build();
+    return Response.ok(jsonArray.toString()).build();
   }
 
   @POST
@@ -665,12 +666,12 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
     long usable = this.getUsableSpace().get();
     long used = this.getUsedSpace().get();
     String summary = this.getDiskSpace();
-    JSONObject json = new JSONObject();
-    json.put("size", total);
-    json.put("usable", usable);
-    json.put("used", used);
-    json.put("summary", summary);
-    return Response.ok(json.toJSONString()).build();
+    JsonObject json = new JsonObject();
+    json.addProperty("size", total);
+    json.addProperty("usable", usable);
+    json.addProperty("used", used);
+    json.addProperty("summary", summary);
+    return Response.ok(json.toString()).build();
   }
 
   @GET

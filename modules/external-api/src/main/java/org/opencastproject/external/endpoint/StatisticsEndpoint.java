@@ -49,9 +49,10 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -62,7 +63,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -202,10 +202,10 @@ public class StatisticsEndpoint {
       providers = statisticsService.getProviders();
     }
 
-    JSONArray result = new JSONArray();
+    JsonArray result = new JsonArray();
     providers.stream().map(p -> StatisticsProviderUtils.toJson(p, withParameters)).forEach(result::add);
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toString());
   }
 
   @GET
@@ -237,7 +237,7 @@ public class StatisticsEndpoint {
       Optional<StatisticsProvider> provider = statisticsService.getProvider(id);
       if (provider.isPresent()) {
         return ApiResponseBuilder.Json.ok(acceptHeader, StatisticsProviderUtils.toJson(provider.get(),
-            withParameters).toJSONString());
+            withParameters).toString());
       } else {
         return ApiResponseBuilder.notFound("Cannot find a statistics provider with id '%s'.", id);
       }
@@ -275,13 +275,13 @@ public class StatisticsEndpoint {
       return RestUtil.R.badRequest("Unable to parse form parameter 'data': " + e.getMessage());
     }
 
-    JSONArray result = new JSONArray();
+    JsonArray result = new JsonArray();
     queries.stream()
       .peek(query -> checkAccess(query.getParameters().getResourceId(), query.getProvider().getResourceType()))
       .map(query -> QueryUtils.execute(query))
         .forEach(result::add);
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toString());
   }
 
   @POST
@@ -357,8 +357,9 @@ public class StatisticsEndpoint {
             filters
     );
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, new JSONObject(Collections.singletonMap("csv", result))
-        .toJSONString());
+    JsonObject csvJson = new JsonObject();
+    csvJson.addProperty("csv", result);
+    return ApiResponseBuilder.Json.ok(acceptHeader, csvJson.toString());
   }
 
   private void checkAccess(final String resourceId, final ResourceType resourceType) {

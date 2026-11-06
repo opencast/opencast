@@ -30,11 +30,11 @@ import static org.junit.Assert.fail;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.security.api.DefaultOrganization;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -116,7 +116,7 @@ public class EventTest {
   }
 
   @Test
-  public void testToJson() throws ParseException, IOException {
+  public void testToJson() throws IOException {
     Event event = new Event(id, defaultOrganization);
     event.setTitle(title);
     event.setDescription(description);
@@ -126,36 +126,36 @@ public class EventTest {
     event.setContributors(contributors);
     event.setAgentConfiguration(agentConfiguration);
     logger.info(event.toJSON());
-    JSONObject parse = (JSONObject) new JSONParser().parse(event.toJSON());
-    if (parse.get(EVENT_JSON_KEY) == null || !(parse.get(EVENT_JSON_KEY) instanceof JSONObject)) {
+    JsonObject parse = JsonParser.parseString(event.toJSON()).getAsJsonObject();
+    if (parse.get(EVENT_JSON_KEY) == null || !parse.get(EVENT_JSON_KEY).isJsonObject()) {
       fail("There must be an event object returned.");
     }
-    JSONObject eventJsonObject = (JSONObject) parse.get(EVENT_JSON_KEY);
-    assertEquals(id, eventJsonObject.get(IDENTIFIER_JSON_KEY));
-    assertEquals(defaultOrganization, eventJsonObject.get(ORGANIZATION_JSON_KEY));
-    assertEquals(title, eventJsonObject.get(TITLE_JSON_KEY));
-    assertEquals(description, eventJsonObject.get(DESCRIPTION_JSON_KEY));
-    assertEquals(subject, eventJsonObject.get(SUBJECT_JSON_KEY));
-    assertEquals(location, eventJsonObject.get(LOCATION_JSON_KEY));
+    JsonObject eventJsonObject = parse.getAsJsonObject(EVENT_JSON_KEY);
+    assertEquals(id, eventJsonObject.get(IDENTIFIER_JSON_KEY).getAsString());
+    assertEquals(defaultOrganization, eventJsonObject.get(ORGANIZATION_JSON_KEY).getAsString());
+    assertEquals(title, eventJsonObject.get(TITLE_JSON_KEY).getAsString());
+    assertEquals(description, eventJsonObject.get(DESCRIPTION_JSON_KEY).getAsString());
+    assertEquals(subject, eventJsonObject.get(SUBJECT_JSON_KEY).getAsString());
+    assertEquals(location, eventJsonObject.get(LOCATION_JSON_KEY).getAsString());
 
-    JSONArray presentersArray = (JSONArray) ((JSONObject) eventJsonObject.get(PRESENTERS_JSON_KEY))
-            .get(PRESENTER_JSON_KEY);
+    JsonArray presentersArray = eventJsonObject.getAsJsonObject(PRESENTERS_JSON_KEY)
+            .getAsJsonArray((String) PRESENTER_JSON_KEY);
     // Ordering not important, just a convenient shorthand.
-    assertEquals(presenter1, presentersArray.get(0));
-    assertEquals(presenter2, presentersArray.get(1));
-    assertEquals(presenter3, presentersArray.get(2));
+    assertEquals(presenter1, presentersArray.get(0).getAsString());
+    assertEquals(presenter2, presentersArray.get(1).getAsString());
+    assertEquals(presenter3, presentersArray.get(2).getAsString());
 
-    JSONArray contributorsArray = (JSONArray) ((JSONObject) eventJsonObject.get(CONTRIBUTORS_JSON_KEY))
-            .get(CONTRIBUTOR_JSON_KEY);
+    JsonArray contributorsArray = eventJsonObject.getAsJsonObject(CONTRIBUTORS_JSON_KEY)
+            .getAsJsonArray(CONTRIBUTOR_JSON_KEY);
     // Ordering not important, just a convenient shorthand.
-    assertEquals(contributor1, contributorsArray.get(0));
-    assertEquals(contributor2, contributorsArray.get(1));
-    assertEquals(contributor3, contributorsArray.get(2));
+    assertEquals(contributor1, contributorsArray.get(0).getAsString());
+    assertEquals(contributor2, contributorsArray.get(1).getAsString());
+    assertEquals(contributor3, contributorsArray.get(2).getAsString());
 
-    JSONObject agentConfigurationObject = (JSONObject) eventJsonObject.get(AGENT_CONFIGURATION_KEY);
-    JSONArray entryArray = (JSONArray) agentConfigurationObject.get(ENTRY_KEY);
+    JsonObject agentConfigurationObject = eventJsonObject.getAsJsonObject(AGENT_CONFIGURATION_KEY);
+    JsonArray entryArray = agentConfigurationObject.getAsJsonArray(ENTRY_KEY);
     // Ordering not important
-    assertThat(eventCAConfigJson, SameJSONAs.sameJSONAs(entryArray.toJSONString()).allowingAnyArrayOrdering());
+    assertThat(eventCAConfigJson, SameJSONAs.sameJSONAs(entryArray.toString()).allowingAnyArrayOrdering());
   }
 
   @Test
