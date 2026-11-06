@@ -62,6 +62,13 @@ public class HelloWorldRestEndpointTest {
   }
 
   @Test
+  public void testHelloNameMissing() {
+    Response response = rest.helloName(null);
+    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertEquals("Hello!", response.getEntity());
+  }
+
+  @Test
   public void testHelloName() throws Exception {
     Response response = rest.helloName("Peter");
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
