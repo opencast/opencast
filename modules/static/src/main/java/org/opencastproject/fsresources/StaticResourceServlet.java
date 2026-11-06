@@ -21,6 +21,11 @@
 
 package org.opencastproject.fsresources;
 
+import org.opencastproject.basicstatistics.BasicStatisticsService;
+import org.opencastproject.basicstatistics.EventPayload;
+import org.opencastproject.basicstatistics.EventType;
+import org.opencastproject.basicstatistics.ItemType;
+import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.util.ConfigurationException;
@@ -45,6 +50,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +106,13 @@ public class StaticResourceServlet extends HttpServlet {
   private SecurityService securityService = null;
 
   private List<StaticFileAuthorization> authorizations = new ArrayList<>();
+
+  private BasicStatisticsService statisticsService;
+
+  @Reference
+  public void setBasicStatisticsService(BasicStatisticsService service) {
+    this.statisticsService = service;
+  }
 
   /**
    * No-arg constructor
@@ -239,7 +252,18 @@ public class StaticResourceServlet extends HttpServlet {
 
     if ((((ranges == null) || (ranges.isEmpty())) && (req.getHeader("Range") == null)) || (ranges == FULL_RANGE)) {
       if (withBody) {
+        Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
+        if (e == null) {
+          recordFileFetched(
+              contentType,
+              req,
+              requestTimestamp,
+              path,
+              0,
+              file.length()
+          );
+        }
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -272,7 +296,18 @@ public class StaticResourceServlet extends HttpServlet {
         } catch (IllegalStateException e) {
           logger.debug(e.getMessage(), e);
         }
+        Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
+        if (e == null) {
+          recordFileFetched(
+              contentType,
+              req,
+              requestTimestamp,
+              path,
+              range.start,
+              range.end
+          );
+        }
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -294,7 +329,18 @@ public class StaticResourceServlet extends HttpServlet {
       } catch (IllegalStateException e) {
         logger.debug(e.getMessage(), e);
       }
+      Instant requestTimestamp = Instant.now();
       copy(file, resp.getOutputStream(), ranges.iterator(), contentType);
+      for (Range range : ranges) {
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            range.start,
+            range.end
+        );
+      }
     }
   }
 
@@ -537,6 +583,56 @@ public class StaticResourceServlet extends HttpServlet {
       start = 0;
       end = 0;
       length = 0;
+    }
+  }
+
+  /**
+   * Sends statistic events to the basic statistic service
+   * @param contentType Mimetype string for determining item type
+   * @param request http request to parse ip and user agent from
+   * @param timestamp time of the response
+   * @param path request path to parse mp id and element id from
+   * @param from range start
+   * @param to range end
+   */
+  private void recordFileFetched(
+      String contentType,
+      HttpServletRequest request,
+      Instant timestamp,
+      String path,
+      long from,
+      long to
+  ) {
+    try {
+      // We only care about request that fetch "video" files for now
+      if (!contentType.startsWith("video/")
+          && !contentType.startsWith(MimeTypes.HLS.toString())
+          && !contentType.startsWith(MimeTypes.DASH.toString())) {
+        return;
+      }
+
+      String[] parts = path.split("/");
+
+      // TODO: Find a less brittle way to determine these
+      if (parts.length < 5) {
+        logger.warn("Cannot determine media package and element id from path '{}', skipping statistics", path);
+        return;
+      }
+      String mediaPackageId = parts[3];
+      String elementId = parts[4];
+
+      EventPayload payload = new EventPayload.FetchFile(elementId, from, to);
+
+      RawEvent event = new RawEvent();
+      event.setTimestamp(timestamp);
+      event.setItemType(ItemType.VIDEO);
+      event.setItemId(mediaPackageId);
+      event.setEventType(EventType.FETCH_FILE);
+      event.setEventPayload(RawEvent.serializePayload(payload));
+
+      statisticsService.recordFileFetched(event, request);
+    } catch (Exception | InternalError e) {
+      logger.warn("Cannot report statistics to basic statistics service", e);
     }
   }
 }
