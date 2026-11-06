@@ -85,7 +85,7 @@
     <feature version="[5.3.39,5.4)">spring</feature>
     <feature version="[5.7.12,5.8)">spring-security</feature>
 
-    <!-- Spring Security 5: LDAP has NOT been tested -->
+    <!-- LDAP support, used by opencast-security-ldap and opencast-userdirectory-ldap -->
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/${spring-security-ldap-servicemix.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-ldap/2.4.1_1</bundle>
 
