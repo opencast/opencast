@@ -55,7 +55,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/api/listproviders")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0,
+            ApiMediaType.VERSION_1_13_0 })
 @RestService(
         name = "externalapilistproviders",
         title = "External API List Providers Service",

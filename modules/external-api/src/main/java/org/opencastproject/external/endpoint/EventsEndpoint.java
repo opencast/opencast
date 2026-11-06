@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_11_0;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_13_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_7_0;
@@ -194,7 +195,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0 })
+            ApiMediaType.VERSION_1_12_0, ApiMediaType.VERSION_1_13_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 @Tag(name = "External API")
@@ -228,6 +229,12 @@ public class EventsEndpoint {
 
   /** Default ID of the workflow used to retract published events */
   private static final String DEFAULT_RETRACT_WORKFLOW = "retract-for-deletion";
+
+  /** The number of events returned if the request does not ask for a specific limit (API version 1.13.0 and newer) */
+  private static final int DEFAULT_LIMIT = 100;
+
+  /** The largest limit a request may ask for (API version 1.13.0 and newer) */
+  private static final int MAX_LIMIT = 10000;
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
@@ -899,14 +906,17 @@ public class EventsEndpoint {
               + "criteria. In the comma seperated list each type of sorting is specified as a pair such as: "
               + "<Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or "
               + "descending order and is mandatory.", isRequired = false, type = STRING),
-          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.",
-              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request. "
+              + "If API ver > 1.12.0: defaults to 100 and must not be larger than 10000.", isRequired = false,
+              type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false,
               type = RestParameter.Type.INTEGER)
       },
       responses = {
           @RestResponse(description = "A (potentially empty) list of events is returned.",
-              responseCode = HttpServletResponse.SC_OK)
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The requested limit is larger than the allowed maximum.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST)
       })
   public Response getEvents(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
           @QueryParam("commentReason") String reasonFilter, @QueryParam("commentResolution") String resolutionFilter,
@@ -923,6 +933,10 @@ public class EventsEndpoint {
       withScheduling = false;
     }
 
+    if (!requestedVersion.isSmallerThan(VERSION_1_13_0) && limit != null && limit > MAX_LIMIT) {
+      return RestUtil.R.badRequest(String.format("The limit must not be larger than %d, use the offset to page "
+              + "through the results", MAX_LIMIT));
+    }
     Optional<Integer> optLimit = Optional.ofNullable(limit);
     Optional<Integer> optOffset = Optional.ofNullable(offset);
     Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
@@ -931,6 +945,10 @@ public class EventsEndpoint {
     // If the limit is set to 0, this is not taken into account
     if (optLimit.isPresent() && limit == 0) {
       optLimit = Optional.empty();
+    }
+    // Since API version 1.13.0 the number of results is always limited
+    if (!requestedVersion.isSmallerThan(VERSION_1_13_0) && (optLimit.isEmpty() || optLimit.get() < 1)) {
+      optLimit = Optional.of(DEFAULT_LIMIT);
     }
 
     //List of all events from the filters
@@ -2337,7 +2355,8 @@ public class EventsEndpoint {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
               ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0,
+              ApiMediaType.VERSION_1_13_0 })
   @RestQuery(
       name = "geteventscheduling",
       description = "Returns an event's scheduling information.",
@@ -2378,7 +2397,8 @@ public class EventsEndpoint {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
               ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0,
+              ApiMediaType.VERSION_1_13_0 })
   @RestQuery(
       name = "updateeventscheduling",
       description = "Update an event's scheduling information.",

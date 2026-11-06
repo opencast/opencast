@@ -25,6 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_13_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;
@@ -132,7 +133,7 @@ import javax.ws.rs.core.Response.Status;
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0 })
+            ApiMediaType.VERSION_1_12_0, ApiMediaType.VERSION_1_13_0 })
 @RestService(
     name = "externalapiseries",
     title = "External API Series Service",
@@ -152,7 +153,12 @@ import javax.ws.rs.core.Response.Status;
 public class SeriesEndpoint {
 
   private static final int CREATED_BY_UI_ORDER = 9;
+
+  /** The number of series returned if the request does not ask for a specific limit */
   private static final int DEFAULT_LIMIT = 100;
+
+  /** The largest limit a request may ask for (API version 1.13.0 and newer) */
+  private static final int MAX_LIMIT = 10000;
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
 
@@ -217,8 +223,9 @@ public class SeriesEndpoint {
               + "criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort "
               + "Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or "
               + "descending order and is mandatory.", isRequired = false, type = STRING),
-          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.",
-              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request. "
+              + "Defaults to 100. If API ver > 1.12.0: must not be larger than 10000.", isRequired = false,
+              type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false,
               type = RestParameter.Type.INTEGER),
           @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl should be included in "
@@ -226,7 +233,9 @@ public class SeriesEndpoint {
       },
       responses = {
           @RestResponse(description = "A (potentially empty) list of series is returned.",
-              responseCode = HttpServletResponse.SC_OK)
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The requested limit is larger than the allowed maximum.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST)
       })
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
@@ -236,6 +245,10 @@ public class SeriesEndpoint {
     if (requestedVersion.isSmallerThan(VERSION_1_5_0)) {
       // withAcl was added for version 1.5.0 and should be ignored for smaller versions.
       withAcl = false;
+    }
+    if (!requestedVersion.isSmallerThan(VERSION_1_13_0) && limit > MAX_LIMIT) {
+      return RestUtil.R.badRequest(String.format("The limit must not be larger than %d, use the offset to page "
+              + "through the results", MAX_LIMIT));
     }
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
