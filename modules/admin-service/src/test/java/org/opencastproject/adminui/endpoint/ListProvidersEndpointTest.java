@@ -29,7 +29,7 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

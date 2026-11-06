@@ -21,12 +21,12 @@
 
 package org.opencastproject.workflow.remote;
 
-import static org.apache.http.HttpStatus.SC_CONFLICT;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.hc.core5.http.HttpStatus.SC_CONFLICT;
+import static org.apache.hc.core5.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -45,17 +45,17 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -63,7 +63,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,10 +121,10 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public WorkflowDefinition getWorkflowDefinitionById(String id) throws WorkflowDatabaseException, NotFoundException {
     HttpGet get = new HttpGet("/definition/" + id + ".xml");
-    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
+    ClassicHttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Workflow definition " + id + " does not exist.");
         } else {
           return XmlWorkflowParser.parseWorkflowDefinition(response.getEntity().getContent());
@@ -149,10 +148,10 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public WorkflowInstance getWorkflowById(long id) throws WorkflowDatabaseException, NotFoundException {
     HttpGet get = new HttpGet("/instance/" + id + ".xml");
-    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
+    ClassicHttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Workflow instance " + id + " does not exist.");
         } else {
           return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
@@ -172,10 +171,10 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   public List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)
           throws WorkflowDatabaseException, UnauthorizedException {
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
-    HttpResponse response = getResponse(get, SC_OK, SC_FORBIDDEN);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_FORBIDDEN);
     try {
       if (response != null) {
-        if (SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
+        if (SC_FORBIDDEN == response.getCode()) {
           throw new UnauthorizedException("You do not have permission to load the workflow instances");
         }
         return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
@@ -201,13 +200,13 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     List<NameValuePair> queryStringParams = new ArrayList<>();
     queryStringParams.add(new BasicNameValuePair("action", action));
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/currentInstance.xml?"
-        + URLEncodedUtils.format(queryStringParams, StandardCharsets.UTF_8));
-    HttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK, SC_FORBIDDEN);
+        + WWWFormCodec.format(queryStringParams, StandardCharsets.UTF_8));
+    ClassicHttpResponse response = getResponse(get, SC_NOT_FOUND, SC_OK, SC_FORBIDDEN);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           return Optional.empty();
-        } else if (SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
+        } else if (SC_FORBIDDEN == response.getCode()) {
           throw new UnauthorizedException("You do not have permission to load the workflow instance");
         }
         return Optional.ofNullable(
@@ -227,7 +226,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public boolean mediaPackageHasActiveWorkflows(String mediaPackageId) throws WorkflowDatabaseException {
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/hasActiveWorkflows");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()).trim());
@@ -243,7 +242,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public boolean userHasActiveWorkflows(String userId) throws WorkflowDatabaseException {
     HttpGet get = new HttpGet("/user/" + userId + "/hasActiveWorkflows");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()).trim());
@@ -313,14 +312,14 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       if (properties != null) {
         params.add(new BasicNameValuePair("properties", mapToString(properties)));
       }
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new IllegalStateException("Unable to assemble a remote workflow request", e);
     }
-    HttpResponse response = getResponse(post, SC_NOT_FOUND, SC_OK);
+    ClassicHttpResponse response = getResponse(post, SC_NOT_FOUND, SC_OK);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Workflow instance " + parentWorkflowId + " does not exist.");
         } else {
           return XmlWorkflowParser.parseWorkflowInstance(response.getEntity().getContent());
@@ -378,11 +377,11 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     StringBuilder url = new StringBuilder("/count");
     if (queryStringParams.size() > 0) {
       url.append("?");
-      url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
+      url.append(WWWFormCodec.format(queryStringParams, StandardCharsets.UTF_8));
     }
 
     HttpGet get = new HttpGet(url.toString());
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         String body = null;
@@ -412,15 +411,11 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpPost post = new HttpPost("/stop");
     List<BasicNameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
+    post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+    ClassicHttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
     try {
       if (response != null) {
-        if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
+        if (response.getCode() == SC_NOT_FOUND) {
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
         } else {
           logger.info("Workflow '{}' stopped", workflowInstanceId);
@@ -447,15 +442,11 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpPost post = new HttpPost("/suspend");
     List<BasicNameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
+    post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+    ClassicHttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
     try {
       if (response != null) {
-        if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
+        if (response.getCode() == SC_NOT_FOUND) {
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
         } else {
           logger.info("Workflow '{}' suspended", workflowInstanceId);
@@ -498,14 +489,14 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       params.add(new BasicNameValuePair("properties", mapToString(properties)));
     }
     post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
+    ClassicHttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
       if (response != null) {
-        if (response.getStatusLine().getStatusCode() == SC_NOT_FOUND) {
+        if (response.getCode() == SC_NOT_FOUND) {
           throw new NotFoundException("Workflow instance with id='" + workflowInstanceId + "' not found");
-        } else if (response.getStatusLine().getStatusCode() == SC_UNAUTHORIZED) {
+        } else if (response.getCode() == SC_UNAUTHORIZED) {
           throw new UnauthorizedException("You do not have permission to resume");
-        } else if (response.getStatusLine().getStatusCode() == SC_CONFLICT) {
+        } else if (response.getCode() == SC_CONFLICT) {
           throw new IllegalStateException("Can not resume a workflow where the current state is not in paused");
         } else {
           logger.info("Workflow '{}' resumed", workflowInstanceId);
@@ -533,14 +524,12 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("workflow", XmlWorkflowParser.toXml(workflowInstance)));
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new IllegalStateException("unable to serialize workflow instance to xml");
     }
 
-    HttpResponse response = getResponse(post, SC_NO_CONTENT);
+    ClassicHttpResponse response = getResponse(post, SC_NO_CONTENT);
     try {
       if (response != null) {
         logger.info("Workflow '{}' updated", workflowInstance);
@@ -574,15 +563,15 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (force) {
       List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
       queryStringParams.add(new BasicNameValuePair("force", "true"));
-      deleteString = deleteString + "?" + URLEncodedUtils.format(queryStringParams, StandardCharsets.UTF_8);
+      deleteString = deleteString + "?" + WWWFormCodec.format(queryStringParams, StandardCharsets.UTF_8);
     }
 
     HttpDelete delete = new HttpDelete(deleteString);
 
-    HttpResponse response = getResponse(delete, SC_NO_CONTENT, SC_NOT_FOUND);
+    ClassicHttpResponse response = getResponse(delete, SC_NO_CONTENT, SC_NOT_FOUND);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Workflow id not found: " + workflowInstanceId);
         } else {
           logger.info("Workflow '{}' removed", workflowInstanceId);
@@ -603,7 +592,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() throws WorkflowDatabaseException {
     HttpGet get = new HttpGet("/definitions.xml");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         List<WorkflowDefinition> list = XmlWorkflowParser.parseWorkflowDefinitions(response.getEntity().getContent());
@@ -652,16 +641,12 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (state != null) {
       params.add(new BasicNameValuePair("state", state.toString()));
     }
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
+    post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
-    HttpResponse response = getResponse(post, SC_OK, HttpStatus.SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(post, SC_OK, HttpStatus.SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (HttpStatus.SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        if (HttpStatus.SC_UNAUTHORIZED == response.getCode()) {
           throw new UnauthorizedException("You do not have permission to cleanup");
         } else {
           logger.info("Successful request to workflow cleanup endpoint");
@@ -677,7 +662,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   @Override
   public Map<String, Map<String, String>> getWorkflowStateMappings() {
     HttpGet get = new HttpGet("/statemappings.json");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         return (Map<String, Map<String, String>>) new JSONParser().parse(

@@ -45,9 +45,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -339,19 +339,20 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
       }
       HttpDelete delete = new HttpDelete(deleteUrl);
 
-      HttpResponse response = null;
+      ClassicHttpResponse response = null;
       try {
         response = client.execute(delete);
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
-          logger.info("Successfully deleted external URI {}", delete.getURI());
+          logger.info("Successfully deleted external URI {}", delete.getRequestUri());
         } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-          logger.debug("External URI {} has already been deleted", delete.getURI());
+          logger.debug("External URI {} has already been deleted", delete.getRequestUri());
         } else {
-          logger.warn("Unable to delete external URI {}, status code '{}' returned", delete.getURI(), statusCode);
+          logger.warn("Unable to delete external URI {}, status code '{}' returned", delete.getRequestUri(),
+              statusCode);
         }
       } catch (TrustedHttpClientException e) {
-        logger.warn("Unable to execute DELETE request on external URI {}", delete.getURI());
+        logger.warn("Unable to execute DELETE request on external URI {}", delete.getRequestUri());
       } finally {
         client.close(response);
       }

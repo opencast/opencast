@@ -33,13 +33,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.entity.mime.InputStreamBody;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -67,8 +67,8 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
     super(LtiService.JOB_TYPE);
   }
 
-  private HttpResponse safeGetResponse(final HttpRequestBase r) {
-    final HttpResponse response = getResponse(r);
+  private ClassicHttpResponse safeGetResponse(final HttpUriRequestBase r) {
+    final ClassicHttpResponse response = getResponse(r);
     if (response == null) {
       throw new RuntimeException("No response from service");
     }
@@ -77,7 +77,7 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
 
   @Override
   public List<LtiJob> listJobs(final String seriesId) {
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = safeGetResponse(new HttpGet("/jobs?seriesId=" + seriesId));
       return gson.fromJson(
@@ -130,13 +130,13 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
 
   @Override
   public String getEventMetadata(final String eventId) throws NotFoundException, UnauthorizedException {
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = safeGetResponse(new HttpGet("/" + eventId + "/metadata"));
-      if (response.getStatusLine().getStatusCode() == Response.Status.NOT_FOUND.getStatusCode()) {
+      if (response.getCode() == Response.Status.NOT_FOUND.getStatusCode()) {
         throw new NotFoundException("event not found: " + eventId);
       }
-      if (response.getStatusLine().getStatusCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+      if (response.getCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
         throw new UnauthorizedException("not authorized to access event with ID " + eventId);
       }
       return IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
@@ -149,7 +149,7 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
 
   @Override
   public String getNewEventMetadata() {
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = safeGetResponse(new HttpGet("/new/metadata"));
       return IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
@@ -167,13 +167,13 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
     entity.addTextBody("metadata", metadataJson);
     final HttpPost post = new HttpPost("/" + eventId + "/metadata");
     post.setEntity(entity.build());
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = safeGetResponse(post);
-      if (response.getStatusLine().getStatusCode() == Response.Status.NOT_FOUND.getStatusCode()) {
+      if (response.getCode() == Response.Status.NOT_FOUND.getStatusCode()) {
         throw new NotFoundException("event not found: " + eventId);
       }
-      if (response.getStatusLine().getStatusCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+      if (response.getCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
         throw new UnauthorizedException("not authorized to access event with ID " + eventId);
       }
     } finally {
@@ -184,10 +184,11 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
   @Override
   public void delete(String eventId) {
     final HttpDelete post = new HttpDelete("/" + eventId);
-    final HttpResponse response = getResponse(post, Response.Status.NO_CONTENT.getStatusCode());
+    final ClassicHttpResponse response = getResponse(post, Response.Status.NO_CONTENT.getStatusCode());
     if (response == null) {
       throw new RuntimeException("No response from service");
     }
+    closeConnection(response);
   }
 
   @Reference

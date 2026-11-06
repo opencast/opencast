@@ -24,39 +24,39 @@ package org.opencastproject.util;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Prelude.sleep;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Tuple;
 
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.util.Timeout;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /** Functions to support Apache httpcomponents and HTTP related operations in general. */
-
-/** Functions to support Apache httpcomponents. */
 public final class HttpUtil {
   private HttpUtil() {
   }
 
   public static HttpPost post(NameValuePair... formParams) {
-    final HttpPost post = new HttpPost();
+    final HttpPost post = new HttpPost("");
     setFormParams(post, formParams);
     return post;
   }
@@ -69,34 +69,49 @@ public final class HttpUtil {
 
   public static HttpGet get(String path, Tuple<String, String>... queryParams) {
     String queryString = Arrays.stream(queryParams)
-        .map(a -> {
-          try {
-            return a.getA() + "=" + URLEncoder.encode(a.getB(), StandardCharsets.UTF_8.toString());
-          } catch (UnsupportedEncodingException e) {
-            return chuck(e);
-          }
-        })
+        .map(a -> a.getA() + "=" + URLEncoder.encode(a.getB(), StandardCharsets.UTF_8))
         .collect(Collectors.joining("&"));
 
     String url = path + (queryString.isEmpty() ? "" : "?" + queryString);
     return new HttpGet(url);
   }
 
-  private static void setFormParams(HttpEntityEnclosingRequest r, NameValuePair[] formParams) {
-    final List<NameValuePair> params = Arrays.asList(formParams);
-    try {
-      r.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      chuck(e);
-    }
+  private static void setFormParams(ClassicHttpRequest r, NameValuePair[] formParams) {
+    r.setEntity(new UrlEncodedFormEntity(Arrays.asList(formParams), StandardCharsets.UTF_8));
   }
 
   public static NameValuePair param(String name, String value) {
     return new BasicNameValuePair(name, value);
   }
 
-  public static boolean isOk(HttpResponse res) {
-    return res.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+  public static boolean isOk(ClassicHttpResponse res) {
+    return res.getCode() == HttpStatus.SC_OK;
+  }
+
+  /**
+   * Creates a builder for a plain http client using the given timeouts.
+   *
+   * @param connectTimeoutMs
+   *          the time in milliseconds to wait for a connection to be established
+   * @param socketTimeoutMs
+   *          the maximum time in milliseconds of inactivity while waiting for response data
+   * @return the builder, which can be configured further before calling {@link HttpClientBuilder#build()}
+   */
+  public static HttpClientBuilder clientBuilder(int connectTimeoutMs, int socketTimeoutMs) {
+    final Timeout connectTimeout = Timeout.ofMilliseconds(connectTimeoutMs);
+    final Timeout socketTimeout = Timeout.ofMilliseconds(socketTimeoutMs);
+    return HttpClientBuilder.create()
+        .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+            .useSystemProperties()
+            .setDefaultConnectionConfig(ConnectionConfig.custom()
+                .setConnectTimeout(connectTimeout)
+                .setSocketTimeout(socketTimeout)
+                .build())
+            .build())
+        .setDefaultRequestConfig(RequestConfig.custom()
+            .setConnectionRequestTimeout(connectTimeout)
+            .setResponseTimeout(socketTimeout)
+            .build());
   }
 
   /**
@@ -109,12 +124,12 @@ public final class HttpUtil {
     long now = 0L;
     while (true) {
       final HttpHead head = new HttpHead(resourceUri);
-      HttpResponse response = null;
+      ClassicHttpResponse response = null;
       final int status;
       try {
         try {
           response = http.execute(head);
-          status = response.getStatusLine().getStatusCode();
+          status = response.getCode();
         } finally {
           http.close(response);
         }

@@ -30,9 +30,8 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -78,8 +76,8 @@ public class TrustedHttpClientResourceClosingTest {
       setUrlSigningService(urlSigningService);
     }
 
-    Map<HttpResponse, CloseableHttpClient> getResponseMap() {
-      return responseMap;
+    int getLeasedConnections() {
+      return connectionManager.getTotalStats().getLeased();
     }
   }
 
@@ -87,11 +85,11 @@ public class TrustedHttpClientResourceClosingTest {
   public void testResourceClosing() throws Exception {
     startServer();
     final TestHttpClient client = new TestHttpClient();
-    final HttpResponse response;
+    final ClassicHttpResponse response;
     response = client.execute(new HttpGet("http://127.0.0.1:" + PORT));
-    assertEquals("Request should be stored in response map", 1, client.getResponseMap().size());
+    assertEquals("Connection should be leased from the pool", 1, client.getLeasedConnections());
     client.close(response);
-    assertEquals("Request should be removed from response map", 0, client.getResponseMap().size());
+    assertEquals("Connection should be returned to the pool", 0, client.getLeasedConnections());
   }
 
   private void startServer() throws Exception {

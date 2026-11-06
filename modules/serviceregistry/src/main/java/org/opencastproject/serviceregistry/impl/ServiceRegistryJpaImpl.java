@@ -64,9 +64,10 @@ import org.opencastproject.util.function.ThrowingConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.message.StatusLine;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -2492,15 +2493,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           String serviceUrl = UrlSupport.concat(service.getHost(), service.getPath(), "dispatch");
 
           HttpHead options = new HttpHead(serviceUrl);
-          HttpResponse response = null;
+          ClassicHttpResponse response = null;
           try {
             try {
               response = client.execute(options);
               if (response != null) {
-                switch (response.getStatusLine().getStatusCode()) {
+                switch (response.getCode()) {
                   case HttpStatus.SC_OK:
                     // this service is reachable, continue checking other services
-                    logger.trace("Service " + service + " is responsive: " + response.getStatusLine());
+                    logger.trace("Service " + service + " is responsive: " + new StatusLine(response));
                     if (unresponsive.remove(service)) {
                       logger.info("Service {} is still online", service);
                     } else if (!service.isOnline()) {
@@ -2516,7 +2517,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                     if (!service.isOnline()) {
                       continue;
                     }
-                    logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
+                    logger.warn("Service {} is not working as expected: {}", service, new StatusLine(response));
                 }
               } else {
                 logger.warn("Service {} does not respond", service);

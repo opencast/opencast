@@ -146,14 +146,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>${httpcomponents-httpcore.version}</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -262,8 +257,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
