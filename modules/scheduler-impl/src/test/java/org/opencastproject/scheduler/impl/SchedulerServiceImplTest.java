@@ -155,6 +155,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -883,7 +884,9 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testFindConflictingEvents() throws Exception {
-    final long currentTime = System.currentTimeMillis();
+    // Use a fixed time far away from any daylight saving time change. The RRule below keeps the same local time in
+    // America/Chicago, which does not match the event scheduled 24 hours later if a DST change happens in between.
+    final long currentTime = Instant.parse("2026-06-10T14:00:00Z").toEpochMilli();
     final MediaPackage mediaPackageA = generateEvent(Optional.empty());
     final MediaPackage mediaPackageB = generateEvent(Optional.empty());
     final MediaPackage mediaPackageC = generateEvent(Optional.empty());
