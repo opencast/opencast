@@ -36,18 +36,19 @@ import com.google.common.base.CharMatcher;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -59,9 +60,9 @@ import java.util.regex.Pattern;
         "service.description=Provides the user id role"
     },
     immediate = true,
-    service = { RoleProvider.class, UserIdRoleProvider.class, ManagedService.class }
+    service = { RoleProvider.class, UserIdRoleProvider.class }
 )
-public class UserIdRoleProvider implements RoleProvider, ManagedService {
+public class UserIdRoleProvider implements RoleProvider {
 
 
   private static final String ROLE_USER = "ROLE_USER";
@@ -238,8 +239,9 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
     return p.matcher(string).matches();
   }
 
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     Optional<String> userPrefixProperty = OsgiUtil.getOptCfg(properties, ROLE_USER_PREFIX_KEY);
     if (userPrefixProperty.isPresent()) {
       userRolePrefix = userPrefixProperty.get();

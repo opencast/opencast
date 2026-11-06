@@ -45,10 +45,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +63,8 @@ import java.net.URI;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -74,12 +74,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Component(
     immediate = true,
-    service = { WaveformService.class,ManagedService.class },
+    service = { WaveformService.class },
     property = {
         "service.description=Waveform Service"
     }
 )
-public class WaveformServiceImpl extends AbstractJobProducer implements WaveformService, ManagedService {
+public class WaveformServiceImpl extends AbstractJobProducer implements WaveformService {
 
   /** The logging facility */
   protected static final Logger logger = LoggerFactory.getLogger(WaveformServiceImpl.class);
@@ -185,21 +185,18 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     super(JOB_TYPE);
   }
 
-  @Override
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     logger.info("Activate ffmpeg waveform service");
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG_KEY);
     binary = (path == null ? DEFAULT_FFMPEG_BINARY : path);
     logger.debug("ffmpeg binary set to {}", binary);
+    updated(properties);
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties == null) {
-      return;
-    }
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     logger.debug("Configuring the waveform service");
     waveformJobLoad = LoadUtil.getConfiguredLoadValue(properties,
             WAVEFORM_JOB_LOAD_CONFIG_KEY, DEFAULT_WAVEFORM_JOB_LOAD, serviceRegistry);

@@ -60,6 +60,7 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -95,7 +96,7 @@ public class JobTest {
     serviceRegistry = new ServiceRegistryJpaImpl();
     serviceRegistry.setEntityManagerFactory(emf);
     serviceRegistry.setDBSessionFactory(getDbSessionFactory());
-    serviceRegistry.activate(null);
+    serviceRegistry.activate(null, new HashMap<>());
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);

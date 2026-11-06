@@ -68,7 +68,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpHead;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -88,7 +87,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,9 +113,9 @@ import javax.persistence.TypedQuery;
       "service.description=Service registry"
     },
     immediate = true,
-    service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }
+    service = { ServiceRegistry.class, ServiceRegistryJpaImpl.class }
 )
-public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
+public class ServiceRegistryJpaImpl implements ServiceRegistry {
 
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
@@ -267,7 +265,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     logger.info("Activate service registry");
 
     db = dbSessionFactory.createSession(emf);
@@ -332,6 +330,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .map(Boolean::valueOf)
               .orElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
+
+    updated(properties);
 
     localSystemLoad = 0;
     logger.info("Activated");
@@ -621,12 +621,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * {@inheritDoc}
+   * OSGi callback when the configuration is updated.
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     logger.info("Updating service registry properties");
 
     maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
@@ -729,16 +732,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       hbfuture = scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval,
           heartbeatInterval, TimeUnit.SECONDS);
     }
-  }
-
-  /**
-   * OSGI callback when the configuration is updated. This method is only here to prevent the
-   * configuration admin service from calling the service deactivate and activate methods
-   * for a config update. It does not have to do anything as the updates are handled by updated().
-   */
-  @Modified
-  public void modified(Map<String, Object> config) throws ConfigurationException {
-    logger.debug("Modified serviceregistry");
   }
 
   private Function<EntityManager, Optional<JpaJob>> getJpaJobQuery(long id) {

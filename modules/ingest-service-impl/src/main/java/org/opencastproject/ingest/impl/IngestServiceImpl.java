@@ -114,11 +114,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -136,7 +136,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -154,16 +153,12 @@ import java.util.stream.Collectors;
  */
 @Component(
     immediate = true,
-    service = {
-        IngestService.class,
-        ManagedService.class
-    },
+    service = { IngestService.class },
     property = {
-        "service.description=Ingest Service",
-        "service.pid=org.opencastproject.ingest.impl.IngestServiceImpl"
+        "service.description=Ingest Service"
     }
 )
-public class IngestServiceImpl extends AbstractJobProducer implements IngestService, ManagedService {
+public class IngestServiceImpl extends AbstractJobProducer implements IngestService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(IngestServiceImpl.class);
@@ -355,15 +350,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param cc
    *          the osgi component context
    */
-  @Override
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     logger.info("Ingest Service started.");
     defaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
     if (defaultWorkflowDefinionId == null) {
       defaultWorkflowDefinionId = "schedule-and-upload";
     }
+    updated(properties);
   }
 
   /**
@@ -375,18 +370,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * {@inheritDoc}
+   * OSGi callback when the configuration is updated.
+   * Retrieve the service configuration, including option to overwrite series
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   *      Retrieve ManagedService configuration, including option to overwrite series
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-
-    if (properties == null) {
-      logger.info("No configuration available, using defaults");
-      return;
-    }
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
 
     downloadAuthMethod = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_AUTH_METHOD));
     if (!"Digest".equals(downloadAuthMethod) && !"Basic".equals(downloadAuthMethod)) {
