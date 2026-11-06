@@ -222,19 +222,3 @@ jobs:
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
           s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
-
-      - name: prepare allinone for upload
-        if: matrix.java == 21
-        working-directory: build
-        run: |
-          tar xf opencast-dist-allinone*.tar.gz
-
-      - name: upload tarball as workflow asset
-        if: >
-          matrix.java == 21
-          && github.repository == 'opencast/opencast'
-        uses: actions/upload-artifact@v7
-        with:
-          name: opencast-allinone
-          path: build/opencast-dist-allinone/
-          overwrite: true
