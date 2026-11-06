@@ -113,7 +113,6 @@
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-opensearch-index</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-series-service-api</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-ingest-service-api</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

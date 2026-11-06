@@ -152,7 +152,6 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>org.osgi:osgi.core</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-server</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
