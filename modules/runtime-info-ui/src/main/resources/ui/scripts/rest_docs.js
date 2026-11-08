@@ -40,13 +40,13 @@ async function init() {
       throw new Error(`${response.status} ${response.statusText}`);
     }
     rest = (await response.json()).rest;
+    rest.sort((a, b) => a.path > b.path ? 1 : -1);
   } catch (error) {
     const li = document.createElement('li');
     li.innerText = `Could not load the list of services: ${error.message}`;
     docs.appendChild(li);
     return;
   }
-  rest.sort((a, b) => a.path > b.path ? 1 : -1);
 
   for (const endpoint of rest) {
     const li = document.createElement('li');
