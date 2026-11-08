@@ -138,7 +138,11 @@ function refreshPath(form) {
   return path;
 }
 
-/** The parameters to send, as [name, value] pairs. Untouched optional fields are left out. */
+/**
+ * The parameters to send, as [name, value] pairs. Empty text fields are left out, since an empty
+ * string is rarely a meaningful value and often is not even a valid one, e.g. for numbers or dates.
+ * Checkboxes are always sent as either true or false.
+ */
 function collectParams(form) {
   const params = [];
   for (const input of form.querySelectorAll('.form_param_submit')) {
@@ -215,7 +219,6 @@ function init() {
   for (const form of document.querySelectorAll('form.form_test_form')) {
     for (const input of form.querySelectorAll('.form_param_path')) {
       input.addEventListener('input', () => refreshPath(form));
-      input.addEventListener('change', () => refreshPath(form));
     }
     refreshPath(form);
     form.addEventListener('submit', (event) => submitForm(event, form));
