@@ -71,7 +71,8 @@ function prettify(text) {
         out += char + '\n' + '  '.repeat(depth);
       }
     } else if (char === '}' || char === ']') {
-      depth -= 1;
+      // never drop below zero, even for unbalanced input which merely looks like JSON
+      depth = Math.max(0, depth - 1);
       out += '\n' + '  '.repeat(depth) + char;
     } else if (char === ',') {
       out += char + '\n' + '  '.repeat(depth);
@@ -186,17 +187,23 @@ async function submitForm(event, form) {
   response.classList.add('hidden');
   working.classList.remove('hidden');
 
+  // Only the request itself belongs in the try block. Anything failing later must not be reported as a
+  // failed request.
   let message;
+  let result;
+  let text;
   try {
     // FormData sets its own Content-Type, including the multipart boundary. Never set it by hand.
-    const result = await fetch(url, {method: method, body: body, credentials: 'same-origin'});
-    const text = await result.text();
-    message = `Status: ${result.status} (${result.statusText})\n\n${prettify(text)}`;
+    result = await fetch(url, {method: method, body: body, credentials: 'same-origin'});
+    text = await result.text();
   } catch (error) {
     message = `The request failed: ${error.message}\n\n`
       + 'Note that the form submits to the server URL Opencast is configured with. If you are '
       + 'browsing these docs through a different host or port, the request is cross-origin and '
       + 'will be blocked.';
+  }
+  if (message === undefined) {
+    message = `Status: ${result.status} (${result.statusText})\n\n${prettify(text)}`;
   }
 
   working.classList.add('hidden');
