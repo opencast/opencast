@@ -163,7 +163,8 @@
       <th scope="row">Testing:</th>
       <td>
         <div class="spaced"><strong>Sample:</strong>
-        <#if endpoint.method == "GET">
+        <#-- only link the sample if it can be requested as is, without any parameters to fill in -->
+        <#if endpoint.method == "GET" && endpoint.form.items?size == 0>
         <a href="${meta.url}${endpoint.path}${endpoint.queryString!}"><tt>${endpoint.path}${endpoint.queryString!}</tt></a>
         <#else>
         <tt>${endpoint.path}${endpoint.queryString!}</tt>
