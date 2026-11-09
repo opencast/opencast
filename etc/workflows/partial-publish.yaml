@@ -57,7 +57,7 @@ operations:
     configurations:
       - source-flavor: '*/trimmed'
       - target-flavor: '*/search+preview'
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: search-cover.http
       - time: 3
 
@@ -69,7 +69,7 @@ operations:
     configurations:
       - source-flavor: presentation/trimmed
       - target-flavor: presentation/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
 
@@ -81,7 +81,7 @@ operations:
     configurations:
       - source-flavor: ${presentation_thumbnail_time_flavor}
       - target-flavor: presentation/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: ${presentation_thumbnail_time_time}
 
@@ -91,7 +91,7 @@ operations:
     description: Prepare thumbnail for publication
     configurations:
       - source-flavor: presentation/player+preview
-      - target-tags: +engage-download
+      - target-tags: +engage-download, +archive
 
   # Create a cover image
   - id: image
@@ -101,7 +101,7 @@ operations:
     configurations:
       - source-flavor: presenter/trimmed
       - target-flavor: presenter/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
 
@@ -113,7 +113,7 @@ operations:
     configurations:
       - source-flavor: ${presenter_thumbnail_time_flavor}
       - target-flavor: presenter/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: ${presenter_thumbnail_time_time}
 
@@ -134,7 +134,7 @@ operations:
     description: Prepare thumbnail for publication
     configurations:
       - source-flavor: presenter/player+preview
-      - target-tags: +engage-download
+      - target-tags: +engage-download, +archive
 
   # Generate timeline preview images
   - id: timelinepreviews
