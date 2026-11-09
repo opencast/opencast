@@ -136,6 +136,16 @@ operations:
       - source-flavor: presenter/player+preview
       - target-tags: +engage-download, +archive
 
+  - id: tag
+    if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})
+    exception-handler-workflow: partial-error
+    description: Setting search preview image for audio-only files
+    configurations:
+      - source-flavor: '*/player+preview'
+      - target-flavor: '*/search+preview'
+      - target-tags: +engage-download, +archive
+      - copy: true
+
   # Generate timeline preview images
   - id: timelinepreviews
     if: ${presenter_work_video} OR ${presentation_work_video}
