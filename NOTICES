@@ -648,7 +648,6 @@ db
   com.mchange                            mchange-commons-java                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
   com.typesafe                           config                                           -
   mysql                                  mysql-connector-java                             The GNU General Public License, Version 2
-  net.java.dev.jna                       jna                                              LGPL, version 2.1-ASL, version 2
   org.postgresql                         postgresql                                       -
   org.slf4j                              slf4j-api                                        MIT License
 
