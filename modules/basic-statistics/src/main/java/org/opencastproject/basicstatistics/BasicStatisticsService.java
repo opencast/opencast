@@ -38,6 +38,7 @@ import com.google.common.net.InetAddresses;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -64,7 +65,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * A simple tutorial class to learn about Opencast Services
+ * Collects raw statistics events, e.g. file fetches and client-pushed playback events, and persists them.
  */
 @Component(
     property = {
@@ -84,7 +85,13 @@ public class BasicStatisticsService implements FileFetchListener {
   /** Config key for an administrator-set override of the data-completeness threshold date (an ISO date). */
   private static final String COMPLETENESS_THRESHOLD_DATE_KEY = "completeness.threshold.date";
 
-  private LocalDate configuredCompletenessThreshold;
+  private volatile LocalDate configuredCompletenessThreshold;
+
+  /**
+   * Cached result of {@link #getCompletenessThreshold()} once derived from the database, since the date of the
+   * first ever recorded event cannot change once it is known.
+   */
+  private volatile LocalDate cachedCompletenessThreshold;
 
   /** Limits what clients can send to the client push endpoint. Until it is configured, the defaults are used. */
   private volatile ClientPushRateLimiter clientPushRateLimiter = createClientPushRateLimiter(Map.of());
@@ -216,9 +223,16 @@ public class BasicStatisticsService implements FileFetchListener {
     if (configuredCompletenessThreshold != null) {
       return configuredCompletenessThreshold;
     }
+    if (cachedCompletenessThreshold != null) {
+      return cachedCompletenessThreshold;
+    }
     try {
       Instant version1 = persistence.getVersion1Timestamp();
-      return version1 != null ? version1.atZone(ZoneOffset.UTC).toLocalDate() : null;
+      if (version1 == null) {
+        return null;
+      }
+      cachedCompletenessThreshold = version1.atZone(ZoneOffset.UTC).toLocalDate();
+      return cachedCompletenessThreshold;
     } catch (BasicStatisticsDatabaseException e) {
       logger.warn("Could not determine the statistics completeness threshold", e);
       return null;
@@ -280,9 +294,12 @@ public class BasicStatisticsService implements FileFetchListener {
   public void fileFetched(String path, String contentType, Instant timestamp, long from, Long to,
           HttpServletRequest request) {
     // We only care about request that fetch "video" files for now
-    if (!contentType.startsWith("video/")
-        && !contentType.startsWith(MimeTypes.HLS.toString())
-        && !contentType.startsWith(MimeTypes.DASH.toString())) {
+    // Media types are case-insensitive (RFC 2045/7231), and MimeTypes.xml declares HLS as "application/x-mpegURL"
+    // while the MimeTypes.HLS constant uses "application/X-mpegURL", so a case-sensitive comparison here would miss
+    // HLS playlist requests entirely.
+    if (!Strings.CI.startsWith(contentType, "video/")
+        && !Strings.CI.startsWith(contentType, MimeTypes.HLS.toString())
+        && !Strings.CI.startsWith(contentType, MimeTypes.DASH.toString())) {
       return;
     }
 

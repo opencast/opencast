@@ -234,12 +234,18 @@ public class StaticResourceServlet extends HttpServlet {
     }
     resp.setHeader("ETag", eTag);
 
+    String contentType = MimeTypes.getMimeType(path);
+
     if (xAccelRedirect != null) {
       resp.setHeader("X-Accel-Redirect", Paths.get(xAccelRedirect, path).toString());
+      // The actual bytes are served by the proxy from here on, so this is the only point left to record the
+      // fetch. Range requests are handled by the proxy as well, so they cannot be attributed here.
+      if (withBody) {
+        recordFileFetched(contentType, req, Instant.now(), path, 0, null);
+      }
       return;
     }
 
-    String contentType = MimeTypes.getMimeType(path);
     if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
       resp.setContentType(contentType);
     }
@@ -614,6 +620,10 @@ public class StaticResourceServlet extends HttpServlet {
       if (listener != null) {
         listener.fileFetched(path, contentType, timestamp, from, to, request);
       }
+    } catch (IllegalArgumentException e) {
+      // Expected for requests with a missing or unparseable client IP or user agent, e.g. from crawlers. Not
+      // worth a warning with a stack trace, which could otherwise be logged once per fetched file or HLS segment.
+      logger.debug("Cannot report fetched file to the file fetch listener: {}", e.getMessage());
     } catch (Exception | InternalError e) {
       logger.warn("Cannot report fetched file to the file fetch listener", e);
     }

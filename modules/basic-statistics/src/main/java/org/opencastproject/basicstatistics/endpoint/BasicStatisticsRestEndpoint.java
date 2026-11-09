@@ -94,7 +94,8 @@ import javax.ws.rs.core.Response;
     title = "Basic Statistics Service Endpoint",
     abstractText = "This service offers the endpoints for Opencasts basic statistics",
     notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+        "All paths above are relative to the REST endpoint base (something like "
+            + "http://your.server/basic-statistics)",
         "If the service is down or not working it will return a status 503, this means the the "
             + "underlying service is not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was "
@@ -113,6 +114,8 @@ public class BasicStatisticsRestEndpoint {
   /** duration): specifies the maximum allowed/expected clock skew between different devices
    * (user client, file server, Opencast). */
   private static final Duration ALLOWED_CLOCK_SKEW = Duration.ofSeconds(30);
+  /** Maximum length of an item id, matching the size of the database column it is stored in. */
+  private static final int MAX_ITEM_ID_LENGTH = 255;
 
   /** The service */
   protected BasicStatisticsService basicStatisticsService;
@@ -416,7 +419,7 @@ public class BasicStatisticsRestEndpoint {
           continue;
         }
         // Additional Validation
-        if (dto.getUa() == null) {
+        if (dto.getUa() == null || dto.getUa().isBlank()) {
           rejected.add((new RejectedEvent(index, "ua (user agent) field must be set on trusted push")));
           continue;
         }
@@ -509,6 +512,9 @@ public class BasicStatisticsRestEndpoint {
   private RejectedEvent validate(RawEvent event, int index, Instant now) {
     if (StringUtils.isBlank(event.getItemId())) {
       return new RejectedEvent(index, "Item id was not specified");
+    }
+    if (event.getItemId().length() > MAX_ITEM_ID_LENGTH) {
+      return new RejectedEvent(index, "Item id is longer than " + MAX_ITEM_ID_LENGTH + " characters");
     }
     if (event.getTimestamp().isAfter(now.plus(ALLOWED_CLOCK_SKEW))) {
       return new RejectedEvent(index, "Timestamp is too far in the future.");
