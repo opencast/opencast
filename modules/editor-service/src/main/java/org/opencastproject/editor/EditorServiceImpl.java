@@ -698,6 +698,8 @@ public class EditorServiceImpl implements EditorService {
           .flatMap(Arrays::stream)
           .distinct()
           .forEach(attachment::addTag);
+      // Force the archive tag because otherwise the thumbnail disappears once set.
+      attachment.addTag("archive");
 
       // Remove old thumbnails
       Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
