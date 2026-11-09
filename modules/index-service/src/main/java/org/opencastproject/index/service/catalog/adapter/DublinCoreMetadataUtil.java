@@ -21,6 +21,7 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -72,7 +73,7 @@ public final class DublinCoreMetadataUtil {
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, DublinCoreMetadataCollection metadata) {
     for (MetadataField field : metadata.getOutputFields().values()) {
       if (field.isUpdated() && field.isRequired() && isBlankValue(field.getValue())) {
-        throw new IllegalArgumentException(String.format(
+        throw new MetadataValidationException(field.getInputID(), String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
       }
@@ -109,13 +110,13 @@ public final class DublinCoreMetadataUtil {
    *
    * @param metadata
    *          the fields to validate
-   * @throws IllegalArgumentException
+   * @throws MetadataValidationException
    *           if a required field's value is blank
    */
   public static void validateRequiredFieldsPresent(DublinCoreMetadataCollection metadata) {
     for (MetadataField field : metadata.getOutputFields().values()) {
       if (field.isRequired() && isBlankValue(field.getValue())) {
-        throw new IllegalArgumentException(String.format(
+        throw new MetadataValidationException(field.getInputID(), String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
       }

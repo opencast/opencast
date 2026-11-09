@@ -40,7 +40,7 @@
     <hamcrest-json.version>0.2</hamcrest-json.version>
     <httpcomponents-httpclient.version>4.5.14</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
-    <jackson.version>2.22.2</jackson.version>
+    <jackson.version>2.22.4</jackson.version>
     <jackson.annotations.version>2.22</jackson.annotations.version>
     <jakarta.mail.version>1.6.8</jakarta.mail.version>
     <java.release>21</java.release>
@@ -129,9 +129,6 @@
     <module>modules/editor-service-remote</module>
     <module>modules/editor-service</module>
     <module>modules/editor</module>
-    <module>modules/elasticsearch-api</module>
-    <module>modules/elasticsearch-impl</module>
-    <module>modules/elasticsearch-index</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/engage-paella-player-8</module>
@@ -187,6 +184,9 @@
     <module>modules/oaipmh-persistence</module>
     <module>modules/oaipmh-remote</module>
     <module>modules/oaipmh</module>
+    <module>modules/opensearch-api</module>
+    <module>modules/opensearch-impl</module>
+    <module>modules/opensearch-index</module>
     <module>modules/runtime-info-openapi-ui</module>
     <module>modules/playlists</module>
     <module>modules/plugin-manager</module>
@@ -518,7 +518,7 @@
         <!-- use this to generate a code coverage report: -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.15</version>
+        <version>0.8.16</version>
         <configuration>
           <skip>${maven.test.skip}</skip>
           <output>file</output>
@@ -727,7 +727,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.21.0</version>
+          <version>3.22.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1202,7 +1202,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-reload4j</artifactId>
-        <version>2.0.16</version>
+        <version>2.0.20</version>
         <scope>test</scope>
       </dependency>
       <!-- apache commons syncing -->
@@ -1529,7 +1529,7 @@
         <!-- use this to generate a code coverage report: -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.15</version>
+        <version>0.8.16</version>
         <configuration>
           <skip>${maven.test.skip}</skip>
           <output>file</output>

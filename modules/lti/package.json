@@ -9,7 +9,7 @@
     "bootstrap": "^5.3.8",
     "i18next": "^26.4.3",
     "i18next-browser-languagedetector": "^8.2.1",
-    "query-string": "^9.5.1",
+    "query-string": "^10.0.0",
     "react": "^19.3.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.3.0",
@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "serve": "vite preview",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",

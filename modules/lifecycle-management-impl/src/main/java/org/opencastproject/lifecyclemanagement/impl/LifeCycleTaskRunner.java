@@ -22,9 +22,6 @@ package org.opencastproject.lifecyclemanagement.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
@@ -34,6 +31,9 @@ import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.Status;
 import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -95,7 +95,7 @@ public class LifeCycleTaskRunner {
   protected SecurityService securityService;
   protected OrganizationDirectoryService organizationDirectoryService;
   private IndexService indexService;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
   protected ScheduledExecutorService scheduledExecutor = null;
@@ -139,8 +139,8 @@ public class LifeCycleTaskRunner {
   }
 
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Activate
@@ -420,7 +420,7 @@ public class LifeCycleTaskRunner {
 
     final Optional<Event> event;
     try {
-      event = indexService.getEvent(mediaPackageId, elasticsearchIndex);
+      event = indexService.getEvent(mediaPackageId, opensearchIndex);
 
       if (event.isEmpty()) {
         logger.debug("Event for given id " + mediaPackageId + " does not exist. No deletion necessary.");

@@ -1,0 +1,18 @@
+The MariaDB JDBC driver has been updated to version 4 ([#8205](https://github.com/opencast/opencast/pull/8205)).
+
+This driver now defaults to `sslMode=verify-full`, which means connections to MariaDB are TLS-encrypted and the
+server certificate is verified by default. With MariaDB 11.4 or later, this works out of the box, even with the
+self-signed certificate MariaDB generates automatically. Connections will fail if your database server does not offer
+TLS or if its certificate cannot be verified (e.g. older MariaDB versions or a certificate not signed by a trusted CA).
+
+If that is the case, either fix the server's TLS configuration or set the SSL mode explicitly in the JDBC URL in
+`etc/custom.properties`:
+
+```properties
+# use TLS if the server offers it, otherwise connect unencrypted
+org.opencastproject.db.jdbc.url=jdbc:mariadb://localhost/opencast?useMysqlMetadata=true&sslMode=allow
+# use TLS without verifying the certificate
+org.opencastproject.db.jdbc.url=jdbc:mariadb://localhost/opencast?useMysqlMetadata=true&sslMode=trust
+# disable TLS (old default)
+org.opencastproject.db.jdbc.url=jdbc:mariadb://localhost/opencast?useMysqlMetadata=true&sslMode=disable
+```

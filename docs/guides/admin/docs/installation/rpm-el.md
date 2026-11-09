@@ -74,7 +74,7 @@ dnf install opensearch opensearch-plugin-analysis-icu
 After installing OpenSearch please make sure to install all necessary plugins and update the configuration.
 For details, please follow:
 
-- [Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md)
+- [Opencast OpenSearch Documentation](../configuration/searchindex/opensearch.md)
 
 
 Finally, make sure to start and enable the service:

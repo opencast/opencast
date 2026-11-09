@@ -24,11 +24,6 @@ package org.opencastproject.search.impl;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
@@ -39,6 +34,11 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
@@ -103,7 +103,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * A Elasticsearch-based {@link SearchService} implementation.
+ * A OpenSearch-based {@link SearchService} implementation.
  */
 @Component(
         immediate = true,
@@ -127,7 +127,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private final Gson gson = new Gson();
 
-  private ElasticsearchIndex esIndex;
+  private OpenSearchIndex esIndex;
 
   private SeriesService seriesService;
 
@@ -171,14 +171,14 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void createIndex() {
     var mapping = "";
-    try (var in = this.getClass().getResourceAsStream("/elasticsearch/search-mapping.json")) {
+    try (var in = this.getClass().getResourceAsStream("/opensearch/search-mapping.json")) {
       mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new SearchException("Could not read mapping.", e);
     }
     try {
       logger.debug("Trying to create index for '{}'", INDEX_NAME);
-      InputStream is = getClass().getResourceAsStream("/elasticsearch/indexSettings.json");
+      InputStream is = getClass().getResourceAsStream("/opensearch/indexSettings.json");
       String indexSettings = IOUtils.toString(is, StandardCharsets.UTF_8);
       final CreateIndexRequest request = new CreateIndexRequest(INDEX_NAME)
           .settings(indexSettings, XContentType.JSON)
@@ -199,7 +199,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   }
 
   @Reference
-  public void setEsIndex(ElasticsearchIndex esIndex) {
+  public void setEsIndex(OpenSearchIndex esIndex) {
     this.esIndex = esIndex;
   }
 
@@ -340,7 +340,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       throw new SearchException(e);
     }
 
-    // Elasticsearch series
+    // OpenSearch series
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
       AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()

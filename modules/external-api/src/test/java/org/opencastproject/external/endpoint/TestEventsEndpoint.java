@@ -30,11 +30,10 @@ import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatal
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.capture.CaptureParameters;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -45,6 +44,8 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
@@ -87,6 +88,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public static final String UNAUTHORIZED_TYPE = "unauthorizedcatalog";
   public static final String UPDATE_EVENT = "updateevent";
   public static final String METADATA_UPDATE_EVENT = "metadataupdateevent";
+  public static final String METADATA_VALIDATION_EVENT = "metadatavalidationevent";
   public static final String METADATA_GET_EVENT = "metadatagetevent";
   public static final String SCHEDULING_GET_EVENT = "schedulinggetevent";
   public static final String SCHEDULING_UPDATE_EVENT = "schedulingupdateevent";
@@ -116,10 +118,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public TestEventsEndpoint() throws Exception {
     this.endpointBaseUrl = "https://api.opencast.org";
 
-    ElasticsearchIndex elasticsearchIndex = new ElasticsearchIndex();
+    OpenSearchIndex opensearchIndex = new OpenSearchIndex();
 
     IndexService indexService = EasyMock.createMock(IndexService.class);
-    EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Optional.<Event> empty())
+    EasyMock.expect(indexService.getEvent(MISSING_ID, opensearchIndex)).andReturn(Optional.<Event> empty())
         .anyTimes();
 
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
@@ -164,7 +166,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     deleteMetadataMP.remove(deleteCatalog1);
     EasyMock.expectLastCall().anyTimes();
 
-    EasyMock.expect(indexService.getEvent(DELETE_EVENT_METADATA, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(DELETE_EVENT_METADATA, opensearchIndex))
             .andReturn(Optional.of(deleteMetadataEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(deleteMetadataEvent)).andReturn(deleteMetadataMP).anyTimes();
 
@@ -190,7 +192,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     Event noPublicationsEvent = new Event(NO_PUBLICATIONS_EVENT, defaultOrg.getId());
     MediaPackage noPublicationsMP = EasyMock.createMock(MediaPackage.class);
     EasyMock.expect(noPublicationsMP.getPublications()).andReturn(new Publication[] {}).anyTimes();
-    EasyMock.expect(indexService.getEvent(NO_PUBLICATIONS_EVENT, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(NO_PUBLICATIONS_EVENT, opensearchIndex))
             .andReturn(Optional.of(noPublicationsEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(noPublicationsEvent)).andReturn(noPublicationsMP).anyTimes();
     // Two Pubs
@@ -206,7 +208,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
             MimeType.mimeType("not", "used"));
     EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { paellaPublication, oaipmh })
             .anyTimes();
-    EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, opensearchIndex))
             .andReturn(Optional.of(twoPublicationsEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(twoPublicationsEvent)).andReturn(twoPublicationsMP).anyTimes();
 
@@ -215,10 +217,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
      */
     capturedMetadataList1 = Capture.newInstance();
     Event updateEvent = new Event(UPDATE_EVENT, defaultOrg.getId());
-    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEvent))
+    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, opensearchIndex)).andReturn(Optional.of(updateEvent))
         .anyTimes();
     EasyMock.expect(indexService.updateEventMetadata(eq(UPDATE_EVENT), capture(capturedMetadataList1),
-        eq(elasticsearchIndex))).andReturn(null).anyTimes();
+        eq(opensearchIndex))).andReturn(null).anyTimes();
 
     /**
      * Update event metadata external service mocking
@@ -226,11 +228,26 @@ public class TestEventsEndpoint extends EventsEndpoint {
     capturedMetadataList2 = Capture.newInstance();
     Event updateEventMetadata = new Event(METADATA_UPDATE_EVENT, defaultOrg.getId());
     updateEventMetadata.setRecordingStartDate("2017-08-29T00:05:00.000Z");
-    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, opensearchIndex))
         .andReturn(Optional.of(updateEventMetadata)).anyTimes();
     EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_UPDATE_EVENT), capture(capturedMetadataList2),
-        eq(elasticsearchIndex))).andReturn(null).anyTimes();
+        eq(opensearchIndex))).andReturn(null).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
+
+    /**
+     * Update event metadata failing validation while storing the catalog. The offending field is 'title', so a request
+     * updating the title is the client's fault while any other request hits a title which was already empty in the
+     * stored catalog.
+     */
+    Event metadataValidationEvent = new Event(METADATA_VALIDATION_EVENT, defaultOrg.getId());
+    metadataValidationEvent.setRecordingStartDate("2017-08-29T00:05:00.000Z");
+    EasyMock.expect(indexService.getEvent(METADATA_VALIDATION_EVENT, opensearchIndex))
+        .andReturn(Optional.of(metadataValidationEvent)).anyTimes();
+    EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_VALIDATION_EVENT),
+        EasyMock.anyObject(MetadataList.class), eq(opensearchIndex)))
+        .andThrow(new MetadataValidationException("title", "The event metadata field with id 'title' and the "
+            + "metadata type 'TEXT' is required and can not be empty!.")).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(metadataValidationEvent)).andReturn(null).anyTimes();
 
     /**
      * Update event track data
@@ -244,7 +261,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
     MediaPackage mpUpdated = builder.loadFromXml(uriMPUpdated.toURL().openStream());
 
-    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, opensearchIndex))
         .andReturn(Optional.of(updateEventTrack)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventTrack)).andReturn(mp).anyTimes();
     EasyMock.expect(ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
@@ -260,7 +277,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
      */
     Event getEvent = new Event(METADATA_GET_EVENT, defaultOrg.getId());
     getEvent.setRecordingStartDate("2017-08-29T00:05:00.000Z");
-    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, elasticsearchIndex)).andReturn(Optional.of(getEvent))
+    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, opensearchIndex)).andReturn(Optional.of(getEvent))
         .anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(getEvent)).andReturn(null).anyTimes();
 
@@ -282,7 +299,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     capturedAgentId = Capture.newInstance();
     capturedAgentConfig = Capture.newInstance();
     Event updateEventScheduling = new Event(SCHEDULING_UPDATE_EVENT, defaultOrg.getId());
-    EasyMock.expect(indexService.getEvent(SCHEDULING_UPDATE_EVENT, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(SCHEDULING_UPDATE_EVENT, opensearchIndex))
         .andReturn(Optional.of(updateEventScheduling)).anyTimes();
     EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_UPDATE_EVENT))
         .andReturn(technicalMetadata1).anyTimes();
@@ -313,7 +330,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1,default2"),
         Optional.empty()
     );
-    EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, elasticsearchIndex))
+    EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, opensearchIndex))
         .andReturn(Optional.of(getEventScheduling)).anyTimes();
     EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_GET_EVENT))
         .andReturn(technicalMetadata2).anyTimes();
@@ -323,7 +340,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService,
         noPublicationsMP, twoPublicationsMP);
 
-    setElasticsearchIndex(elasticsearchIndex);
+    setOpenSearchIndex(opensearchIndex);
     setIndexService(indexService);
     setSchedulerService(schedulerService);
     setIngestService(ingestService);

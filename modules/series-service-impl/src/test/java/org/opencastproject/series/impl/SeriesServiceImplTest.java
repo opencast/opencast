@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -36,6 +35,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -113,7 +113,7 @@ public class SeriesServiceImplTest {
 
     root = Paths.get("target", Long.toString(currentTime)).toString();
 
-    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex esIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
 
     EasyMock.expect(esIndex.addOrUpdateSeries(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
@@ -123,7 +123,7 @@ public class SeriesServiceImplTest {
     seriesService = new SeriesServiceImpl();
     seriesService.setPersistence(seriesDatabase);
     seriesService.setSecurityService(securityService);
-    seriesService.setElasticsearchIndex(esIndex);
+    seriesService.setOpenSearchIndex(esIndex);
     seriesService.addMessageHandler(EasyMock.createNiceMock(SeriesUpdateHandler.class));
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);

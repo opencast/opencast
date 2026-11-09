@@ -27,7 +27,7 @@ Because of this, rebuilding the index from Opencast's own database is the recomm
 it sidesteps all Lucene segment-version concerns entirely:
 
 1. Install a fresh OpenSearch 3.x node.
-2. Point Opencast's `org.opencastproject.elasticsearch.*` configuration keys at the new node.
+2. Point Opencast's `org.opencastproject.opensearch.*` configuration keys at the new node.
 3. Restart Opencast. Since the new node has no index yet, Opencast will create an empty one automatically.
 4. Trigger a full index rebuild with an authenticated `POST` request to `/index/rebuild` on the admin node. This
    repopulates the index from the database and other backing services (series, scheduler, asset manager, comments,
