@@ -118,7 +118,6 @@
             <ignoredUnusedDeclaredDependencies>org.apache.commons:com.springsource.org.apache.commons.logging</ignoredUnusedDeclaredDependencies>
           </ignoredUsedUndeclaredDependencies>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependencies>org.springframework:spring-core</ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependencies>com.google.crypto.tink:tink</ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependencies>commons-logging:commons-logging</ignoredUnusedDeclaredDependencies>
           </ignoredUnusedDeclaredDependencies>

@@ -113,7 +113,6 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- runtime tests -->
-            <ignoredUnusedDeclaredDependency>com.sun.jersey:jersey-bundle</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.component</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
