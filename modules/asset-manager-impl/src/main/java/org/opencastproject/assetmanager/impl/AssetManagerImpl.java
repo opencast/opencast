@@ -60,8 +60,6 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-<<<<<<< HEAD
-=======
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
@@ -72,7 +70,6 @@ import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.opensearch.index.rebuild.IndexRebuildService.DataType;
 import org.opencastproject.security.api.AccessControlEntry;
->>>>>>> develop
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AuthorizationService;
