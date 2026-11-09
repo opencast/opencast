@@ -118,6 +118,14 @@ operations:
       - target-tags: preview
       - copy: false
 
+  - id: tag
+    # Adding this tags the */video+preview so that thumbnails work in direct-to-editor workflows
+    description: Tagging video preview media package elements
+    configurations:
+      - source-flavors: '*/video+preview,'
+      - target-tags: preview
+      - copy: false
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Silence detection
 
