@@ -348,7 +348,7 @@ public class EditorServiceImpl implements EditorService {
         Objects.toString(properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
     logger.debug("Chapter flavor set to '{}'", chapterFlavor);
 
-    thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
+    thumbnailSubType = Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
     logger.debug("Thumbnail subtype set to '{}'", thumbnailSubType);
 
     thumbnailWfProperty = Objects.toString(properties.get(OPT_THUMBNAIL_WF_PROPERTY), DEFAULT_THUMBNAIL_WF_PROPERTY);
