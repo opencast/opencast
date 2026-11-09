@@ -873,11 +873,11 @@
     <property name="jwksTimeToLive" value="3600000" />
   </bean>
 
-  <!-- Spring 5: LDAP has not been tested! -->
-
   <!-- ################ -->
   <!-- # LDAP Support # -->
   <!-- ################ -->
+
+  <!-- See https://docs.opencast.org/develop/admin/#configuration/security.ldap/ -->
 
   <!--
   <bean id="contextSource"
