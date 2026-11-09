@@ -133,11 +133,6 @@
       <version>${lucene.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.carrotsearch</groupId>
-      <artifactId>hppc</artifactId>
-      <version>0.8.1</version>
-    </dependency>
-    <dependency>
       <groupId>org.reactivestreams</groupId>
       <artifactId>reactive-streams</artifactId>
       <version>1.0.4</version>
@@ -213,7 +208,6 @@
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queries</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-reactive</ignoredUnusedDeclaredDependency>
@@ -297,7 +291,6 @@
               reactor-core,
               reactive-streams,
               snakeyaml-engine,
-              hppc,
               lucene-core,
               lucene-join,
               lucene-queryparser,
