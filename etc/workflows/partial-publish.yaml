@@ -51,6 +51,7 @@ operations:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Encode to engage search result thumbnails
   - id: image
+    if: (NOT ${presentation/thumbnail_edited}) AND (NOT ${presentation_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Creating search result default thumbnails
     configurations:
