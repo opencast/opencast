@@ -69,7 +69,6 @@ import org.opencastproject.opensearch.index.rebuild.IndexProducer;
 import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.opensearch.index.rebuild.IndexRebuildService.DataType;
-import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AuthorizationService;
