@@ -1,10 +1,20 @@
 name: PRs » Merge conflict check
 on:
   push:
+    branches:
+      - develop
+      - 'r/*'
   pull_request_target:
     types:
       - opened
       - synchronize
+
+# The action checks all open pull requests on every run. Concurrent runs each
+# work with their own snapshot of the labels and may comment on the same pull
+# request twice, so make sure only one run is active at a time.
+concurrency:
+  group: merge-conflict-check
+  cancel-in-progress: false
 
 jobs:
   check-conflicts:
