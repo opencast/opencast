@@ -744,8 +744,10 @@ public class AgentImpl implements Agent {
       try {
         configurationProperties.load(new StringReader(this.configurationString));
         this.setConfiguration(configurationProperties);
+      } catch (IllegalArgumentException e) {
+        log.warn("Illegal argument exception when loading {}'s capabilities", name, e);
       } catch (IOException e) {
-        log.warn("Unable to load agent " + name + "'s capabilities, IO exception occurred.", e);
+        log.warn("Unable to load agent {}'s capabilities, IO exception occurred.", name, e);
       }
     }
   }
