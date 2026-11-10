@@ -9,6 +9,8 @@ Parameter      | Example    | Description
 **time**       | `10m20s`   | Seeks initially automatically to a specified time
 **trimming**   | `1m2s;10m` | Apply a soft trimming to the video
 **logLevel**   | `DEBUG`    | Configure the logging system to show only the log messages at or above a certain level
+**jwt**        | `eyJ...`   | JWT granting access to the event, for embedding the player
+**jwtRefresh** | `true`     | Ask the embedding page for new JWTs when needed
 
 
 id
@@ -68,6 +70,20 @@ Possible values
 * `VERBOSE`
 
 Default value: defined in `config.json` file
+
+
+jwt
+---
+A JWT that grants access to the event. This is used by external applications (e.g. an LMS) that embed the player.
+See [Embedding with JWT](jwt.md).
+
+
+jwtRefresh
+----------
+If `true`, the player asks the embedding page for new JWTs when needed, e.g. because the one passed via `jwt`
+expired. This only works if the player is embedded in an iframe. See [Embedding with JWT](jwt.md#refreshing-jwts).
+
+Default value: `false`
 
 
 Example
