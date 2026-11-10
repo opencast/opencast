@@ -34,6 +34,7 @@ import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
+import org.opencastproject.assetmanager.util.AssetStoreDirectory;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
 import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.mediapackage.identifier.Id;
@@ -147,7 +148,7 @@ public final class WorkspaceImpl implements Workspace {
   private boolean waitForResourceFlag = false;
 
   /** the asset manager directory if locally available */
-  private List<String> assetManagerPaths = null;
+  private List<AssetStoreDirectory> assetManagerPaths = null;
 
   /** the download url and directory if locally available */
   private String downloadUrl = null;
