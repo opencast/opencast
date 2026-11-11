@@ -23,7 +23,6 @@ package org.opencastproject.util.doc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,19 +35,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tests that the FreeMarker configuration used by {@link DocUtil} is safe for templates whose content
- * is influenced by user-controlled values. Workflow properties are substituted into operation
- * configuration values before those values are rendered as FreeMarker templates, so the engine must
- * never allow template content to instantiate classes, access the Java API or load other templates,
- * and template errors must not leak the template or the data into the rendered output or into
- * thrown exceptions (whose stack traces are stored in incident details).
+ * Tests that the FreeMarker configuration used by {@link DocUtil} is safe for templates whose content or data
+ * is influenced by user-controlled values (e.g. operation configuration values and workflow properties). The
+ * engine must never allow template content to instantiate classes, access the Java API or load other
+ * templates, and template errors must not leak the template or the data into the thrown exception (whose
+ * stack trace is stored in incident details).
  */
 public class DocUtilTest {
 
   /**
    * @param entries
    *          key/value pairs
-   * @return a data model (never empty: an empty model makes DocUtil return the template unprocessed)
+   * @return a data model
    */
   private static Map<String, Object> data(String... entries) {
     Map<String, Object> data = new HashMap<>();
@@ -61,6 +59,20 @@ public class DocUtilTest {
   @Test
   public void interpolatesData() {
     assertEquals("Hello World!", DocUtil.processTextTemplate("test", "Hello ${name}!", data("name", "World")));
+  }
+
+  @Test
+  public void emptyDataModelDoesNotReturnTheTemplateUnprocessed() {
+    // Static templates are rendered with an empty (or null) data model, and templates referencing
+    // missing variables fail instead of passing through unrendered
+    assertEquals("static text", DocUtil.processTextTemplate("test", "static text", new HashMap<>()));
+    assertEquals("static text", DocUtil.processTextTemplate("test", "static text", null));
+    try {
+      DocUtil.processTextTemplate("test", "${missing}", new HashMap<>());
+      fail("Expected a RuntimeException for a template that references a missing variable");
+    } catch (RuntimeException e) {
+      // expected
+    }
   }
 
   @Test
@@ -86,11 +98,18 @@ public class DocUtilTest {
               marker.toAbsolutePath().toString().matches(".*\\s.*"));
       String command = "touch " + marker.toAbsolutePath();
       String payload = "${\"freemarker.template.utility.Execute\"?new()(" + freeMarkerString(command) + ")}";
-      String result = DocUtil.processTextTemplate("test", payload, data("name", "value"));
-      assertTrue("Template errors must produce the generic error result, got: " + result,
-              result.startsWith("ERROR::"));
-      assertFalse("The template must not be able to instantiate classes (e.g. to execute commands)",
-              Files.exists(marker));
+      try {
+        DocUtil.processTextTemplate("test", payload, data("name", "value"));
+        fail("Expected a RuntimeException: class instantiation must be blocked");
+      } catch (RuntimeException e) {
+        // Assert on the full stack trace including the cause chain: incident details store it,
+        // so the template must not leak through a cause either
+        String stackTrace = ExceptionUtils.getStackTrace(e);
+        assertFalse("The template source must not leak into the exception or its cause chain, got: " + stackTrace,
+                stackTrace.contains(command));
+        assertFalse("The template must not be able to instantiate classes (e.g. to execute commands)",
+                Files.exists(marker));
+      }
     } finally {
       Files.deleteIfExists(marker);
     }
@@ -98,27 +117,45 @@ public class DocUtilTest {
 
   @Test
   public void cannotAccessTheApi() {
-    // With the API built-in disabled, ?api fails while the template is processed
-    String result = DocUtil.processTextTemplate("test", "${name?api}", data("name", "value"));
-    assertTrue("The ?api built-in must be disabled, got: " + result, result.startsWith("ERROR::"));
+    // With the API built-in disabled, ?api fails while the template is processed; if it were enabled,
+    // the template would render the object's string representation instead
+    try {
+      DocUtil.processTextTemplate("test", "${name?api}", data("name", "value"));
+      fail("Expected a RuntimeException: the ?api built-in must be disabled");
+    } catch (RuntimeException e) {
+      // expected
+    }
   }
 
   @Test
   public void cannotIncludeTemplates() {
-    String result = DocUtil.processTextTemplate("test", "<#include \"/etc/passwd\">", data("name", "value"));
-    assertTrue("#include must fail without a template loader, got: " + result, result.startsWith("ERROR::"));
-    assertFalse(result.contains("root:"));
+    try {
+      DocUtil.processTextTemplate("test", "<#include \"/etc/passwd\">", data("name", "value"));
+      fail("Expected a RuntimeException: #include must fail without a template loader");
+    } catch (RuntimeException e) {
+      // The include fails before any file is read; make sure that nothing of the file leaked anyway
+      String stackTrace = ExceptionUtils.getStackTrace(e);
+      assertFalse("The included file's content must not leak into the exception, got: " + stackTrace,
+              stackTrace.contains("root:"));
+    }
   }
 
   @Test
-  public void errorResultDoesNotLeakTemplateOrData() {
-    String result = DocUtil.processTextTemplate("test",
-            "${\"freemarker.template.utility.Execute\"?new()(\"id\")}",
-            data("name", "value", "secret", "super-secret-value"));
-    assertTrue(result.startsWith("ERROR::"));
-    assertFalse("The data model must not leak into the error result", result.contains("super-secret-value"));
-    assertFalse("The template source must not leak into the error result",
-            result.contains("freemarker.template.utility.Execute"));
+  public void processErrorDoesNotLeakTemplateOrData() {
+    try {
+      DocUtil.processTextTemplate("test",
+              "${\"freemarker.template.utility.Execute\"?new()(\"id\")}",
+              data("name", "value", "secret", "super-secret-value"));
+      fail("Expected a RuntimeException");
+    } catch (RuntimeException e) {
+      // Assert on the full stack trace including the cause chain: incident details store it,
+      // so the template and the data must not leak through a cause either
+      String stackTrace = ExceptionUtils.getStackTrace(e);
+      assertFalse("The data model must not leak into the exception or its cause chain",
+              stackTrace.contains("super-secret-value"));
+      assertFalse("The template source must not leak into the exception or its cause chain",
+              stackTrace.contains("freemarker.template.utility.Execute"));
+    }
   }
 
   @Test

@@ -95,6 +95,12 @@ public final class DocUtil {
    *          key =&gt; value (String =&gt; Object)<br>
    *          "username" =&gt; "aaronz"<br>
    * @return the processed template
+   * @throws IllegalArgumentException
+   *           if the input is invalid in some way
+   * @throws IllegalStateException
+   *           if the freemarker configuration is not initialized
+   * @throws RuntimeException
+   *           if the template is invalid or fails while being processed
    */
   public static String processTextTemplate(String templateName, String textTemplate, Map<String, Object> data) {
     if (freemarkerConfig == null) {
@@ -103,9 +109,6 @@ public final class DocUtil {
     if (StringUtils.isEmpty(templateName)) {
       throw new IllegalArgumentException("The templateName cannot be null or empty string, "
               + "please specify a key name to use when processing this template (can be anything moderately unique)");
-    }
-    if (data == null || data.size() == 0) {
-      return textTemplate;
     }
     if (StringUtils.isEmpty(textTemplate)) {
       throw new IllegalArgumentException("The textTemplate cannot be null or empty string, "
@@ -130,23 +133,22 @@ public final class DocUtil {
     }
 
     // process the template
-    String result;
+    Writer output = new StringWriter();
     try {
-      Writer output = new StringWriter();
       template.process(data, output);
-      result = output.toString();
-      logger.debug("Generated complete document ({} chars) from template ({})", result.length(), templateName);
     } catch (TemplateException e) {
-      // Do not include the template or the data in the result: the template may contain user-controlled
-      // input and the data may contain sensitive values, and both would leak into the rendered output
+      // Do not include the template or the data in the exception or in its cause: the template may contain
+      // user-controlled input and the data may contain sensitive values, and both the message and the cause
+      // chain surface in incident details. Both are already logged.
       logger.error("Failed while processing the Doc template ({}), template: {}", templateName, textTemplate, e);
       logger.debug("Data model of the failed Doc template ({}): {}", templateName, data);
-      result = "ERROR:: Failed while processing the template (" + templateName + ")";
+      throw new RuntimeException("Failed while processing the template (" + templateName + ")");
     } catch (IOException e) {
       throw new RuntimeException("Failure while sending freemarker output to stream", e);
     }
-
-    return result;
+    String outputText = output.toString();
+    logger.debug("Generated complete document ({} chars) from template ({})", outputText.length(), templateName);
+    return outputText;
   }
 
   /**
