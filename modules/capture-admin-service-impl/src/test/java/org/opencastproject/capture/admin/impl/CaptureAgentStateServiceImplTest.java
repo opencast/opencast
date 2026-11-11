@@ -36,6 +36,7 @@ import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
@@ -511,5 +512,35 @@ public class CaptureAgentStateServiceImplTest {
 
     assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
     assertTrue(time - agent.getLastHeardFrom() <= 5);
+  }
+
+  @Test
+  public void testAgentInOtherOrganizationStateTimeout() throws Exception {
+    service.setupAgentCache(1, TimeUnit.SECONDS);
+    String name = "agent-in-other-org";
+    String otherOrgId = "other_org";
+
+    // Register the agent while "logged in" to a different organization than the one whose thread will later
+    // happen to process the cache eviction below.
+    SecurityService defaultOrgSecurityService = service.securityService;
+    JaxbOrganization otherOrg = new JaxbOrganization(otherOrgId);
+    User otherOrgUser = new JaxbUser("testuser", "test", otherOrg,
+            new HashSet<>(Set.of(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, otherOrg, ""))));
+    SecurityService otherOrgSecurityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(otherOrgSecurityService.getUser()).andReturn(otherOrgUser).anyTimes();
+    EasyMock.expect(otherOrgSecurityService.getOrganization()).andReturn(otherOrg).anyTimes();
+    EasyMock.replay(otherOrgSecurityService);
+
+    service.setSecurityService(otherOrgSecurityService);
+    service.setAgentState(name, IDLE);
+
+    // Eviction is processed lazily, on whichever thread happens to touch the cache next; here, that is back on
+    // the default organization, not the one the agent above was registered in.
+    service.setSecurityService(defaultOrgSecurityService);
+
+    Thread.sleep(1500);
+    service.getKnownAgents();
+
+    assertEquals(OFFLINE, service.getAgent(name, otherOrgId).getState());
   }
 }

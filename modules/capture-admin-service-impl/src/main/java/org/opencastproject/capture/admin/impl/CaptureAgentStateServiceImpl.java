@@ -593,9 +593,10 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       @Override
       public void onRemoval(RemovalNotification<String, Object> removal) {
         if (RemovalCause.EXPIRED.equals(removal.getCause())) {
-          String org = securityService.getOrganization().getId();
           try {
-            String agentName = removal.getKey().split(DELIMITER)[0];
+            String[] key = removal.getKey().split(DELIMITER);
+            String agentName = key[0];
+            String org = key[1];
             AgentImpl agent = getAgent(agentName, org);
             if (!ignoredStates.contains(agent.getState())) {
               agent.setState(AgentState.OFFLINE);
