@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -97,6 +98,13 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     logger.debug("Activating email workflow operation handler");
+  }
+
+  @Override
+  public Set<String> getTemplatedConfigurationKeys() {
+    // The template file names are not included: their values are lookups in the email template repository,
+    // not template content
+    return Set.of(TO_PROPERTY, CC_PROPERTY, BCC_PROPERTY, SUBJECT_PROPERTY, BODY_PROPERTY, BODY_HTML_PROPERTY);
   }
 
   /**
@@ -208,12 +216,12 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
-      String configName) {
+      String configName) throws WorkflowOperationException {
     return applyTemplateIfNecessary(workflowInstance, operation, configName, null);
   }
 
   private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
-          String configName, String separator) {
+          String configName, String separator) throws WorkflowOperationException {
     String configValue = operation.getConfiguration(configName);
 
     // Templates are cached, use as template name: the template name or, if
@@ -238,10 +246,14 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     // Apply the template
-    if (separator == null) {
-      return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance);
+    try {
+      if (separator == null) {
+        return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance);
+      }
+      return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance, separator);
+    } catch (RuntimeException e) {
+      throw new WorkflowOperationException("Failed to render the '" + configName + "' option", e);
     }
-    return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance, separator);
   }
 
   /**

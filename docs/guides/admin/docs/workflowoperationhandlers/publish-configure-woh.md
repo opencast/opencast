@@ -68,11 +68,17 @@ The organization properties are also available and can be accessed with the `org
 eg. `${org_player}` will be replaced by the value of the organization property named `player`.
 
 Note some organization properties contain an `.` (period) in their name (e.g. `org.opencastproject.external.api.url`).
-As this character have an special meaning in the FreeMarker library (used for substitution), all occurrences are replaced
-with `_` (underscore).
+Such properties can be referenced with the dot, eg. `${org_org.opencastproject.external.api.url}`, or in a flattened
+form with underscores instead of dots, eg. `${org_org_opencastproject_external_api_url}`. If one property name is a
+dot prefix of another property's name (e.g. `player` and `player.mobile`, or `a.b` and `a.b.c`), only one of the two
+has a dotted form; use the flattened form for both, which always works.
 
 Additional to the organization properties you can use `org_id`, `org_name`, `org_admin_role` and
 `org_anonymous_role` as well.
+
+Workflow properties are also available under their property name. The `url-pattern` is evaluated as a FreeMarker
+template, so the `${name:default}` form is not supported; use `${name!'default'}` instead. If a variable is missing,
+the operation fails.
 
 
 Publication Channel Labels and Icons

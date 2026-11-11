@@ -27,9 +27,12 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.util.doc.DocUtil;
+import org.opencastproject.util.doc.OrganizationTemplateData;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -47,10 +50,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -72,6 +75,8 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
 
   private TranscriptionService service = null;
 
+  private SecurityService securityService = null;
+
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
@@ -91,11 +96,22 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   }
 
   @Override
+  public Set<String> getTemplatedConfigurationKeys() {
+    return Set.of(TARGET_FLAVOR, TARGET_TAGS, TARGET_TAG);
+  }
+
+  @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    Map<String, Object> wfProps = Collections.unmodifiableMap(workflowInstance.getConfigurations());
+    // The template data: organization properties first, so that workflow properties take precedence over an
+    // organization property with the same name, matching the workflow service's variable resolution
+    Map<String, Object> wfProps = new HashMap<>();
+    Organization organization = securityService != null ? securityService.getOrganization() : null;
+    OrganizationTemplateData.addOrganizationProperties(wfProps,
+        organization != null ? organization.getProperties() : null);
+    workflowInstance.getConfigurations().forEach(wfProps::put);
 
     logger.debug("Attach transcription for media package '{}' started.", mediaPackage.getIdentifier());
 
@@ -104,21 +120,38 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing.");
     }
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
-    ConfiguredTagsAndFlavors.TargetTags targetTagOption = tagsAndFlavors.getTargetTags();
+    // Render the templated configuration values into local variables before parsing them: the rendered values
+    // must not be written back to the operation, since the workflow is persisted after the operation runs and a
+    // retry would then render them again, evaluating property values as template source
+    Map<String, String> rendered = new HashMap<>();
+    for (String key : getTemplatedConfigurationKeys()) {
+      String template = operation.getConfiguration(key);
+      if (StringUtils.isNotEmpty(template)) {
+        try {
+          rendered.put(key, DocUtil.processTextTemplate("Replacing variables in " + key, template, wfProps));
+        } catch (RuntimeException e) {
+          throw new WorkflowOperationException("Failed to render the '" + key + "' option", e);
+        }
+      }
+    }
+
+    String targetFlavorValue = StringUtils.trimToNull(rendered.get(TARGET_FLAVOR));
+    if (targetFlavorValue == null) {
+      throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVOR + "' must be set");
+    }
     MediaPackageElementFlavor targetFlavor;
     try {
-
-      targetFlavor = MediaPackageElementFlavor.parseFlavor(DocUtil.processTextTemplate(
-          "Replacing variables in target-flavor",
-          operation.getConfiguration(TARGET_FLAVOR), // we can't use tagsAndFlavors.getSingleTargetFlavor() here
-                                                     // because the flavor will be all lower case
-                                                     // and templating may not work due to keys mismatch
-          wfProps));
-    } catch (IllegalStateException ex) {
-      throw new WorkflowOperationException(TARGET_FLAVOR + " option not set or used correctly.", ex);
+      targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorValue);
+    } catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException(targetFlavorValue + " is not a valid flavor!");
     }
+
+    List<String> targetTagList = asList(rendered.get(TARGET_TAGS));
+    String targetTag = StringUtils.trimToNull(rendered.get(TARGET_TAG));
+    if (targetTagList.isEmpty() && targetTag != null) {
+      targetTagList.add(targetTag);
+    }
+    ConfiguredTagsAndFlavors.TargetTags targetTagOption = parseTargetTagsByType(targetTagList);
 
     String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
     MediaPackageElement.Type type = null;
@@ -143,29 +176,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
       transcription.setFlavor(targetFlavor);
 
-      List<String> overrideTags = new ArrayList<>();
-      List<String> addTags = new ArrayList<>();
-      List<String> removeTags = new ArrayList<>();
-      for (String tag : targetTagOption.getOverrideTags()) {
-        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
-        if (StringUtils.isNotEmpty(templatedTag)) {
-          overrideTags.add(templatedTag);
-        }
-      }
-      for (String tag : targetTagOption.getAddTags()) {
-        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
-        if (StringUtils.isNotEmpty(templatedTag)) {
-          addTags.add(templatedTag);
-        }
-      }
-      for (String tag : targetTagOption.getRemoveTags()) {
-        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
-        if (StringUtils.isNotEmpty(templatedTag)) {
-          removeTags.add(templatedTag);
-        }
-      }
-      applyTargetTagsToElement(new ConfiguredTagsAndFlavors.TargetTags(overrideTags, addTags, removeTags),
-          transcription);
+      applyTargetTagsToElement(targetTagOption, transcription);
 
       mediaPackage.add(transcription);
       logger.info("Added transcription to the media package {}: {}",
@@ -181,6 +192,11 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   @Reference(target = "(provider=microsoft.azure)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   @Reference

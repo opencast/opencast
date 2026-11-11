@@ -23,6 +23,8 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.job.api.JobContext;
 
+import java.util.Set;
+
 /**
  * Handler for workflow operations.
  */
@@ -86,5 +88,19 @@ public interface WorkflowOperationHandler {
    *           If the workflow operation fails to clean up properly.
    */
   void destroy(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException;
+
+  /**
+   * Returns the operation configuration keys whose values are FreeMarker templates that this handler renders itself,
+   * using the workflow properties as template data. The workflow service does not substitute workflow properties into
+   * the values of these keys before the handler runs, so that a substituted value is not evaluated as template source
+   * a second time.
+   *
+   * @return the set of operation configuration keys whose values are templates rendered by this handler.
+   *         Implementations must not return {@code null}; the workflow service treats a returned
+   *         {@code null} as an empty set
+   */
+  default Set<String> getTemplatedConfigurationKeys() {
+    return Set.of();
+  }
 
 }

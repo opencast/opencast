@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -180,7 +181,17 @@ final class WorkflowOperationWorker {
     operation.setExecutionCondition(executionCondition);
     operation.setDescription(WorkflowConditionInterpreter.replaceVariables(
         operation.getDescription(), variables, null, false));
+    final Set<String> declaredTemplatedConfigurations =
+        handler != null ? handler.getTemplatedConfigurationKeys() : null;
+    final Set<String> templatedConfigurations = declaredTemplatedConfigurations != null
+        ? declaredTemplatedConfigurations : Set.of();
     for (var cfg: operation.getConfigurations().entrySet()) {
+      // The values of templated configuration keys are rendered by the handler itself, using the workflow
+      // properties as template data. Substituting them here would make the substituted value be parsed as
+      // template source a second time
+      if (templatedConfigurations.contains(cfg.getKey())) {
+        continue;
+      }
       var value = WorkflowConditionInterpreter.replaceVariables(
           cfg.getValue(), variables, null, false);
       operation.setConfiguration(cfg.getKey(), value);
