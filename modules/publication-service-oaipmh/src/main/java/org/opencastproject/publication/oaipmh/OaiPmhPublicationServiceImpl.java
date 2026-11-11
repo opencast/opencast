@@ -482,10 +482,15 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       // publish to oai-pmh
       oaiPmhDatabase.store(oaiPmhDistMp, repository);
 
-      return Arrays.stream(mediaPackage.getPublications())
+      final Optional<Publication> existingPublication = Arrays.stream(mediaPackage.getPublications())
           .filter(p -> channel.equals(p.getChannel()))
-          .findFirst()
-          .orElse(createPublicationElement(mpId, repository));
+          .findFirst();
+      // Not Optional#orElse: createPublicationElement throws, so it must not be evaluated unless it is the
+      // value actually returned.
+      if (existingPublication.isPresent()) {
+        return existingPublication.get();
+      }
+      return createPublicationElement(mpId, repository);
     } catch (OaiPmhDatabaseException e) {
       throw new PublicationException(format("Unable to update media package %s in OAI-PMH repository %s", mpId,
           repository), e);
