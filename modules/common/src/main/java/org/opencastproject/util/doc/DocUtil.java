@@ -34,8 +34,9 @@ import java.io.Writer;
 import java.util.Map;
 
 import freemarker.core.ParseException;
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.DefaultObjectWrapperBuilder;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -63,8 +64,16 @@ public final class DocUtil {
   public static void reset() {
     freemarkerConfig = null;
     // static initializer
-    freemarkerConfig = new Configuration();
-    freemarkerConfig.setObjectWrapper(new DefaultObjectWrapper());
+    // The rendered templates may contain user-controlled values (workflow properties are substituted
+    // into operation configuration values before rendering), so the engine must never allow them to
+    // instantiate classes (?new), access the Java API (?api) or load other templates (#include/#import)
+    freemarkerConfig = new Configuration(Configuration.VERSION_2_3_0);
+    freemarkerConfig.setObjectWrapper(new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_0).build());
+    freemarkerConfig.setNewBuiltinClassResolver(TemplateClassResolver.ALLOWS_NOTHING_RESOLVER);
+    freemarkerConfig.setAPIBuiltinEnabled(false);
+    freemarkerConfig.setTemplateLoader(null);
+    // DocUtil logs template failures itself; do not let the engine log them as well
+    freemarkerConfig.setLogTemplateExceptions(false);
     freemarkerConfig.clearTemplateCache();
     logger.debug("Created new freemarker template processor for DocUtils");
   }
@@ -108,10 +117,14 @@ public final class DocUtil {
     try {
       template = new Template(templateName, new StringReader(textTemplate), freemarkerConfig);
     } catch (ParseException e) {
-      String msg = "Failure while parsing the Doc template (" + templateName + "), template is invalid: " + e
-              + " :: template=" + textTemplate;
-      logger.error(msg);
-      throw new RuntimeException(msg, e);
+      // Do not include the template in the exception or in its cause: the template may contain
+      // user-controlled input, and both the message and the cause chain surface in incident details.
+      // The exception with the template is already logged above.
+      logger.error("Failure while parsing the Doc template ({}), template is invalid: {} :: template={}",
+              templateName, e, textTemplate);
+      // The line and column are safe to include: they are numbers, not user-controlled content
+      throw new RuntimeException("Failure while parsing the Doc template (" + templateName
+              + "), template is invalid (line " + e.getLineNumber() + ", column " + e.getColumnNumber() + ")");
     } catch (IOException e) {
       throw new RuntimeException("Failure while creating freemarker template", e);
     }
@@ -124,9 +137,11 @@ public final class DocUtil {
       result = output.toString();
       logger.debug("Generated complete document ({} chars) from template ({})", result.length(), templateName);
     } catch (TemplateException e) {
-      logger.error("Failed while processing the Doc template ({})", templateName, e);
-      result = "ERROR:: Failed while processing the template (" + templateName + "): " + e + "\n Template: "
-              + textTemplate + "\n Data: " + data;
+      // Do not include the template or the data in the result: the template may contain user-controlled
+      // input and the data may contain sensitive values, and both would leak into the rendered output
+      logger.error("Failed while processing the Doc template ({}), template: {}", templateName, textTemplate, e);
+      logger.debug("Data model of the failed Doc template ({}): {}", templateName, data);
+      result = "ERROR:: Failed while processing the template (" + templateName + ")";
     } catch (IOException e) {
       throw new RuntimeException("Failure while sending freemarker output to stream", e);
     }
