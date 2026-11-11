@@ -593,17 +593,19 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       @Override
       public void onRemoval(RemovalNotification<String, Object> removal) {
         if (RemovalCause.EXPIRED.equals(removal.getCause())) {
-          String org = securityService.getOrganization().getId();
+          String[] key = removal.getKey().split(DELIMITER);
+          String agentName = key[0];
+          String org = key[1];
           try {
-            String agentName = removal.getKey().split(DELIMITER)[0];
             AgentImpl agent = getAgent(agentName, org);
             if (!ignoredStates.contains(agent.getState())) {
               agent.setState(AgentState.OFFLINE);
               updateAgentInDatabase(agent, false, 2);
             }
           } catch (NotFoundException e) {
-            //Ignore this
-            //It should not happen, and if it does we just don't update the non-existant agent in the DB
+            // Should not happen: the cache key names an agent/organization pair that no longer exists in the DB.
+            logger.warn("Could not mark agent '{}' of organization '{}' as offline: no longer found in the "
+                + "database", agentName, org);
           }
         }
       }
