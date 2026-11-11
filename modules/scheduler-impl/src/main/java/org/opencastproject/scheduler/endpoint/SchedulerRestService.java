@@ -81,6 +81,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
@@ -949,7 +950,9 @@ public class SchedulerRestService {
               description = "The scheduling source of the event"),
       },
       responses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event is successfully created"),
+          @RestResponse(responseCode = HttpServletResponse.SC_CREATED,
+              description = "Events are successfully created, a JSON array of the new events is returned, each "
+                      + "with its id and its start/end date (UTC)"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT,
               description = "Unable to create event, conflicting events found (ConflicsFound)"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT,
@@ -960,6 +963,7 @@ public class SchedulerRestService {
               description = "Missing or invalid information for this request")
       }
   )
+  @Produces(MediaType.APPLICATION_JSON)
   public Response addMultipleEvents(@FormParam("rrule") String rruleString, @FormParam("start") long startTime,
           @FormParam("end") long endTime, @FormParam("duration") long duration, @FormParam("tz") String tzString,
           @FormParam("agent") String agentId, @FormParam("users") String users,
@@ -1028,9 +1032,20 @@ public class SchedulerRestService {
     DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.forTimeZone(tz));
 
     try {
-      service.addMultipleEvents(rrule, startDate.toDate(), endDate.toDate(), duration, tz, agentId, userIds, templateMp,
-              wfProperties, caProperties, Optional.ofNullable(schedulingSource));
-      return Response.status(Status.CREATED).build();
+      Map<String, Period<ZonedDateTime>> events = service.addMultipleEvents(rrule, startDate.toDate(),
+              endDate.toDate(), duration, tz, agentId, userIds, templateMp, wfProperties, caProperties,
+              Optional.ofNullable(schedulingSource));
+      JsonArray eventsJson = new JsonArray();
+      for (Map.Entry<String, Period<ZonedDateTime>> event : events.entrySet()) {
+        JsonObject eventJson = new JsonObject();
+        eventJson.addProperty("id", event.getKey());
+        eventJson.addProperty("start",
+                DateTimeSupport.toUTC(Date.from(event.getValue().getStart().toInstant()).getTime()));
+        eventJson.addProperty("end",
+                DateTimeSupport.toUTC(Date.from(event.getValue().getEnd().toInstant()).getTime()));
+        eventsJson.add(eventJson);
+      }
+      return Response.status(Status.CREATED).entity(eventsJson.toString()).type(MediaType.APPLICATION_JSON).build();
     } catch (UnauthorizedException e) {
       throw e;
     } catch (SchedulerConflictException e) {
