@@ -6,6 +6,9 @@ on:
     tags:
       - '*.*'
 
+permissions:
+  contents: read
+
 jobs:
   update-room-desc:
     name: Update Matrix Room
