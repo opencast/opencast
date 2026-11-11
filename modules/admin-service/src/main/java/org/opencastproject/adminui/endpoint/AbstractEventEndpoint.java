@@ -32,6 +32,7 @@ import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.adminui.endpoint.EndpointUtil.fromJettison;
 import static org.opencastproject.adminui.endpoint.EndpointUtil.transformAccessControList;
 import static org.opencastproject.index.service.impl.util.EventUtils.internalChannelFilter;
 import static org.opencastproject.index.service.util.JSONUtils.arrayToJsonArray;
@@ -136,7 +137,7 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.Jsons.Val;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -158,6 +159,7 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
 import net.fortuna.ical4j.model.property.RRule;
@@ -166,9 +168,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.codehaus.jettison.json.JSONException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.slf4j.Logger;
@@ -346,15 +345,11 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    JSONParser parser = new JSONParser();
     List<String> ids;
     try {
-      ids = (List<String>) parser.parse(eventIds);
-    } catch (org.json.simple.parser.ParseException e) {
+      ids = toIdList(eventIds);
+    } catch (JsonParseException | IllegalStateException | UnsupportedOperationException e) {
       logger.error("Unable to parse '{}'", eventIds, e);
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}'", eventIds, e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
@@ -493,15 +488,11 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    JSONParser parser = new JSONParser();
-    JSONArray eventIdsJsonArray;
+    JsonArray eventIdsJsonArray;
     try {
-      eventIdsJsonArray = (JSONArray) parser.parse(eventIdsContent);
-    } catch (org.json.simple.parser.ParseException e) {
+      eventIdsJsonArray = GsonUtil.gson().fromJson(eventIdsContent, JsonArray.class);
+    } catch (JsonParseException | IllegalStateException e) {
       logger.error("Unable to parse '{}'", eventIdsContent, e);
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}'", eventIdsContent, e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
@@ -922,11 +913,11 @@ public abstract class AbstractEventEndpoint {
 
     try {
       List<EventComment> comments = getEventCommentService().getComments(eventId);
-      List<Val> commentArr = new ArrayList<>();
+      JsonArray commentArr = new JsonArray();
       for (EventComment c : comments) {
         commentArr.add(c.toJson());
       }
-      return Response.ok(org.opencastproject.util.Jsons.arr(commentArr).toJson(), MediaType.APPLICATION_JSON_TYPE)
+      return Response.ok(commentArr.toString(), MediaType.APPLICATION_JSON_TYPE)
               .build();
     } catch (EventCommentException e) {
       logger.error("Unable to get comments from event {}", eventId, e);
@@ -957,15 +948,10 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", eventId);
     }
 
-    JSONObject json = new JSONObject();
+    JsonObject json = new JsonObject();
+    json.addProperty("active", WorkflowUtil.isActive(optEvent.get().getWorkflowState()));
 
-    if (WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
-      json.put("active", true);
-    } else {
-      json.put("active", false);
-    }
-
-    return Response.ok(json.toJSONString()).build();
+    return Response.ok(json.toString()).build();
   }
 
   @GET
@@ -994,7 +980,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       EventComment comment = getEventCommentService().getComment(commentId);
-      return Response.ok(comment.toJson().toJson()).build();
+      return Response.ok(comment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1059,7 +1045,7 @@ public abstract class AbstractEventEndpoint {
       updatedComment = getEventCommentService().updateComment(updatedComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1135,9 +1121,9 @@ public abstract class AbstractEventEndpoint {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
                 + "being used by the distribution channel.");
-        JSONObject json = new JSONObject();
-        json.put("Error", "Unable to edit an ACL for a current workflow.");
-        return conflict(json.toJSONString());
+        JsonObject json = new JsonObject();
+        json.addProperty("Error", "Unable to edit an ACL for a current workflow.");
+        return conflict(json.toString());
       } else {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
@@ -1200,7 +1186,7 @@ public abstract class AbstractEventEndpoint {
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
       return Response.created(getCommentUrl(eventId, createdComment.getId().get()))
-              .entity(createdComment.toJson().toJson()).build();
+              .entity(createdComment.toJson().toString()).build();
     } catch (Exception e) {
       logger.error("Unable to create a comment on the event {}", eventId, e);
       throw new WebApplicationException(e);
@@ -1239,7 +1225,7 @@ public abstract class AbstractEventEndpoint {
       updatedComment = getEventCommentService().updateComment(updatedComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1334,7 +1320,7 @@ public abstract class AbstractEventEndpoint {
       EventComment updatedComment = getEventCommentService().updateComment(comment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1401,7 +1387,7 @@ public abstract class AbstractEventEndpoint {
       EventComment updatedComment = getEventCommentService().updateComment(comment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1465,7 +1451,7 @@ public abstract class AbstractEventEndpoint {
       updatedComment = getEventCommentService().updateComment(updatedComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (Exception e) {
       logger.warn("Could not create event comment reply on comment {}", comment, e);
       throw new WebApplicationException(e);
@@ -1596,15 +1582,11 @@ public abstract class AbstractEventEndpoint {
       return badRequest("Event ids can't be empty");
     }
 
-    JSONParser parser = new JSONParser();
     List<String> ids;
     try {
-      ids = (List<String>) parser.parse(eventIds);
-    } catch (org.json.simple.parser.ParseException e) {
+      ids = toIdList(eventIds);
+    } catch (JsonParseException | IllegalStateException | UnsupportedOperationException e) {
       logger.error("Unable to parse '{}'", eventIds, e);
-      return badRequest("Unable to parse event ids");
-    } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}'", eventIds, e);
       return badRequest("Unable to parse event ids");
     }
 
@@ -1731,14 +1713,14 @@ public abstract class AbstractEventEndpoint {
 
       events.values().forEach(e -> e.ifPresent(event -> {
 
-        JSONObject metadata = null;
+        JsonObject metadata = null;
 
         // Update the scheduling information
         try {
           if (groupInstructions.getScheduling() != null) {
             // Since we only have the start/end time, we have to add the correct date(s) for this event.
-            final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupInstructions.getScheduling());
-            updateEventScheduling(scheduling.toJSONString(), event);
+            final JsonObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupInstructions.getScheduling());
+            updateEventScheduling(scheduling.toString(), event);
             // We have to update the non-technical metadata as well to keep them in sync with the technical ones.
             metadata = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
           }
@@ -1751,7 +1733,7 @@ public abstract class AbstractEventEndpoint {
           if (groupInstructions.getMetadata() != null || metadata != null) {
             metadata = BulkUpdateUtil.mergeMetadataFields(metadata, groupInstructions.getMetadata());
             getIndexService().updateAllEventMetadata(event.getIdentifier(),
-                JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
+                singletonArray(metadata).toString(), getIndex());
           }
         } catch (Exception exception) {
           metadataUpdateFailures.put(event.getIdentifier(), exception.getMessage());
@@ -1797,7 +1779,7 @@ public abstract class AbstractEventEndpoint {
     }
 
     final Map<String, List<JsonObject>> conflicts = new HashMap<>();
-    final List<Tuple3<String, Optional<Event>, JSONObject>> eventsWithSchedulingOpt = instructions.getGroups().stream()
+    final List<Tuple3<String, Optional<Event>, JsonObject>> eventsWithSchedulingOpt = instructions.getGroups().stream()
         .flatMap(group -> group.getEventIds().stream().map(eventId -> Tuple3
             .tuple3(eventId, BulkUpdateUtil.getEvent(getIndexService(), getIndex(), eventId), group.getScheduling())))
         .collect(Collectors.toList());
@@ -1807,20 +1789,20 @@ public abstract class AbstractEventEndpoint {
     if (!notFoundIds.isEmpty()) {
       return notFoundJson(collectionToJsonArray(notFoundIds));
     }
-    final List<Tuple<Event, JSONObject>> eventsWithScheduling = eventsWithSchedulingOpt.stream()
+    final List<Tuple<Event, JsonObject>> eventsWithScheduling = eventsWithSchedulingOpt.stream()
         .map(e -> Tuple.tuple(e.getB().get(), e.getC())).collect(Collectors.toList());
     final Set<String> changedIds = eventsWithScheduling.stream().map(e -> e.getA().getIdentifier())
         .collect(Collectors.toSet());
-    for (final Tuple<Event, JSONObject> eventWithGroup : eventsWithScheduling) {
+    for (final Tuple<Event, JsonObject> eventWithGroup : eventsWithScheduling) {
       final Event event = eventWithGroup.getA();
-      final JSONObject groupScheduling = eventWithGroup.getB();
+      final JsonObject groupScheduling = eventWithGroup.getB();
       try {
         if (groupScheduling != null) {
           // Since we only have the start/end time, we have to add the correct date(s) for this event.
-          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupScheduling);
-          final Date start = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_START_KEY)));
-          final Date end = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_END_KEY)));
-          final String agentId = Optional.ofNullable((String) scheduling.get(SCHEDULING_AGENT_ID_KEY))
+          final JsonObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupScheduling);
+          final Date start = Date.from(Instant.parse(GsonUtil.getStringOrNull(scheduling, SCHEDULING_START_KEY)));
+          final Date end = Date.from(Instant.parse(GsonUtil.getStringOrNull(scheduling, SCHEDULING_END_KEY)));
+          final String agentId = Optional.ofNullable(GsonUtil.getStringOrNull(scheduling, SCHEDULING_AGENT_ID_KEY))
               .orElse(event.getAgentId());
 
           final List<JsonObject> currentConflicts = new ArrayList<>();
@@ -1829,11 +1811,14 @@ public abstract class AbstractEventEndpoint {
           eventsWithScheduling.stream()
               .filter(otherEvent -> !otherEvent.getA().getIdentifier().equals(event.getIdentifier()))
               .forEach(otherEvent -> {
-                final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent.getA(),
+                final JsonObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent.getA(),
                     otherEvent.getB());
-                final Date otherStart = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_START_KEY)));
-                final Date otherEnd = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_END_KEY)));
-                final String otherAgentId = Optional.ofNullable((String) otherScheduling.get(SCHEDULING_AGENT_ID_KEY))
+                final Date otherStart = Date.from(
+                    Instant.parse(GsonUtil.getStringOrNull(otherScheduling, SCHEDULING_START_KEY)));
+                final Date otherEnd = Date.from(
+                    Instant.parse(GsonUtil.getStringOrNull(otherScheduling, SCHEDULING_END_KEY)));
+                final String otherAgentId = Optional
+                    .ofNullable(GsonUtil.getStringOrNull(otherScheduling, SCHEDULING_AGENT_ID_KEY))
                     .orElse(otherEvent.getA().getAgentId());
                 if (!otherAgentId.equals(agentId)) {
                   // different agent -> no conflict
@@ -1953,15 +1938,11 @@ public abstract class AbstractEventEndpoint {
       return badRequest("Event ids can't be empty");
     }
 
-    JSONParser parser = new JSONParser();
     List<String> ids;
     try {
-      ids = (List<String>) parser.parse(eventIds);
-    } catch (org.json.simple.parser.ParseException e) {
+      ids = toIdList(eventIds);
+    } catch (JsonParseException | IllegalStateException | UnsupportedOperationException e) {
       logger.error("Unable to parse '{}'", eventIds, e);
-      return badRequest("Unable to parse event ids");
-    } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}'", eventIds, e);
       return badRequest("Unable to parse event ids");
     }
 
@@ -2323,8 +2304,8 @@ public abstract class AbstractEventEndpoint {
       if (eventData == null) {
         throw new WebApplicationException(NOT_FOUND);
       }
-      eventData.put("baseURL", tobira.getOrigin());
-      return Response.ok(eventData.toJSONString()).build();
+      eventData.addProperty("baseURL", tobira.getOrigin());
+      return Response.ok(eventData.toString()).build();
     } catch (TobiraException e) {
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
@@ -2444,9 +2425,9 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
       try {
 
-        JSONObject configJSON;
+        JsonObject configJSON;
         try {
-          configJSON = (JSONObject) new JSONParser().parse(configuration);
+          configJSON = GsonUtil.gson().fromJson(configuration, JsonObject.class);
         } catch (Exception e) {
           logger.warn("Unable to parse the workflow configuration {}", configuration);
           return badRequest();
@@ -2455,14 +2436,14 @@ public abstract class AbstractEventEndpoint {
         Optional<Map<String, String>> caMetadataOpt = Optional.empty();
         Optional<Map<String, String>> workflowConfigOpt = Optional.empty();
 
-        String workflowId = (String) configJSON.get("id");
+        String workflowId = GsonUtil.getStringOrNull(configJSON, "id");
         Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(id));
         if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
           caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
           caMetadataOpt = Optional.of(caMetadata);
         }
 
-        Map<String, String> workflowConfig = new HashMap<>((JSONObject) configJSON.get("configuration"));
+        Map<String, String> workflowConfig = GsonUtil.toStringMap(configJSON.getAsJsonObject("configuration"));
         Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(id));
         if (!oldWorkflowConfig.equals(workflowConfig)) {
           workflowConfigOpt = Optional.of(workflowConfig);
@@ -2822,10 +2803,10 @@ public abstract class AbstractEventEndpoint {
     }
 
     // Add all available ACLs to the response
-    JSONArray systemAclsJson = new JSONArray();
+    JsonArray systemAclsJson = new JsonArray();
     List<ManagedAcl> acls = getAclService().getAcls();
     for (ManagedAcl acl : acls) {
-      systemAclsJson.add(AccessInformationUtil.serializeManagedAcl(acl));
+      systemAclsJson.add(fromJettison(AccessInformationUtil.serializeManagedAcl(acl)));
     }
 
     AccessControlList activeAcl = new AccessControlList();
@@ -2839,18 +2820,18 @@ public abstract class AbstractEventEndpoint {
     Optional<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, activeAcl,
             getAdminUIConfiguration().getMatchManagedAclRolePrefixes());
 
-    JSONObject episodeAccessJson = new JSONObject();
-    episodeAccessJson.put("current_acl", currentAcl.isPresent() ? currentAcl.get().getId() : 0L);
-    episodeAccessJson.put("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
-    episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
+    JsonObject episodeAccessJson = new JsonObject();
+    episodeAccessJson.addProperty("current_acl", currentAcl.isPresent() ? currentAcl.get().getId() : 0L);
+    episodeAccessJson.add("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
+    episodeAccessJson.add("privileges", fromJettison(AccessInformationUtil.serializePrivilegesByRole(activeAcl)));
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
             && WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
-      episodeAccessJson.put("locked", true);
+      episodeAccessJson.addProperty("locked", true);
     }
 
-    JSONObject jsonReturnObj = new JSONObject();
-    jsonReturnObj.put("episode_access", episodeAccessJson);
-    jsonReturnObj.put("system_acls", systemAclsJson);
+    JsonObject jsonReturnObj = new JsonObject();
+    jsonReturnObj.add("episode_access", episodeAccessJson);
+    jsonReturnObj.add("system_acls", systemAclsJson);
 
     return Response.ok(jsonReturnObj.toString()).build();
   }
@@ -3031,10 +3012,9 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
     }
 
-    JSONParser parser = new JSONParser();
-    JSONObject metadataJson;
+    JsonObject metadataJson;
     try {
-      metadataJson = (JSONObject) parser.parse(metadata);
+      metadataJson = GsonUtil.gson().fromJson(metadata, JsonObject.class);
     } catch (Exception e) {
       logger.warn("Unable to parse metadata {}", metadata);
       return RestUtil.R.badRequest("Unable to parse metadata");
@@ -3044,9 +3024,9 @@ public abstract class AbstractEventEndpoint {
     String startDate;
     String endDate;
     try {
-      device = (String) metadataJson.get("device");
-      startDate = (String) metadataJson.get("start");
-      endDate = (String) metadataJson.get("end");
+      device = GsonUtil.getStringOrNull(metadataJson, "device");
+      startDate = GsonUtil.getStringOrNull(metadataJson, "start");
+      endDate = GsonUtil.getStringOrNull(metadataJson, "end");
     } catch (Exception e) {
       logger.warn("Unable to parse metadata {}", metadata);
       return RestUtil.R.badRequest("Unable to parse metadata");
@@ -3073,7 +3053,7 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.badRequest("Unable to parse end date");
     }
 
-    String rruleString = (String) metadataJson.get("rrule");
+    String rruleString = GsonUtil.getStringOrNull(metadataJson, "rrule");
 
     RRule<ZonedDateTime> rrule = null;
     TimeZone timeZone = TimeZone.getDefault();
@@ -3087,7 +3067,7 @@ public abstract class AbstractEventEndpoint {
         return Response.status(Status.BAD_REQUEST).build();
       }
 
-      durationString = (String) metadataJson.get("duration");
+      durationString = GsonUtil.getStringOrNull(metadataJson, "duration");
       if (StringUtils.isBlank(durationString)) {
         logger.warn("If checking recurrence, must include duration.");
         return Response.status(Status.BAD_REQUEST).build();
@@ -3103,7 +3083,7 @@ public abstract class AbstractEventEndpoint {
       timeZone = TimeZone.getTimeZone(timezone);
     }
 
-    String eventId = (String) metadataJson.get("id");
+    String eventId = GsonUtil.getStringOrNull(metadataJson, "id");
 
     try {
       List<MediaPackage> events = null;
@@ -3878,6 +3858,21 @@ public abstract class AbstractEventEndpoint {
 
   private void checkAgentAccessForAgent(final String agentId) throws UnauthorizedException {
     SecurityUtil.checkAgentAccess(getSecurityService(), agentId);
+  }
+
+
+  /** Read a JSON array of event identifiers into a list. */
+  private static List<String> toIdList(String json) {
+    final List<String> ids = new ArrayList<>();
+    GsonUtil.gson().fromJson(json, JsonArray.class).forEach(id -> ids.add(id.getAsString()));
+    return ids;
+  }
+
+  /** Wrap one object in an array, which updateAllEventMetadata expects. */
+  private static JsonArray singletonArray(JsonObject element) {
+    final JsonArray array = new JsonArray();
+    array.add(element);
+    return array;
   }
 
 }

@@ -34,9 +34,10 @@ import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,8 +46,6 @@ import org.junit.Test;
 public class LifeCycleManagementTest {
   /** The REST test environment */
   private static final RestServiceTestEnv env = testEnvForClasses(TestLifeCycleManagementEndpoint.class);
-
-  private static final JSONParser parser = new JSONParser();
 
   private static final String POLICY_ID = "42";
   private static final String MISSING_POLICY_ID = "4444";
@@ -63,24 +62,25 @@ public class LifeCycleManagementTest {
     env.tearDownServer();
   }
 
-  private void assertPolicy(JSONObject json) {
-    assertEquals("title", json.get("title"));
-    assertEquals(TargetType.EVENT.toString(), json.get("targetType"));
-    assertEquals(Action.START_WORKFLOW.toString(), json.get("action"));
-    assertEquals("{\"workflowId\":\"noop\",\"workflowParameters\":\"{}\"}", json.get("actionParameters"));
+  private void assertPolicy(JsonObject json) {
+    assertEquals("title", json.get("title").getAsString());
+    assertEquals(TargetType.EVENT.toString(), json.get("targetType").getAsString());
+    assertEquals(Action.START_WORKFLOW.toString(), json.get("action").getAsString());
+    assertEquals("{\"workflowId\":\"noop\",\"workflowParameters\":\"{}\"}",
+        json.get("actionParameters").getAsString());
 
-    assertEquals("2023-11-30T16:16:47Z", json.get("actionDate"));
-    assertEquals(Timing.SPECIFIC_DATE.toString(), json.get("timing"));
+    assertEquals("2023-11-30T16:16:47Z", json.get("actionDate").getAsString());
+    assertEquals(Timing.SPECIFIC_DATE.toString(), json.get("timing").getAsString());
 
-    assertEquals("{}", json.get("targetFilters"));
+    assertEquals("{}", json.get("targetFilters").getAsString());
 
-    final JSONArray accessControlEntries = (JSONArray) json.get("accessControlEntries");
+    final JsonArray accessControlEntries = json.getAsJsonArray("accessControlEntries");
     assertEquals(1, accessControlEntries.size());
 
-    final JSONObject accessControlEntry = (JSONObject) accessControlEntries.get(0);
-    assertEquals(true, accessControlEntry.get("allow"));
-    assertEquals("ROLE_USER_BOB", accessControlEntry.get("role"));
-    assertEquals("read", accessControlEntry.get("action"));
+    final JsonObject accessControlEntry = accessControlEntries.get(0).getAsJsonObject();
+    assertEquals(true, accessControlEntry.get("allow").getAsBoolean());
+    assertEquals("ROLE_USER_BOB", accessControlEntry.get("role").getAsString());
+    assertEquals("read", accessControlEntry.get("action").getAsString());
   }
 
   @Test
@@ -92,7 +92,7 @@ public class LifeCycleManagementTest {
         .get(env.host("/policies/{id}"))
         .asString();
 
-    assertPolicy((JSONObject) parser.parse(response));
+    assertPolicy(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test
@@ -125,9 +125,9 @@ public class LifeCycleManagementTest {
         .get(env.host("/policies"))
         .asString();
 
-    JSONObject responseObj = (JSONObject) parser.parse(response);
-    final JSONArray policies = (JSONArray) responseObj.get("results");
-    assertPolicy((JSONObject) policies.get(0));
+    JsonObject responseObj = JsonParser.parseString(response).getAsJsonObject();
+    final JsonArray policies = responseObj.getAsJsonArray("results");
+    assertPolicy(policies.get(0).getAsJsonObject());
   }
 
   @Test
@@ -144,7 +144,7 @@ public class LifeCycleManagementTest {
         .post(env.host("policies"))
         .asString();
 
-//    assertPolicy((JSONObject) parser.parse(response));
+//    assertPolicy(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test

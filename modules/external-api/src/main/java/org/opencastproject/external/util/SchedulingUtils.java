@@ -36,6 +36,7 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.gson.JsonArray;
@@ -45,8 +46,6 @@ import com.google.gson.JsonPrimitive;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +56,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public final class SchedulingUtils {
 
@@ -191,34 +191,33 @@ public final class SchedulingUtils {
     /**
      * @return A JSON source representation of this SchedulingInfo as needed by the IndexService to create an event.
      */
-    @SuppressWarnings("unchecked")
-    public JSONObject toSource() {
-      final JSONObject source = new JSONObject();
+    public JsonObject toSource() {
+      final JsonObject source = new JsonObject();
       if (rrule.isPresent()) {
-        source.put("type", "SCHEDULE_MULTIPLE");
+        source.addProperty("type", "SCHEDULE_MULTIPLE");
       } else {
-        source.put("type", "SCHEDULE_SINGLE");
+        source.addProperty("type", "SCHEDULE_SINGLE");
       }
-      final JSONObject sourceMetadata = new JSONObject();
+      final JsonObject sourceMetadata = new JsonObject();
       final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
       if (startDate.isPresent()) {
-        sourceMetadata.put("start", dateFormatter.format(startDate.get().toInstant().atZone(UTC)));
+        sourceMetadata.addProperty("start", dateFormatter.format(startDate.get().toInstant().atZone(UTC)));
       }
       if (endDate.isPresent()) {
-        sourceMetadata.put("end", dateFormatter.format(endDate.get().toInstant().atZone(UTC)));
+        sourceMetadata.addProperty("end", dateFormatter.format(endDate.get().toInstant().atZone(UTC)));
       }
       if (agentId.isPresent()) {
-        sourceMetadata.put("device", agentId.get());
+        sourceMetadata.addProperty("device", agentId.get());
       }
       if (getDuration().isPresent()) {
-        sourceMetadata.put("duration", String.valueOf(getDuration().get()));
+        sourceMetadata.addProperty("duration", String.valueOf(getDuration().get()));
       }
       if (rrule.isPresent()) {
-        sourceMetadata.put("rrule", rrule.get().getValue());
+        sourceMetadata.addProperty("rrule", rrule.get().getValue());
       }
-      sourceMetadata.put("inputs", inputs.orElse(""));
+      sourceMetadata.addProperty("inputs", inputs.orElse(""));
 
-      source.put("metadata", sourceMetadata);
+      source.add("metadata", sourceMetadata);
       return source;
     }
 
@@ -249,21 +248,21 @@ public final class SchedulingUtils {
      * Parse the given json and create a new SchedulingInfo.
      *
      * @param json
-     *          The JSONObject to parse.
+     *          The JSON object to parse.
      *
      * @return The SchedulingInfo instance represented by the given JSON.
      */
-    public static SchedulingInfo of(JSONObject json) {
+    public static SchedulingInfo of(JsonObject json) {
       final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
       final SchedulingInfo schedulingInfo = new SchedulingInfo();
-      final String startDate = (String) json.get(JSON_KEY_START_DATE);
-      final String endDate = (String) json.get(JSON_KEY_END_DATE);
-      final String agentId = (String) json.get(JSON_KEY_AGENT_ID);
-      final JSONArray inputs = (JSONArray) json.get(JSON_KEY_INPUTS);
-      final String rrule = (String) json.get(JSON_KEY_RRULE);
+      final String startDate = GsonUtil.asText(json.get(JSON_KEY_START_DATE), null);
+      final String endDate = GsonUtil.asText(json.get(JSON_KEY_END_DATE), null);
+      final String agentId = GsonUtil.asText(json.get(JSON_KEY_AGENT_ID), null);
+      final JsonArray inputs = GsonUtil.getArrayOrNull(json, JSON_KEY_INPUTS);
+      final String rrule = GsonUtil.asText(json.get(JSON_KEY_RRULE), null);
 
       // Special handling because the original implementation required String but now we require long
-      final String durationString = Objects.toString(json.get(JSON_KEY_DURATION), null);
+      final String durationString = GsonUtil.asText(json.get(JSON_KEY_DURATION), null);
 
       if (isNotBlank(startDate)) {
         schedulingInfo.startDate = Optional.of(Date.from(Instant.from(dateFormatter.parse(startDate))));
@@ -287,7 +286,9 @@ public final class SchedulingUtils {
       }
 
       if (inputs != null) {
-        schedulingInfo.inputs = Optional.of(String.join(",", inputs));
+        schedulingInfo.inputs = Optional.of(StreamSupport.stream(inputs.spliterator(), false)
+            .map(GsonUtil::asText)
+            .collect(Collectors.joining(",")));
       }
       if (isNotBlank(rrule)) {
         try {

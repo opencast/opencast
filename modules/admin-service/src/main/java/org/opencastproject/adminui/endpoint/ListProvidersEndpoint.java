@@ -24,7 +24,6 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.adminui.endpoint.EndpointUtil.addRequestFiltersToQuery;
 import static org.opencastproject.adminui.endpoint.EndpointUtil.generateJSONObject;
 
-import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.authorization.xacml.manager.impl.list.AclsListQuery;
 import org.opencastproject.capture.admin.api.AgentsListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
@@ -49,9 +48,10 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -177,15 +177,7 @@ public class ListProvidersEndpoint {
       return SERVER_ERROR;
     }
 
-    JSONObject jsonList;
-    try {
-      jsonList = generateJSONObject(autocompleteList);
-    } catch (JsonCreationException e) {
-      logger.error("Not able to generate resources list JSON from source {}", source, e);
-      return SERVER_ERROR;
-    }
-
-    return Response.ok(jsonList.toString()).build();
+    return Response.ok(generateJSONObject(autocompleteList).toString()).build();
   }
 
   @GET
@@ -203,17 +195,12 @@ public class ListProvidersEndpoint {
     String[] sources = { "eventCommentReasons" };
     ResourceListQuery query = new DefaultResourceListQuery();
 
-    JSONObject list = new JSONObject();
+    JsonObject list = new JsonObject();
 
     for (String source : sources) {
       if (listProvidersService.hasProvider(source)) {
-        JSONObject subList;
         try {
-          subList = generateJSONObject(listProvidersService.getList(source, query, true));
-          list.put(source, subList);
-        } catch (JsonCreationException e) {
-          logger.error("Not able to generate resources list JSON from source {}", source, e);
-          return SERVER_ERROR;
+          list.add(source, generateJSONObject(listProvidersService.getList(source, query, true)));
         } catch (ListProviderException e) {
           logger.error("Not able to get list from provider {}", source, e);
           return SERVER_ERROR;
@@ -238,9 +225,12 @@ public class ListProvidersEndpoint {
       },
       returnDescription = "")
   public Response getAvailablesProviders(@Context HttpHeaders headers) {
-    JSONArray list = new JSONArray();
+    // Same nested shape as the External API: the provider names are an array inside the response array.
+    JsonArray providers = new JsonArray();
+    listProvidersService.getAvailableProviders().forEach(providers::add);
 
-    list.add(listProvidersService.getAvailableProviders());
+    JsonArray list = new JsonArray();
+    list.add(providers);
 
     return Response.ok(list.toString()).build();
   }

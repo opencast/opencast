@@ -26,8 +26,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import org.json.simple.parser.ParseException;
-
 import java.io.IOException;
 
 
@@ -40,18 +38,6 @@ public class DublinCoreGsonAdapter extends TypeAdapter<DublinCoreCatalog> {
 
   @Override
   public DublinCoreCatalog read(JsonReader in) throws IOException {
-    try {
-      // TODO: this is a bit stupid. To avoid duplicating logic of
-      // `DublinCoreJsonFormat.read(JSONObject json)`, we convert given reader
-      // into a string and then parse it again with `DublinCoreJsonFormat.read`.
-      // At some point we should either parse into a `JSONObject` (from json.simple)
-      // directly or avoid parsing twice some other way.
-      String raw = JsonParser.parseReader(in).toString();
-      return DublinCoreJsonFormat.read(raw);
-    } catch (ParseException e) {
-      // Gson throws parse errors as `IllegalStateException`. For example, see `beginObject` of
-      // `JsonReader`.
-      throw new IllegalStateException("could not parse JSON when deserializing DublinCoreCatalog: ", e);
-    }
+    return DublinCoreJsonFormat.read(JsonParser.parseReader(in).getAsJsonObject());
   }
 }

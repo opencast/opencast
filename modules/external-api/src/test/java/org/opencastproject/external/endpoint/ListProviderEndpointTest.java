@@ -30,9 +30,9 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.simple.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -86,11 +86,11 @@ public class ListProviderEndpointTest {
             .get(env.host("/LANGUAGES.json"))
             .asString();
 
-    final JSONObject json = gson.fromJson(response, JSONObject.class);
+    final JsonObject json = gson.fromJson(response, JsonObject.class);
     assertEquals(3, json.size());
 
-    assertEquals("LANGUAGES.ARABIC",json.get("ara"));
-    assertEquals("LANGUAGES.DANISH",json.get("dan"));
+    assertEquals("LANGUAGES.ARABIC", json.get("ara").getAsString());
+    assertEquals("LANGUAGES.DANISH", json.get("dan").getAsString());
   }
 
   @Test
@@ -104,10 +104,12 @@ public class ListProviderEndpointTest {
             .get(env.host("/LICENSES.json"))
             .asString();
 
-    final JSONObject json = gson.fromJson(response, JSONObject.class);
+    final JsonObject json = gson.fromJson(response, JsonObject.class);
     assertEquals(3, json.size());
 
-    assertEquals("{\"label\":\"EVENTS.LICENSE.CC0\", \"order\":8, \"selectable\": true}",json.get("CC0"));
-    assertEquals("{\"label\":\"EVENTS.LICENSE.CCBYSA\", \"order\":3, \"selectable\": true}",json.get("CC-BY-SA"));
+    assertEquals("{\"label\":\"EVENTS.LICENSE.CC0\", \"order\":8, \"selectable\": true}",
+            json.get("CC0").getAsString());
+    assertEquals("{\"label\":\"EVENTS.LICENSE.CCBYSA\", \"order\":3, \"selectable\": true}",
+            json.get("CC-BY-SA").getAsString());
   }
 }

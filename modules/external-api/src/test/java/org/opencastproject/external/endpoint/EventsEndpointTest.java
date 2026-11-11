@@ -44,7 +44,6 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.commons.io.IOUtils;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,7 +69,7 @@ public class EventsEndpointTest {
   }
 
   @Test
-  public void testDeserializationOfAcl() throws IOException, ParseException {
+  public void testDeserializationOfAcl() throws IOException {
     String emptyAclJson = IOUtils.toString(getClass().getResource("/acl-empty.json"), UTF_8);
     AccessControlList acl = AclUtils.deserializeJsonToAcl(emptyAclJson, false);
     assertEquals(acl.getEntries().size(), 0);
@@ -97,7 +96,7 @@ public class EventsEndpointTest {
   }
 
   @Test
-  public void testDeserializeMetadataFields() throws IOException, ParseException {
+  public void testDeserializeMetadataFields() throws IOException {
     String manyAclJson = IOUtils.toString(getClass().getResource("/event-metadata.json"), UTF_8);
     Map<String, String> fields = RequestUtils.getKeyValueMap(manyAclJson);
     assertEquals(3, fields.size());
