@@ -244,6 +244,8 @@
               !com.mchange.v2.c3p0.*,
               !com.sun.*,
               !javax.cache.*,
+              !jakarta.el.*,
+              !jakarta.servlet.*,
               !javax.el.*,
               !javax.servlet.jsp.*,
               !org.apache.log.*,
