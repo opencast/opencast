@@ -396,7 +396,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           job = downloadDistributionService.distribute(channelId, mediapackage, bulkElementIds, checkAvailability);
         }
         jobs.add(job);
-      } catch (DistributionException | MediaPackageException e) {
+      } catch (DistributionException e) {
         logger.error("Creating the distribution job for {} elements of media package '{}' failed",
                 bulkElementIds.size(), mediapackage, e);
         throw new WorkflowOperationException(e);
@@ -414,7 +414,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
             job = downloadDistributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
           }
           jobs.add(job);
-        } catch (DistributionException | MediaPackageException e) {
+        } catch (DistributionException e) {
           logger.error("Creating the distribution job for element '{}' of media package '{}' failed", elementId,
                   mediapackage, e);
           throw new WorkflowOperationException(e);

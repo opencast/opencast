@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 3 * * 6' # at 03:00 on Saturday
 
+permissions:
+  contents: read
+
 jobs:
   cache-ffmpeg:
     strategy:
@@ -26,10 +29,10 @@ jobs:
           sudo apt install -y -q jq s3cmd
 
       - name: Get FFmpeg download URL
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
-          curl -fL
-          -H "Accept: application/vnd.github+json"
-          -H "X-GitHub-Api-Version: 2022-11-28"
+          gh api
           https://api.github.com/repos/BtbN/FFmpeg-Builds/releases
           | jq -r '
             [

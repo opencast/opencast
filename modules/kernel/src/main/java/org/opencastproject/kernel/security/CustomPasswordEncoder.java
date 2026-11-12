@@ -21,7 +21,7 @@
 
 package org.opencastproject.kernel.security;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -66,7 +66,7 @@ public class CustomPasswordEncoder implements PasswordEncoder {
     // Test BCrypt encoded hash
     logger.debug("Verifying bcrypt hash {}", encodedPassword);
     try {
-      return StringUtils.startsWith(encodedPassword, "$") && encoder.matches(rawPassword, encodedPassword);
+      return Strings.CS.startsWith(encodedPassword, "$") && encoder.matches(rawPassword, encodedPassword);
     } catch (IllegalArgumentException e) {
       logger.debug("bcrypt hash verification failed", e);
     }

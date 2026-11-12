@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -66,7 +66,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-index</artifactId>
+      <artifactId>opencast-opensearch-index</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -79,12 +79,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-ingest-service-api</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-list-providers-api</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -114,12 +108,9 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-index</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-opensearch-index</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-series-service-api</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-ingest-service-api</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

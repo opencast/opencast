@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.handler.composer;
 
-import static org.opencastproject.util.data.Collections.list;
-
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -48,7 +46,7 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.AttachmentSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -478,13 +476,13 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
               "Multiple layout doesn't contain the required layouts for (lower, upper, optional watermark)");
         }
 
-        List<HorizontalCoverageLayoutSpec> multipleLayouts = list(
-                Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0])),
-                Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[1])));
+        List<HorizontalCoverageLayoutSpec> multipleLayouts = List.of(
+                Serializer.horizontalCoverageLayoutSpec(GsonUtil.parse(layouts[0]).getAsJsonObject()),
+                Serializer.horizontalCoverageLayoutSpec(GsonUtil.parse(layouts[1]).getAsJsonObject()));
 
         AbsolutePositionLayoutSpec watermarkLayout = null;
         if (layouts.length > 2) {
-          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[2]));
+          watermarkLayout = Serializer.absolutePositionLayoutSpec(GsonUtil.parse(layouts[2]).getAsJsonObject());
         }
 
         return Tuple.tuple(multipleLayouts, Optional.ofNullable(watermarkLayout));
@@ -503,11 +501,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         }
 
         HorizontalCoverageLayoutSpec singleLayout = Serializer
-                .horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0]));
+                .horizontalCoverageLayoutSpec(GsonUtil.parse(layouts[0]).getAsJsonObject());
 
         AbsolutePositionLayoutSpec watermarkLayout = null;
         if (layouts.length > 1) {
-          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[1]));
+          watermarkLayout = Serializer.absolutePositionLayoutSpec(GsonUtil.parse(layouts[1]).getAsJsonObject());
         }
 
         return Tuple.tuple(singleLayout, Optional.ofNullable(watermarkLayout));

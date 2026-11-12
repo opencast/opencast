@@ -50,8 +50,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,7 +219,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
     URL url = null;
     try {
-      url = new URL(posterimageUrlOpt);
+      url = URI.create(posterimageUrlOpt).toURL();
     } catch (Exception e) {
       logger.debug("Given poster image URI '{}' is not valid", posterimageUrlOpt);
     }
@@ -402,7 +402,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     xml.append(name);
     xml.append(">");
 
-    xml.append(StringEscapeUtils.escapeXml(body));
+    xml.append(StringEscapeUtils.escapeXml10(body));
 
     xml.append("</");
     xml.append(name);

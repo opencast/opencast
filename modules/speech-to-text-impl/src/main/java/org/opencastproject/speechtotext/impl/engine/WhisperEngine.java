@@ -24,11 +24,12 @@ package org.opencastproject.speechtotext.impl.engine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.speechtotext.util.LangCodeUtil;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.OsgiUtil;
 
+import com.google.gson.JsonObject;
+
 import org.apache.commons.io.FilenameUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -234,12 +235,9 @@ public class WhisperEngine implements SpeechToTextEngine {
     // Detect language if not set
     if (language.isBlank()) {
       var jsonFile = FilenameUtils.removeExtension(output.getAbsolutePath()) + ".json";
-      var jsonParser = new JSONParser();
-      try {
-        FileReader reader = new FileReader(jsonFile);
-        Object obj = jsonParser.parse(reader);
-        JSONObject jsonObject = (JSONObject) obj;
-        language = (String) jsonObject.get("language");
+      try (FileReader reader = new FileReader(jsonFile)) {
+        JsonObject jsonObject = GsonUtil.gson().fromJson(reader, JsonObject.class);
+        language = GsonUtil.getStringOrNull(jsonObject, "language");
         // convert language name to iso3 if necessary or take default
         language = LangCodeUtil.getIso2FromLang(language, language);
         logger.debug("Language detected by Whisper: {}", language);

@@ -22,20 +22,12 @@
 package org.opencastproject.series.impl;
 
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
-import static org.opencastproject.util.EqualsUtil.eqListSorted;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
@@ -46,6 +38,13 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Organization;
@@ -60,7 +59,6 @@ import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -79,6 +77,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -88,7 +87,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
- * {@link ElasticsearchIndex} for searching.
+ * {@link OpenSearchIndex} for searching.
  */
 @Component(
     property = {
@@ -116,8 +115,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   /** The system user name */
   private String systemUserName;
 
-  /** The Elasticsearch index */
-  private ElasticsearchIndex index;
+  /** The OpenSearch index */
+  private OpenSearchIndex index;
 
   private AclServiceFactory aclServiceFactory;
 
@@ -155,9 +154,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     this.updateHandlers.remove(handler);
   }
 
-  /** OSGi callbacks for setting the Elasticsearch index. */
+  /** OSGi callbacks for setting the OpenSearch index. */
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex index) {
+  public void setOpenSearchIndex(OpenSearchIndex index) {
     this.index = index;
   }
 
@@ -254,7 +253,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
-        //update Elasticsearch index
+        //update OpenSearch index
         updateSeriesAclInIndex(seriesId, accessControl);
         // still sent for other asynchronous updates
         triggerEventHandlers(SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
@@ -289,7 +288,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   public void deleteSeries(final String seriesID) throws SeriesException, NotFoundException {
     try {
       persistence.deleteSeries(seriesID);
-      // remove from Elasticsearch index
+      // remove from OpenSearch index
       removeSeriesFromIndex(seriesID);
       // still sent for other asynchronous updates
       triggerEventHandlers(SeriesItem.delete(seriesID));
@@ -375,7 +374,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.updateSeriesProperty(seriesID, propertyName, propertyValue);
 
-      // update Elasticsearch index
+      // update OpenSearch index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
         updateThemePropertyInIndex(seriesID, Optional.ofNullable(propertyValue));
       }
@@ -396,7 +395,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       persistence.deleteSeriesProperty(seriesID, propertyName);
 
-      // update Elasticsearch index
+      // update OpenSearch index
       if (propertyName.equals(THEME_PROPERTY_NAME)) {
         updateThemePropertyInIndex(seriesID, Optional.empty());
       }
@@ -425,7 +424,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     final Map<EName, List<DublinCoreValue>> bv = b.getValues();
     if (av.size() == bv.size()) {
       for (Map.Entry<EName, List<DublinCoreValue>> ave : av.entrySet()) {
-        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey()))) {
+        if (!Objects.equals(ave.getValue(), bv.get(ave.getKey()))) {
           return false;
         }
       }
@@ -547,7 +546,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     updatedSeriesData = getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
                             organization.getId()).apply(updatedSeriesData);
 
-                  } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
+                  } catch (IOException | ParserConfigurationException | SAXException e) {
                     logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
                             entry.getKey(), seriesId, e);
                   }
@@ -607,7 +606,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Remove series from Elasticsearch index.
+   * Remove series from OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -625,7 +624,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Remove series extended metadata from Elasticsearch index.
+   * Remove series extended metadata from OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -649,7 +648,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series extended metadata in Elasticsearch index.
+   * Update series extended metadata in OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -670,7 +669,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to reset the extended metadata for a series in an Elasticsearch index.
+   * Get the function to reset the extended metadata for a series in an OpenSearch index.
    *
    * @return the function to do the update
    */
@@ -686,7 +685,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the extended metadata for a series in an Elasticsearch index.
+   * Get the function to update the extended metadata for a series in an OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -716,7 +715,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series metadata in Elasticsearch index.
+   * Update series metadata in OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -737,7 +736,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the metadata for a series in an Elasticsearch index.
+   * Get the function to update the metadata for a series in an OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -769,7 +768,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series acl in Elasticsearch index.
+   * Update series acl in OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -788,7 +787,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the acl for a series in an Elasticsearch index.
+   * Get the function to update the acl for a series in an OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -815,7 +814,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update series theme property in an Elasticsearch index.
+   * Update series theme property in an OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -831,7 +830,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Get the function to update the theme property for a series in an Elasticsearch index.
+   * Get the function to update the theme property for a series in an OpenSearch index.
    *
    * @param seriesId
    *          The series id
@@ -855,7 +854,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /**
-   * Update a series in an Elasticsearch index.
+   * Update a series in an OpenSearch index.
    *
    * @param seriesId
    *          The series id

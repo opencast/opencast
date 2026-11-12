@@ -26,10 +26,10 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
@@ -74,7 +74,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
 
   private AclServiceFactory aclServiceFactory;
   private AssetManager assetManager;
-  private ElasticsearchIndex index;
+  private OpenSearchIndex index;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
   private EventCommentService eventCommentService;
@@ -230,13 +230,13 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public ElasticsearchIndex getIndex() {
+  public OpenSearchIndex getIndex() {
     return index;
   }
 
   /** OSGi DI. */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 

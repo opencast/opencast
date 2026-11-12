@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,11 +197,11 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
   private MediaPackageElementBuilderPlugin createPlugin(Class<? extends MediaPackageElementBuilderPlugin> clazz) {
     MediaPackageElementBuilderPlugin plugin = null;
     try {
-      plugin = clazz.newInstance();
-    } catch (InstantiationException e) {
+      plugin = clazz.getDeclaredConstructor().newInstance();
+    } catch (InstantiationException | NoSuchMethodException e) {
       throw new RuntimeException("Cannot instantiate media package element builder plugin of type " + clazz.getName()
               + ". Did you provide a parameterless constructor?", e);
-    } catch (IllegalAccessException e) {
+    } catch (IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     }
     try {

@@ -24,10 +24,16 @@ on:
     branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
+permissions:
+  contents: read
+
 jobs:
   test-opencast:
     strategy:
       matrix:
+        # Java 21 is the supported version. Java 23 is the newest version
+        # the Karaf 4.4.x line runs on. Java 25 needs Karaf 4.5.0 and
+        # should replace 23 once that is released and integrated.
         java:
           - 21
           - 23
@@ -47,7 +53,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: setup java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
@@ -66,10 +72,17 @@ jobs:
             tesseract-ocr-deu \
             unzip
 
+      - name: check code format
+        run: |
+          ./mvnw spotless:check -Pnone \
+            --batch-mode \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
       - name: build opencast
         run: |
           ./mvnw clean install -Pnone \
             --batch-mode \
+            -Dspotless.apply.skip=true \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
@@ -82,6 +95,7 @@ jobs:
         run: |
           ../mvnw clean install \
             --batch-mode \
+            -Dspotless.apply.skip=true \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
@@ -199,18 +213,11 @@ jobs:
           && matrix.java == 21
           && github.repository == 'opencast/opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
-        env:
-          S3_HOST: ${{ secrets.S3_HOST }}
-          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
-          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-        run: |
-          echo "host_base = ${S3_HOST}" > "$HOME/.s3cfg"
-          echo "host_bucket = ${S3_HOST}" >> "$HOME/.s3cfg"
-          echo "bucket_location = us-east-1" >> "$HOME/.s3cfg"
-          echo "use_https = True" >> "$HOME/.s3cfg"
-          echo "access_key = ${S3_ACCESS_KEY}" >> "$HOME/.s3cfg"
-          echo "secret_key = ${S3_SECRET_KEY}" >> "$HOME/.s3cfg"
-          echo "signature_v2 = False" >> "$HOME/.s3cfg"
+        uses: lkiesow/configure-s3cmd@v1
+        with:
+          host: ${{ secrets.S3_HOST }}
+          access_key: ${{ secrets.S3_ACCESS_KEY }}
+          secret_key: ${{ secrets.S3_SECRET_KEY }}
 
       - name: upload assets
         working-directory: build
@@ -221,19 +228,3 @@ jobs:
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
           s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
-
-      - name: prepare allinone for upload
-        if: matrix.java == 21
-        working-directory: build
-        run: |
-          tar xf opencast-dist-allinone*.tar.gz
-
-      - name: upload tarball as workflow asset
-        if: >
-          matrix.java == 21
-          && github.repository == 'opencast/opencast'
-        uses: actions/upload-artifact@v7
-        with:
-          name: opencast-allinone
-          path: build/opencast-dist-allinone/
-          overwrite: true

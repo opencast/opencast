@@ -47,9 +47,10 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.commons.lang3.Strings;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -131,7 +132,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
           operationInstanceJob.setArguments(Collections.emptyList());
           serviceRegistry.updateJob(operationInstanceJob);
 
-          List<Job> jobs = serviceRegistry.getChildJobs(operationInstanceId);
+          List<Job> jobs = serviceRegistry.getDescendantJobs(operationInstanceId);
           for (Job job : jobs) {
             if (job.getStatus() == Job.Status.FINISHED) {
               logger.debug("Deleting job arguments: {}", job.getArguments());
@@ -281,11 +282,11 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     String elementUri = elementToRemove.getURI().toString();
     String deleteUri;
-    if (StringUtils.containsIgnoreCase(elementUri, UrlSupport.concat(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
+    if (Strings.CI.contains(elementUri, UrlSupport.concat(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
               elementToRemove.getMediaPackage().getIdentifier().toString(), elementToRemove.getIdentifier()))) {
       deleteUri = UrlSupport.concat(repositoryBaseUrl, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
               elementToRemove.getMediaPackage().getIdentifier().toString(), elementToRemove.getIdentifier());
-    } else if (StringUtils.containsIgnoreCase(elementUri, WorkingFileRepository.COLLECTION_PATH_PREFIX)) {
+    } else if (Strings.CI.contains(elementUri, WorkingFileRepository.COLLECTION_PATH_PREFIX)) {
       deleteUri = UrlSupport.concat(repositoryBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX,
           StringUtils.substringAfter(elementToRemove.getURI().getPath(), WorkingFileRepository.COLLECTION_PATH_PREFIX));
     } else {
@@ -294,16 +295,16 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
       return;
     }
     HttpDelete delete = new HttpDelete(deleteUri);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = client.execute(delete);
-      int statusCode = response.getStatusLine().getStatusCode();
+      int statusCode = response.getCode();
       if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
-        logger.info("Successfully deleted external URI {}", delete.getURI());
+        logger.info("Successfully deleted external URI {}", delete.getRequestUri());
       } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-        logger.info("External URI {} has already been deleted", delete.getURI());
+        logger.info("External URI {} has already been deleted", delete.getRequestUri());
       } else {
-        logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getURI(), statusCode);
+        logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getRequestUri(), statusCode);
       }
     } finally {
       try {

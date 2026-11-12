@@ -140,6 +140,10 @@ directly in the Opencast administrative user interface.
 | ROLE_API_PLAYLISTS_EDIT     | POST   | /api/playlists   |
 | ROLE_API_PLAYLISTS_DELETE   | DELETE | /api/playlists   |
 
+**LifeCycle Management API**
+
+Currently restricted to administrators only.
+
 **User- and Role-switching**
 
 The External API supports user- and role-switching, i.e. it is possible to perform requests on behalf of another

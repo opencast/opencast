@@ -67,4 +67,3 @@ public class PlaylistDataFetcher implements ContextDataFetcher<GqlPlaylist> {
     }
   }
 }
-

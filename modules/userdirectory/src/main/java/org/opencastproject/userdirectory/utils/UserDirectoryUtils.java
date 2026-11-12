@@ -26,8 +26,9 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Set;
 
@@ -57,13 +58,12 @@ public final class UserDirectoryUtils {
     Organization org = user.getOrganization();
 
     for (Role role : roles) {
-      if (StringUtils.equals(SecurityConstants.GLOBAL_ADMIN_ROLE, role.getName())) {
-        return user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE);
+      if (Strings.CS.equals(SecurityConstants.GLOBAL_ADMIN_ROLE, role.getName())) {
+        return SecurityUtil.isGlobalAdmin(user);
       }
 
-      if (org != null && StringUtils.equals(org.getAdminRole(), role.getName())) {
-        return user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)
-                || user.hasRole(org.getAdminRole());
+      if (org != null && Strings.CS.equals(org.getAdminRole(), role.getName())) {
+        return SecurityUtil.isAdmin(user, org);
       }
     }
     return true;

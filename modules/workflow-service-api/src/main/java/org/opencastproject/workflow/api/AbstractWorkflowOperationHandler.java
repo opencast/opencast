@@ -30,12 +30,14 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -325,13 +327,37 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   }
 
   /**
-   * Get a configuration option.
+   * Describes the jobs in <code>result</code> that did not finish successfully, identifying each by id, processing
+   * host and final status, for inclusion in a {@link WorkflowOperationException} message. Intended to be used
+   * together with {@link #waitForStatus(Job...)}, so a failure can be traced back to the worker that handled it.
    *
-   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or
-   *             {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
+   * @param result
+   *          the outcome of a {@link #waitForStatus(Job...)} call
+   * @return a human-readable description of the failed jobs, or an empty string if all jobs finished successfully
    */
-  protected Optional<String> getCfg(WorkflowInstance wi, String key) {
-    return Optional.ofNullable(wi.getCurrentOperation().getConfiguration(key));
+  protected String describeFailedJobs(JobBarrier.Result result) {
+    StringBuilder failed = new StringBuilder();
+    for (Map.Entry<Job, Job.Status> entry : result.getStatus().entrySet()) {
+      if (Job.Status.FINISHED.equals(entry.getValue())) {
+        continue;
+      }
+      if (failed.length() > 0) {
+        failed.append(", ");
+      }
+      long jobId = entry.getKey().getId();
+      failed.append(format("id=%d host=%s status=%s", jobId, getProcessingHost(jobId), entry.getValue()));
+    }
+    return failed.length() > 0 ? format("Failed jobs: [%s]", failed) : "";
+  }
+
+  /** The jobs passed to {@link #waitForStatus(Job...)} don't know their processing host, so ask the registry. */
+  private String getProcessingHost(long jobId) {
+    try {
+      return serviceRegistry.getJob(jobId).getProcessingHost();
+    } catch (NotFoundException | ServiceRegistryException e) {
+      logger.warn("Unable to look up processing host of job {}", jobId, e);
+      return null;
+    }
   }
 
   /**
@@ -560,7 +586,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         break;
       case atLeastOne:
         targetFlavorList = getFlavors(operation, TARGET_FLAVORS, TARGET_FLAVOR);
-        if (targetTagList.isEmpty()) {
+        if (targetFlavorList.isEmpty()) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVORS + "' or '" + TARGET_FLAVOR
               + "' must be set");
         }
@@ -583,7 +609,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     List<String> removeTags = new ArrayList();
 
     for (String targetTag : tags) {
-      if (!StringUtils.startsWithAny(targetTag, plus, minus)) {
+      if (!Strings.CS.startsWithAny(targetTag, plus, minus)) {
         if (addTags.size() > 0
             || removeTags.size() > 0) {
           logger.warn("You may not mix override tags and tag changes. "
@@ -591,9 +617,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
               + "The tag {} is not prefixed with '{}' or '{}'.", overrideTags, targetTag, plus, minus);
         }
         overrideTags.add(targetTag);
-      } else if (StringUtils.startsWith(targetTag, plus)) {
+      } else if (Strings.CS.startsWith(targetTag, plus)) {
         addTags.add(StringUtils.substring(targetTag, 1));
-      } else if (StringUtils.startsWith(targetTag, minus)) {
+      } else if (Strings.CS.startsWith(targetTag, minus)) {
         removeTags.add(StringUtils.substring(targetTag, 1));
       }
     }

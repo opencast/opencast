@@ -29,13 +29,13 @@ import static org.junit.Assert.assertThrows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -92,7 +92,7 @@ public class AclScannerTest {
     SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
     EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    final OpenSearchIndex index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
             .anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(seriesSearchResult)

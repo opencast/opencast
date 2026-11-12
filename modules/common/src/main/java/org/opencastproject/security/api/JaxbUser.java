@@ -21,8 +21,6 @@
 
 package org.opencastproject.security.api;
 
-import org.opencastproject.util.EqualsUtil;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -315,7 +313,7 @@ public final class JaxbUser implements User {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(userName, organization, provider);
+    return Objects.hash(userName, organization, provider);
   }
 
   /**

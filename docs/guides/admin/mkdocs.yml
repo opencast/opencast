@@ -41,9 +41,10 @@ nav:
   - Upgrade Guide: "upgrade.md"
   - Registration: "registration.md"
   - Changelogs:
+      - Opencast 21: "changelog/opencast-21.md"
       - Opencast 20: "changelog/opencast-20.md"
-      - Opencast 19: "changelog/opencast-19.md"
       - Older Versions:
+          - Opencast 19: "changelog/older-versions/opencast-19.md"
           - Opencast 18: "changelog/older-versions/opencast-18.md"
           - Opencast 17: "changelog/older-versions/opencast-17.md"
           - Opencast 16: "changelog/older-versions/opencast-16.md"
@@ -98,7 +99,6 @@ nav:
               - Overview: 'configuration/admin-ui/statistics/statistics.overview.md'
               - InfluxDB Statistics Provider: 'configuration/admin-ui/statistics/influxdb-statistics-provider.md'
               - Matomo Statistics Provider: 'configuration/admin-ui/statistics/matomo-statistics-provider.md'
-          - Thumbnails: "configuration/admin-ui/thumbnails.md"
           - Imprint and Privacy Statement: "configuration/admin-ui/about.md"
           - Terms of Use: "configuration/admin-ui/terms.md"
       - Amazon Services:
@@ -122,6 +122,7 @@ nav:
       - External Monitoring: "configuration/monitoring.md"
       - Firewall: "configuration/firewall.md"
       - Inbox: "configuration/inbox.md"
+      - LifeCycle Management: 'configuration/lifecycle-management.md'
       - LTI Module: "configuration/ltimodule.md"
       - List Providers: "configuration/listproviders.md"
       - Live Schedule: "configuration/liveschedule.md"
@@ -143,7 +144,7 @@ nav:
       - Role Based Event Access: "configuration/episode-id-roles.md"
       - Search Index:
           - Overview: "configuration/searchindex/index.md"
-          - Elasticsearch: "configuration/searchindex/elasticsearch.md"
+          - OpenSearch: "configuration/searchindex/opensearch.md"
       - Serving Static Files: "configuration/serving-static-files.md"
       - Stream Security:
           - Overview: "configuration/stream-security/stream-security-overview.md"
@@ -154,6 +155,7 @@ nav:
           - Basic: "configuration/terminationstate.md"
           - AWS AutoScaling: "configuration/terminationstate.aws.autoscaling.md"
       - Text Extraction: "configuration/textextraction.md"
+      - Thumbnails: "configuration/thumbnails.md"
       - Timeline Previews: "configuration/timelinepreviews.md"
       - Tobira: "configuration/tobira.md"
       - Transcription configuration:

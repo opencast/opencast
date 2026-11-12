@@ -31,7 +31,6 @@ import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
@@ -41,9 +40,9 @@ import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -102,7 +101,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distribute(channelId, mediaPackage, elementIds);
@@ -111,7 +110,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   @Override
   public boolean publishToStreaming() {
     HttpGet get = new HttpGet("/publishToStreaming");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
 
     if (response != null) {
       String content = null;
@@ -131,7 +130,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   @Override
   public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds)
-          throws DistributionException,  MediaPackageException {
+          throws DistributionException {
     logger.info("Distributing {} elements to {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),

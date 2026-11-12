@@ -27,7 +27,6 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.getResponseType;
@@ -50,6 +49,7 @@ import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -60,11 +60,12 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -78,6 +79,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
@@ -193,11 +195,11 @@ public class IncidentServiceEndpoint {
     try {
       final List<Incident> incidents = svc.getIncidentsOfJob(jobIds);
       final MediaType mt = getResponseType(type);
-      if (eq(FMT_SYS, format)) {
+      if (Objects.equals(FMT_SYS, format)) {
         return ok(mt, new JaxbIncidentList(incidents));
-      } else if (eq(FMT_DIGEST, format)) {
+      } else if (Objects.equals(FMT_DIGEST, format)) {
         return ok(mt, new JaxbIncidentDigestList(svc, request.getLocale(), incidents));
-      } else if (eq(FMT_FULL, format)) {
+      } else if (Objects.equals(FMT_FULL, format)) {
         return ok(mt, new JaxbIncidentFullList(svc, request.getLocale(), incidents));
       } else {
         return unknownFormat();
@@ -247,11 +249,11 @@ public class IncidentServiceEndpoint {
     try {
       final IncidentTree tree = svc.getIncidentsOfJob(jobId, cascade);
       final MediaType mt = getResponseType(type);
-      if (eq(FMT_SYS, format)) {
+      if (Objects.equals(FMT_SYS, format)) {
         return ok(mt, new JaxbIncidentTree(tree));
-      } else if (eq(FMT_DIGEST, format)) {
+      } else if (Objects.equals(FMT_DIGEST, format)) {
         return ok(mt, new JaxbIncidentFullTree(svc, request.getLocale(), tree));
-      } else if (eq(FMT_FULL, format)) {
+      } else if (Objects.equals(FMT_FULL, format)) {
         return ok(mt, new JaxbIncidentFullTree(svc, request.getLocale(), tree));
       } else {
         return unknownFormat();
@@ -313,10 +315,10 @@ public class IncidentServiceEndpoint {
           throws NotFoundException {
     try {
       IncidentL10n localization = svc.getLocalization(incidentId, LocaleUtils.toLocale(locale));
-      JSONObject json = new JSONObject();
-      json.put("title", localization.getTitle());
-      json.put("description", localization.getDescription());
-      return Response.ok(json.toJSONString()).build();
+      JsonObject json = new JsonObject();
+      json.addProperty("title", localization.getTitle());
+      json.addProperty("description", localization.getDescription());
+      return Response.ok(json.toString()).build();
     } catch (IncidentServiceException e) {
       logger.warn("Unable to get job localization of jo incident:", e);
       throw new WebApplicationException(INTERNAL_SERVER_ERROR);
@@ -365,10 +367,11 @@ public class IncidentServiceEndpoint {
         map = params.getMap();
       }
       if (StringUtils.isNotBlank(details)) {
-        final JSONArray array = (JSONArray) JSONValue.parse(details);
-        for (int i = 0; i < array.size(); i++) {
-          JSONObject tuple = (JSONObject) array.get(i);
-          list.add(Tuple.tuple((String) tuple.get("title"), (String) tuple.get("content")));
+        final JsonArray array = GsonUtil.gson().fromJson(details, JsonArray.class);
+        for (JsonElement element : array) {
+          JsonObject tuple = element.getAsJsonObject();
+          list.add(Tuple.tuple(GsonUtil.getStringOrNull(tuple, "title"),
+                  GsonUtil.getStringOrNull(tuple, "content")));
         }
       }
     } catch (Exception e) {

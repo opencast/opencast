@@ -34,13 +34,13 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -53,7 +53,6 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.themes.list.ThemesListQuery;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -82,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -131,7 +131,7 @@ public class ThemesEndpoint {
   private SecurityService securityService;
 
   /** The admin UI search index */
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
 
   /** The series service */
   private SeriesService seriesService;
@@ -156,7 +156,7 @@ public class ThemesEndpoint {
 
   /** OSGi DI. */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.searchIndex = index;
   }
 
@@ -304,6 +304,11 @@ public class ThemesEndpoint {
       try {
         results = searchIndex.getByQuery(query);
       } catch (SearchIndexException e) {
+        if (e.isBadRequest()) {
+          logger.warn("The admin UI Search Index rejected the query for series with theme '{}': {}", themeId,
+                  e.getMessage());
+          return RestUtil.R.badRequest(e.getMessage());
+        }
         logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId,
                 e);
         return RestUtil.R.serverError();
@@ -603,6 +608,11 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("The admin UI Search Index rejected the query for series with theme '{}': {}", themeId,
+                e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId, e);
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
@@ -770,7 +780,7 @@ public class ThemesEndpoint {
    *           If there was an error while persisting or deleting one of the files.
    */
   private void updateReferencedFile(String original, String updated) throws NotFoundException, IOException {
-    if (EqualsUtil.ne(original, updated)) {
+    if (!Objects.equals(original, updated)) {
       if (isNotBlank(original)) {
         staticFileService.deleteFile(original);
       }

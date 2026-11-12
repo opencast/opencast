@@ -21,7 +21,6 @@
 
 package org.opencastproject.graphql.type.output.field;
 
-import static org.opencastproject.graphql.type.output.field.GqlStringMetadataField.TYPE_NAME;
 
 import org.opencastproject.graphql.type.output.GqlMetadataFieldInterface;
 import org.opencastproject.metadata.dublincore.MetadataField;

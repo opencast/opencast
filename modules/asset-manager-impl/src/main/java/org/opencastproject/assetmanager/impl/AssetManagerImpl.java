@@ -25,7 +25,6 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNo
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.metadata.dublincore.CatalogUIAdapter.ORGANIZATION_WILDCARD;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.functions.Misc.chuck;
@@ -51,15 +50,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
 import org.opencastproject.db.DBSessionFactory;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.DataType;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -70,6 +60,15 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService.DataType;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -170,7 +169,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private DBSessionFactory dbSessionFactory;
   private EntityManagerFactory emf;
   private AclServiceFactory aclServiceFactory;
-  private ElasticsearchIndex index;
+  private OpenSearchIndex index;
 
   // careful: org key can be wildcard!
   private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
@@ -267,7 +266,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 
@@ -318,7 +317,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public List<Snapshot> getLatestSnapshots(Collection mediaPackageIds) {
+  public List<Snapshot> getLatestSnapshots(Collection<String> mediaPackageIds) {
     String orgId = securityService.getOrganization().getId();
     switch (isAdmin()) {
       case GLOBAL:
@@ -498,8 +497,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       Snapshot archived = addInternal(owner, MediaPackageSupport.copy(mp)).toSnapshot();
       return getHttpAssetProvider().prepareForDelivery(archived);
     } catch (Exception e) {
-      logger.error("An error occurred", e);
-      throw unwrapExceptionUntil(AssetManagerException.class, e).orElse(new AssetManagerException(e));
+      throw unwrapExceptionUntil(AssetManagerException.class, e)
+          .orElseGet(() -> new AssetManagerException(
+              format("Failed to take snapshot of media package %s", mp.getIdentifier()), e));
     }
   }
 
@@ -543,7 +543,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Update the event in the Elasticsearch index.
+   * Update the event in the OpenSearch index.
    *
    * @param snapshot
    *         The newest snapshot of the event to update
@@ -569,7 +569,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Remove the event from the Elasticsearch index
+   * Remove the event from the OpenSearch index
    *
    * @param eventId
    *         The id of the event to remove
@@ -1223,9 +1223,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private AdminRole isAdmin() {
     final User user = securityService.getUser();
-    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    if (SecurityUtil.isGlobalAdmin(user)) {
       return AdminRole.GLOBAL;
-    } else if (user.hasRole(securityService.getOrganization().getAdminRole())
+    } else if (SecurityUtil.isOrganizationAdmin(user, securityService.getOrganization())
             || user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
       // In this context, we treat capture agents the same way as organization admins, allowing them access so that
       // they can ingest new media without requiring them to be explicitly specified in the ACLs.
@@ -1412,29 +1412,23 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     calcChecksumsForMediaPackageElements(pmp);
     // download and archive elements
     storeAssets(pmp, version);
-    // store mediapackage in db
-    final SnapshotDto snapshotDto;
-    try {
-      // rewrite URIs for archival
-      for (MediaPackageElement mpe : pmp.getElements()) {
-        String fileName = getFileName(mpe).orElse("unknown");
-        URI archiveUri = new URI(
-            "urn",
-            "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
-            null
-        );
-        mpe.setURI(archiveUri);
-      }
-
-      String currentOrgId = securityService.getOrganization().getId();
-      snapshotDto = getDatabase().saveSnapshot(
-              currentOrgId, pmp, now, version,
-              Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
+    // rewrite URIs for archival
+    for (MediaPackageElement mpe : pmp.getElements()) {
+      String fileName = getFileName(mpe).orElse("unknown");
+      URI archiveUri = new URI(
+          "urn",
+          "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
+          null
       );
-    } catch (AssetManagerException e) {
-      logger.error("Could not take snapshot {}", mpId, e);
-      throw new AssetManagerException(e);
+      mpe.setURI(archiveUri);
     }
+
+    // store mediapackage in db
+    String currentOrgId = securityService.getOrganization().getId();
+    final SnapshotDto snapshotDto = getDatabase().saveSnapshot(
+            currentOrgId, pmp, now, version,
+            Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
+    );
     // save manifest to element store
     // this is done at the end after the media package element ids have been rewritten to neutral URNs
     storeManifest(pmp, version);
@@ -1594,7 +1588,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   /**
-   * Get the function to update a commented event in the Elasticsearch index.
+   * Get the function to update a commented event in the OpenSearch index.
    *
    * @return the function to do the update
    */

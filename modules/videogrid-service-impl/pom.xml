@@ -7,13 +7,17 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
@@ -87,10 +91,6 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -100,8 +100,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>

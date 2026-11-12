@@ -24,7 +24,6 @@ package org.opencastproject.distribution.api;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageException;
 
 import java.util.List;
 
@@ -51,11 +50,9 @@ public interface DistributionService {
    * @return The job
    * @throws DistributionException
    *           if there was a problem distributing the media
-   * @throws MediaPackageException
-   *           if there was a problem with the mediapackage element
    */
   Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException;
+          throws DistributionException;
 
   /**
    * Distributes a media package element synchronously, bypassing the Opencast job system.
@@ -68,11 +65,9 @@ public interface DistributionService {
    * @return list of distributed media package elements
    * @throws DistributionException
    *           if there was a problem distributing the media
-   * @throws MediaPackageException
-   *           if there was a problem with the mediapackage element
    */
   List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException;
+          throws DistributionException;
 
   /**
    * Retract a media package element from the distribution channel.
@@ -98,7 +93,7 @@ public interface DistributionService {
    *           if there was a problem retracting the mediapackage
    */
   List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, String elementId)
-          throws DistributionException, MediaPackageException;
+          throws DistributionException;
 
   /**
    * Returns the distribution type for this service.

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -45,6 +45,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-search-service-api</artifactId>
       <version>${project.version}</version>
@@ -58,12 +62,12 @@
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -86,9 +90,9 @@
       <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>${elasticsearch.version}</version>
+      <groupId>org.opensearch</groupId>
+      <artifactId>opensearch</artifactId>
+      <version>${opensearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -109,7 +113,6 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <!-- runtime tests -->
-            <ignoredUnusedDeclaredDependency>com.sun.jersey:jersey-bundle</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.component</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>

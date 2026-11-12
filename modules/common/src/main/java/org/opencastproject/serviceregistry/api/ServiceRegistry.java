@@ -435,15 +435,28 @@ public interface ServiceRegistry {
   List<Job> getActiveJobs() throws ServiceRegistryException;
 
   /**
-   * Get all child jobs from a job
+   * Get the direct child jobs of a job, i.e. those jobs that have the given job as their parent.
    *
    * @param id
    *          the parent job id
-   * @return a list of the child jobs ordered by execution
+   * @return a list of the direct child jobs ordered by creation date
    * @throws ServiceRegistryException
    *           if there is a problem accessing the service registry
+   * @see #getDescendantJobs(long)
    */
   List<Job> getChildJobs(long id) throws ServiceRegistryException;
+
+  /**
+   * Get all descendant jobs of a job, i.e. its children, their children and so on.
+   *
+   * @param id
+   *          the ancestor job id
+   * @return a flattened list of all descendant jobs
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry
+   * @see #getChildJobs(long)
+   */
+  List<Job> getDescendantJobs(long id) throws ServiceRegistryException;
 
   /**
    * Return a facility to record job incidents.

@@ -58,7 +58,7 @@ operations:
       - time: 50%
 
   - id: cover-image
-    if: NOT (${presenter_source_video} OR ${presentation_source_video})
+    if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presenter_source_audio}
     description: Create a cover image for audio-only files
     configurations:
       - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
@@ -66,28 +66,55 @@ operations:
       - height: 1080
       - target-flavor: presenter/image+work
 
+  - id: cover-image
+    if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presentation_source_audio}
+    description: Create a cover image for audio-only files
+    configurations:
+      - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
+      - width: 1920
+      - height: 1080
+      - target-flavor: 'presentation/image+work'
+
   - id: image-to-video
-    if: NOT (${presenter_source_video} OR ${presentation_source_video})
+    if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presenter_source_audio}
     description: Composite
     configurations:
-      - source-flavor: presenter/image+work
-      - target-flavor: '*/video+work'
+      - source-flavor: 'presenter/image+work'
+      - target-flavor: 'presenter/video+work'
       - duration: ${presenter_source_duration}
       - profile: image-movie.work
 
+  - id: image-to-video
+    if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presentation_source_audio}
+    description: Composite
+    configurations:
+      - source-flavor: 'presentation/image+work'
+      - target-flavor: 'presentation/video+work'
+      - duration: ${presentation_source_duration}
+      - profile: image-movie.work
+
   - id: prepare-av
-    if: NOT (${presenter_source_video} OR ${presentation_source_video})
+    if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presenter_source_audio}
     description: Preparing presenter audio and video work versions
     configurations:
-      - source-flavor: presenter/video+work
-      - target-flavor: presenter/preview
+      - source-flavor: 'presenter/video+work'
+      - target-flavor: 'presenter/preview'
+      - rewrite: false
+      - audio-muxing-source-flavors: '*/source'
+
+  - id: prepare-av
+    if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presentation_source_audio}
+    description: Preparing presenter audio and video work versions
+    configurations:
+      - source-flavor: 'presentation/video+work'
+      - target-flavor: 'presentation/preview'
       - rewrite: false
       - audio-muxing-source-flavors: '*/source'
 
   - id: tag
     description: Tagging media package elements
     configurations:
-      - source-flavors: presenter/preview
+      - source-flavors: 'presenter/preview, presentation/preview'
       - target-tags: preview
       - copy: false
 

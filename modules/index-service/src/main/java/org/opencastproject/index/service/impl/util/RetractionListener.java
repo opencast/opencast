@@ -99,4 +99,3 @@ public final class RetractionListener implements WorkflowListener {
     retractions.remove(workflow.getId());
   }
 }
-

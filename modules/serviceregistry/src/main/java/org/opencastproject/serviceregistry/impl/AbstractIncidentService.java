@@ -36,7 +36,6 @@ import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -132,7 +131,7 @@ public abstract class AbstractIncidentService implements IncidentService {
             continue;
           }
           IncidentTree operationResult = getIncidentsOfJob(operation.getId(), true);
-          if (hasIncidents(Collections.list(operationResult))) {
+          if (hasIncidents(List.of(operationResult))) {
             childIncidents.add(operationResult);
           }
         }
@@ -229,12 +228,9 @@ public abstract class AbstractIncidentService implements IncidentService {
     List<Job> childJobs = getServiceRegistry().getChildJobs(jobId);
     List<IncidentTree> incidentResults = new ArrayList<>();
     for (Job childJob : childJobs) {
-      if (childJob.getParentJobId() != jobId) {
-        continue;
-      }
       List<Incident> incidentsForJob = getIncidentsOfJob(childJob.getId());
       IncidentTree incidentTree = new IncidentTreeImpl(incidentsForJob, getChildIncidents(childJob.getId()));
-      if (hasIncidents(Collections.list(incidentTree))) {
+      if (hasIncidents(List.of(incidentTree))) {
         incidentResults.add(incidentTree);
       }
     }

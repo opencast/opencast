@@ -27,15 +27,8 @@ import static org.junit.Assert.assertTrue;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchQuery;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
+import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -57,6 +50,14 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchQuery;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.impl.SearchResultItemImpl;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.Util;
@@ -82,7 +83,10 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
-import net.fortuna.ical4j.model.DateTime;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -91,9 +95,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,6 +107,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -123,7 +125,6 @@ import java.util.UUID;
 
 public class IndexServiceImplTest {
 
-  private static final JSONParser parser = new JSONParser();
   private static final Logger logger = LoggerFactory.getLogger(IndexServiceImplTest.class);
 
   /**
@@ -235,6 +236,64 @@ public class IndexServiceImplTest {
     return Tuple.tuple(commonEventCatalogUIAdapter, metadataCell);
   }
 
+  private CommonSeriesCatalogUIAdapter setupCommonSeriesCatalogUIAdapter()
+          throws org.osgi.service.cm.ConfigurationException {
+    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = new CommonSeriesCatalogUIAdapter();
+
+    Properties seriesCatalogProperties = new Properties();
+    InputStream in = null;
+    try {
+      in = getClass().getResourceAsStream("/series-catalog.properties");
+      seriesCatalogProperties.load(in);
+    } catch (IOException e) {
+      throw new ComponentException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+
+    commonSeriesCatalogUIAdapter.updated(PropertiesUtil.toDictionary(seriesCatalogProperties));
+    return commonSeriesCatalogUIAdapter;
+  }
+
+  /**
+   *
+   *
+   * Test Create Series
+   *
+   *
+   */
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSeriesWithoutMetadataExpectsIllegalArgumentException() throws Exception {
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+    indexServiceImpl.addCatalogUIAdapter(setupCommonSeriesCatalogUIAdapter());
+
+    // No metadata for the required title field was submitted at all (e.g. the "dublincore/series" catalog was
+    // omitted from the request), so this must be rejected instead of silently creating a series without a title.
+    indexServiceImpl.createSeries(new MetadataList(), new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSeriesWithBlankTitleExpectsIllegalArgumentException() throws Exception {
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = setupCommonSeriesCatalogUIAdapter();
+    indexServiceImpl.addCatalogUIAdapter(commonSeriesCatalogUIAdapter);
+
+    DublinCoreMetadataCollection seriesMetadata = commonSeriesCatalogUIAdapter.getRawFields();
+    MetadataField title = seriesMetadata.getOutputFields().get("title");
+    seriesMetadata.removeField(title);
+    MetadataField newTitle = new MetadataField(title);
+    newTitle.setValue("");
+    seriesMetadata.addField(newTitle);
+
+    MetadataList metadataList = new MetadataList();
+    metadataList.add(commonSeriesCatalogUIAdapter, seriesMetadata);
+
+    indexServiceImpl.createSeries(metadataList, new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+  }
+
   /**
    *
    *
@@ -255,9 +314,8 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputEmptyJsonExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
-    JSONObject metadataJson = (JSONObject) parser.parse("{}");
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
+    JsonObject metadataJson = JsonParser.parseString("{}").getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -267,11 +325,10 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoSourceExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-source.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -281,11 +338,10 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoProcessingExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-processing.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -295,11 +351,10 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoMetadataExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-metadata.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -314,8 +369,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event-no-workflow-configuration.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -393,8 +448,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -479,8 +534,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-scheduled-event.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -585,14 +640,14 @@ public class IndexServiceImplTest {
   }
 
   @Test
-  public void testAddAssetsToMp() throws org.json.simple.parser.ParseException, IOException, ConfigurationException,
+  public void testAddAssetsToMp() throws IOException, ConfigurationException,
           MediaPackageException, IngestException, NotFoundException {
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    JSONArray assetMetadata =  (JSONArray) new JSONParser().parse("[{\"id\":\"attachment_attachment_notes\", "
+    JsonArray assetMetadata = JsonParser.parseString("[{\"id\":\"attachment_attachment_notes\", "
         + "\"title\": \"class handout notes\","
         + "\"flavorType\": \"attachment\","
         + "\"flavorSubType\": \"notes\","
-        + "\"type\": \"attachment\"}]");
+        + "\"type\": \"attachment\"}]").getAsJsonArray();
 
     // a test asset input stream
     List<String> assetList = new LinkedList<String>();
@@ -621,8 +676,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-recurring-event.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
     Capture<String> filenameResult = EasyMock.newCapture();
@@ -672,7 +727,7 @@ public class IndexServiceImplTest {
     // Setup scheduler service
     Capture<Date> schedStart = EasyMock.newCapture();
     Capture<Date> schedEnd = EasyMock.newCapture();
-    Capture<RRule> schedRRule = EasyMock.newCapture();
+    Capture<RRule<ZonedDateTime>> schedRRule = EasyMock.newCapture();
     Capture schedDuration = EasyMock.newCapture();
     Capture<TimeZone> schedTz = EasyMock.newCapture();
 
@@ -685,14 +740,14 @@ public class IndexServiceImplTest {
             EasyMock.captureLong(schedDuration), EasyMock.capture(schedTz), EasyMock.anyString(),
             EasyMock.<Set<String>>anyObject(), EasyMock.capture(mp), EasyMock.<Map<String, String>>anyObject(),
             EasyMock.<Map<String, String>>anyObject(), EasyMock.<Optional<String>>anyObject())).
-            andAnswer(new IAnswer<Map<String, Period>>() {
+            andAnswer(new IAnswer<Map<String, Period<ZonedDateTime>>>() {
               @Override
-              public Map<String, Period> answer() throws Throwable {
-                List<Period> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
+              public Map<String, Period<ZonedDateTime>> answer() throws Throwable {
+                List<Period<ZonedDateTime>> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
                     schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
-                Map<String, Period> mapping = new LinkedHashMap<>();
+                Map<String, Period<ZonedDateTime>> mapping = new LinkedHashMap<>();
                 int counter = 0;
-                for (Period p : periods) {
+                for (Period<ZonedDateTime> p : periods) {
                   mapping.put(new IdImpl(UUID.randomUUID().toString()).toString(), p);
                 }
                 return mapping;
@@ -756,7 +811,7 @@ public class IndexServiceImplTest {
 
     SearchResult<Event> result = new SearchResultImpl<>(query, 0, 0);
 
-    ElasticsearchIndex abstractIndex = EasyMock.createMock(ElasticsearchIndex.class);
+    OpenSearchIndex abstractIndex = EasyMock.createMock(OpenSearchIndex.class);
     EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
     EasyMock.replay(abstractIndex);
 
@@ -837,7 +892,7 @@ public class IndexServiceImplTest {
     SearchResultImpl<Event> searchResult = new SearchResultImpl<>(query, 0, 0);
     searchResult.addResultItem(searchResultItem);
     SecurityService securityService = setupSecurityService(username, org);
-    ElasticsearchIndex index = EasyMock.createMock(ElasticsearchIndex.class);
+    OpenSearchIndex index = EasyMock.createMock(OpenSearchIndex.class);
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(getClass().getResourceAsStream("/events/update-event-mp.xml"));
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(searchResult);
@@ -885,7 +940,7 @@ public class IndexServiceImplTest {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
 
@@ -910,11 +965,12 @@ public class IndexServiceImplTest {
 
     periods = generatePeriods(pst, start, end, days, durationMillis);
     simpleDateFormat.setTimeZone(pst);
-    Iterator<Period> iter = periods.iterator();
+    Iterator<Period<ZonedDateTime>> iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      Period<ZonedDateTime> p = iter.next();
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     //Expecting 4 days to be scheduled: Sat (26th), Sun (27th), Mon (28th), Tues(29th)
     assertEquals(4, periods.size());
@@ -931,9 +987,10 @@ public class IndexServiceImplTest {
     simpleDateFormat.setTimeZone(cet);
     iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      Period<ZonedDateTime> p = iter.next();
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     // Expecting 4 days to be scheduled:
     //period Fri Mar 25 00:05:52 CET 2016 to Fri Mar 25 00:10:52 CET 2016
@@ -955,9 +1012,10 @@ public class IndexServiceImplTest {
     simpleDateFormat.setTimeZone(nonDstTz);
     iter = periods.iterator();
     while (iter.hasNext()) {
-      Period p = iter.next();
-      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
-              simpleDateFormat.format(p.getRangeEnd()));
+      Period<ZonedDateTime> p = iter.next();
+      logger.trace("Got period {} to {}",
+              simpleDateFormat.format(Date.from(p.getStart().toInstant())),
+              simpleDateFormat.format(Date.from(p.getEnd().toInstant())));
     }
     // Expecting 4 days to be scheduled:
     // Got period Fri Mar 11 00:05:40 MST 2016 to Fri Mar 11 00:10:40 MST 2016
@@ -973,7 +1031,7 @@ public class IndexServiceImplTest {
     Calendar end;
     long durationMillis;
     String days;
-    List<Period> periods;
+    List<Period<ZonedDateTime>> periods;
 
     // CET
     TimeZone.setDefault(cet);
@@ -988,10 +1046,10 @@ public class IndexServiceImplTest {
     assertEquals(5, periods.size());
 
     TimeZone.setDefault(cet);
-    for (Period d : periods) {
-      DateTime dEnd = d.getEnd();
+    for (Period<ZonedDateTime> d : periods) {
+      ZonedDateTime dEnd = d.getEnd();
 
-      Date date = new Date(dEnd.getTime());
+      Date date = Date.from(dEnd.toInstant());
       Calendar instance = Calendar.getInstance();
       instance.setTime(date);
 
@@ -1133,11 +1191,12 @@ public class IndexServiceImplTest {
             updatedPresenters.getB().containsAll(multiUserList));
   }
 
-  private List<Period> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days, Long duration)
-          throws ParseException {
+  private List<Period<ZonedDateTime>> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days,
+          Long duration) throws ParseException {
     Calendar tzDate = Calendar.getInstance(tz);
     tzDate.setTime(start.getTime());
-    RRule rRule = new RRule(generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
+    RRule<ZonedDateTime> rRule = new RRule<>(
+            generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
     return calculatePeriods(rRule, start.getTime(), end.getTime(), duration, tz);
   }
 
@@ -1146,7 +1205,8 @@ public class IndexServiceImplTest {
   }
 
   // The Util class is in the scheduler-api bundle (this Test class is very similar to the test class in schduler-api)
-  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
+  public List<Period<ZonedDateTime>> calculatePeriods(RRule<ZonedDateTime> rrule, Date start, Date end,
+          long duration, TimeZone tz) {
     return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 }

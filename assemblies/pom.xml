@@ -4,11 +4,13 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
     <checkstyle.skip>true</checkstyle.skip>
+    <spotless.apply.skip>true</spotless.apply.skip>
+    <spotless.check.skip>true</spotless.check.skip>
     <opencast.basedir>${project.basedir}/..</opencast.basedir>
     <packaging.definition>${opencast.basedir}/assemblies/package.xml</packaging.definition>
   </properties>
@@ -112,8 +114,19 @@
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.4/1.4_2;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.2/2.8.0;type:=endorsed;export:=true</library>
-              <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/2.12.0_1;type:=boot;export:=true</library>
+              <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/2.12.1_1;type:=boot;export:=true</library>
             </libraries>
+            <!-- Third-party features (e.g. CXF's cxf-jackson) bring their own, older Jackson bundles which
+                 nothing is wired to, since the resolver prefers our ${jackson.version}. Drop them.
+                 jackson-annotations is versioned differently (e.g. 2.22) and must not be matched. -->
+            <blacklistedBundles>
+              <bundle>mvn:com.fasterxml.jackson.core/jackson-core/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.dataformat/*/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.datatype/*/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.jaxrs/*/[2,${jackson.version})</bundle>
+              <bundle>mvn:com.fasterxml.jackson.module/*/[2,${jackson.version})</bundle>
+            </blacklistedBundles>
             <archiveZip>false</archiveZip>
             <archiveTarGz>false</archiveTarGz>
             <installedFeatures>
@@ -122,16 +135,15 @@
               <feature>opencast-plugin-crop_allinone</feature>
               <feature>opencast-plugin-crop_admin</feature>
               <feature>opencast-plugin-crop_worker</feature>
-              <feature>opencast-plugin-legacy-annotation</feature>
               <feature>opencast-plugin-transcription-services</feature>
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-userdirectory-canvas</feature>
               <feature>opencast-plugin-userdirectory-moodle</feature>
               <feature>opencast-plugin-userdirectory-sakai</feature>
               <feature>opencast-plugin-userdirectory-studip</feature>
-              <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
               <feature>opencast-plugin-graphql</feature>
+              <feature>opencast-plugin-lifecycle-management</feature>
             </installedFeatures>
           </configuration>
         </plugin>
@@ -145,7 +157,6 @@
                 <target>
                   <ant antfile="../resources/build.xml">
                     <target name="basic configuration"/>
-                    <target name="job dispatching"/>
                     <target name="developer mode"/>
                   </ant>
                 </target>

@@ -161,4 +161,3 @@ Set the base URL of the file server. When using a shared filesystem between serv
 set all servers to use the same URL (e.g. URL of the admin node).
 
     prop.org.opencastproject.file.repo.url=http://<ADMIN-URL>:8080
-

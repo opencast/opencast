@@ -37,7 +37,6 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.RequireUtil;
 
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -104,7 +103,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
         dc.setFlavor(flavor);
         return Optional.of(dc);
       }
-    } catch (SeriesException | IOException | ParseException | ParserConfigurationException | SAXException e) {
+    } catch (SeriesException | IOException | ParserConfigurationException | SAXException e) {
       logger.error("Error while loading DublinCore catalog {} of series '{}'", flavor, seriesId, e);
       return Optional.empty();
     }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -130,12 +130,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-api</artifactId>
+      <artifactId>opencast-opensearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-impl</artifactId>
+      <artifactId>opencast-opensearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -147,6 +147,12 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-kernel</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -172,7 +178,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-index</artifactId>
+      <artifactId>opencast-opensearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -209,25 +215,16 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>${httpcomponents-httpcore.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jettison</groupId>
@@ -237,11 +234,6 @@
     <dependency>
       <groupId>org.mnode.ical4j</groupId>
       <artifactId>ical4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
-      <scope>test</scope>
     </dependency>
     <!-- Testing -->
     <dependency>
@@ -264,7 +256,6 @@
     <dependency>
       <groupId>uk.co.datumedge</groupId>
       <artifactId>hamcrest-json</artifactId>
-      <version>0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -333,14 +324,11 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredNonTestScopedDependencies>
-            <ignoredNonTestScopedDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredNonTestScopedDependency>
+            <ignoredNonTestScopedDependency>org.opencastproject:opencast-opensearch-impl</ignoredNonTestScopedDependency>
             <ignoredNonTestScopedDependency>joda-time:joda-time</ignoredNonTestScopedDependency>
           </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- Required for successful tests: -->
             <ignoredUnusedDeclaredDependency>org.eclipse.persistence:org.eclipse.persistence.jpa</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.eclipse.persistence:org.eclipse.persistence.asm</ignoredUnusedDeclaredDependency>

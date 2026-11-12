@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -111,8 +111,8 @@
       <version>${project.oauth.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
@@ -149,8 +149,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- The following dependencies are required at runtime: -->
             <ignoredUnusedDeclaredDependency>org.osgi:osgi.core</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.checkerframework:checker-qual</ignoredUnusedDeclaredDependency>
@@ -184,6 +182,8 @@
               !org.jaxen.*,
               !sun.security.util,
               !org.osgi.service.log,
+              <!-- optional Apache HttpClient 4 transport of the Google client, not used -->
+              !org.apache.http.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *

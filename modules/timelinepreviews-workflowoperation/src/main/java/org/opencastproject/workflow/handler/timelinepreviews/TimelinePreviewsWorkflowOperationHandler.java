@@ -233,15 +233,18 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
           }
 
           // set the timeline previews attachment flavor and add it to the mediapackage
-          if ("*".equals(targetFlavor.getType())) {
-            targetFlavor = new MediaPackageElementFlavor(
-                timelinePreviewsMpe.getFlavor().getType(), targetFlavor.getSubtype());
+          // Resolve wildcards against this element only. The configured target flavor must stay
+          // untouched, otherwise the first track's flavor would be reused for all later ones.
+          MediaPackageElementFlavor elementTargetFlavor = targetFlavor;
+          if ("*".equals(elementTargetFlavor.getType())) {
+            elementTargetFlavor = new MediaPackageElementFlavor(
+                timelinePreviewsMpe.getFlavor().getType(), elementTargetFlavor.getSubtype());
           }
-          if ("*".equals(targetFlavor.getSubtype())) {
-            targetFlavor = new MediaPackageElementFlavor(
-                targetFlavor.getType(), timelinePreviewsMpe.getFlavor().getSubtype());
+          if ("*".equals(elementTargetFlavor.getSubtype())) {
+            elementTargetFlavor = new MediaPackageElementFlavor(
+                elementTargetFlavor.getType(), timelinePreviewsMpe.getFlavor().getSubtype());
           }
-          timelinePreviewsMpe.setFlavor(targetFlavor);
+          timelinePreviewsMpe.setFlavor(elementTargetFlavor);
           applyTargetTagsToElement(targetTagsProperty, timelinePreviewsMpe);
 
           mediaPackage.add(timelinePreviewsMpe);

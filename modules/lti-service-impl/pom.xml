@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -73,13 +73,13 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-index</artifactId>
+      <artifactId>opencast-opensearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <!-- we use this for the transitive dependency to elasticsearch -->
+      <!-- we use this for the transitive dependency to opensearch -->
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-api</artifactId>
+      <artifactId>opencast-opensearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -110,7 +110,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-impl</artifactId>
+      <artifactId>opencast-opensearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -122,10 +122,6 @@
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -134,7 +130,7 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-opensearch-impl</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -145,7 +141,7 @@
         <configuration>
           <instructions>
             <Import-Package>
-              org.opencastproject.elasticsearch.impl;version=${project.version},
+              org.opencastproject.opensearch.impl;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.index.service.message,
               org.opencastproject.metadata.dublincore;version=${project.version},

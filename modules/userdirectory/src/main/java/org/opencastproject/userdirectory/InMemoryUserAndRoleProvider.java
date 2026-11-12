@@ -345,7 +345,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
             .flatMap(user -> user.getRoles().stream())
             .filter(role -> (like(role.getName(), query) || like(role.getDescription(), query))
                     && !(target == Role.Target.ACL && GLOBAL_SUDO_ROLE.equals(role.getName())))
-            .sorted(Comparator.comparing(Role::getName))
+            .sorted(Role.BY_NAME)
             .skip(offset).limit(limit <= 0 ? Long.MAX_VALUE : limit)
             .iterator();
   }

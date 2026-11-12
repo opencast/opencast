@@ -23,8 +23,6 @@ package org.opencastproject.graphql.command;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.GraphQLUnauthorizedException;
@@ -33,6 +31,8 @@ import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.graphql.series.GqlSeries;
 import org.opencastproject.graphql.type.input.AccessControlListInput;
 import org.opencastproject.graphql.util.GraphQLObjectMapper;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
@@ -83,7 +83,7 @@ public class UpdateSeriesAclCommand extends AbstractCommand<GqlSeries> {
     }
 
     try {
-      ElasticsearchIndex index = context.getService(ElasticsearchIndex.class);
+      OpenSearchIndex index = context.getService(OpenSearchIndex.class);
       return new GqlSeries(
           index.getSeries(seriesId, context.getOrganization(), context.getUser()).get()
       );

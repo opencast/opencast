@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.XMLConstants;
@@ -146,7 +146,7 @@ public final class XmlNamespaceContext implements NamespaceContext {
     return new NamespaceContext() {
       @Override public String getNamespaceURI(String prefix) {
         final String uri = b.getNamespaceURI(prefix);
-        if (eq(XMLConstants.DEFAULT_NS_PREFIX, prefix) && eq(XMLConstants.NULL_NS_URI, uri)) {
+        if (Objects.equals(XMLConstants.DEFAULT_NS_PREFIX, prefix) && Objects.equals(XMLConstants.NULL_NS_URI, uri)) {
           return a.getNamespaceURI(prefix);
         } else {
           return uri;

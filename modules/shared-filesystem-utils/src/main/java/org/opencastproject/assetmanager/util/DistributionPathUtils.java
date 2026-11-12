@@ -21,6 +21,8 @@
 
 package org.opencastproject.assetmanager.util;
 
+import org.opencastproject.util.UrlSupport;
+
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -97,10 +99,13 @@ public final class DistributionPathUtils {
 
 
   /**
-   * Splits up a distribution URI and returns a local path instead.
+   * Splits up a distribution URI and returns a local path instead. A query of the URI, e.g. from stream security, and
+   * a fragment are ignored, as they are not part of the path of the file.
    *
    * @param localPath
    *          Path to the local distribution directory
+   * @param downloadUrl
+   *          URL of the distribution download. If it is not configured, there is no local file.
    * @param organizationId
    *          Organization identifier
    * @param uri
@@ -113,13 +118,17 @@ public final class DistributionPathUtils {
       final String organizationId,
       final URI uri
   ) {
+    // The query, e.g. the signature of stream security, and the fragment are not part of the path of the file
+    final String uriString = UrlSupport.withoutQueryAndFragment(uri);
+
     if (localPath == null
+            || downloadUrl == null
             || organizationId == null
-            || !uri.toString().startsWith(downloadUrl)) {
+            || !uriString.startsWith(downloadUrl)) {
       return null;
     }
 
-    final File file = Paths.get(localPath, uri.toString().substring(downloadUrl.length())).toFile();
+    final File file = Paths.get(localPath, uriString.substring(downloadUrl.length())).toFile();
 
     if (file.isFile()) {
       logger.debug("Converted {} to local file at {}", uri, file);

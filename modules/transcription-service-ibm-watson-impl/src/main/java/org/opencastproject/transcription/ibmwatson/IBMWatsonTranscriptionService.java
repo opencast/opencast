@@ -50,6 +50,8 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.GsonUtil;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -62,31 +64,31 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.FileEntity;
+import org.apache.hc.core5.util.TimeValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -233,7 +235,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
   // For preemptive basic authentication
   private AuthCache authCache;
-  private CredentialsProvider credentialsProvider;
+  private BasicCredentialsProvider credentialsProvider;
 
   public IBMWatsonTranscriptionService() {
     super(JOB_TYPE);
@@ -272,11 +274,14 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         // We will use preemptive basic auth
         try {
           URI uri = new URI(watsonServiceUrl);
-          HttpHost targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+          HttpHost targetHost = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
           credentialsProvider = new BasicCredentialsProvider();
-          credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, psw));
+          credentialsProvider.setCredentials(new AuthScope(targetHost),
+              new UsernamePasswordCredentials(user, psw.toCharArray()));
+          BasicScheme basicScheme = new BasicScheme();
+          basicScheme.initPreemptive(new UsernamePasswordCredentials(user, psw.toCharArray()));
           authCache = new BasicAuthCache();
-          authCache.put(targetHost, new BasicScheme());
+          authCache.put(targetHost, basicScheme);
         } catch (URISyntaxException e) {
           throw new RuntimeException("Watson STT service url is not valid: " + watsonServiceUrl, e);
         }
@@ -425,11 +430,11 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   @Override
   public void transcriptionDone(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = null;
+    JsonObject jsonObj = null;
     String jobId = null;
     try {
-      jsonObj = (JSONObject) obj;
-      jobId = (String) jsonObj.get("id");
+      jsonObj = (JsonObject) obj;
+      jobId = GsonUtil.getStringOrNull(jsonObj, "id");
 
       // Check for errors inside the results object. Sometimes we get a status completed, but
       // the transcription failed e.g.
@@ -439,10 +444,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       // "event":"recognitions.completed_with_results",
       // "user_token":"66c6c9b0-b6a2-4c9a-92c8-55f953ab3d38",
       // "created":"2019-02-11T05:04:29.283Z"}' http://ADMIN/transcripts/watson/results
-      if (jsonObj.get("results") instanceof JSONArray) {
-        JSONArray resultsArray = (JSONArray) jsonObj.get("results");
-        if (resultsArray != null && resultsArray.size() > 0) {
-          String error = (String) ((JSONObject) resultsArray.get(0)).get("error");
+      if (jsonObj.get("results") instanceof JsonArray) {
+        JsonArray resultsArray = jsonObj.getAsJsonArray("results");
+        if (resultsArray.size() > 0) {
+          String error = GsonUtil.getStringOrNull(resultsArray.get(0).getAsJsonObject(), "error");
           if (!StringUtils.isEmpty(error)) {
             retryOrError(jobId, mpId,
                 String.format("Transcription completed with error for mpId %s, jobId %s: %s", mpId, jobId, error));
@@ -459,12 +464,12 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
       // Save results in file system if there
-      if (jsonObj.get("results") != null) {
+      if (has(jsonObj, "results")) {
         saveResults(jobId, jsonObj);
       }
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
-              mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString());
+              mpId, jobId, jsonObj == null ? "null" : jsonObj.toString());
       throw new TranscriptionServiceException("Could not save transcription results file", e);
     } catch (TranscriptionDatabaseException e) {
       logger.warn("Error when updating state in database for mpId {}, jobId {}", mpId, jobId);
@@ -474,8 +479,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   @Override
   public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = (JSONObject) obj;
-    String jobId = (String) jsonObj.get("id");
+    JsonObject jsonObj = (JsonObject) obj;
+    String jobId = GsonUtil.getStringOrNull(jsonObj, "id");
     try {
       retryOrError(jobId, mpId, String.format("Transcription error for media package %s, job id %s", mpId, jobId));
     } catch (TranscriptionDatabaseException e) {
@@ -551,7 +556,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
     try {
       response = httpClient.execute(httpPost, context);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -630,13 +635,12 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       HttpPost httpPost = new HttpPost(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS)
               + String.format(
                       "?inactivity_timeout=-1&timestamps=true&smart_formatting=true%s", additionalParms));
-      logger.debug("Url to invoke ibm watson service: {}", httpPost.getURI().toString());
+      logger.debug("Url to invoke ibm watson service: {}", httpPost.getRequestUri());
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, track.getMimeType().toString());
-      FileEntity fileEntity = new FileEntity(audioFile);
-      fileEntity.setChunked(true);
+      FileEntity fileEntity = new FileEntity(audioFile, ContentType.APPLICATION_OCTET_STREAM);
       httpPost.setEntity(fileEntity);
       response = httpClient.execute(httpPost, context);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_CREATED: // 201
@@ -651,11 +655,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // "http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/4bd734c0-e575-21f3-de03-f932aa0468a0"
           // }
           String jsonString = EntityUtils.toString(response.getEntity());
-          JSONParser jsonParser = new JSONParser();
-          JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          String jobId = (String) jsonObject.get("id");
-          String jobStatus = (String) jsonObject.get("status");
-          String jobUrl = (String) jsonObject.get("url");
+          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          String jobId = GsonUtil.getStringOrNull(jsonObject, "id");
+          String jobStatus = GsonUtil.getStringOrNull(jsonObject, "status");
+          String jobUrl = GsonUtil.getStringOrNull(jsonObject, "url");
           logger.info("Transcription for mp {} has been submitted. Job id: {}, job status: {}, job url: {}", mpId,
                   jobId, jobStatus, jobUrl);
 
@@ -709,7 +712,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     try {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS, jobId));
       response = httpClient.execute(httpGet, context);
-      int code = response.getStatusLine().getStatusCode();
+      int code = response.getCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -717,10 +720,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
           // Response returned is a json object described above
           String jsonString = EntityUtils.toString(entity);
-          JSONParser jsonParser = new JSONParser();
-          JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          String jobStatus = (String) jsonObject.get("status");
-          mpId = (String) jsonObject.get("user_token");
+          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          String jobStatus = GsonUtil.getStringOrNull(jsonObject, "status");
+          mpId = GsonUtil.getStringOrNull(jsonObject, "user_token");
           // user_token doesn't come back if this is not in the context of a callback so get the mpId from the db
           if (mpId == null) {
             TranscriptionJobControl jc = database.findByJob(jobId);
@@ -731,7 +733,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           logger.info("Recognitions job {} has been found, status {}", jobId, jobStatus);
           EntityUtils.consume(entity);
 
-          if (jobStatus.indexOf(RecognitionJobStatus.COMPLETED) > -1 && jsonObject.get("results") != null) {
+          if (jobStatus.indexOf(RecognitionJobStatus.COMPLETED) > -1 && has(jsonObject, "results")) {
             transcriptionDone(mpId, jsonObject);
           }
           return jobStatus;
@@ -767,12 +769,18 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     }
   }
 
-  private void saveResults(String jobId, JSONObject jsonObj) throws IOException {
-    if (jsonObj.get("results") != null) {
+  private void saveResults(String jobId, JsonObject jsonObj) throws IOException {
+    if (has(jsonObj, "results")) {
       // Save the results into a collection
       workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
-              new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
+              new ByteArrayInputStream(jsonObj.toString().getBytes()));
     }
+  }
+
+  /** True when the member is present and not JSON null. */
+  private static boolean has(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value != null && !value.isJsonNull();
   }
 
   @Override
@@ -811,10 +819,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   protected CloseableHttpClient makeHttpClient() {
-    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT).setConnectionRequestTimeout(CONNECTION_TIMEOUT).build();
-    return HttpClients.custom().setDefaultRequestConfig(reqConfig)
-            .setRetryHandler(new DefaultHttpRequestRetryHandler(3, true)).build();
+    // Besides I/O errors, this also retries requests answered with 429 or 503. Watson may send a Retry-After header
+    // with such a response, which is honored; without it, wait a moment instead of re-sending the request immediately.
+    return HttpUtil.clientBuilder(CONNECTION_TIMEOUT, SOCKET_TIMEOUT)
+            .setRetryStrategy(new DefaultHttpRequestRetryStrategy(3, TimeValue.ofSeconds(5))).build();
   }
 
   protected void retryOrError(String jobId, String mpId, String errorMsg) throws TranscriptionDatabaseException {

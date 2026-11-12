@@ -34,9 +34,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,7 +48,6 @@ public class WorkflowsEndpointTest {
 
   private static final RestServiceTestEnv env = testEnvForClasses(TestWorkflowsEndpoint.class);
 
-  private static final JSONParser parser = new JSONParser();
 
   private static final long RUNNING_WORKFLOW_ID = 84L;
   private static final long STOPPED_WORKFLOW_ID = 42L;
@@ -66,69 +66,69 @@ public class WorkflowsEndpointTest {
 
   // GET /
 
-  private void assertRunningWorkflow(JSONObject wi) {
-    assertEquals(RUNNING_WORKFLOW_ID, wi.get("identifier"));
-    assertEquals("Running Workflow", wi.get("title"));
-    assertEquals("A running workflow", wi.get("description"));
-    assertEquals("fast", wi.get("workflow_definition_identifier"));
-    assertEquals("905672ed-181c-4d60-b7cd-02758f61e713", wi.get("event_identifier"));
-    assertEquals("running", wi.get("state"));
-    final JSONObject wiCfg = (JSONObject) wi.get("configuration");
-    assertEquals("5678", wiCfg.get("efgh"));
+  private void assertRunningWorkflow(JsonObject wi) {
+    assertEquals(RUNNING_WORKFLOW_ID, wi.get("identifier").getAsLong());
+    assertEquals("Running Workflow", wi.get("title").getAsString());
+    assertEquals("A running workflow", wi.get("description").getAsString());
+    assertEquals("fast", wi.get("workflow_definition_identifier").getAsString());
+    assertEquals("905672ed-181c-4d60-b7cd-02758f61e713", wi.get("event_identifier").getAsString());
+    assertEquals("running", wi.get("state").getAsString());
+    final JsonObject wiCfg = wi.getAsJsonObject("configuration");
+    assertEquals("5678", wiCfg.get("efgh").getAsString());
 
-    final JSONArray ops = (JSONArray) wi.get("operations");
+    final JsonArray ops = wi.getAsJsonArray("operations");
     assertEquals(1, ops.size());
 
-    final JSONObject woi = (JSONObject) ops.get(0);
-    assertEquals(1234L, woi.get("identifier"));
-    assertEquals("my-op", woi.get("operation"));
-    assertEquals("Example Operation", woi.get("description"));
-    assertEquals("running", woi.get("state"));
-    assertEquals(20L, woi.get("time_in_queue"));
-    assertEquals("http://localhost:8080", woi.get("host"));
-    assertEquals("${letfail}", woi.get("if"));
-    assertEquals(true, woi.get("fail_workflow_on_error"));
-    assertEquals("fail", woi.get("error_handler_workflow"));
-    assertEquals("retry", woi.get("retry_strategy"));
-    assertEquals(42L, woi.get("max_attempts"));
-    assertEquals(1L, woi.get("failed_attempts"));
-    assertEquals("2018-01-01T12:00:00Z", woi.get("start"));
-    assertEquals("", woi.get("completion"));
-    final JSONObject woiCfg = (JSONObject) woi.get("configuration");
-    assertEquals("value", woiCfg.get("key"));
-    assertEquals("bar", woiCfg.get("foo"));
+    final JsonObject woi = ops.get(0).getAsJsonObject();
+    assertEquals(1234L, woi.get("identifier").getAsLong());
+    assertEquals("my-op", woi.get("operation").getAsString());
+    assertEquals("Example Operation", woi.get("description").getAsString());
+    assertEquals("running", woi.get("state").getAsString());
+    assertEquals(20L, woi.get("time_in_queue").getAsLong());
+    assertEquals("http://localhost:8080", woi.get("host").getAsString());
+    assertEquals("${letfail}", woi.get("if").getAsString());
+    assertEquals(true, woi.get("fail_workflow_on_error").getAsBoolean());
+    assertEquals("fail", woi.get("error_handler_workflow").getAsString());
+    assertEquals("retry", woi.get("retry_strategy").getAsString());
+    assertEquals(42L, woi.get("max_attempts").getAsLong());
+    assertEquals(1L, woi.get("failed_attempts").getAsLong());
+    assertEquals("2018-01-01T12:00:00Z", woi.get("start").getAsString());
+    assertEquals("", woi.get("completion").getAsString());
+    final JsonObject woiCfg = woi.getAsJsonObject("configuration");
+    assertEquals("value", woiCfg.get("key").getAsString());
+    assertEquals("bar", woiCfg.get("foo").getAsString());
   }
 
-  private void assertStoppedWorkflow(JSONObject wi) {
-    assertEquals(STOPPED_WORKFLOW_ID, wi.get("identifier"));
-    assertEquals("Stopped Workflow", wi.get("title"));
-    assertEquals("A stopped workflow", wi.get("description"));
-    assertEquals("fast", wi.get("workflow_definition_identifier"));
-    assertEquals("905672ed-181c-4d60-b7cd-02758f61e713", wi.get("event_identifier"));
-    assertEquals("stopped", wi.get("state"));
-    final JSONObject wiCfg = (JSONObject) wi.get("configuration");
-    assertEquals("9000", wiCfg.get("ijklm"));
+  private void assertStoppedWorkflow(JsonObject wi) {
+    assertEquals(STOPPED_WORKFLOW_ID, wi.get("identifier").getAsLong());
+    assertEquals("Stopped Workflow", wi.get("title").getAsString());
+    assertEquals("A stopped workflow", wi.get("description").getAsString());
+    assertEquals("fast", wi.get("workflow_definition_identifier").getAsString());
+    assertEquals("905672ed-181c-4d60-b7cd-02758f61e713", wi.get("event_identifier").getAsString());
+    assertEquals("stopped", wi.get("state").getAsString());
+    final JsonObject wiCfg = wi.getAsJsonObject("configuration");
+    assertEquals("9000", wiCfg.get("ijklm").getAsString());
 
-    final JSONArray ops = (JSONArray) wi.get("operations");
+    final JsonArray ops = wi.getAsJsonArray("operations");
     assertEquals(1, ops.size());
 
-    final JSONObject woi = (JSONObject) ops.get(0);
-    assertEquals(5678L, woi.get("identifier"));
-    assertEquals("my-op2", woi.get("operation"));
-    assertEquals("Example Operation2", woi.get("description"));
-    assertEquals("succeeded", woi.get("state"));
-    assertEquals(30L, woi.get("time_in_queue"));
-    assertEquals("http://localhost:8080", woi.get("host"));
-    assertEquals("", woi.get("if"));
-    assertEquals(false, woi.get("fail_workflow_on_error"));
-    assertEquals("", woi.get("error_handler_workflow"));
-    assertEquals("hold", woi.get("retry_strategy"));
-    assertEquals(0L, woi.get("max_attempts"));
-    assertEquals(0L, woi.get("failed_attempts"));
-    assertEquals("2018-02-03T12:00:00Z", woi.get("start"));
-    assertEquals("2018-02-03T13:14:15Z", woi.get("completion"));
-    final JSONObject woiCfg = (JSONObject) woi.get("configuration");
-    assertEquals("1234", woiCfg.get("abcd"));
+    final JsonObject woi = ops.get(0).getAsJsonObject();
+    assertEquals(5678L, woi.get("identifier").getAsLong());
+    assertEquals("my-op2", woi.get("operation").getAsString());
+    assertEquals("Example Operation2", woi.get("description").getAsString());
+    assertEquals("succeeded", woi.get("state").getAsString());
+    assertEquals(30L, woi.get("time_in_queue").getAsLong());
+    assertEquals("http://localhost:8080", woi.get("host").getAsString());
+    assertEquals("", woi.get("if").getAsString());
+    assertEquals(false, woi.get("fail_workflow_on_error").getAsBoolean());
+    assertEquals("", woi.get("error_handler_workflow").getAsString());
+    assertEquals("hold", woi.get("retry_strategy").getAsString());
+    assertEquals(0L, woi.get("max_attempts").getAsLong());
+    assertEquals(0L, woi.get("failed_attempts").getAsLong());
+    assertEquals("2018-02-03T12:00:00Z", woi.get("start").getAsString());
+    assertEquals("2018-02-03T13:14:15Z", woi.get("completion").getAsString());
+    final JsonObject woiCfg = woi.getAsJsonObject("configuration");
+    assertEquals("1234", woiCfg.get("abcd").getAsString());
   }
 
   // POST /
@@ -147,7 +147,7 @@ public class WorkflowsEndpointTest {
                                    .post(env.host("/"))
                                    .asString();
 
-    assertRunningWorkflow((JSONObject) parser.parse(response));
+    assertRunningWorkflow(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test
@@ -192,7 +192,7 @@ public class WorkflowsEndpointTest {
                                    .post(env.host("/"))
                                    .asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
     assertTrue(json.get("message").toString().contains("Illegal state msg"));
   }
 
@@ -234,7 +234,7 @@ public class WorkflowsEndpointTest {
                                    .get(env.host("/{workflowInstanceId}"))
                                    .asString();
 
-    assertRunningWorkflow((JSONObject) parser.parse(response));
+    assertRunningWorkflow(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test
@@ -269,7 +269,7 @@ public class WorkflowsEndpointTest {
                                    .put(env.host("/{workflowInstanceId}"))
                                    .asString();
 
-    assertRunningWorkflow((JSONObject) parser.parse(response));
+    assertRunningWorkflow(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test
@@ -284,10 +284,10 @@ public class WorkflowsEndpointTest {
                                    .put(env.host("/{workflowInstanceId}"))
                                    .asString();
 
-    final JSONObject wi = (JSONObject) parser.parse(response);
-    assertEquals("paused", wi.get("state"));
-    final JSONObject wiCfg = (JSONObject) wi.get("configuration");
-    assertEquals("123", wiCfg.get("abc"));
+    final JsonObject wi = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("paused", wi.get("state").getAsString());
+    final JsonObject wiCfg = wi.getAsJsonObject("configuration");
+    assertEquals("123", wiCfg.get("abc").getAsString());
   }
 
   @Test

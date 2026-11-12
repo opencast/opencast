@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -30,11 +30,10 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -43,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.ws.rs.GET;
@@ -108,12 +108,10 @@ public class VersionEndpoint {
     if (System.currentTimeMillis() / 1000L - lastUpdated < 3600) {
       return;
     }
-    HttpClient client = HttpClientBuilder.create().useSystemProperties().build();
-    HttpGet request = new HttpGet(URL);
     final String responseString;
-    try {
-      HttpResponse response = client.execute(request);
-      responseString = IOUtils.toString(response.getEntity().getContent(), "utf-8");
+    try (CloseableHttpClient client = HttpClientBuilder.create().useSystemProperties().build()) {
+      responseString = client.execute(new HttpGet(URL),
+          response -> EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
     } catch (IOException e) {
       // Be silent about not reaching GitHub. It's not the end of the world and we don't want to spam the logs.
       logger.debug("Could not get version from GitHub", e);

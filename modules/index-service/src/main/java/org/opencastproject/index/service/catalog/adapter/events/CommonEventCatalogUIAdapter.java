@@ -32,7 +32,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,7 @@ import java.util.Map;
 /**
  * Episode dublincore catalog implementation of a AbstractEventsCatalogUIAdapter
  */
-public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAdapter implements ManagedService {
+public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAdapter {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(CommonEventCatalogUIAdapter.class);

@@ -32,10 +32,6 @@ import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CO
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -43,6 +39,10 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -267,7 +267,7 @@ public class WorkflowServiceImplTest {
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
     EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[0]).anyTimes();
 
-    final ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    final OpenSearchIndex index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.replay(result, index);
@@ -294,6 +294,20 @@ public class WorkflowServiceImplTest {
     Assert.assertNotNull(mediapackageFromDb);
     Assert.assertEquals(mediapackage1.getIdentifier().toString(), mediapackageFromDb.getIdentifier().toString());
     Assert.assertEquals(2, service.countWorkflowInstances());
+  }
+
+  @Test
+  public void testStopDoesNotOverwriteTerminatedState() throws Exception {
+    // A workflow which ran to completion must keep its SUCCEEDED state when stop() is called on it, so that the
+    // record of how it actually ended is not lost.
+    WorkflowInstance succeeded = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    Assert.assertEquals(WorkflowState.SUCCEEDED, service.stop(succeeded.getId()).getState());
+    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(succeeded.getId()).getState());
+
+    // Failed workflows are terminated as well and must be left alone likewise.
+    WorkflowInstance failed = startAndWait(failingDefinitionWithoutErrorHandler, mediapackage2, WorkflowState.FAILED);
+    Assert.assertEquals(WorkflowState.FAILED, service.stop(failed.getId()).getState());
+    Assert.assertEquals(WorkflowState.FAILED, service.getWorkflowById(failed.getId()).getState());
   }
 
   @Test
@@ -650,7 +664,7 @@ public class WorkflowServiceImplTest {
     service.remove(wi1.getId());
     assertEquals(2, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
 
     service.remove(wi2.getId(), false);
@@ -684,7 +698,7 @@ public class WorkflowServiceImplTest {
     service.remove(wi1.getId());
     assertEquals(0, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
   }
 
@@ -708,7 +722,7 @@ public class WorkflowServiceImplTest {
     service.cleanupWorkflowInstances(0, WorkflowState.SUCCEEDED);
     assertEquals(0, service.countWorkflowInstances());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
-      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+      assertEquals(0, serviceRegistry.getDescendantJobs(op.getId()).size());
     }
   }
 

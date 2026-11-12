@@ -24,12 +24,13 @@ package org.opencastproject.kernel.mail;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
+import java.util.Map;
 
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
@@ -43,12 +44,12 @@ import javax.mail.internet.MimeMultipart;
  */
 @Component(
     immediate = true,
-    service = { ManagedService.class,SmtpService.class },
+    service = { SmtpService.class },
     property = {
         "service.description=SMTP Service"
     }
 )
-public class SmtpService extends BaseSmtpService implements ManagedService {
+public class SmtpService extends BaseSmtpService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SmtpService.class);
@@ -71,15 +72,16 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
   private static final String TEXT_HTML = "text/html; charset=UTF-8";
 
   /**
-   * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
+   * Callback from OSGi Declarative Services on component activation and configuration changes.
    *
    * @param properties
    *          the configuration properties
    * @throws ConfigurationException
    *           if configuration fails
    */
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
 
     // Production or test mode
     String optMode = StringUtils.trimToNull((String) properties.get(OPT_MAIL_MODE));

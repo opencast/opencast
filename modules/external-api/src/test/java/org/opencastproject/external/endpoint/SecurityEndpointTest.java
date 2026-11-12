@@ -21,6 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
@@ -31,8 +32,9 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,7 +51,6 @@ public class SecurityEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestSecurityEndpoint.class);
 
   /** The json parser */
-  private static final JSONParser parser = new JSONParser();
 
   @BeforeClass
   public static void oneTimeSetUp() {
@@ -68,9 +69,9 @@ public class SecurityEndpointTest {
             .formParam("valid-until", toUTC(validUntil.getTime())).accept(APP_V1_0_0_JSON).log().all().expect()
             .statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url"));
-    assertEquals(validUntil.getTime(), fromUTC((String) json.get("valid-until")));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url").getAsString());
+    assertEquals(validUntil.getTime(), fromUTC(json.get("valid-until").getAsString()));
   }
 
   @Test
@@ -86,9 +87,16 @@ public class SecurityEndpointTest {
     final String response = given().formParam("url", "http://mycdn.com/path/movie.mp4").accept(APP_V1_0_0_JSON).log()
             .all().expect().statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url"));
-    assertTrue(new Date().getTime() < fromUTC((String) json.get("valid-until")));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url").getAsString());
+    assertTrue(new Date().getTime() < fromUTC(json.get("valid-until").getAsString()));
+  }
+
+  @Test
+  public void testSignUrlWithMalformedValidity() throws Exception {
+    // A date without the 'T' separator is not ISO-8601 and must not end up as a server error
+    given().formParam("url", "http://mycdn.com/path/movie.mp4").formParam("valid-until", "2015-04-17 07:30:32Z")
+            .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_BAD_REQUEST).when().post(env.host("/sign"));
   }
 
   @Test
@@ -96,8 +104,8 @@ public class SecurityEndpointTest {
     final String response = given().formParam("url", "http://otherhost.com/path/file.txt").accept(APP_V1_0_0_JSON).log()
             .all().expect().statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("Given URL cannot be signed", json.get("error"));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("Given URL cannot be signed", json.get("error").getAsString());
   }
 
 }

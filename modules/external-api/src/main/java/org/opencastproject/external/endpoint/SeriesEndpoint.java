@@ -22,9 +22,9 @@ package org.opencastproject.external.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;
@@ -35,14 +35,6 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
@@ -50,6 +42,7 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -59,6 +52,14 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -70,6 +71,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -82,14 +84,12 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -102,11 +102,13 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -160,15 +162,15 @@ public class SeriesEndpoint {
   protected String endpointBaseUrl;
 
   /* OSGi service references */
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private IndexService indexService;
   private SecurityService securityService;
   private SeriesService seriesService;
 
   /** OSGi DI */
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   /** OSGi DI */
@@ -351,7 +353,7 @@ public class SeriesEndpoint {
 
       logger.trace("Using Query: " + query.toString());
 
-      SearchResult<Series> result = elasticsearchIndex.getByQuery(query);
+      SearchResult<Series> result = opensearchIndex.getByQuery(query);
       final boolean includeAcl = (withAcl != null && withAcl);
       return queryResultToJson(result, includeAcl, requestedVersion);
 
@@ -449,7 +451,7 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
@@ -535,7 +537,7 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -559,7 +561,7 @@ public class SeriesEndpoint {
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -738,7 +740,10 @@ public class SeriesEndpoint {
           @RestResponse(description = "The request is invalid or inconsistent.",
               responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The specified series does not exist.",
-              responseCode = HttpServletResponse.SC_NOT_FOUND)
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The metadata stored for the specified series is incomplete or invalid and needs "
+              + "to be fixed before it can be updated.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
@@ -748,7 +753,7 @@ public class SeriesEndpoint {
     Map<String, String> updatedFields;
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
-    } catch (ParseException e) {
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Unable to update series '{}' with metadata type '{}' and content '{}'", id, type, metadataJSON, e);
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
               metadataJSON, e.getMessage()));
@@ -765,7 +770,7 @@ public class SeriesEndpoint {
     Optional<DublinCoreMetadataCollection> optCollection = Optional.empty();
     SeriesCatalogUIAdapter adapter = null;
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -804,23 +809,66 @@ public class SeriesEndpoint {
 
     DublinCoreMetadataCollection collection = optCollection.get();
 
+    // Remember which fields the client actually modified. If storing the metadata fails later on, this tells us
+    // whether the offending field is one the client sent or one which was already invalid in the stored catalog.
+    Set<String> updatedFieldIds = new HashSet<>();
+
     for (String key : updatedFields.keySet()) {
-      MetadataField field = collection.getOutputFields().get(key);
+      boolean isSubjects = "subjects".equals(key);
+      MetadataField field = collection.getOutputFields().get(
+              isSubjects ? DublinCore.PROPERTY_SUBJECT.getLocalName() : key);
       if (field == null) {
         return ApiResponseBuilder.notFound(
-                "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.", key,
+                "Cannot find a metadata field with id '%s' from series with id '%s' and the metadata type '%s'.", key,
                 id, type);
       } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
         return R.badRequest(String.format(
                 "The series metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 key, type));
       }
-      collection.removeField(field);
-      collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      if (isSubjects) {
+        JsonArray subjectArray;
+        try {
+          subjectArray = GsonUtil.gson().fromJson(updatedFields.get(key), JsonArray.class);
+        } catch (JsonParseException | ClassCastException e) {
+          subjectArray = null;
+        }
+        if (subjectArray == null) {
+          logger.debug("Unable to update series '{}' as the subjects '{}' are no json array",
+                  id, updatedFields.get(key));
+          return R.badRequest(
+                  String.format("Unable to parse subjects '%s' as a json array.", updatedFields.get(key)));
+        }
+        updatedFieldIds.add(field.getInputID());
+        collection.removeField(field);
+        String subjects = subjectArray.asList().stream().map(GsonUtil::asText).collect(Collectors.joining(","));
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(field, subjects));
+      } else {
+        updatedFieldIds.add(field.getInputID());
+        collection.removeField(field);
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      }
     }
 
     metadataList.add(adapter, collection);
-    indexService.updateAllSeriesMetadata(id, metadataList, elasticsearchIndex);
+    try {
+      indexService.updateAllSeriesMetadata(id, metadataList, opensearchIndex);
+    } catch (MetadataValidationException e) {
+      if (updatedFieldIds.contains(e.getFieldId())) {
+        logger.debug("Client sent an invalid value for field '{}' of series '{}'", e.getFieldId(), id, e);
+        return R.badRequest(e.getMessage());
+      }
+      // The client did not touch this field. Its value was already invalid in the stored catalog, so there is
+      // nothing the client can do about this.
+      logger.error("Cannot update metadata of series '{}' since the required field '{}' is empty in the stored "
+              + "catalog. The series needs to be fixed before its metadata can be updated.", id, e.getFieldId());
+      return ApiResponseBuilder.serverError(
+              "Cannot update metadata of series '%s' because its stored metadata is incomplete: %s",
+              id, e.getMessage());
+    } catch (IllegalArgumentException e) {
+      logger.error("Cannot update metadata of series '{}'", id, e);
+      return ApiResponseBuilder.serverError("Cannot update metadata of series '%s': %s", id, e.getMessage());
+    }
     return ApiResponseBuilder.Json.ok(acceptHeader, "");
   }
 
@@ -867,7 +915,7 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -899,8 +947,7 @@ public class SeriesEndpoint {
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    JSONParser parser = new JSONParser();
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
       Series series = optSeries.get();
@@ -908,13 +955,13 @@ public class SeriesEndpoint {
       if (series.getAccessPolicy() == null) {
         return ApiResponseBuilder.notFound("Acl for series with id '%s' is not defined.", id);
       }
-      JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
+      JsonObject acl = GsonUtil.gson().fromJson(series.getAccessPolicy(), JsonObject.class);
 
-      if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
+      if (!acl.getAsJsonObject("acl").has("ace")) {
         return ApiResponseBuilder.notFound("Cannot find acl for series with id '%s'.", id);
       } else {
-        return ApiResponseBuilder.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace"))
-            .toJSONString());
+        return ApiResponseBuilder.Json.ok(requestedVersion, acl.getAsJsonObject("acl").getAsJsonArray("ace")
+            .toString());
       }
     }
 
@@ -937,7 +984,7 @@ public class SeriesEndpoint {
       })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
-    if (elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+    if (opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
@@ -1004,7 +1051,7 @@ public class SeriesEndpoint {
       @PathParam("seriesId") String seriesID, @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
-      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, elasticsearchIndex);
+      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, opensearchIndex);
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
       boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
       return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true,
@@ -1053,7 +1100,7 @@ public class SeriesEndpoint {
     MetadataList metadataList;
     try {
       metadataList = deserializeMetadataList(metadataParam);
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.debug("Unable to parse series metadata '{}'", metadataParam, e);
       return R.badRequest(String.format("Unable to parse metadata because '%s'", e.getMessage()));
     } catch (NotFoundException e) {
@@ -1076,7 +1123,7 @@ public class SeriesEndpoint {
     AccessControlList acl;
     try {
       acl = AclUtils.deserializeJsonToAcl(aclParam, false);
-    } catch (ParseException e) {
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Unable to parse acl '{}'", aclParam, e);
       return R.badRequest(String.format("Unable to parse acl '%s' because '%s'", aclParam, e.getMessage()));
     } catch (IllegalArgumentException e) {
@@ -1089,6 +1136,9 @@ public class SeriesEndpoint {
       JsonObject json = new JsonObject();
       json.addProperty("identifier", safeString(seriesId));
       return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)), json);
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to create series with metadata '{}'", metadataParam, e);
+      return R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}'",
               metadataParam, aclParam, themeIdParam, e);
@@ -1102,22 +1152,21 @@ public class SeriesEndpoint {
    * @param json
    *          The json string that contains an array of metadata field lists for the different catalogs.
    * @return A {@link MetadataList} with the fields populated with the values provided.
-   * @throws ParseException
+   * @throws JsonParseException
    *           Thrown if unable to parse the json string.
    * @throws NotFoundException
    *           Thrown if unable to find the catalog or field that the json refers to.
    */
-  protected MetadataList deserializeMetadataList(String json) throws ParseException, NotFoundException {
+  protected MetadataList deserializeMetadataList(String json) throws NotFoundException {
     MetadataList metadataList = new MetadataList();
-    JSONParser parser = new JSONParser();
-    JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
-    for (int i = 0; i < jsonCatalogs.size(); i++) {
-      JSONObject catalog = (JSONObject) jsonCatalogs.get(i);
-      if (catalog.get("flavor") == null || StringUtils.isBlank(catalog.get("flavor").toString())) {
+    JsonArray jsonCatalogs = GsonUtil.gson().fromJson(json, JsonArray.class);
+    for (JsonElement catalogElement : jsonCatalogs) {
+      JsonObject catalog = catalogElement.getAsJsonObject();
+      String flavorString = GsonUtil.getStringOrNull(catalog, "flavor");
+      if (StringUtils.isBlank(flavorString)) {
         throw new IllegalArgumentException(
                 "Unable to create new series as no flavor was given for one of the metadata collections");
       }
-      String flavorString = catalog.get("flavor").toString();
 
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
@@ -1138,6 +1187,7 @@ public class SeriesEndpoint {
       }
 
       String fieldsJson = catalog.get("fields").toString();
+      // toString() is the JSON text here on purpose: getKeyValueMap parses it again.
       if (StringUtils.trimToNull(fieldsJson) != null) {
         Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
         for (String key : fields.keySet()) {
@@ -1149,10 +1199,12 @@ public class SeriesEndpoint {
             }
             collection.removeField(field);
             try {
-              JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
+              JsonArray subjects = GsonUtil.gson().fromJson(fields.get(key), JsonArray.class);
+              List<String> subjectValues = new ArrayList<>();
+              subjects.forEach(subject -> subjectValues.add(GsonUtil.asText(subject)));
               collection.addField(
-                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
-            } catch (ParseException e) {
+                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectValues, ",")));
+            } catch (JsonParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
@@ -1205,22 +1257,21 @@ public class SeriesEndpoint {
       override = false;
     }
 
-    JSONParser parser = new JSONParser();
-    JSONArray acl;
+    JsonArray acl;
     try {
-      acl = (JSONArray) parser.parse(aclJson);
-    } catch (ParseException e) {
+      acl = GsonUtil.gson().fromJson(aclJson, JsonArray.class);
+    } catch (JsonParseException e) {
       logger.debug("Could not parse ACL ({})", aclJson, e);
       return R.badRequest("Could not parse ACL");
     }
 
-    List<AccessControlEntry> accessControlEntries = ((List<?>) acl).stream()
+    List<AccessControlEntry> accessControlEntries = acl.asList().stream()
         .map(a -> {
-          JSONObject ace = (JSONObject) a;
+          JsonObject ace = a.getAsJsonObject();
           return new AccessControlEntry(
-              (String) ace.get("role"),
-              (String) ace.get("action"),
-              (Boolean) ace.get("allow")
+              GsonUtil.getStringOrNull(ace, "role"),
+              GsonUtil.getStringOrNull(ace, "action"),
+              ace.get("allow").getAsBoolean()
           );
         })
         .collect(Collectors.toList());
@@ -1255,18 +1306,16 @@ public class SeriesEndpoint {
       return R.badRequest("Missing form parameter 'acl'");
     }
 
-    JSONParser parser = new JSONParser();
-    JSONObject props;
+    JsonObject props;
     try {
-      props = (JSONObject) parser.parse(propertiesJson);
-    } catch (ParseException e) {
+      props = GsonUtil.gson().fromJson(propertiesJson, JsonObject.class);
+    } catch (JsonParseException e) {
       logger.debug("Could not parse properties ({})", propertiesJson, e);
       return R.badRequest("Could not parse series properties");
     }
 
-    for (Object prop : props.entrySet()) {
-      Entry<String, Object> field = (Entry<String, Object>) prop;
-      seriesService.updateSeriesProperty(seriesID, field.getKey(), field.getValue().toString());
+    for (Entry<String, JsonElement> field : props.entrySet()) {
+      seriesService.updateSeriesProperty(seriesID, field.getKey(), GsonUtil.asText(field.getValue()));
     }
 
     return ApiResponseBuilder.Json.ok(acceptHeader, propertiesJson);
@@ -1593,7 +1642,7 @@ public class SeriesEndpoint {
     }
 
     try {
-      return elasticsearchIndex.getByQuery(q);
+      return opensearchIndex.getByQuery(q);
     } catch (SearchIndexException e) {
       logger.error("Failed to execute search query: {}", e.getMessage());
       throw new SeriesException(e);

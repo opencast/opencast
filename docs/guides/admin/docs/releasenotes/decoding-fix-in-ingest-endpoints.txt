@@ -1,0 +1,15 @@
+addDCCatalog and discardMediaPackage bound their form fields with
+@FormParam and had no multipart-consuming counterpart, unlike every
+other add-by-file endpoint in this class. CXF decodes @FormParam
+values as if they were application/x-www-form-urlencoded regardless
+of the request's actual content type, which turns a literal '+' into
+a space. That's correct for a genuinely URL-encoded body, but
+multipart/form-data has no such convention, so a client sending either
+endpoint as multipart/form-data got its flavor - or, for addDCCatalog,
+any '+' inside the DublinCore catalog itself - silently corrupted.
+
+Both endpoints now also have a @consumes(MULTIPART_FORM_DATA) overload
+that reads the raw multipart fields itself, the same way addTrack,
+addCatalog, addAttachment and addPartialTrack already do. The existing
+@FormParam overloads are unchanged and still correctly decode genuine
+application/x-www-form-urlencoded requests.

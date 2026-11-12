@@ -27,9 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
-import static org.opencastproject.util.data.Collections.list;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.message.broker.api.update.SeriesUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -37,6 +35,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -50,7 +49,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.impl.persistence.SeriesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -64,6 +62,7 @@ import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -112,9 +111,9 @@ public class SeriesServiceImplTest {
     seriesDatabase.setSecurityService(securityService);
     seriesDatabase.activate(null);
 
-    root = PathSupport.concat("target", Long.toString(currentTime));
+    root = Paths.get("target", Long.toString(currentTime)).toString();
 
-    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex esIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
 
     EasyMock.expect(esIndex.addOrUpdateSeries(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
@@ -124,7 +123,7 @@ public class SeriesServiceImplTest {
     seriesService = new SeriesServiceImpl();
     seriesService.setPersistence(seriesDatabase);
     seriesService.setSecurityService(securityService);
-    seriesService.setElasticsearchIndex(esIndex);
+    seriesService.setOpenSearchIndex(esIndex);
     seriesService.addMessageHandler(EasyMock.createNiceMock(SeriesUpdateHandler.class));
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
@@ -228,17 +227,17 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality1() {
-    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
-    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog a = DublinCores.mkOpencastEpisode().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencastEpisode().getCatalog();
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertFalse(DublinCoreUtil.equals(a, b));
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertTrue(DublinCoreUtil.equals(a, b));
-    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Paul"), DublinCoreValue.mk("Peter")));
+    a.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Paul"), DublinCoreValue.mk("Peter")));
     assertFalse(DublinCoreUtil.equals(a, b));
     //
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     assertTrue(DublinCoreUtil.equals(a, b));
     //
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
@@ -250,13 +249,13 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality2() {
-    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
-    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog a = DublinCores.mkOpencastEpisode().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencastEpisode().getCatalog();
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
-    a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
-    b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    a.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
+    b.set(DublinCore.PROPERTY_CONTRIBUTOR, List.of(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     b.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     b.set(DublinCore.PROPERTY_SPATIAL, "room1");
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");

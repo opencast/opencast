@@ -207,15 +207,17 @@ public class RestDocData extends DocData {
   }
 
   /**
-   * Validates paths: VALID: /sample , /sample/{thing} , /{my}/{path}.xml , /my/fancy_path/is/{awesome}.{FORMAT}
-   * INVALID: sample, /sample/, /sa#$%mple/path
+   * Validates paths: VALID: (empty), /sample , /sample/{thing} , /{my}/{path}.xml ,
+   * /my/fancy_path/is/{awesome}.{FORMAT} INVALID: sample, /sample/, /sa#$%mple/path
+   * <p>
+   * The empty path is valid and denotes an endpoint at the root of its service.
    *
    * @param path
    *          the path value to check
    * @return true if this path is valid, false otherwise
    */
   public static boolean isValidPath(String path) {
-    return path != null && path.matches("^/$|^/[\\w/{}|:.*+]*[\\w}.]$");
+    return path != null && path.matches("^$|^/$|^/[\\w/{}|:.*+]*[\\w}.]$");
   }
 
   /**
@@ -239,7 +241,15 @@ public class RestDocData extends DocData {
    */
   public void addEndpoint(RestQuery restQuery, Class<?> returnType, Produces produces, String httpMethodString,
           Path path) {
-    String pathValue = path.value().startsWith("/") ? path.value() : "/" + path.value();
+    // An endpoint at the root of its service ("" or "/") contributes no path segment of its own:
+    // the documentation renders the service base URL immediately followed by this value, and the
+    // security configuration intercepts those paths without a trailing slash.
+    String pathValue = path.value();
+    if ("/".equals(pathValue)) {
+      pathValue = "";
+    } else if (!pathValue.isEmpty() && !pathValue.startsWith("/")) {
+      pathValue = "/" + pathValue;
+    }
     RestEndpointData endpoint = new RestEndpointData(returnType, restQuery.name(), httpMethodString, pathValue,
             restQuery.description());
     // Add return description if needed

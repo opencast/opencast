@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -60,7 +61,7 @@ public final class UserParser {
   public static User fromXml(String xml) {
     InputStream in = null;
     try {
-      in = IOUtils.toInputStream(xml);
+      in = IOUtils.toInputStream(xml, StandardCharsets.UTF_8);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
       return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbUser.class).getValue();
     } catch (JAXBException e) {

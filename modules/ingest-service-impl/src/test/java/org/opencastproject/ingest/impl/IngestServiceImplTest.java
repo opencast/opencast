@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.impl;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -54,6 +55,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.IncidentService;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -71,13 +73,12 @@ import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -97,9 +98,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 public class IngestServiceImplTest {
@@ -108,7 +111,7 @@ public class IngestServiceImplTest {
   private WorkflowService workflowService = null;
   private WorkflowInstance workflowInstance = null;
   private WorkingFileRepository wfr = null;
-  private CloseableHttpResponse httpResponse = null;
+  private ClassicHttpResponse httpResponse = null;
   private CloseableHttpClient customClient = null;
   private TrustedHttpClient httpClient;
   private static URI baseDir;
@@ -128,6 +131,8 @@ public class IngestServiceImplTest {
 
   private static long workflowInstanceID = 1L;
   private ServiceRegistryInMemoryImpl serviceRegistry;
+  /** The failure reasons of all jobs that were updated to the status failed */
+  private final List<Job.FailureReason> failedJobReasons = new ArrayList<>();
 
   private MediaPackage ingestMediaPackage;
   private MediaPackage schedulerMediaPackage;
@@ -260,16 +265,12 @@ public class IngestServiceImplTest {
     EasyMock.expect(entity.getContent()).andReturn(new ByteArrayInputStream(movie)).anyTimes();
     EasyMock.replay(entity);
 
-    StatusLine statusLine = EasyMock.createMock(StatusLine.class);
-    EasyMock.expect(statusLine.getStatusCode()).andReturn(200).anyTimes();
-    EasyMock.replay(statusLine);
-
     Header contentDispositionHeader = EasyMock.createMock(Header.class);
     EasyMock.expect(contentDispositionHeader.getValue()).andReturn("attachment; filename=fname.mp4").anyTimes();
     EasyMock.replay(contentDispositionHeader);
 
-    httpResponse = EasyMock.createMock(CloseableHttpResponse.class);
-    EasyMock.expect(httpResponse.getStatusLine()).andReturn(statusLine).anyTimes();
+    httpResponse = EasyMock.createMock(ClassicHttpResponse.class);
+    EasyMock.expect(httpResponse.getCode()).andReturn(200).anyTimes();
     EasyMock.expect(httpResponse.getFirstHeader("Content-Disposition")).andReturn(contentDispositionHeader).anyTimes();
     EasyMock.expect(httpResponse.getEntity()).andReturn(entity).anyTimes();
     EasyMock.replay(httpResponse);
@@ -309,7 +310,8 @@ public class IngestServiceImplTest {
         protected CloseableHttpClient getAuthedHttpClient() {
           CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
           try {
-            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
+            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject()))
+                .andReturn(CloseableHttpResponse.adapt(httpResponse)).anyTimes();
             client.close();
             EasyMock.expectLastCall().once();
           } catch (Exception e) { }
@@ -326,7 +328,15 @@ public class IngestServiceImplTest {
     service.setSchedulerService(schedulerService);
     service.setMediaInspectionService(mediaInspectionService);
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class)) {
+      @Override
+      public Job updateJob(Job job) throws NotFoundException, ServiceRegistryException {
+        if (Status.FAILED.equals(job.getStatus())) {
+          failedJobReasons.add(job.getFailureReason());
+        }
+        return super.updateJob(job);
+      }
+    };
     serviceRegistry.registerService(service);
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
@@ -431,12 +441,13 @@ public class IngestServiceImplTest {
     //There's one case (accessing the filesystem) where we *don't* expect the mocks to be used
     if (shouldTouchMocks) {
       if (shouldSendAuth) {
-        EasyMock.expect(customClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
+        EasyMock.expect(customClient.execute(EasyMock.anyObject()))
+            .andReturn(CloseableHttpResponse.adapt(httpResponse)).once();
         customClient.close();
         EasyMock.expectLastCall().once();
       } else {
         EasyMock.expect(httpClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
-        httpClient.close(EasyMock.anyObject(HttpResponse.class));
+        httpClient.close(EasyMock.anyObject(ClassicHttpResponse.class));
         EasyMock.expectLastCall().once();
       }
     }
@@ -751,6 +762,100 @@ public class IngestServiceImplTest {
     }
     Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
     Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+  }
+
+  @Test
+  public void testInterruptedUploadIsDataFailure() throws Exception {
+    useWorkingFileRepositoryReadingUploads();
+
+    try {
+      service.addTrack(brokenUpload(), "track.mp4", MediaPackageElements.PRESENTATION_SOURCE,
+              service.createMediaPackage());
+      Assert.fail("The interrupted upload should have failed");
+    } catch (IOException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testInterruptedUploadIsDataFailureForAllUploadMethods() throws Exception {
+    useWorkingFileRepositoryReadingUploads();
+
+    final MediaPackageElementFlavor flavor = MediaPackageElements.PRESENTATION_SOURCE;
+    final List<ThrowingUpload> uploads = List.of(
+            () -> service.addPartialTrack(brokenUpload(), "track.mp4", flavor, 0L, service.createMediaPackage()),
+            () -> service.addCatalog(brokenUpload(), "catalog.xml", flavor, service.createMediaPackage()),
+            () -> service.addAttachment(brokenUpload(), "attachment.txt", flavor, service.createMediaPackage()));
+    for (ThrowingUpload upload : uploads) {
+      try {
+        upload.run();
+        Assert.fail("The interrupted upload should have failed");
+      } catch (IOException e) {
+        // expected
+      }
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA, Job.FailureReason.DATA, Job.FailureReason.DATA),
+            failedJobReasons);
+  }
+
+  @Test
+  public void testInterruptedZipUploadIsDataFailure() throws Exception {
+    try {
+      service.addZippedMediaPackage(brokenUpload());
+      Assert.fail("The interrupted upload should have failed");
+    } catch (IngestException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testStorageFailureIsNoDataFailure() throws Exception {
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        IOUtils.toByteArray(in);
+        throw new IOException("No space left on device");
+      }
+    });
+
+    try {
+      service.addTrack(new ByteArrayInputStream("data".getBytes()), "track.mp4",
+              MediaPackageElements.PRESENTATION_SOURCE, service.createMediaPackage());
+      Assert.fail("The failing storage should have failed the ingest");
+    } catch (IOException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.NONE), failedJobReasons);
+  }
+
+  /** Makes the working file repository read all of an upload, like the real one does */
+  private void useWorkingFileRepositoryReadingUploads() {
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        IOUtils.toByteArray(in);
+        return urlTrack;
+      }
+    });
+  }
+
+  @FunctionalInterface
+  private interface ThrowingUpload {
+    void run() throws Exception;
+  }
+
+  /** An upload of which the client goes away half way through */
+  private static InputStream brokenUpload() {
+    return new InputStream() {
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Idle timeout expired: 30000/30000 ms");
+      }
+    };
   }
 
   private void testEpisodeUpdateNewAndExisting() throws Exception {

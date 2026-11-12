@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -279,17 +279,17 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-api</artifactId>
+      <artifactId>opencast-opensearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-impl</artifactId>
+      <artifactId>opencast-opensearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-index</artifactId>
+      <artifactId>opencast-opensearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -1159,7 +1159,7 @@
         <!-- use this to generate a code coverage report: -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.15</version>
         <configuration>
           <skip>${maven.test.skip}</skip>
         </configuration>
@@ -1172,10 +1172,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

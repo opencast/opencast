@@ -43,8 +43,8 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
+import org.apache.hc.client5.http.fluent.Content;
+import org.apache.hc.client5.http.fluent.Request;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -267,6 +267,12 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     }
 
+    // Only exact usernames can be looked up. A query starting with a wildcard cannot match anything, so do not
+    // bother the external system with it.
+    if (query.startsWith("%")) {
+      return Collections.emptyIterator();
+    }
+
     if (query.endsWith("%")) {
       query = query.substring(0, query.length() - 1);
     }
@@ -396,7 +402,7 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
   }
 
   private JsonNode getRequestJson(String urlString) throws IOException {
-    Content content = Request.Get(urlString).addHeader("Authorization", "Bearer " + token)
+    Content content = Request.get(urlString).addHeader("Authorization", "Bearer " + token)
         .execute().returnContent();
     ObjectMapper mapper = new ObjectMapper();
     return mapper.readTree(content.asStream());

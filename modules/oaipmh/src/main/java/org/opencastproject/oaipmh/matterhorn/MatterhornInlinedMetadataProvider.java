@@ -30,7 +30,6 @@ import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.XmlUtil;
-import org.opencastproject.util.data.Collections;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,6 +37,7 @@ import org.w3c.dom.Node;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +78,7 @@ public class MatterhornInlinedMetadataProvider implements MetadataProvider {
     XmlGen xml = new XmlGen(Optional.<String>empty()) {
       @Override
       public Element create() {
-        List<Node> inlinedNodes = Collections.list(parse(Optional.ofNullable(item.getMediaPackageXml())));
+        List<Node> inlinedNodes = new ArrayList<>(List.of(parse(Optional.ofNullable(item.getMediaPackageXml()))));
         for (SearchResultElementItem elementItem : item.getElements()) {
           inlinedNodes.add($e(elementItem.getType(), NS_URI,
                   $a("type", elementItem.getFlavor()),

@@ -37,6 +37,7 @@ import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationException;
@@ -463,7 +464,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       String homeOrganization = request.getHeader(headerHomeOrganization);
       roles.add(new JpaRole(roleOrganizationPrefix + homeOrganization + roleOrganizationSuffix, organization));
     }
-    if (StringUtils.equals(id, bootstrapUserId)) {
+    if (Strings.CS.equals(id, bootstrapUserId)) {
       roles.add(new JpaRole(GLOBAL_ADMIN_ROLE, organization));
     }
     if (headerAffiliation != null) {

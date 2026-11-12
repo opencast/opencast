@@ -37,6 +37,7 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -51,7 +52,6 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.apache.commons.io.IOUtils;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -308,14 +308,21 @@ public class PlaylistRestService {
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
     Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
     if (optSort.isPresent()) {
-      sortCriterion = SortCriterion.parse(optSort.get());
+      try {
+        sortCriterion = SortCriterion.parse(optSort.get());
+      } catch (IllegalArgumentException e) {
+        return RestUtil.R.badRequest(String.format(
+            "Invalid sort parameter '%s': %s. Expected <field>:ASC or <field>:DESC, supported fields: updated",
+            optSort.get(), e.getMessage()));
+      }
 
       switch (sortCriterion.getFieldName()) {
         case "updated":
           break;
         default:
           logger.info("Unknown sort criteria {}", sortCriterion.getFieldName());
-          return Response.status(SC_BAD_REQUEST).build();
+          return RestUtil.R.badRequest(String.format(
+              "Unknown sort field '%s', supported fields: updated", sortCriterion.getFieldName()));
       }
     }
 
@@ -637,10 +644,9 @@ public class PlaylistRestService {
    * parse JSON to JAXB when accepting a request is not that automatic. This functions takes care of that.
    * @param json Valid JSON as a string
    * @return A Playlist containing the information from the JSON
-   * @throws ParseException
    * @throws IOException
    */
-  public Playlist parseJsonToPlaylist(String json) throws ParseException, IOException {
+  public Playlist parseJsonToPlaylist(String json) throws IOException {
     JaxbAnnotationModule module = new JaxbAnnotationModule();
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(module);

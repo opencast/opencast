@@ -47,13 +47,18 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
     this.days = days;
   }
 
-  private boolean isEmptyDirectory(Path path) throws IOException {
-    if (Files.isDirectory(path)) {
-      try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
-        return !directory.iterator().hasNext();
-      }
+  private boolean isEmptyDirectory(Path path) {
+    if (!Files.isDirectory(path)) {
+      return false;
     }
-    return false;
+    try (DirectoryStream<Path> directory = Files.newDirectoryStream(path)) {
+      return !directory.iterator().hasNext();
+    } catch (NoSuchFileException e) {
+      return false;
+    } catch (IOException e) {
+      logger.warn("Could not check whether directory {} is empty", path, e);
+      return false;
+    }
   }
 
   @Override
@@ -82,7 +87,10 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
   }
 
   @Override
-  public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+  public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+    if (exc != null && !(exc instanceof NoSuchFileException)) {
+      logger.warn("Error while iterating directory {}", dir, exc);
+    }
     if (dir.equals(startingDirectory)) {
       logger.info("Cleanup finished @{}", dir);
     } else if (isEmptyDirectory(dir)) {
@@ -122,7 +130,7 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
       Files.walkFileTree(startingDir, fileFilter);
       return true;
     } catch (IOException e) {
-      logger.error("Cleanup of directory {} failed", startingDir);
+      logger.error("Cleanup of directory {} failed", startingDir, e);
       return false;
     }
   }

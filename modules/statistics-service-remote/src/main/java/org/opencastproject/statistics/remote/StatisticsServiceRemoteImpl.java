@@ -33,19 +33,19 @@ import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.codehaus.jettison.json.JSONException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -94,7 +94,6 @@ import javax.ws.rs.Path;
 @JaxrsResource
 public class StatisticsServiceRemoteImpl extends RemoteBase implements StatisticsService {
 
-  private static final JSONParser jsonParser = new JSONParser();
 
   public StatisticsServiceRemoteImpl() {
     super(JOB_TYPE);
@@ -103,7 +102,7 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
   @Override
   public Set<StatisticsProvider> getProviders() {
     final HttpGet get = new HttpGet("providers.json");
-    final HttpResponse response = getResponse(get, SC_OK);
+    final ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
         return jsonToProviders(EntityUtils.toString(response.getEntity(), UTF_8));
@@ -142,8 +141,8 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     queryStringParams.add(new BasicNameValuePair("resolution", resolution.name()));
     queryStringParams.add(new BasicNameValuePair("zoneId", zoneId.getId()));
     final HttpGet get = new HttpGet("timeseries/" + provider.getId() + ".json?"
-        + URLEncodedUtils.format(queryStringParams, UTF_8));
-    final HttpResponse response = getResponse(get, SC_OK);
+        + WWWFormCodec.format(queryStringParams, UTF_8));
+    final ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
         return jsonToTimeSeries(EntityUtils.toString(response.getEntity(), UTF_8));
@@ -168,37 +167,37 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     queryStringParams.add(new BasicNameValuePair("temporalResolution", temporalResolution.toString()));
     queryStringParams.add(new BasicNameValuePair("duration", duration.toString()));
 
-    final HttpGet get = new HttpGet("/writeDuration?" + URLEncodedUtils.format(queryStringParams, UTF_8));
-    final HttpResponse response = getResponse(get, SC_OK);
+    final HttpGet get = new HttpGet("/writeDuration?" + WWWFormCodec.format(queryStringParams, UTF_8));
+    final ClassicHttpResponse response = getResponse(get, SC_OK);
     closeConnection(response);
     throw new RuntimeException("Unable to get time series data from remote service");
   }
 
-  @SuppressWarnings("unchecked")
-  private TimeSeries jsonToTimeSeries(String json) throws ParseException {
-    final JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
-    final JSONArray labelsJson = (JSONArray) jsonObject.get("labels");
-    final JSONArray valuesJson = (JSONArray) jsonObject.get("values");
+  private TimeSeries jsonToTimeSeries(String json) {
+    final JsonObject jsonObject = GsonUtil.gson().fromJson(json, JsonObject.class);
+    final JsonArray labelsJson = jsonObject.getAsJsonArray("labels");
+    final JsonArray valuesJson = jsonObject.getAsJsonArray("values");
     final List<String> labels = new ArrayList<>();
     final List<Double> values = new ArrayList<>();
     for (int i = 0; i < labelsJson.size(); i++) {
-      labels.add((String) labelsJson.get(i));
-      values.add((Double) valuesJson.get(i));
+      labels.add(labelsJson.get(i).getAsString());
+      values.add(valuesJson.get(i).getAsDouble());
     }
-    return new TimeSeries(labels, values, (Double) jsonObject.getOrDefault("total", null));
+    final JsonElement total = jsonObject.get("total");
+    return new TimeSeries(labels, values, total == null || total.isJsonNull() ? null : total.getAsDouble());
   }
 
-  private Set<StatisticsProvider> jsonToProviders(String json) throws ParseException, JSONException {
-    final JSONArray providersJson = (JSONArray) jsonParser.parse(json);
+  private Set<StatisticsProvider> jsonToProviders(String json) {
+    final JsonArray providersJson = GsonUtil.gson().fromJson(json, JsonArray.class);
     final Set<StatisticsProvider> providers = new HashSet<>();
-    for (Object object : providersJson) {
-      JSONObject jsonObject = (JSONObject) object;
-      final String idJson = (String) jsonObject.get("id");
-      final String titleJson = (String) jsonObject.get("title");
-      final String descriptionJson = (String) jsonObject.get("description");
-      final String resourceTypeJson = (String) jsonObject.get("resourceType");
-      if (jsonObject.containsKey("dataResolutions")) {
-        final JSONArray resolutionsJson = (JSONArray) jsonObject.get("dataResolutions");
+    for (JsonElement object : providersJson) {
+      JsonObject jsonObject = object.getAsJsonObject();
+      final String idJson = GsonUtil.getStringOrNull(jsonObject, "id");
+      final String titleJson = GsonUtil.getStringOrNull(jsonObject, "title");
+      final String descriptionJson = GsonUtil.getStringOrNull(jsonObject, "description");
+      final String resourceTypeJson = GsonUtil.getStringOrNull(jsonObject, "resourceType");
+      if (jsonObject.has("dataResolutions")) {
+        final JsonArray resolutionsJson = jsonObject.getAsJsonArray("dataResolutions");
         providers.add(new TimeSeriesProvider() {
           @Override
           public String getId() {
@@ -234,8 +233,8 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
           @Override
           public Set<DataResolution> getDataResolutions() {
             final Set<DataResolution> result = new HashSet<>();
-            for (Object obj : resolutionsJson) {
-              result.add(DataResolution.valueOf((String) obj));
+            for (JsonElement obj : resolutionsJson) {
+              result.add(DataResolution.valueOf(obj.getAsString()));
             }
             return result;
           }

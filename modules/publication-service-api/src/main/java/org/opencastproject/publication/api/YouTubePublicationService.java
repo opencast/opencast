@@ -22,8 +22,11 @@
 package org.opencastproject.publication.api;
 
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.Track;
+
+import java.util.List;
 
 /**
  * Publishes elements from MediaPackages to youtube.
@@ -36,17 +39,22 @@ public interface YouTubePublicationService {
   String JOB_TYPE = "org.opencastproject.publication.youtube";
 
   /**
-   * Publishes a media package element.
+   * Publishes a media package element with an optional thumbnail.
    *
    * @param mediaPackage
    *          the media package
    * @param track
    *          the track of the media package to publish
+   * @param thumbnail
+   *          the thumbnail of the media package to publish
+   * @param captions
+   *          the list of captions to publish
    * @return The job
    * @throws PublicationException
    *           if there was a problem publishing the media
    */
-  Job publish(MediaPackage mediaPackage, Track track) throws PublicationException;
+  Job publish(MediaPackage mediaPackage, Track track, Attachment thumbnail, List<Track> captions)
+          throws PublicationException;
 
   /**
    * Retract a media package element from the distribution channel.

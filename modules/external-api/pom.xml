@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -102,9 +102,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <!-- we use this for the transitive dependency to elasticsearch -->
+      <!-- we use this for the transitive dependency to opensearch -->
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-api</artifactId>
+      <artifactId>opencast-opensearch-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -114,7 +114,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-index</artifactId>
+      <artifactId>opencast-opensearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -146,22 +146,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>${httpcomponents-httpcore.version}</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
@@ -191,12 +182,29 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>${gson.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-playlists</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-lifecycle-management-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-lifecycle-management-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cronutils</groupId>
+      <artifactId>cron-utils</artifactId>
     </dependency>
     <!-- Testing -->
     <dependency>
@@ -212,7 +220,6 @@
     <dependency>
       <groupId>uk.co.datumedge</groupId>
       <artifactId>hamcrest-json</artifactId>
-      <version>0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -246,8 +253,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -258,7 +263,7 @@
         <configuration>
           <instructions>
             <Import-Package>
-              org.opencastproject.elasticsearch.impl;version=${project.version},
+              org.opencastproject.opensearch.impl;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.index.service.message,
               org.opencastproject.metadata.dublincore;version=${project.version},
@@ -269,14 +274,18 @@
               javax.servlet.http,
               org.apache.commons.lang3,
               org.osgi.service.component,
-              org.json.simple,
-              org.json.simple.parser,
               org.osgi.framework,
               org.slf4j,
+              !org.opencastproject.lifecyclemanagement.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
+            <!-- The lifecycle management plugin is optional and may be enabled at runtime -->
+            <DynamicImport-Package>
+              org.opencastproject.lifecyclemanagement.api,
+              org.opencastproject.lifecyclemanagement.impl
+            </DynamicImport-Package>
             <Export-Package>
               org.opencastproject.external.api,
               org.opencastproject.external.common,

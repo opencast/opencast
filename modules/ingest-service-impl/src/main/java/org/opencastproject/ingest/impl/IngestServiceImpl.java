@@ -24,7 +24,6 @@ package org.opencastproject.ingest.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 
@@ -100,20 +99,20 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ProxyInputStream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -509,6 +508,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
+    UploadInputStream upload = new UploadInputStream(zipStream);
     Set<String> collectionFilenames = new HashSet<>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
@@ -520,7 +520,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Create the working file target collection for this ingest operation
       String wfrCollectionId = Long.toString(job.getId());
 
-      zis = new ZipArchiveInputStream(zipStream);
+      zis = new ZipArchiveInputStream(upload);
       ZipArchiveEntry entry;
       MediaPackage mp = null;
       Map<String, URI> uris = new HashMap<>();
@@ -532,7 +532,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Indicates if zip has a root folder or not, initialized as true
       boolean hasRootFolder = true;
       // While there are entries write them to a collection
-      while ((entry = zis.getNextZipEntry()) != null) {
+      while ((entry = zis.getNextEntry()) != null) {
         try {
           if (entry.isDirectory() || entry.getName().contains("__MACOSX")) {
             continue;
@@ -619,6 +619,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
       throw e;
     } catch (Exception e) {
+      if (upload.readFailed) {
+        job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      }
       if (e instanceof IngestException) {
         throw (IngestException) e;
       }
@@ -752,7 +755,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         final int length = Math.max(0, FILENAME_LENGTH_MAX - extension.length());
         fileName = fileName.substring(0, length) + extension;
       }
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -819,7 +822,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding partial track {} from input stream on mediapackage {}", elementId, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       job.setStatus(Job.Status.FINISHED);
@@ -897,7 +900,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           mediaPackage.getIdentifier(), seriesCatalogs[0].getURI(), seriesCatalogs[0].getIdentifier());
     }
     // Parse series dublincore
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     InputStream in = null;
     boolean isUpdated = false;
     boolean isNew = false;
@@ -957,7 +960,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           HttpGet getExtendedMetadata = new HttpGet(seriesElement.getURI());
           response = httpClient.execute(getExtendedMetadata);
           in = response.getEntity().getContent();
-          data = IOUtils.readFully(in, (int) response.getEntity().getContentLength());
+          data = IOUtils.toByteArray(in, (int) response.getEntity().getContentLength());
         } catch (Exception e) {
           throw new IngestException("Unable to read series " + catalogType + " metadata catalog for series "
               + seriesId + ".", e);
@@ -1038,7 +1041,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       final String elementId = UUID.randomUUID().toString();
       final String mediaPackageId = mediaPackage.getIdentifier().toString();
       logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackageId);
-      final URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      final URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
 
       final boolean isJSON;
       try (InputStream inputStream = workingFileRepository.get(mediaPackageId, elementId)) {
@@ -1140,7 +1143,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from input stream on mediapackage {}", elementId, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
+      URI newUrl = addUploadToRepo(job, mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -1700,7 +1703,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     CloseableHttpClient externalHttpClient = null;
     try {
       if (uri.toString().startsWith("http")) {
@@ -1728,7 +1731,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throw new IOException("Null response object from the http client, refer to code for explanation");
         }
 
-        int httpStatusCode = response.getStatusLine().getStatusCode();
+        int httpStatusCode = response.getCode();
         if (httpStatusCode != 200) {
           throw new IOException(uri + " returns http " + httpStatusCode);
         }
@@ -1759,7 +1762,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  private String getContentDispositionFileName(HttpResponse response) {
+  private String getContentDispositionFileName(ClassicHttpResponse response) {
     if (response == null) {
       return null;
     }
@@ -1769,10 +1772,44 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return contentDisposition.getParameter("filename");
   }
 
+  /**
+   * Stores the content of an upload in the working file repository.
+   *
+   * If reading the upload fails, the client is to blame, e.g. because it closed the connection. That is no reason to
+   * consider this service unhealthy, so the job is marked as failed because of its data.
+   */
+  private URI addUploadToRepo(Job job, MediaPackage mp, String elementId, String filename, InputStream upload)
+          throws IOException {
+    UploadInputStream in = new UploadInputStream(upload);
+    try {
+      return addContentToRepo(mp, elementId, filename, in);
+    } catch (IOException e) {
+      if (in.readFailed) {
+        job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      }
+      throw e;
+    }
+  }
+
   private URI addContentToRepo(MediaPackage mp, String elementId, String filename, InputStream file)
           throws IOException {
     ProgressInputStream progressInputStream = new ProgressInputStream(file);
     return workingFileRepository.put(mp.getIdentifier().toString(), elementId, filename, progressInputStream);
+  }
+
+  /** An upload stream which remembers whether reading from it failed, as opposed to processing what was read. */
+  private static final class UploadInputStream extends ProxyInputStream {
+    private volatile boolean readFailed = false;
+
+    UploadInputStream(InputStream in) {
+      super(in);
+    }
+
+    @Override
+    protected void handleIOException(IOException e) throws IOException {
+      readFailed = true;
+      throw e;
+    }
   }
 
   private MediaPackage addContentToMediaPackage(MediaPackage mp, String elementId, URI uri,
@@ -1912,14 +1949,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   protected CloseableHttpClient getAuthedHttpClient() {
     HttpClientBuilder cb = HttpClientBuilder.create();
-    CredentialsProvider provider = new BasicCredentialsProvider();
-    String schema = AuthSchemes.DIGEST;
+    BasicCredentialsProvider provider = new BasicCredentialsProvider();
+    String schema = StandardAuthScheme.DIGEST;
     if ("Basic".equals(downloadAuthMethod)) {
-      schema = AuthSchemes.BASIC;
+      schema = StandardAuthScheme.BASIC;
     }
     provider.setCredentials(
-        new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, schema),
-        new UsernamePasswordCredentials(downloadUser, downloadPassword));
+        new AuthScope(null, null, -1, null, schema),
+        new UsernamePasswordCredentials(downloadUser, downloadPassword.toCharArray()));
     return cb.setDefaultCredentialsProvider(provider).build();
   }
 
@@ -2071,7 +2108,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     // Verify user is a CA by checking roles and captureAgentId
     User user = securityService.getUser();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
+    if (!SecurityUtil.isGlobalAdmin(user) && !user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
       logger.info("User '{}' is missing capture agent roles, won't apply CASeries", user.getUsername());
       return mp;
     }

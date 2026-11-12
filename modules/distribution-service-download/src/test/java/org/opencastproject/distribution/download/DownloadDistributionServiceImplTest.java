@@ -42,15 +42,13 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -67,6 +65,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -92,16 +91,12 @@ public class DownloadDistributionServiceImplTest {
     distributionRoot = new File(mediaPackageRoot, "static");
     service = new DownloadDistributionServiceImpl();
 
-    StatusLine statusLine = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
-    EasyMock.replay(statusLine);
-
-    HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
     EasyMock.replay(response);
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute((ClassicHttpRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
 
     defaultOrganization = new DefaultOrganization();
@@ -191,7 +186,7 @@ public class DownloadDistributionServiceImplTest {
     jobBarrier.waitForJobs();
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
+            Paths.get(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()).toString());
     Assert.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "track-1");
     File metadataDir = new File(mpDir, "catalog-1");
@@ -224,7 +219,7 @@ public class DownloadDistributionServiceImplTest {
     mp.add(MediaPackageElementParser.getFromXml(job5.getPayload()));
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
+            Paths.get(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()).toString());
     File mediaDir = new File(mpDir, "track-1");
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
@@ -279,7 +274,7 @@ public class DownloadDistributionServiceImplTest {
     mp.add(job5Element);
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
+            Paths.get(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()).toString());
     File mediaDir = new File(mpDir, "track-1");
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
@@ -333,7 +328,7 @@ public class DownloadDistributionServiceImplTest {
     jobBarrier.waitForJobs();
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
+            Paths.get(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()).toString());
     Assert.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "master");
     File variantDir = new File(mpDir, "variant");

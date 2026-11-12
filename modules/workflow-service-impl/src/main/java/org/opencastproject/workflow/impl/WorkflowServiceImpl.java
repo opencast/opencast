@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILING;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.INSTANTIATED;
@@ -33,16 +32,6 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
@@ -55,6 +44,16 @@ import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MetadataService;
 import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
@@ -66,6 +65,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -232,8 +232,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final Striped<Lock> updateLock = Striped.lazyWeakLock(1024);
   private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
-  /** The Elasticsearch indices */
-  private ElasticsearchIndex index;
+  /** The OpenSearch indices */
+  private OpenSearchIndex index;
 
   /**
    * Constructs a new workflow service impl, with a priority-sorted map of metadata services
@@ -860,7 +860,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       WorkflowInstance instance = getWorkflowById(workflowInstanceId);
 
-      if (instance.getState() != STOPPED) {
+      // Only workflows which have not yet terminated can be stopped. Overwriting the state of an already terminated
+      // workflow would discard how it actually ended, turning e.g. a SUCCEEDED workflow into a STOPPED one.
+      if (!instance.getState().isTerminated()) {
         // Update the workflow instance
         instance.setState(STOPPED);
         update(instance);
@@ -1135,7 +1137,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throws UnauthorizedException {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
-    String currentOrgAdminRole = currentOrg.getAdminRole();
     String currentOrgId = currentOrg.getId();
 
     MediaPackage mediapackage = workflow.getMediaPackage();
@@ -1150,8 +1151,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     var creatorName = workflow.getCreatorName();
     var workflowCreator = creatorName == null ? null : userDirectoryService.loadUser(creatorName);
-    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
+    boolean authorized = SecurityUtil.isGlobalAdmin(currentUser)
+            || (currentOrgId.equals(workflowOrgId) && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg))
             || (currentUser.equals(workflowCreator))
             || (authorizationService.hasPermission(mediapackage, action) && currentOrgId.equals(workflowOrgId));
 
@@ -1167,8 +1168,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // asset manager already checks if user is admin, org admin for same org as mp, or has explicit read rights
     // global admins can still get workflow instances if mp is gone from asset manager
     // org admins can't because then we don't know if mp belonged to same org as user
-    return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || mp.isPresent() && currentUser.hasRole(securityService.getOrganization().getAdminRole())
+    return SecurityUtil.isGlobalAdmin(currentUser)
+            || mp.isPresent() && SecurityUtil.isOrganizationAdmin(currentUser, securityService.getOrganization())
             || mp.isPresent() && authorizationService.hasPermission(mp.get(), action);
   }
 
@@ -1419,7 +1420,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         currentOperation.setState(OperationState.FAILED);
       }
       handleFailedOperation(workflow, currentOperation);
-    } else if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
+    } else if (failedAttempt == currentOperation.getMaxAttempts()) {
       handleFailedOperation(workflow, currentOperation);
     } else {
       switch (currentOperation.getRetryStrategy()) {
@@ -2025,7 +2026,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          the admin UI index.
    */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 
@@ -2313,7 +2314,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Remove a workflow instance from the Elasticsearch index.
+   * Remove a workflow instance from the OpenSearch index.
    *
    * @param workflowInstanceId
    *         the identifier of the workflow instance to remove
@@ -2374,7 +2375,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Update a workflow instance in the Elasticsearch index.
+   * Update a workflow instance in the OpenSearch index.
    *
    * @param id
    *         workflow id
@@ -2410,7 +2411,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Get the function to update the workflow state for an event in the Elasticsearch index.
+   * Get the function to update the workflow state for an event in the OpenSearch index.
    *
    * @return the function to do the update
    */

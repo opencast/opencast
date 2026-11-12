@@ -20,6 +20,8 @@
  */
 package org.opencastproject.workflow.handler.speechtotext;
 
+import static org.opencastproject.speechtotext.async.api.SpeechToTextAsyncTracker.JOBS_WORKFLOW_CONFIGURATION;
+
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -30,6 +32,7 @@ import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.speechtotext.api.SpeechToTextServiceException;
+import org.opencastproject.speechtotext.async.api.SpeechToTextAsyncTracker;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -72,15 +75,15 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
   /** Property name for configuring the place where the subtitles shall be appended. */
   private static final String TARGET_ELEMENT = "target-element";
 
-  /** Workflow configuration name to store jobs in */
-  private static final String JOBS_WORKFLOW_CONFIGURATION = "speech-to-text-jobs";
-
   private enum AppendSubtitleAs {
     attachment, track
   }
 
   /** The inspection service. */
   private MediaInspectionService mediaInspectionService;
+
+  /** Service to tracker asynchrnous requests to the speech-to-text service */
+  private SpeechToTextAsyncTracker speechToTextTracker;
 
   @Override
   @Activate
@@ -189,8 +192,14 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
       }
 
       mediaPackage.add(MediaPackageElementParser.getFromXml(inspection.getPayload()));
+      speechToTextTracker.untrack(job);
 
       workspace.delete(output);
+      // Sanity check, cleanup input file that was copied to collection for async run
+      if (jobOutput.length > 3) {
+        URI inputUri = new URI(jobOutput[3]);
+        workspace.delete(inputUri);
+      }
     } catch (Exception e) {
       throw new WorkflowOperationException("Error handling text-to-speech service output", e);
     }
@@ -198,7 +207,8 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
     try {
       workspace.cleanup(mediaPackage.getIdentifier());
     } catch (IOException e) {
-      throw new WorkflowOperationException(e);
+      // We shouldn't fail the operation because workspace cleanup failed.
+      logger.error("Could not clean up workspace for media package {}.", mediaPackage.getIdentifier(), e);
     }
   }
 
@@ -235,10 +245,16 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
   }
 
   @Reference
+  public void setSpeechToTextAsyncTracker(SpeechToTextAsyncTracker sttTracker) {
+    this.speechToTextTracker = sttTracker;
+  }
+
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Override
   @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;

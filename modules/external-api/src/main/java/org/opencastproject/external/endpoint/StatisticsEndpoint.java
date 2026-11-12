@@ -21,23 +21,23 @@
 
 package org.opencastproject.external.endpoint;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.util.statistics.QueryUtils;
 import org.opencastproject.external.util.statistics.ResourceTypeUtils;
 import org.opencastproject.external.util.statistics.StatisticsProviderUtils;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
@@ -49,9 +49,10 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -62,7 +63,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -108,7 +108,7 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
@@ -123,8 +123,8 @@ public class StatisticsEndpoint {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Reference
@@ -202,10 +202,10 @@ public class StatisticsEndpoint {
       providers = statisticsService.getProviders();
     }
 
-    JSONArray result = new JSONArray();
+    JsonArray result = new JsonArray();
     providers.stream().map(p -> StatisticsProviderUtils.toJson(p, withParameters)).forEach(result::add);
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toString());
   }
 
   @GET
@@ -237,7 +237,7 @@ public class StatisticsEndpoint {
       Optional<StatisticsProvider> provider = statisticsService.getProvider(id);
       if (provider.isPresent()) {
         return ApiResponseBuilder.Json.ok(acceptHeader, StatisticsProviderUtils.toJson(provider.get(),
-            withParameters).toJSONString());
+            withParameters).toString());
       } else {
         return ApiResponseBuilder.notFound("Cannot find a statistics provider with id '%s'.", id);
       }
@@ -275,13 +275,13 @@ public class StatisticsEndpoint {
       return RestUtil.R.badRequest("Unable to parse form parameter 'data': " + e.getMessage());
     }
 
-    JSONArray result = new JSONArray();
+    JsonArray result = new JsonArray();
     queries.stream()
       .peek(query -> checkAccess(query.getParameters().getResourceId(), query.getProvider().getResourceType()))
       .map(query -> QueryUtils.execute(query))
         .forEach(result::add);
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toString());
   }
 
   @POST
@@ -348,7 +348,7 @@ public class StatisticsEndpoint {
             parameters.getFrom(),
             parameters.getTo(),
             parameters.getDataResolution(),
-            this.elasticsearchIndex,
+            this.opensearchIndex,
             ZoneId.systemDefault(),
             true,
             parameters.getDetailLevel(),
@@ -357,8 +357,9 @@ public class StatisticsEndpoint {
             filters
     );
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, new JSONObject(Collections.singletonMap("csv", result))
-        .toJSONString());
+    JsonObject csvJson = new JsonObject();
+    csvJson.addProperty("csv", result);
+    return ApiResponseBuilder.Json.ok(acceptHeader, csvJson.toString());
   }
 
   private void checkAccess(final String resourceId, final ResourceType resourceType) {
@@ -382,7 +383,7 @@ public class StatisticsEndpoint {
   }
 
   private void checkMediapackageAccess(final String mpId) throws UnauthorizedException, SearchIndexException {
-    final Optional<Event> event = indexService.getEvent(mpId, elasticsearchIndex);
+    final Optional<Event> event = indexService.getEvent(mpId, opensearchIndex);
     if (event.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
@@ -390,7 +391,7 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Optional<Series> series = elasticsearchIndex.getSeries(seriesId, securityService.getOrganization(),
+    final Optional<Series> series = opensearchIndex.getSeries(seriesId, securityService.getOrganization(),
         securityService.getUser());
     if (series.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
@@ -401,11 +402,10 @@ public class StatisticsEndpoint {
   private void checkOrganizationAccess(final String orgId) throws UnauthorizedException {
     final User currentUser = securityService.getUser();
     final Organization currentOrg = securityService.getOrganization();
-    final String currentOrgAdminRole = currentOrg.getAdminRole();
     final String currentOrgId = currentOrg.getId();
 
-    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(orgId));
+    boolean authorized = SecurityUtil.isGlobalAdmin(currentUser)
+            || (currentOrgId.equals(orgId) && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg));
 
     if (!authorized) {
       throw new UnauthorizedException(currentUser, "read");

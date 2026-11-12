@@ -100,7 +100,8 @@ public class YouTubeV3PublicationServiceImplTest {
         .loadFromXml(xml);
     //
     expect(youTubeService.getMyPlaylistByTitle(mediaPackage.getTitle())).andReturn(null).once();
-    expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null, mediaPackage.getSeries()))
+    expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null,
+      YouTubeAPIVersion3Service.PrivacyStatus.PUBLIC, mediaPackage.getSeries()))
       .andReturn(new Playlist()).once();
     expect(youTubeService.addVideoToMyChannel(anyObject(VideoUpload.class))).andReturn(new Video()).once();
     expect(youTubeService.addPlaylistItem(anyObject(String.class), anyObject(String.class)))
@@ -110,7 +111,7 @@ public class YouTubeV3PublicationServiceImplTest {
           anyObject(Float.class))).andReturn(new JobImpl()).once();
     replay(youTubeService, orgDirectory, security, registry, userDirectoryService, workspace);
     service.updated(getServiceProperties());
-    service.publish(mediaPackage, mediaPackage.getTracks()[0]);
+    service.publish(mediaPackage, mediaPackage.getTracks()[0], null, null);
   }
 
   private Dictionary getServiceProperties() throws IOException {

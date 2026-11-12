@@ -5,7 +5,7 @@
   },
   "overrides": [
       {
-          "files": ["./webpack.config.ts"],
+          "files": ["./vite.config.ts"],
           "parserOptions": {
               "project": false
           }

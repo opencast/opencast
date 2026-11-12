@@ -48,11 +48,11 @@ import org.opencastproject.util.UrlSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -64,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -102,17 +103,28 @@ public class JobDispatcher {
   /** Configuration key for the dispatch interval, in seconds */
   protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
+  /** Configuration key for the dispatch lease timeout, in seconds */
+  protected static final String OPT_DISPATCH_LOCK_TIMEOUT = "dispatch.lock.timeout";
+
   /** Minimum delay between job dispatching attempts, in seconds */
   static final float MIN_DISPATCH_INTERVAL = 1.0F;
 
-  /** Default delay between job dispatching attempts, in seconds */
-  static final float DEFAULT_DISPATCH_INTERVAL = 0.0F;
+  /**
+   * Default delay between job dispatching attempts, in seconds. Dispatching is on by default: every node running
+   * this component is a candidate dispatcher, and the elected leader is decided automatically at runtime via
+   * {@link DispatchLeaseManager}. Set {@link #OPT_DISPATCHINTERVAL} to 0 on a node to explicitly exclude it from
+   * candidacy.
+   */
+  static final float DEFAULT_DISPATCH_INTERVAL = 2.0F;
 
   /** Multiplicative factor to transform dispatch interval captured in seconds to milliseconds */
   static final long DISPATCH_INTERVAL_MS_FACTOR = 1000;
 
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
+
+  /** Default multiple of the dispatch interval used as the dispatch lease timeout, if not explicitly configured */
+  static final int DEFAULT_DISPATCH_LOCK_TIMEOUT_FACTOR = 3;
 
   private static final Logger logger = LoggerFactory.getLogger(JobDispatcher.class);
 
@@ -134,6 +146,9 @@ public class JobDispatcher {
   protected DBSession db;
 
   private ScheduledFuture jdfuture = null;
+
+  /** Elects a single active dispatcher across candidate nodes; null while dispatching is disabled on this node. */
+  private volatile DispatchLeaseManager leaseManager = null;
 
   /**
    * A list with job types that cannot be dispatched in each interation
@@ -229,9 +244,27 @@ public class JobDispatcher {
       }
     }
 
+    long dispatchLockTimeout = Math.round(dispatchInterval * DEFAULT_DISPATCH_LOCK_TIMEOUT_FACTOR);
+    String dispatchLockTimeoutString = StringUtils.trimToNull((String) properties.get(OPT_DISPATCH_LOCK_TIMEOUT));
+    if (StringUtils.isNotBlank(dispatchLockTimeoutString)) {
+      try {
+        dispatchLockTimeout = Long.parseLong(dispatchLockTimeoutString);
+      } catch (Exception e) {
+        logger.warn("Dispatch lock timeout '{}' is malformed, using default of {}s", dispatchLockTimeoutString,
+            dispatchLockTimeout);
+      }
+    }
+
     // Stop the current dispatch thread so we can configure a new one
     if (jdfuture != null) {
       jdfuture.cancel(true);
+    }
+
+    // Release any lease this node might still hold so another candidate can take over immediately, then discard the
+    // lease manager. A new one is created below if dispatching is (still) enabled.
+    if (leaseManager != null) {
+      leaseManager.release();
+      leaseManager = null;
     }
 
     // Schedule the job dispatching.
@@ -239,6 +272,7 @@ public class JobDispatcher {
       long dispatchIntervalMs = Math.round(dispatchInterval * DISPATCH_INTERVAL_MS_FACTOR);
       logger.info("Job dispatching is enabled");
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
+      leaseManager = new DispatchLeaseManager(db, serviceRegistry.getRegistryHostname(), dispatchLockTimeout);
       jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs,
           dispatchIntervalMs, TimeUnit.MILLISECONDS);
       // Schedule heartbeat for dispatching nodes
@@ -264,6 +298,12 @@ public class JobDispatcher {
         logger.error("Error shutting down the Job Dispatcher", e);
       }
     }
+
+    // Hand off leadership immediately rather than making other candidate nodes wait out the full lease timeout
+    if (leaseManager != null) {
+      leaseManager.release();
+      leaseManager = null;
+    }
   }
 
   Runnable getJobDispatcherRunnable() {
@@ -279,6 +319,12 @@ public class JobDispatcher {
      */
     @Override
     public void run() {
+      DispatchLeaseManager currentLeaseManager = leaseManager;
+      if (currentLeaseManager == null || !currentLeaseManager.tryAcquireOrRenew()) {
+        logger.debug("Not the elected dispatcher, skipping this round of job dispatch");
+        return;
+      }
+
       logger.debug("Starting job dispatch");
 
       undispatchableJobTypes = new ArrayList<>();
@@ -421,7 +467,7 @@ public class JobDispatcher {
           // same time if there is processing capacity available.
           boolean parentHasRunningChildren = false;
           if (parentJob != null) {
-            for (Job child : serviceRegistry.getChildJobs(parentJob.getId())) {
+            for (Job child : serviceRegistry.getDescendantJobs(parentJob.getId())) {
               if (Job.Status.RUNNING.equals(child.getStatus())) {
                 parentHasRunningChildren = true;
                 break;
@@ -548,7 +594,7 @@ public class JobDispatcher {
         post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
         // Post the request
-        HttpResponse response = null;
+        ClassicHttpResponse response = null;
         int responseStatusCode;
         try {
           logger.debug("Trying to dispatch {} type '{}' load {} to {}", job, job.getJobType(), job.getJobLoad(),
@@ -557,7 +603,7 @@ public class JobDispatcher {
             serviceRegistry.setCurrentJob(job.toJob());
           }
           response = client.execute(post);
-          responseStatusCode = response.getStatusLine().getStatusCode();
+          responseStatusCode = response.getCode();
           if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
             return registration.getHost();
           } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
@@ -568,7 +614,8 @@ public class JobDispatcher {
             job.setStatus(Job.Status.FAILED);
             job = serviceRegistry.updateJob(job); // will open a tx
             logger.debug("Service {} refused to accept {}", registration, job);
-            throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
+            throw new UndispatchableJobException(
+                IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
           } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
             logger.debug("Service {} is not yet reachable", registration);
             continue;

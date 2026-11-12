@@ -24,7 +24,6 @@ package org.opencastproject.index.service.util;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
-
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListFilter;

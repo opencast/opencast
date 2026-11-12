@@ -21,8 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Strings.split;
 
@@ -31,9 +29,10 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.rest.ErrorCodeException;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
+
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -152,37 +151,6 @@ public final class RestUtil {
     return response;
   }
 
-  /**
-   * Create a stream response.
-   *
-   * @deprecated use
-   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, java.util.Optional,
- *                      java.util.Optional)}
-   *             instead
-   */
-  @Deprecated
-  public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Optional<Long> streamLength,
-          Optional<String> fileName) {
-    final Response.ResponseBuilder b = Response.ok(in).header("Content-Type", contentType);
-    if (streamLength.isPresent()) {
-      b.header("Content-Length", streamLength.get());
-    }
-    if (fileName.isPresent()) {
-      b.header("Content-Disposition", "attachment; filename=" + fileName.get());
-    }
-    return b;
-  }
-
-  /**
-   * Return JSON if <code>format</code> == json, XML else.
-   *
-   * @deprecated use {@link #getResponseType(String)}
-   */
-  @Deprecated
-  public static MediaType getResponseFormat(String format) {
-    return "json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
-  }
-
   /** Return JSON if <code>type</code> == json, XML else. */
   public static MediaType getResponseType(String type) {
     return "json".equalsIgnoreCase(type) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
@@ -204,8 +172,12 @@ public final class RestUtil {
   }
 
   public static String generateErrorResponse(ErrorCodeException e) {
-    Obj json = obj(p("error", obj(p("code", e.getErrorCode()), p("message", StringUtils.trimToEmpty(e.getMessage())))));
-    return json.toJson();
+    JsonObject error = new JsonObject();
+    error.addProperty("code", e.getErrorCode());
+    error.addProperty("message", StringUtils.trimToEmpty(e.getMessage()));
+    JsonObject json = new JsonObject();
+    json.add("error", error);
+    return json.toString();
   }
 
   /** Response builder functions. */
@@ -225,8 +197,8 @@ public final class RestUtil {
       return Response.ok().entity(Boolean.toString(entity)).build();
     }
 
-    public static Response ok(Jsons.Obj json) {
-      return Response.ok().entity(json.toJson()).type(MediaType.APPLICATION_JSON_TYPE).build();
+    public static Response ok(JsonObject json) {
+      return Response.ok().entity(json.toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     public static Response ok(Job job) {
@@ -335,42 +307,6 @@ public final class RestUtil {
 
     public static Response conflict(String msg) {
       return Response.status(Response.Status.CONFLICT).entity(msg).build();
-    }
-
-    /**
-     * create a partial file response
-     *
-     * @param f
-     *          the requested file
-     * @param contentType
-     *          the contentType to send
-     * @param fileName
-     *          the filename to send
-     * @param rangeHeader
-     *          the range header
-     * @return the Responsebuilder
-     * @throws IOException
-     *           if something goes wrong
-     */
-
-    /**
-     * Creates a precondition failed status response
-     *
-     * @return a precondition failed status response
-     */
-    public static Response preconditionFailed() {
-      return Response.status(Response.Status.PRECONDITION_FAILED).build();
-    }
-
-    /**
-     * Creates a precondition failed status response with a message
-     *
-     * @param message
-     *          The message body
-     * @return a precondition failed status response with a message
-     */
-    public static Response preconditionFailed(String message) {
-      return Response.status(Response.Status.PRECONDITION_FAILED).entity(message).build();
     }
 
   }

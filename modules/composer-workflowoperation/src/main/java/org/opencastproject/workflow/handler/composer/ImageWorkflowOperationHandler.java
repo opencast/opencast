@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.handler.composer;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.eq;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -42,7 +41,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.UnknownFileTypeException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -196,10 +194,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   protected void adjustMetadata(Extraction extraction, Attachment image, Cfg cfg) {
     // Adjust the target flavor. Make sure to account for partial updates
     for (final MediaPackageElementFlavor flavor : cfg.targetImageFlavor) {
-      final String flavorType = eq("*", flavor.getType())
+      final String flavorType = Objects.equals("*", flavor.getType())
           ? extraction.track.getFlavor().getType()
           : flavor.getType();
-      final String flavorSubtype = eq("*", flavor.getSubtype())
+      final String flavorSubtype = Objects.equals("*", flavor.getSubtype())
           ? extraction.track.getFlavor().getSubtype()
           : flavor.getSubtype();
       image.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
@@ -262,7 +260,8 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     try {
-      return handler.composerService.image(track, profile.getIdentifier(), Collections.toDoubleArray(seconds));
+      return handler.composerService.image(track, profile.getIdentifier(),
+          seconds.stream().mapToDouble(Double::doubleValue).toArray());
     } catch (Exception e) {
       throw new WorkflowOperationException("Error starting image extraction job", e);
     }
@@ -596,7 +595,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     private boolean eqFields(MediaPosition that) {
-      return position == that.position && eq(type, that.type);
+      return position == that.position && Objects.equals(type, that.type);
     }
 
     @Override public String toString() {

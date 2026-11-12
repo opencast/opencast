@@ -29,11 +29,11 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.speechtotext.api.SpeechToTextService;
 import org.opencastproject.speechtotext.api.SpeechToTextServiceException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,21 +66,23 @@ public class SpeechToTextServiceRemoteImpl extends RemoteBase implements SpeechT
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean, Boolean)
    */
   @Override
-  public Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException {
+  public Job transcribe(URI mediaFile, String language, Boolean translate, Boolean async)
+          throws SpeechToTextServiceException {
 
     List<NameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("mediaFilePath", mediaFile.toString()));
     params.add(new BasicNameValuePair("language", language));
     params.add(new BasicNameValuePair("translate", translate.toString()));
+    params.add(new BasicNameValuePair("async", async.toString()));
 
     logger.info("Generating subtitle for {}", mediaFile);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       HttpPost post = new HttpPost("/speechtotext");
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
       response = getResponse(post);
       if (response == null) {
         throw new SpeechToTextServiceException("No response from service");
@@ -94,11 +97,13 @@ public class SpeechToTextServiceRemoteImpl extends RemoteBase implements SpeechT
     }
   }
 
+  @Override
   @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
 
+  @Override
   @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.remoteServiceManager = remoteServiceManager;

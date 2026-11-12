@@ -22,14 +22,14 @@
 package org.opencastproject.scheduler.remote;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_CONFLICT;
-import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.hc.core5.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.hc.core5.http.HttpStatus.SC_CONFLICT;
+import static org.apache.hc.core5.http.HttpStatus.SC_CREATED;
+import static org.apache.hc.core5.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -47,32 +47,36 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -80,7 +84,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -101,7 +104,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceRemoteImpl.class);
 
   /** A parser for handling JSON documents inside the body of a request. **/
-  private final JSONParser parser = new JSONParser();
 
   public SchedulerServiceRemoteImpl() {
     super(JOB_TYPE);
@@ -129,23 +131,23 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     }
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
-    HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
+    ClassicHttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
-      if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
+      if (response != null && SC_CREATED == response.getCode()) {
         logger.info("Successfully added event {} to the scheduler service", eventId);
         return;
-      } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_CONFLICT == response.getCode()) {
         String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
-        JSONObject json = (JSONObject) parser.parse(errorJson);
-        JSONObject error = (JSONObject) json.get("error");
-        String errorCode = (String) error.get("code");
+        JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
+        JsonObject error = json.getAsJsonObject("error");
+        String errorCode = GsonUtil.getStringOrNull(error, "code");
         if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event " + eventId);
         } else {
           throw new SchedulerException("Unexpected error code " + errorCode);
         }
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to create the event");
         throw new UnauthorizedException("Unauthorized to create the event");
       } else {
@@ -161,9 +163,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
-          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Optional<String> schedulingSource)
+  public Map<String, Period<ZonedDateTime>> addMultipleEvents(RRule<ZonedDateTime> rRule, Date start, Date end,
+          Long duration, TimeZone tz, String captureAgentId, Set<String> userIds, MediaPackage templateMp,
+          Map<String, String> wfProperties, Map<String, String> caMetadata, Optional<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     HttpPost post = new HttpPost("/");
     logger.debug("Start adding a new events through remote Schedule Service");
@@ -186,23 +188,23 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
 
     String eventId = templateMp.getIdentifier().toString();
 
-    HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
+    ClassicHttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
-      if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
+      if (response != null && SC_CREATED == response.getCode()) {
         logger.info("Successfully added events to the scheduler service");
         return null;
-      } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_CONFLICT == response.getCode()) {
         String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
-        JSONObject json = (JSONObject) parser.parse(errorJson);
-        JSONObject error = (JSONObject) json.get("error");
-        String errorCode = (String) error.get("code");
+        JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
+        JsonObject error = json.getAsJsonObject("error");
+        String errorCode = GsonUtil.getStringOrNull(error, "code");
         if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event based on {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event based on" + eventId);
         } else {
           throw new SchedulerException("Unexpected error code " + errorCode);
         }
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to create the event");
         throw new UnauthorizedException("Unauthorized to create the event");
       } else {
@@ -261,34 +263,34 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("allowConflict", BooleanUtils.toString(allowConflict, "true", "false", "false")));
     put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
-    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_FORBIDDEN, SC_CONFLICT);
+    ClassicHttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_FORBIDDEN, SC_CONFLICT);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           logger.info("Event {} was not found by the scheduler service", eventId);
           throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+        } else if (SC_OK == response.getCode()) {
           logger.info("Event {} successfully updated with capture agent metadata.", eventId);
           return;
-        } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
+        } else if (response != null && SC_CONFLICT == response.getCode()) {
           String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(errorJson);
-          JSONObject error = (JSONObject) json.get("error");
-          String errorCode = (String) error.get("code");
+          JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
+          JsonObject error = json.getAsJsonObject("error");
+          String errorCode = GsonUtil.getStringOrNull(error, "code");
           if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
             logger.info("Conflicting events found when updating event {}", eventId);
             throw new SchedulerConflictException("Conflicting events found when updating event " + eventId);
           } else {
             throw new SchedulerException("Unexpected error code " + errorCode);
           }
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to update the event {}.", eventId);
           throw new UnauthorizedException("Unauthorized to update the event " + eventId);
-        } else if (SC_FORBIDDEN == response.getStatusLine().getStatusCode()) {
+        } else if (SC_FORBIDDEN == response.getCode()) {
           logger.info("Forbidden to update the event {}.", eventId);
           throw new SchedulerException("Event with specified ID cannot be updated");
         } else {
-          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+          throw new SchedulerException("Unexpected status code " + new StatusLine(response));
         }
       }
     } catch (NotFoundException | SchedulerConflictException | UnauthorizedException e) {
@@ -306,15 +308,15 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     logger.debug("Start removing event {} from scheduling service.", eventId);
     HttpDelete delete = new HttpDelete("/" + eventId);
 
-    HttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
+    ClassicHttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
-      if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+      if (response != null && SC_NOT_FOUND == response.getCode()) {
         logger.info("Event {} was not found by the scheduler service", eventId);
         throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
-      } else if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_OK == response.getCode()) {
         logger.info("Event {} removed from scheduling service.", eventId);
         return;
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to remove the event {}.", eventId);
         throw new UnauthorizedException("Unauthorized to remove the event " + eventId);
       }
@@ -332,12 +334,12 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public MediaPackage getMediaPackage(String eventId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
     HttpGet get = new HttpGet(eventId.concat("/mediapackage.xml"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Event mediapackage '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to get mediapacakge of the event {}.", eventId);
           throw new UnauthorizedException("Unauthorized to get mediapackage of the event " + eventId);
         } else {
@@ -362,12 +364,12 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public DublinCoreCatalog getDublinCore(String eventId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
     HttpGet get = new HttpGet(eventId.concat("/dublincore.xml"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Event catalog '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to get dublincore of the event {}.", eventId);
           throw new UnauthorizedException("Unauthorized to get dublincore of the event " + eventId);
         } else {
@@ -390,44 +392,32 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public TechnicalMetadata getTechnicalMetadata(String eventId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
     HttpGet get = new HttpGet(eventId.concat("/technical.json"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException("Event with id '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to get the technical metadata of the event {}.", eventId);
           throw new UnauthorizedException("Unauthorized to get the technical metadata of the event " + eventId);
         } else {
           String technicalMetadataJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(technicalMetadataJson);
-          final String recordingId = (String) json.get("id");
-          final Date start = new Date(DateTimeSupport.fromUTC((String) json.get("start")));
-          final Date end = new Date(DateTimeSupport.fromUTC((String) json.get("end")));
-          final String location = (String) json.get("location");
+          JsonObject json = GsonUtil.gson().fromJson(technicalMetadataJson, JsonObject.class);
+          final String recordingId = GsonUtil.getStringOrNull(json, "id");
+          final Date start = new Date(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(json, "start")));
+          final Date end = new Date(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(json, "end")));
+          final String location = GsonUtil.getStringOrNull(json, "location");
 
           final Set<String> presenters = new HashSet<>();
-          JSONArray presentersArr = (JSONArray) json.get("presenters");
-          for (int i = 0; i < presentersArr.size(); i++) {
-            presenters.add((String) presentersArr.get(i));
+          for (JsonElement presenter : json.getAsJsonArray("presenters")) {
+            presenters.add(presenter.getAsString());
           }
 
-          final Map<String, String> wfProperties = new HashMap<>();
-          JSONObject wfPropertiesObj = (JSONObject) json.get("wfProperties");
-          Set<Entry<String, String>> entrySet = wfPropertiesObj.entrySet();
-          for (Entry<String, String> entry : entrySet) {
-            wfProperties.put(entry.getKey(), entry.getValue());
-          }
+          final Map<String, String> wfProperties = GsonUtil.toStringMap(json.getAsJsonObject("wfProperties"));
+          final Map<String, String> agentConfig = GsonUtil.toStringMap(json.getAsJsonObject("agentConfig"));
 
-          final Map<String, String> agentConfig = new HashMap<>();
-          JSONObject agentConfigObj = (JSONObject) json.get("agentConfig");
-          entrySet = agentConfigObj.entrySet();
-          for (Entry<String, String> entry : entrySet) {
-            agentConfig.put(entry.getKey(), entry.getValue());
-          }
-
-          String status = (String) json.get("state");
-          String lastHeard = (String) json.get("lastHeardFrom");
+          String status = GsonUtil.getStringOrNull(json, "state");
+          String lastHeard = GsonUtil.getStringOrNull(json, "lastHeardFrom");
           Recording recording = null;
           if (StringUtils.isNotBlank(status) && StringUtils.isNotBlank(lastHeard)) {
             recording = new RecordingImpl(recordingId, status, DateTimeSupport.fromUTC(lastHeard));
@@ -453,13 +443,13 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public Map<String, String> getWorkflowConfig(String eventId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
     HttpGet get = new HttpGet(eventId.concat("/workflow.properties"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException(
                   "Event workflow configuration '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to get workflow config of the event {}.", eventId);
           throw new UnauthorizedException("Unauthorized to get workflow config of the event " + eventId);
         } else {
@@ -483,13 +473,13 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public Map<String, String> getCaptureAgentConfiguration(String eventId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
     HttpGet get = new HttpGet(eventId.concat("/agent.properties"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           throw new NotFoundException(
                   "Event capture agent configuration '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to get capture agent config of the event {}.", eventId);
           throw new UnauthorizedException("Unauthorized to get capture agent config of the event " + eventId);
         } else {
@@ -514,9 +504,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public int getEventCount() throws SchedulerException, UnauthorizedException {
     final HttpGet get = new HttpGet(UrlSupport.concat("eventCount"));
-    final HttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
+    final ClassicHttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
     try {
-      if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      if (SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to get event count");
         throw new UnauthorizedException("Unauthorized to get event count");
       }
@@ -534,10 +524,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public String getScheduleLastModified(String agentId) throws SchedulerException {
     HttpGet get = new HttpGet(UrlSupport.concat(agentId, "lastmodified"));
-    HttpResponse response = getResponse(get, SC_OK);
+    ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String agentHash = EntityUtils.toString(response.getEntity(), UTF_8);
           logger.info("Successfully get agent last modified hash of agent with id {} from the remote scheduler service",
                   agentId);
@@ -571,16 +561,16 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     if (endTo.isPresent()) {
       queryStringParams.add(new BasicNameValuePair("endsto", Long.toString(endTo.get().getTime())));
     }
-    HttpGet get = new HttpGet("recordings.xml?".concat(URLEncodedUtils.format(queryStringParams, UTF_8)));
-    HttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
+    HttpGet get = new HttpGet("recordings.xml?".concat(WWWFormCodec.format(queryStringParams, UTF_8)));
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
           List<MediaPackage> events = MediaPackageParser.getArrayFromXml(mediaPackageXml);
           logger.info("Successfully get recordings from the remote scheduler service");
           return events;
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to search for events");
           throw new UnauthorizedException("Unauthorized to search for events");
         }
@@ -599,14 +589,14 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public Optional<MediaPackage> getCurrentRecording(String captureAgentId)
           throws SchedulerException, UnauthorizedException {
     HttpGet get = new HttpGet(UrlSupport.concat("currentRecording", captureAgentId));
-    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
     try {
-      if (SC_OK == response.getStatusLine().getStatusCode()) {
+      if (SC_OK == response.getCode()) {
         String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
         MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
         logger.info("Successfully get current recording of agent {} from the remote scheduler service", captureAgentId);
         return Optional.of(event);
-      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      } else if (SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to get current recording of agent {}", captureAgentId);
         throw new UnauthorizedException("Unauthorized to get current recording of agent " + captureAgentId);
       } else {
@@ -625,15 +615,15 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public Optional<MediaPackage> getUpcomingRecording(String captureAgentId)
           throws SchedulerException, UnauthorizedException {
     HttpGet get = new HttpGet(UrlSupport.concat("upcomingRecording", captureAgentId));
-    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
     try {
-      if (SC_OK == response.getStatusLine().getStatusCode()) {
+      if (SC_OK == response.getCode()) {
         String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
         MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
         logger.info("Successfully get upcoming recording of agent {} from the remote scheduler service",
             captureAgentId);
         return Optional.of(event);
-      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      } else if (SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to get upcoming recording of agent {}", captureAgentId);
         throw new UnauthorizedException("Unauthorized to get upcoming recording of agent " + captureAgentId);
       } else {
@@ -655,19 +645,19 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     queryStringParams.add(new BasicNameValuePair("agent", captureDeviceID));
     queryStringParams.add(new BasicNameValuePair("start", Long.toString(startDate.getTime())));
     queryStringParams.add(new BasicNameValuePair("end", Long.toString(endDate.getTime())));
-    HttpGet get = new HttpGet("conflicts.xml?".concat(URLEncodedUtils.format(queryStringParams, UTF_8)));
-    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT);
+    HttpGet get = new HttpGet("conflicts.xml?".concat(WWWFormCodec.format(queryStringParams, UTF_8)));
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
           List<MediaPackage> events = MediaPackageParser.getArrayFromXml(mediaPackageXml);
           logger.info("Successfully get conflicts from the remote scheduler service");
           return events;
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to search for conflicting events");
           throw new UnauthorizedException("Unauthorized to search for conflicting events");
-        } else if (SC_NO_CONTENT == response.getStatusLine().getStatusCode()) {
+        } else if (SC_NO_CONTENT == response.getCode()) {
           return Collections.<MediaPackage> emptyList();
         }
       }
@@ -682,8 +672,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public List<MediaPackage> findConflictingEvents(String captureAgentId, RRule rrule, Date startDate, Date endDate,
-          long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException {
+  public List<MediaPackage> findConflictingEvents(String captureAgentId, RRule<ZonedDateTime> rrule, Date startDate,
+          Date endDate, long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException {
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
     queryStringParams.add(new BasicNameValuePair("agent", captureAgentId));
     queryStringParams.add(new BasicNameValuePair("rrule", rrule.getRecur().toString()));
@@ -691,19 +681,19 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     queryStringParams.add(new BasicNameValuePair("end", Long.toString(endDate.getTime())));
     queryStringParams.add(new BasicNameValuePair("duration", Long.toString(duration)));
     queryStringParams.add(new BasicNameValuePair("timezone", timezone.getID()));
-    HttpGet get = new HttpGet("conflicts.xml?".concat(URLEncodedUtils.format(queryStringParams, UTF_8)));
-    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT);
+    HttpGet get = new HttpGet("conflicts.xml?".concat(WWWFormCodec.format(queryStringParams, UTF_8)));
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
           List<MediaPackage> events = MediaPackageParser.getArrayFromXml(mediaPackageXml);
           logger.info("Successfully get conflicts from the remote scheduler service");
           return events;
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        } else if (SC_UNAUTHORIZED == response.getCode()) {
           logger.info("Unauthorized to search for conflicting events");
           throw new UnauthorizedException("Unauthorized to search for conflicting events");
-        } else if (SC_NO_CONTENT == response.getStatusLine().getStatusCode()) {
+        } else if (SC_NO_CONTENT == response.getCode()) {
           return Collections.<MediaPackage> emptyList();
         }
       }
@@ -730,11 +720,11 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     if (cutoff.isPresent()) {
       queryStringParams.add(new BasicNameValuePair("cutoff", Long.toString(cutoff.get().getTime())));
     }
-    HttpGet get = new HttpGet("calendars?".concat(URLEncodedUtils.format(queryStringParams, UTF_8)));
-    HttpResponse response = getResponse(get, SC_OK);
+    HttpGet get = new HttpGet("calendars?".concat(WWWFormCodec.format(queryStringParams, UTF_8)));
+    ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String calendar = EntityUtils.toString(response.getEntity(), UTF_8);
           logger.info("Successfully get calendar of agent with id {} from the remote scheduler service",
                   captureAgentId);
@@ -758,12 +748,12 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("buffer", Long.toString(buffer)));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
-    HttpResponse response = getResponse(post, SC_OK, SC_UNAUTHORIZED);
+    ClassicHttpResponse response = getResponse(post, SC_OK, SC_UNAUTHORIZED);
     try {
-      if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
+      if (response != null && SC_OK == response.getCode()) {
         logger.info("Successfully started removing old schedules before butter {} to the scheduler service", buffer);
         return;
-      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+      } else if (SC_UNAUTHORIZED == response.getCode()) {
         logger.info("Unauthorized to remove old schedules before buffer {}.", buffer);
         throw new UnauthorizedException("Unauthorized to remove old schedules");
       }
@@ -786,22 +776,22 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("state", state));
     put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
-    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST);
+    ClassicHttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_BAD_REQUEST);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        if (SC_NOT_FOUND == response.getCode()) {
           logger.warn("Event with mediapackage id {} was not found by the scheduler service", mediapackageId);
           throw new NotFoundException(
                   "Event with mediapackage id '" + mediapackageId + "' not found on remote scheduler service!");
-        } else if (SC_BAD_REQUEST == response.getStatusLine().getStatusCode()) {
+        } else if (SC_BAD_REQUEST == response.getCode()) {
           logger.info("Unable to update event with mediapackage id {}, invalid recording state: {}.", mediapackageId,
                   state);
           return false;
-        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
+        } else if (SC_OK == response.getCode()) {
           logger.info("Event with mediapackage id {} successfully updated with recording status.", mediapackageId);
           return true;
         } else {
-          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
+          throw new SchedulerException("Unexpected status code " + new StatusLine(response));
         }
       }
     } catch (NotFoundException e) {
@@ -818,18 +808,18 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public Recording getRecordingState(String id) throws NotFoundException, SchedulerException {
     HttpGet get = new HttpGet(UrlSupport.concat(id, "recordingStatus"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    ClassicHttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String recordingStateJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(recordingStateJson);
-          String recordingId = (String) json.get("id");
-          String status = (String) json.get("state");
-          Long lastHeard = (Long) json.get("lastHeardFrom");
+          JsonObject json = GsonUtil.gson().fromJson(recordingStateJson, JsonObject.class);
+          String recordingId = GsonUtil.getStringOrNull(json, "id");
+          String status = GsonUtil.getStringOrNull(json, "state");
+          Long lastHeard = json.get("lastHeardFrom").getAsLong();
           logger.info("Successfully get calendar of agent with id {} from the remote scheduler service", id);
           return new RecordingImpl(recordingId, status, lastHeard);
-        } else if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+        } else if (SC_NOT_FOUND == response.getCode()) {
           logger.warn("Event with mediapackage id {} was not found by the scheduler service", id);
           throw new NotFoundException("Event with mediapackage id '" + id + "' not found on remote scheduler service!");
         }
@@ -848,12 +838,12 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public void removeRecording(String eventId) throws NotFoundException, SchedulerException {
     HttpDelete delete = new HttpDelete(UrlSupport.concat(eventId, "recordingStatus"));
 
-    HttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND);
+    ClassicHttpResponse response = getResponse(delete, SC_OK, SC_NOT_FOUND);
     try {
-      if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
+      if (response != null && SC_NOT_FOUND == response.getCode()) {
         logger.info("Event {} was not found by the scheduler service", eventId);
         throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
-      } else if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
+      } else if (response != null && SC_OK == response.getCode()) {
         logger.info("Recording status of event {} removed from scheduling service.", eventId);
         return;
       }
@@ -871,18 +861,18 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public Map<String, Recording> getKnownRecordings() throws SchedulerException {
     HttpGet get = new HttpGet("recordingStatus");
-    HttpResponse response = getResponse(get, SC_OK);
+    ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
-        if (SC_OK == response.getStatusLine().getStatusCode()) {
+        if (SC_OK == response.getCode()) {
           String recordingStates = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONArray recordings = (JSONArray) parser.parse(recordingStates);
+          JsonArray recordings = GsonUtil.gson().fromJson(recordingStates, JsonArray.class);
           Map<String, Recording> recordingsMap = new HashMap<String, Recording>();
-          for (int i = 0; i < recordings.size(); i++) {
-            JSONObject recording = (JSONObject) recordings.get(i);
-            String recordingId = (String) recording.get("id");
-            String status = (String) recording.get("state");
-            Long lastHeard = (Long) recording.get("lastHeardFrom");
+          for (JsonElement element : recordings) {
+            JsonObject recording = element.getAsJsonObject();
+            String recordingId = GsonUtil.getStringOrNull(recording, "id");
+            String status = GsonUtil.getStringOrNull(recording, "state");
+            Long lastHeard = recording.get("lastHeardFrom").getAsLong();
             recordingsMap.put(recordingId, new RecordingImpl(recordingId, status, lastHeard));
           }
           logger.info("Successfully get recording states from the remote scheduler service");

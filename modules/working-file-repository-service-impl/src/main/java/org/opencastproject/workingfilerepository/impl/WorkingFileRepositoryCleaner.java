@@ -128,26 +128,19 @@ public class WorkingFileRepositoryCleaner {
     }
   }
 
-  // just to make sure Quartz is being shut down...
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    shutdown();
-  }
-
   // call working file repository cleaner to clean up
   private void cleanup() {
     for (String collectionId : collectionIds) {
       try {
         workingFileRepository.cleanupOldFilesFromCollection(collectionId, maxAge);
       } catch (IOException e) {
-        logger.error("Cleaning of collection with id:{} failed", collectionId);
+        logger.error("Cleaning of collection with id:{} failed", collectionId, e);
       }
     }
     try {
       workingFileRepository.cleanupOldFilesFromMediaPackage(maxAge);
     } catch (IOException e) {
-      logger.error("Cleaning of mediapackages failed");
+      logger.error("Cleaning of mediapackages failed", e);
     }
   }
 

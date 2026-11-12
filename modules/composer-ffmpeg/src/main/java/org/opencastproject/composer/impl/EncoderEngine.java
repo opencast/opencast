@@ -32,6 +32,7 @@ import org.opencastproject.util.IoSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -74,6 +76,8 @@ public class EncoderEngine implements AutoCloseable {
   static final String PROP_TRIMMING_DURATION = "trim.duration";
   /** If true STDERR and STDOUT of the spawned process will be mixed so that both can be read via STDIN */
   private static final boolean REDIRECT_ERROR_STREAM = true;
+  /** Placeholder for random range replacement (e.g. #{random:0:3}). */
+  private static final Pattern RANDOM_PARAMETER_PATTERN = Pattern.compile("#\\{random:(-?\\d+):(-?\\d+)\\}");
 
   private static Logger logger = LoggerFactory.getLogger(EncoderEngine.class);
   /** the encoder binary */
@@ -413,11 +417,29 @@ public class EncoderEngine implements AutoCloseable {
       }
     }
 
+    // Replace random placeholders like "#{random:0:3}".
+    cmd = replaceRandomParameters(cmd);
+
     // Also replace spaces
     cmd = cmd.replace("#{space}", " ");
 
     /* Remove unused commandline parts */
     return cmd.replaceAll("#\\{.*?\\}", "");
+  }
+
+  private String replaceRandomParameters(String cmd) {
+    Matcher matcher = RANDOM_PARAMETER_PATTERN.matcher(cmd);
+    StringBuffer output = new StringBuffer();
+    while (matcher.find()) {
+      int start = Integer.parseInt(matcher.group(1));
+      int end = Integer.parseInt(matcher.group(2));
+      long lower = Math.min(start, end);
+      long upper = Math.max(start, end);
+      long replacement = ThreadLocalRandom.current().nextLong(lower, upper + 1);
+      matcher.appendReplacement(output, Matcher.quoteReplacement(Long.toString(replacement)));
+    }
+    matcher.appendTail(output);
+    return output.toString();
   }
 
   @Override
@@ -444,20 +466,20 @@ public class EncoderEngine implements AutoCloseable {
     }
 
     // Others go to trace logging
-    if (StringUtils.startsWithAny(message.toLowerCase(),
+    if (Strings.CS.startsWithAny(message.toLowerCase(),
           "ffmpeg version", "configuration", "lib", "size=", "frame=", "built with")) {
       logger.trace(message);
 
     // Handle output files
-    } else if (StringUtils.startsWith(message, "Output #")) {
+    } else if (Strings.CS.startsWith(message, "Output #")) {
       logger.debug(message);
       Matcher matcher = outputPattern.matcher(message);
       if (matcher.find()) {
         String type = matcher.group(1);
         String outputPath = matcher.group(2);
-        if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
-                && !StringUtils.equals("/dev/null", outputPath)
-                && !StringUtils.startsWith("pipe:", outputPath)) {
+        if (!Strings.CS.equals("NUL", outputPath) && !Strings.CS.equals("/dev/null", outputPath)
+                && !Strings.CS.equals("/dev/null", outputPath)
+                && !Strings.CS.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           if (!type.startsWith("hls")) {
             logger.info("Identified output file {}", outputFile);
@@ -465,13 +487,13 @@ public class EncoderEngine implements AutoCloseable {
           }
         }
       }
-    } else if (StringUtils.startsWith(message, "[hls @ ")) {
+    } else if (Strings.CS.startsWith(message, "[hls @ ")) {
       logger.debug(message);
       Matcher matcher = outputPatternHLS.matcher(message);
       if (matcher.find()) {
         final String outputPath = Objects.toString(matcher.group(1), matcher.group(2));
-        if (!StringUtils.equals("NUL", outputPath) && !StringUtils.equals("/dev/null", outputPath)
-                && !StringUtils.startsWith("pipe:", outputPath)) {
+        if (!Strings.CS.equals("NUL", outputPath) && !Strings.CS.equals("/dev/null", outputPath)
+                && !Strings.CS.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
           // HLS generates the filenames based on a template with %v and %d replaced
           // HLS writes into the same manifest file to add each segment
@@ -483,7 +505,7 @@ public class EncoderEngine implements AutoCloseable {
       }
 
     // Some to debug
-    } else if (StringUtils.startsWithAny(message.toLowerCase(),
+    } else if (Strings.CS.startsWithAny(message.toLowerCase(),
         "artist", "compatible_brands", "copyright", "creation_time", "description", "composer", "date", "duration",
         "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
         "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ ",
@@ -751,6 +773,7 @@ public class EncoderEngine implements AutoCloseable {
       for (Map.Entry<String, String> e : params.entrySet()) {
         r = r.replace("#{" + e.getKey() + "}", e.getValue());
       }
+      r = replaceRandomParameters(r);
       return r;
     }
 
@@ -794,6 +817,7 @@ public class EncoderEngine implements AutoCloseable {
         ffmpgGCmd = ffmpgGCmd.replace("#{" + e.getKey() + "}", e.getValue());
       }
       ffmpgGCmd = ffmpgGCmd.replace("#{space}", " ");
+      ffmpgGCmd = replaceRandomParameters(ffmpgGCmd);
       int indx = 0; // individual quality profiles - names are not needed anymore
       // Only quality(bitrate/resolution/etc) and position matters
       for (EncodingProfile profile : profiles) {
@@ -812,6 +836,7 @@ public class EncoderEngine implements AutoCloseable {
           ffmpgCmd = ffmpgCmd.replace("#{" + e.getKey() + "}", e.getValue());
         }
         ffmpgCmd = ffmpgCmd.replace("#{space}", " ");
+        ffmpgCmd = replaceRandomParameters(ffmpgCmd);
         List<String> cmdToken;
         try {
           cmdToken = commandSplit(ffmpgCmd);
@@ -1003,6 +1028,7 @@ public class EncoderEngine implements AutoCloseable {
           ffmpgCmd = ffmpgCmd.replace("#{" + e.getKey() + "}", e.getValue());
         }
         ffmpgCmd = ffmpgCmd.replace("#{space}", " ");
+        ffmpgCmd = replaceRandomParameters(ffmpgCmd);
         String[] arguments;
         try {
           arguments = CommandLineUtils.translateCommandline(ffmpgCmd);

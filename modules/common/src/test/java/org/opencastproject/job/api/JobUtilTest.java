@@ -34,7 +34,6 @@ import static org.opencastproject.util.JobUtil.sumQueueTime;
 import static org.opencastproject.util.JobUtil.update;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.JobUtil.waitForJobSuccess;
-import static org.opencastproject.util.data.Collections.list;
 
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier.Result;
@@ -48,11 +47,9 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -179,8 +176,7 @@ public class JobUtilTest {
 
   @Test
   public void testJobFromHttpResponse() throws Exception {
-    BasicHttpResponse response = new BasicHttpResponse(
-            new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
+    BasicClassicHttpResponse response = new BasicClassicHttpResponse(HttpStatus.SC_NO_CONTENT, "No message");
     Optional<Job> job = JobUtil.jobFromHttpResponse(response);
     assertFalse(job.isPresent());
 
@@ -205,7 +201,7 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setQueueTime(queueTime3);
 
-    long sumQueueTime = sumQueueTime(list(job1, job2, job3));
+    long sumQueueTime = sumQueueTime(List.of(job1, job2, job3));
     assertEquals(queueTime1 + queueTime2 + queueTime3, sumQueueTime);
   }
 
@@ -218,7 +214,7 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setStatus(Status.WAITING);
 
-    List<Job> nonFinished = getNonFinished(list(job1, job2, job3));
+    List<Job> nonFinished = getNonFinished(List.of(job1, job2, job3));
     assertEquals(2, nonFinished.size());
     assertFalse(nonFinished.contains(job1));
   }

@@ -23,8 +23,6 @@ package org.opencastproject.graphql.command;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
@@ -38,6 +36,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
@@ -59,7 +59,7 @@ public class CreateSeriesCommand extends AbstractCommand<GqlSeries> {
   @Override
   public GqlSeries execute() {
     OpencastContext context = OpencastContextManager.getCurrentContext();
-    final ElasticsearchIndex index = context.getService(ElasticsearchIndex.class);
+    final OpenSearchIndex index = context.getService(OpenSearchIndex.class);
     final IndexService indexService = context.getService(IndexService.class);
 
     final Map<String, Object> seriesMetadata = environment.getArgument("metadata");

@@ -75,7 +75,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -716,8 +715,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       }
       if (StringUtils.isNotBlank(transcriptionJson.source)) {
         try {
-          azureStorageClient.deleteFile(new URL(transcriptionJson.source));
-        } catch (IOException | MicrosoftAzureNotAllowedException | MicrosoftAzureStorageClientException e) {
+          azureStorageClient.deleteFile(URI.create(transcriptionJson.source).toURL());
+        } catch (IOException | MicrosoftAzureNotAllowedException | MicrosoftAzureStorageClientException
+            | IllegalArgumentException e) {
           throw new TranscriptionServiceException(String.format(
               "Unable to delete audio source file for media package %s.", mpId, e));
         }

@@ -8,6 +8,9 @@ configuration to `on` or `off`.
 List of Available Plugins
 -------------------------
 
+- opencast-plugin-lifecycle-management
+    - Beta feature which allows to automatically perform actions on events based on policies. See
+      [LifeCycle Management](lifecycle-management.md)
 - opencast-plugin-transcription-services
     - Support for the Amberscript transcription service
     - Support for the Google cloud transcription service

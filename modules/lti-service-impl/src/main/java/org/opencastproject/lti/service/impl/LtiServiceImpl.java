@@ -26,12 +26,6 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.Workflows;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -51,6 +45,12 @@ import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -59,6 +59,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -70,12 +71,10 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -124,7 +123,7 @@ public class LtiServiceImpl implements LtiService {
   private WorkflowService workflowService;
   private AssetManager assetManager;
   private Workspace workspace;
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
   private AuthorizationService authorizationService;
   private SeriesService seriesService;
   private String workflow;
@@ -166,7 +165,7 @@ public class LtiServiceImpl implements LtiService {
 
   /** OSGi DI */
   @Reference
-  public void setSearchIndex(ElasticsearchIndex searchIndex) {
+  public void setSearchIndex(OpenSearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
@@ -316,9 +315,9 @@ public class LtiServiceImpl implements LtiService {
 
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
 
-      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
+      JsonArray metadataJsonArray = GsonUtil.parse(metadataJson).getAsJsonArray();
 
-      JSONArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
+      JsonArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
       MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
 
       replaceField(collection, "isPartOf", seriesId);
@@ -398,10 +397,10 @@ public class LtiServiceImpl implements LtiService {
     try {
       final MetadataList metadataList = new MetadataList();
       metadataList.add(adapter, collection);
-      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadata));
+      MetadataJson.fillListFromJson(metadataList, GsonUtil.parse(metadata).getAsJsonArray());
       this.indexService.updateEventMetadata(eventId, metadataList, searchIndex);
       republishMetadata(eventId);
-    } catch (IndexServiceException | SearchIndexException | ParseException e) {
+    } catch (IndexServiceException | SearchIndexException e) {
       throw new RuntimeException(e);
     }
   }
@@ -463,7 +462,7 @@ public class LtiServiceImpl implements LtiService {
     metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), metadataCollection);
 
     final String wfState = event.getWorkflowState();
-    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+    if (wfState != null && WorkflowUtil.isActive(wfState)) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
     return new Gson().toJson(MetadataJson.listToJson(metadataList, true, false));

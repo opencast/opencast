@@ -23,7 +23,7 @@ package org.opencastproject.authorization.xacml.manager.impl;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
@@ -41,7 +41,7 @@ import org.osgi.service.component.annotations.Reference;
 public class OsgiAclServiceFactory implements AclServiceFactory {
   private AclDb aclDb;
   private SecurityService securityService;
-  protected ElasticsearchIndex index;
+  protected OpenSearchIndex index;
 
   @Override
   public AclService serviceFor(Organization org) {
@@ -59,7 +59,7 @@ public class OsgiAclServiceFactory implements AclServiceFactory {
   }
 
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 }

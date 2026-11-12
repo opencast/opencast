@@ -50,6 +50,7 @@ import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -58,9 +59,11 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -68,7 +71,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -410,7 +415,7 @@ public class ServiceRegistryEndpoint {
     try {
       for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByLoad(serviceType)) {
         JaxbServiceRegistration jaxbReg = new JaxbServiceRegistration(reg);
-        URL internalHostUrl = new URL(jaxbReg.getHost());
+        URL internalHostUrl = URI.create(jaxbReg.getHost()).toURL();
         String tenantSpecificHost = StringUtils.trimToNull(properties.get("org.opencastproject.host."
             + internalHostUrl.getHost()));
         if (StringUtils.isNotBlank(tenantSpecificHost)) {
@@ -419,7 +424,7 @@ public class ServiceRegistryEndpoint {
         registrations.add(jaxbReg);
       }
       return Response.ok(registrations).build();
-    } catch (ServiceRegistryException | MalformedURLException e) {
+    } catch (ServiceRegistryException | MalformedURLException | IllegalArgumentException e) {
       throw new WebApplicationException(e);
     }
   }
@@ -449,7 +454,7 @@ public class ServiceRegistryEndpoint {
   @RestQuery(
       name = "health",
       description = "Checks the status of the registered services",
-      returnDescription = "Returns NO_CONTENT if services are in a proper state",
+      returnDescription = "Returns a count of healthy, warning and error services",
       restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING,
               description = "The service type identifier"),
@@ -473,7 +478,7 @@ public class ServiceRegistryEndpoint {
   @RestQuery(
       name = "health",
       description = "Checks the status of the registered services",
-      returnDescription = "Returns NO_CONTENT if services are in a proper state",
+      returnDescription = "Returns a count of healthy, warning and error services",
       restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING,
               description = "The service type identifier"),
@@ -781,10 +786,11 @@ public class ServiceRegistryEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(
       name = "childrenjobsasxml",
-      description = "Returns all children from a job as XML.",
-      returnDescription = "A list of children jobs as XML",
+      description = "Returns all descendants (children, their children and so on) of a job as XML.",
+      returnDescription = "A list of descendant jobs as XML",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier")
+          @RestParameter(name = "id", isRequired = true, type = Type.STRING,
+              description = "The ancestor job identifier")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Jobs found.")
@@ -798,17 +804,18 @@ public class ServiceRegistryEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
       name = "childrenjobsasjson",
-      description = "Returns all children from a job as JSON.",
-      returnDescription = "A list of children jobs as JSON",
+      description = "Returns all descendants (children, their children and so on) of a job as JSON.",
+      returnDescription = "A list of descendant jobs as JSON",
       pathParameters = {
-          @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier")
+          @RestParameter(name = "id", isRequired = true, type = Type.STRING,
+              description = "The ancestor job identifier")
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "Jobs found.")
       })
   public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) {
     try {
-      return new JaxbJobList(serviceRegistry.getChildJobs(id));
+      return new JaxbJobList(serviceRegistry.getDescendantJobs(id));
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
@@ -1035,13 +1042,24 @@ public class ServiceRegistryEndpoint {
       },
       responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "Jobs successfully removed"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "jobIds is not a JSON array of identifiers"),
           @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               description = "Error while removing jobs")
       })
   public Response removeParentlessJobs(@FormParam("jobIds") String jobIds) throws NotFoundException {
+    final List<Long> jobIdList = new ArrayList<>();
     try {
-      final JSONArray array = (JSONArray) JSONValue.parse(jobIds);
-      final List<Long> jobIdList = Arrays.asList((Long[]) array.toArray(new Long[0]));
+      final JsonArray array = GsonUtil.gson().fromJson(jobIds, JsonArray.class);
+      if (array == null) {
+        throw new JsonParseException("jobIds is empty");
+      }
+      for (JsonElement id : array) {
+        jobIdList.add(id.getAsLong());
+      }
+    } catch (JsonParseException | IllegalStateException | NumberFormatException e) {
+      return Response.status(Status.BAD_REQUEST).entity("jobIds must be a JSON array of job identifiers").build();
+    }
+    try {
       serviceRegistry.removeJobs(jobIdList);
       return Response.noContent().build();
     } catch (ServiceRegistryException e) {

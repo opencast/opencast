@@ -22,8 +22,8 @@
 
 package org.opencastproject.search.api;
 
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +39,7 @@ public class SearchResultList {
         .map(SearchHit::getSourceAsMap)
         .map(SearchResult::rehydrate)
         .collect(Collectors.toUnmodifiableList());
-    totalhits = hits.getTotalHits().value;
+    totalhits = hits.getTotalHits().value();
   }
 
   public List<SearchResult> getHits() {

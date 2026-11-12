@@ -55,9 +55,7 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.scheduler.api.RecordingState.CAPTURING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOADING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
-import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -73,9 +71,6 @@ import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.db.DBSession;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -96,6 +91,9 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -128,19 +126,15 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -161,6 +155,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -171,6 +167,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -201,7 +198,7 @@ public class SchedulerServiceImplTest {
   private Organization currentOrg = new DefaultOrganization();
 
   private static SchedulerServiceImpl schedSvc;
-  private static ElasticsearchIndex index;
+  private static OpenSearchIndex index;
 
   // persistent properties
   private static SchedulerServiceDatabaseImpl schedulerDatabase;
@@ -238,16 +235,21 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(episodeAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("dublincore", "episode"))
             .anyTimes();
     EasyMock.expect(episodeAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    final Capture<String> stringCapture = EasyMock.newCapture();
-    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
-        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
+    // Read the argument of the current invocation instead of capturing it. addMultipleEventInternal() calls
+    // getEventCatalogUIAdapterFlavors() from a parallel stream, which queries both adapters below. A Capture
+    // shared between them is mutable state without a common lock, so one adapter's answer could observe the
+    // Capture while the other was rewriting it and fail with "Nothing captured yet".
+    EasyMock.expect(episodeAdapter.handlesOrganization(EasyMock.anyString()))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(EasyMock.getCurrentArguments()[0]))
+        .anyTimes();
 
     EventCatalogUIAdapter extendedAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(extendedAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor("extended", "episode"))
             .anyTimes();
     EasyMock.expect(extendedAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    EasyMock.expect(extendedAdapter.handlesOrganization(EasyMock.capture(stringCapture)))
-        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(stringCapture.getValue())).anyTimes();
+    EasyMock.expect(extendedAdapter.handlesOrganization(EasyMock.anyString()))
+        .andAnswer(() -> DefaultOrganization.DEFAULT_ORGANIZATION_ID.equals(EasyMock.getCurrentArguments()[0]))
+        .anyTimes();
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty(EasyMock.anyString())).andReturn("adminuser").anyTimes();
@@ -257,7 +259,7 @@ public class SchedulerServiceImplTest {
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
 
-    index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
@@ -711,7 +713,7 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testAddMultipleEventsEmptyRange() throws Exception {
-    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
+    final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
     final Date end = start;
     final Long duration = 6900000L;
@@ -728,7 +730,7 @@ public class SchedulerServiceImplTest {
     final Map<String, String> wfProperties = this.wfProperties;
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Optional<String> schedulingSource = Optional.empty();
-    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+    final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
         rrule,
         start,
         end,
@@ -746,7 +748,7 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testAddMultipleEvents() throws Exception {
-    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
+    final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
     final Date end = new Date(1570953300000L); // 2019-10-13T07:55:00Z
     final Long duration = 6900000L;
@@ -764,7 +766,7 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Optional<String> schedulingSource = Optional.empty();
     assertEquals("mod0", schedSvc.getScheduleLastModified(captureAgentId));
-    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+    final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
         rrule,
         start,
         end,
@@ -778,15 +780,15 @@ public class SchedulerServiceImplTest {
         schedulingSource
     );
 
+    final ZoneId zoneId = tz.toZoneId();
     final int expectedEventCount = rrule.getRecur().getDates(
-        new net.fortuna.ical4j.model.Date(start),
-        new net.fortuna.ical4j.model.Date(end),
-        Value.DATE
+        start.toInstant().atZone(zoneId),
+        end.toInstant().atZone(zoneId)
     ).size();
     assertEquals(expectedEventCount, scheduled.keySet().size());
     final String randomMpId = scheduled.keySet().stream().findAny()
         .orElseThrow(() -> new RuntimeException("This should never happen"));
-    final Period period = scheduled.get(randomMpId);
+    final Period<ZonedDateTime> period = scheduled.get(randomMpId);
     final MediaPackage mediaPackage = schedSvc.getMediaPackage(randomMpId);
     final DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(randomMpId);
     final TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(randomMpId);
@@ -794,8 +796,8 @@ public class SchedulerServiceImplTest {
     assertTrue(eventLoaded.getFirst(PROPERTY_TITLE).startsWith(dublinCoreCatalog.getFirst(PROPERTY_TITLE)));
     assertEquals(randomMpId, technicalMetadata.getEventId());
     assertEquals(captureAgentId, technicalMetadata.getAgentId());
-    assertEquals(new Date(period.getStart().getTime()), technicalMetadata.getStartDate());
-    assertEquals(new Date(period.getEnd().getTime()), technicalMetadata.getEndDate());
+    assertEquals(Date.from(period.getStart().toInstant()), technicalMetadata.getStartDate());
+    assertEquals(Date.from(period.getEnd().toInstant()), technicalMetadata.getEndDate());
     assertEquals(userIds, technicalMetadata.getPresenters());
     assertTrue(technicalMetadata.getRecording().isEmpty());
     assertTrue(technicalMetadata.getCaptureAgentConfiguration().size() >= caProperties.size());
@@ -805,10 +807,10 @@ public class SchedulerServiceImplTest {
     assertTrue(schedSvc.getCaptureAgentConfiguration(randomMpId).size() >= caProperties.size());
   }
 
-  @Test(expected = SchedulerConflictException.class)
+  @Test(expected = SchedulerException.class)
   public void testAddMultipleEventsConflict() throws Exception {
     for (int i = 0; i < 2; i++) {
-      final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
+      final RRule<ZonedDateTime> rrule = new RRule<>("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");
       final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
       final Date end = new Date(1570953300000L); // 2019-10-13T07:55:00Z
       final Long duration = 6900000L;
@@ -823,7 +825,7 @@ public class SchedulerServiceImplTest {
       final Map<String, String> wfProperties = this.wfProperties;
       final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
       final Optional<String> schedulingSource = Optional.empty();
-      final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+      final Map<String, Period<ZonedDateTime>> scheduled = schedSvc.addMultipleEvents(
           rrule,
           start,
           end,
@@ -882,7 +884,9 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testFindConflictingEvents() throws Exception {
-    final long currentTime = System.currentTimeMillis();
+    // Use a fixed time far away from any daylight saving time change. The RRule below keeps the same local time in
+    // America/Chicago, which does not match the event scheduled 24 hours later if a DST change happens in between.
+    final long currentTime = Instant.parse("2026-06-10T14:00:00Z").toEpochMilli();
     final MediaPackage mediaPackageA = generateEvent(Optional.empty());
     final MediaPackage mediaPackageB = generateEvent(Optional.empty());
     final MediaPackage mediaPackageC = generateEvent(Optional.empty());
@@ -920,7 +924,7 @@ public class SchedulerServiceImplTest {
     {
       ZonedDateTime startZdt = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC);
       List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
+              new RRule<>("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
                   + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
@@ -929,7 +933,7 @@ public class SchedulerServiceImplTest {
       // No events are contained in the RRule and date range:
       // 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
       List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
+              new RRule<>("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
               new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
       assertEquals(0, conflicts.size());
     }
@@ -1033,7 +1037,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackage = generateEvent(Optional.empty());
     String elementId = addDublinCore(Optional.empty(), mediaPackage, initalEvent);
 
-    Map<String, String> caProperties = map(tuple("org.opencastproject.workflow.definition", "full"));
+    Map<String, String> caProperties = Map.of("org.opencastproject.workflow.definition", "full");
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Optional.empty());
 
@@ -1085,12 +1089,13 @@ public class SchedulerServiceImplTest {
     try {
       String icalString = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
       cal = calBuilder.build(IOUtils.toInputStream(icalString, "UTF-8"));
-      ComponentList vevents = cal.getComponents(VEVENT);
+      List<VEvent> vevents = cal.getComponents(VEVENT);
       for (int i = 0; i < vevents.size(); i++) {
-        PropertyList attachments = ((VEvent) vevents.get(i)).getProperties(Property.ATTACH);
+        List<Property> attachments = vevents.get(i).getProperties(Property.ATTACH);
         for (int j = 0; j < attachments.size(); j++) {
-          String attached = ((Property) attachments.get(j)).getValue();
-          String filename = ((Property) attachments.get(j)).getParameter("X-APPLE-FILENAME").getValue();
+          String attached = attachments.get(j).getValue();
+          String filename = attachments.get(j).getParameter("X-APPLE-FILENAME")
+                  .map(Parameter::getValue).orElse(null);
           attached = new String(Base64.decodeBase64(attached));
           if ("org.opencastproject.capture.agent.properties".equals(filename)) {
             Assert.assertTrue(attached.contains("capture.device.id=testdevice"));
@@ -1529,12 +1534,10 @@ public class SchedulerServiceImplTest {
     final String cs = schedSvc.getCalendar(Optional.empty(), Optional.empty(), Optional.empty());
     final Calendar cal = new CalendarBuilder().build(new StringReader(cs));
     assertEquals("number of entries", 1, cal.getComponents().size());
-    for (Object co : cal.getComponents()) {
-      final Component c = (Component) co;
-      assertEquals("SUMMARY property should contain the DC title", title, c.getProperty(Property.SUMMARY).getValue());
-      final List<Property> attachments = c.getProperties(Property.ATTACH).stream()
-          .map(obj -> (Property) obj)
-          .collect(Collectors.toList());
+    for (Component c : cal.getComponents()) {
+      final String summary = c.<Property>getProperty(Property.SUMMARY).map(Property::getValue).orElse(null);
+      assertEquals("SUMMARY property should contain the DC title", title, summary);
+      final List<Property> attachments = c.getProperties(Property.ATTACH);
       // episode dublin core
       final List<DublinCoreCatalog> dcsIcal = attachments.stream()
           .filter(p -> byParamNameAndValue(p,"X-APPLE-FILENAME", "episode.xml"))
@@ -1548,13 +1551,13 @@ public class SchedulerServiceImplTest {
           .map(p -> parseProperties(decodeBase64(getValue(p))))
           .toList();
       assertEquals("number of CA property sets", 1, caPropsIcal.size());
-      assertTrue("CA properties", eqObj(caProps, caPropsIcal.get(0)));
+      assertTrue("CA properties", Objects.equals(caProps, caPropsIcal.get(0)));
     }
   }
 
   private Boolean byParamNameAndValue(Property p, final String name, final String value) {
-    final Parameter param = p.getParameter(name);
-    return param != null && param.getValue().equals(value);
+    final Optional<Parameter> param = p.getParameter(name);
+    return param.isPresent() && param.get().getValue().equals(value);
   }
 
   private static DublinCoreCatalog parseDc(String s) {
@@ -1629,7 +1632,7 @@ public class SchedulerServiceImplTest {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex esIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(),
             EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))

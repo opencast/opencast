@@ -54,7 +54,6 @@ A list of everything.
     - [Manual Asset Upload](admin-ui/asset-upload.md)
     - [Languages](admin-ui/languages.md)
     - [Statistics](admin-ui/statistics/statistics.overview.md)
-    - [Thumbnails](admin-ui/thumbnails.md)
 - Amazon Services
     - [Amazon S3 Archive Storage](awss3archive.md)
     - [Amazon S3 Distribution](awss3distribution.md)
@@ -91,7 +90,7 @@ A list of everything.
 - [Player Configuration](player/player.overview.md)
 - [Plugin Management](plugin-management.md)
 - [Search Index Overview](searchindex/index.md)
-    - [Elasticsearch](searchindex/elasticsearch.md)
+    - [OpenSearch](searchindex/opensearch.md)
 - [Serving Static Files](serving-static-files.md)
 - [Stream Security Overview](stream-security/stream-security-overview.md)
     -  [Configuration](stream-security/stream-security-config.md)
@@ -101,6 +100,7 @@ A list of everything.
     - [Basic](terminationstate.md)
       - [AWS AutoScaling](terminationstate.aws.autoscaling.md)
 - [Text Extraction](textextraction.md)
+- [Thumbnails](thumbnails.md)
 - [Timeline Previews](timelinepreviews.md)
 - Transcription configuration:
     - [AmberScript](transcription.configuration/amberscripttranscripts.md)

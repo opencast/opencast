@@ -162,7 +162,9 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     try {
-      if (removeFromEngage(mediaPackage.getIdentifier().toString()) || removeFromArchive(mediaPackage)) {
+      boolean removedFromEngage = removeFromEngage(mediaPackage.getIdentifier().toString());
+      boolean removedFromArchive = removeFromArchive(mediaPackage);
+      if (removedFromEngage || removedFromArchive) {
         return createResult(mediaPackage, Action.CONTINUE);
       }
       return createResult(mediaPackage, Action.SKIP);

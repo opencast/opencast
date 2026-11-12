@@ -117,6 +117,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
     Stream<Role> roleStream = getRolesStream()
             .filter(e -> like(e.getName(), query) || like(e.getDescription(), query))
+            .sorted(Role.BY_NAME)  // Sort for consistent returns on limit+offset
             .skip(offset);
     if (limit != 0) {
       roleStream = roleStream.limit(limit);

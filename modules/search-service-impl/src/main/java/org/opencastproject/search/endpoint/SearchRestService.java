@@ -24,7 +24,7 @@ package org.opencastproject.search.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static org.opencastproject.elasticsearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
+import static org.opencastproject.opensearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
 import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
@@ -40,12 +40,12 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.search.impl.SearchServiceIndex;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -57,13 +57,13 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
+import org.opensearch.common.unit.Fuzziness;
+import org.opensearch.index.query.MultiMatchQueryBuilder;
+import org.opensearch.index.query.Operator;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.sort.SortOrder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -201,8 +201,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
         .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
     final var user = securityService.getUser();
-    final var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+    if (!SecurityUtil.isAdmin(user, securityService.getOrganization())) {
       query.filter(QueryBuilders.termsQuery(
           SearchResult.INDEX_ACL + ".read",
           user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
@@ -269,7 +268,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .peek(hit -> hit.remove(SearchResult.TYPE))
         .collect(Collectors.toList());
 
-    var total = hits.getTotalHits().value;
+    var total = hits.getTotalHits().value();
     var json = gson.toJsonTree(Map.of(
         "offset", from,
         "total", total,
@@ -394,8 +393,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    var admin = SecurityUtil.isAdmin(user, securityService.getOrganization());
     var query = QueryBuilders.boolQuery()
         .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
         .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))

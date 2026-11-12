@@ -26,9 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsError;
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsValid;
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.xmlmatchers.transform.XmlConverters.the;
 import static org.xmlmatchers.xpath.HasXPath.hasXPath;
@@ -50,17 +48,18 @@ import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.JsonObj;
-import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
-import org.opencastproject.util.data.Collections;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
@@ -77,6 +76,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -115,7 +115,7 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_IDENTIFY,
               repo.selectVerb(params("Identify", null, null, null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:Identify[oai20:deletedRecord='transient']", NS_CTX)));
+              List.of(hasXPath("//oai20:Identify[oai20:deletedRecord='transient']", NS_CTX)));
   }
 
   @Test
@@ -124,7 +124,7 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo.selectVerb(params("ListIdentifiers", null, null, null, null, null)),
               Optional.of(IsError),
-              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+              List.of(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
   @Test
@@ -136,7 +136,7 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo.selectVerb(params("ListIdentifiers", null, "oai_dc", null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-2']", NS_CTX),
                    hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(2.0))));
@@ -152,12 +152,12 @@ public class OaiPmhRepositoryTest {
               repo(null, Granularity.DAY)
                       .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null)),
               Optional.of(IsError),
-              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+              List.of(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo(null, Granularity.SECOND).selectVerb(params("ListIdentifiers", null, "oai_dc",
                       "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)),
               Optional.of(IsError),
-              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+              List.of(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
   @Test
@@ -168,7 +168,7 @@ public class OaiPmhRepositoryTest {
                                          searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
                       .selectVerb(params("ListRecords", null, "oai_dc", null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
@@ -186,7 +186,7 @@ public class OaiPmhRepositoryTest {
                    Granularity.DAY)
                       .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
               Optional.<OaiPmhResponseStatus>empty(),
-              list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[not(@status='deleted')]", NS_CTX),
                    hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
@@ -202,7 +202,7 @@ public class OaiPmhRepositoryTest {
                    Granularity.DAY)
                       .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
               Optional.<OaiPmhResponseStatus>empty(),
-              list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
@@ -217,7 +217,7 @@ public class OaiPmhRepositoryTest {
                                          searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
                       .selectVerb(params("ListRecords", null, "matterhorn-inlined", null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
@@ -276,23 +276,26 @@ public class OaiPmhRepositoryTest {
     logger.info("--- REQUEST ---");
     logger.info(xml);
     try {
-      final HttpResponse res = client.execute(post);
+      final ClassicHttpResponse res = client.execute(post);
       final String json = withResource(res.getEntity().getContent(), IoSupport.readToString);
       logger.info("--- RESPONSE ---");
       logger.info(json);
       boolean ok = true;
-      for (JsonVal message : JsonObj.jsonObj(json).obj("json").arr("messages")) {
-        if (message.isObj()) {
-          final JsonObj messageObj = JsonVal.asJsonObj(message.get());
+      for (JsonElement message : JsonParser.parseString(json).getAsJsonObject()
+              .getAsJsonObject("json").getAsJsonArray("messages")) {
+        if (message.isJsonObject()) {
+          final JsonObject messageObj = message.getAsJsonObject();
           if (messageObj.has("className")) {
-            final String className = JsonVal.asString(messageObj.val("className").get()).trim();
-            final String text = JsonVal.asString(messageObj.val("text").get()).trim();
+            final String className = messageObj.get("className").getAsString().trim();
+            final String text = messageObj.get("text").getAsString().trim();
             logger.info("[{}] {}", className, text);
-            ok = ok && (eq(className, "correct")
+            ok = ok && (Objects.equals(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions
-                    || (status == IsError && eq(text, "Could not find a valid OAI-PMH command.")))
-                    || (eq(verb, OaiPmhConstants.VERB_IDENTIFY) && eq(text, "Invalid OAI-PMH protocol version ."))
-                    || (eq(verb, OaiPmhConstants.VERB_IDENTIFY) && eq(text, "Invalid adminEmail ."));
+                    || (status == IsError && Objects.equals(text, "Could not find a valid OAI-PMH command.")))
+                    || (Objects.equals(verb, OaiPmhConstants.VERB_IDENTIFY)
+                            && Objects.equals(text, "Invalid OAI-PMH protocol version ."))
+                    || (Objects.equals(verb, OaiPmhConstants.VERB_IDENTIFY)
+                            && Objects.equals(text, "Invalid adminEmail ."));
           }
         }
       }
@@ -354,7 +357,7 @@ public class OaiPmhRepositoryTest {
 
   private static OaiPmhDatabase oaiPmhPersistenceMock(SearchResultItem... items) {
     final SearchResult result = EasyMock.createNiceMock(SearchResult.class);
-    final List<SearchResultItem> db = list(items);
+    final List<SearchResultItem> db = Arrays.asList(items);
     EasyMock.expect(result.getItems()).andReturn(db).anyTimes();
     EasyMock.expect(result.size()).andReturn((long) items.length).anyTimes();
     EasyMock.replay(result);
@@ -423,7 +426,7 @@ public class OaiPmhRepositoryTest {
     } catch (OaiPmhDatabaseException ex) { }
 
     EasyMock.expect(item.getElements()).andReturn(
-            Collections.list(episodeDcElement, seriesDcElement, securityXacmlElement)).anyTimes();
+            List.of(episodeDcElement, seriesDcElement, securityXacmlElement)).anyTimes();
     try {
       EasyMock.expect(item.getEpisodeDublinCore()).andReturn(episodeDc).anyTimes();
       EasyMock.expect(item.getSeriesDublinCore()).andReturn(seriesDc).anyTimes();

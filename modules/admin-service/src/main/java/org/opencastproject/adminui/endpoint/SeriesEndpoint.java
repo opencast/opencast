@@ -32,6 +32,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.adminui.endpoint.EndpointUtil.fromJettison;
 import static org.opencastproject.adminui.endpoint.EndpointUtil.transformAccessControList;
 import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
@@ -57,15 +58,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RestUtils;
@@ -79,6 +71,15 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -92,6 +93,7 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -105,13 +107,13 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -125,11 +127,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -193,7 +197,7 @@ public class SeriesEndpoint {
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
   private ListProvidersService listProvidersService;
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
   private AdminUIConfiguration adminUIConfiguration;
   private ThemesServiceDatabase themesServiceDatabase;
   private UserDirectoryService userDirectoryService;
@@ -209,7 +213,7 @@ public class SeriesEndpoint {
 
   /** OSGi callback for the search index. */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.searchIndex = index;
   }
 
@@ -339,29 +343,30 @@ public class SeriesEndpoint {
     boolean hasProcessingEvents = hasProcessingEvents(seriesId);
 
     // Add all available ACLs to the response
-    JSONArray systemAclsJson = new JSONArray();
+    JsonArray systemAclsJson = new JsonArray();
     List<ManagedAcl> acls = getAclService().getAcls();
     for (ManagedAcl acl : acls) {
-      systemAclsJson.add(AccessInformationUtil.serializeManagedAcl(acl));
+      systemAclsJson.add(fromJettison(AccessInformationUtil.serializeManagedAcl(acl)));
     }
 
-    JSONObject seriesAccessJson = new JSONObject();
+    JsonObject seriesAccessJson = new JsonObject();
     try {
       AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
       Optional<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, seriesAccessControl,
               adminUIConfiguration.getMatchManagedAclRolePrefixes());
-      seriesAccessJson.put("current_acl", currentAcl.isPresent() ? currentAcl.get().getId() : 0);
-      seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
-      seriesAccessJson.put("acl", transformAccessControList(seriesAccessControl, userDirectoryService));
-      seriesAccessJson.put("locked", hasProcessingEvents);
+      seriesAccessJson.addProperty("current_acl", currentAcl.isPresent() ? currentAcl.get().getId() : 0);
+      seriesAccessJson.add("privileges",
+              fromJettison(AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl)));
+      seriesAccessJson.add("acl", transformAccessControList(seriesAccessControl, userDirectoryService));
+      seriesAccessJson.addProperty("locked", hasProcessingEvents);
     } catch (SeriesException e) {
       logger.error("Unable to get ACL from series {}", seriesId, e);
       return RestUtil.R.serverError();
     }
 
-    JSONObject jsonReturnObj = new JSONObject();
-    jsonReturnObj.put("system_acls", systemAclsJson);
-    jsonReturnObj.put("series_access", seriesAccessJson);
+    JsonObject jsonReturnObj = new JsonObject();
+    jsonReturnObj.add("system_acls", systemAclsJson);
+    jsonReturnObj.add("series_access", seriesAccessJson);
 
     return Response.ok(jsonReturnObj.toString()).build();
   }
@@ -580,15 +585,15 @@ public class SeriesEndpoint {
         Optional.empty()
     );
 
-    JSONObject themesJson = new JSONObject();
+    JsonObject themesJson = new JsonObject();
     for (Theme theme : results) {
-      JSONObject themeInfoJson = new JSONObject();
-      themeInfoJson.put("name", theme.getName());
-      themeInfoJson.put("description", theme.getDescription());
-      themesJson.put(theme.getId().get(), themeInfoJson);
+      JsonObject themeInfoJson = new JsonObject();
+      themeInfoJson.addProperty("name", theme.getName());
+      themeInfoJson.addProperty("description", theme.getDescription());
+      themesJson.add(String.valueOf(theme.getId().get()), themeInfoJson);
     }
 
-    return Response.ok(themesJson.toJSONString()).build();
+    return Response.ok(themesJson.toString()).build();
   }
 
   private TobiraService getTobira() {
@@ -637,11 +642,11 @@ public class SeriesEndpoint {
     }
 
     try {
-      var page = (JSONObject) tobira.getPage(path).get("page");
+      var page = tobira.getPage(path).getAsJsonObject("page");
       if (page == null) {
         throw new WebApplicationException(NOT_FOUND);
       }
-      return Response.ok(page.toJSONString()).build();
+      return Response.ok(page.toString()).build();
     } catch (TobiraException e) {
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
@@ -666,9 +671,9 @@ public class SeriesEndpoint {
       })
   public Response createNewSeries(@FormParam("metadata") String metadata) throws UnauthorizedException {
     try {
-      JSONObject metadataJson;
+      JsonObject metadataJson;
       try {
-        metadataJson = (JSONObject) new JSONParser().parse(metadata);
+        metadataJson = GsonUtil.parse(metadata).getAsJsonObject();
       } catch (Exception e) {
         throw new IllegalArgumentException("Unable to parse metadata " + metadata, e);
       }
@@ -681,9 +686,9 @@ public class SeriesEndpoint {
 
       var mounted = mountSeriesInTobira(seriesId, metadataJson);
 
-      var responseObject = new JSONObject();
-      responseObject.put("id", seriesId);
-      responseObject.put("mounted", mounted);
+      var responseObject = new JsonObject();
+      responseObject.addProperty("id", seriesId);
+      responseObject.addProperty("mounted", mounted);
 
       return Response.created(URI.create(UrlSupport.concat(serverUrl, "admin-ng/series/", seriesId, "metadata.json")))
               .entity(responseObject.toString()).build();
@@ -694,38 +699,36 @@ public class SeriesEndpoint {
     }
   }
 
-  private boolean mountSeriesInTobira(String seriesId, JSONObject params) {
+  private boolean mountSeriesInTobira(String seriesId, JsonObject params) {
     var tobira = getTobira();
     if (!tobira.ready()) {
       return false;
     }
 
     var tobiraParams = params.get("tobira");
-    if (tobiraParams == null) {
+    if (tobiraParams == null || !tobiraParams.isJsonObject()) {
       return false;
     }
-    if (!(tobiraParams instanceof JSONObject)) {
-      return false;
-    }
-    var tobiraParamsObject = (JSONObject) tobiraParams;
+    var tobiraParamsObject = tobiraParams.getAsJsonObject();
 
-    var metadataCatalogs = (JSONArray) params.get("metadata");
-    var firstCatalog = (JSONObject) metadataCatalogs.get(0);
-    var metadataFields = (List<JSONObject>) firstCatalog.get("fields");
-    var title = metadataFields.stream()
-            .filter(field -> field.get("id").equals("title"))
+    var metadataCatalogs = params.getAsJsonArray("metadata");
+    var firstCatalog = metadataCatalogs.get(0).getAsJsonObject();
+    var metadataFields = firstCatalog.getAsJsonArray("fields");
+    var title = StreamSupport.stream(metadataFields.spliterator(), false)
+            .map(JsonElement::getAsJsonObject)
+            .filter(field -> field.has("id") && "title".equals(field.get("id").getAsString()))
             .findAny()
-            .map(field -> field.get("value"))
-            .map(String.class::cast)
+            .map(field -> field.get("value").getAsString())
             .get();
 
-    var series = new JSONObject(Map.of(
-            "opencastId", seriesId,
-            "title", title));
-    tobiraParamsObject.put("series", series);
+    var series = new JsonObject();
+    series.addProperty("opencastId", seriesId);
+    series.addProperty("title", title);
+    tobiraParamsObject.add("series", series);
 
     try {
-      tobira.mount(tobiraParamsObject);
+      // TobiraService speaks plain collections, so hand it the tree converted into one
+      tobira.mount(GsonUtil.gson().fromJson(tobiraParamsObject, Map.class));
     } catch (TobiraException e) {
       return false;
     }
@@ -778,14 +781,13 @@ public class SeriesEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
     }
 
-    JSONParser parser = new JSONParser();
-    JSONArray seriesIdsArray;
+    JsonArray seriesIdsArray;
     try {
-      seriesIdsArray = (JSONArray) parser.parse(seriesIdsContent);
-    } catch (org.json.simple.parser.ParseException e) {
+      seriesIdsArray = GsonUtil.gson().fromJson(seriesIdsContent, JsonArray.class);
+    } catch (JsonParseException e) {
       logger.error("Unable to parse '{}'", seriesIdsContent, e);
       return Response.status(Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
+    } catch (ClassCastException | IllegalStateException e) {
       logger.error("Unable to cast '{}' to a JSON array", seriesIdsContent, e);
       return Response.status(Status.BAD_REQUEST).build();
     }
@@ -1009,10 +1011,10 @@ public class SeriesEndpoint {
     }
     try {
       Map<String, String> properties = seriesService.getSeriesProperties(seriesId);
-      JSONArray jsonProperties = new JSONArray();
+      JsonArray jsonProperties = new JsonArray();
       for (String name : properties.keySet()) {
-        JSONObject property = new JSONObject();
-        property.put(name, properties.get(name));
+        JsonObject property = new JsonObject();
+        property.addProperty(name, properties.get(name));
         jsonProperties.add(property);
       }
       return Response.ok(jsonProperties.toString()).build();
@@ -1188,6 +1190,10 @@ public class SeriesEndpoint {
 
       themeId = series.get().getTheme();
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("Unable to get series {}: {}", seriesId, e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.error("Unable to get series {}", seriesId, e);
       throw new WebApplicationException(e);
     }
@@ -1304,8 +1310,8 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       if (seriesData == null) {
         throw new WebApplicationException(NOT_FOUND);
       }
-      seriesData.put("baseURL", tobira.getOrigin());
-      return Response.ok(seriesData.toJSONString()).build();
+      seriesData.addProperty("baseURL", tobira.getOrigin());
+      return Response.ok(seriesData.toString()).build();
     } catch (TobiraException e) {
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
@@ -1367,9 +1373,11 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
     }
 
     try {
-      var paths = (List<JSONObject>) new JSONParser().parse(pathComponents);
+      var paths = new ArrayList<JsonObject>();
+      GsonUtil.gson().fromJson(pathComponents, JsonArray.class)
+              .forEach(component -> paths.add(component.getAsJsonObject()));
 
-      var mountParams = new JSONObject();
+      var mountParams = new HashMap<String, Object>();
       mountParams.put("seriesId", seriesId);
       mountParams.put("targetPath", targetPath);
 
@@ -1377,7 +1385,7 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       tobira.addSeriesMountPoint(mountParams);
 
       if (currentPath != null && !currentPath.trim().isEmpty()) {
-        var unmountParams = new JSONObject();
+        var unmountParams = new HashMap<String, Object>();
         unmountParams.put("seriesId", seriesId);
         unmountParams.put("currentPath", currentPath);
         tobira.removeSeriesMountPoint(unmountParams);
@@ -1431,7 +1439,7 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
 
     try {
       if (currentPath != null && !currentPath.trim().isEmpty()) {
-        var unmountParams = new JSONObject();
+        var unmountParams = new HashMap<String, Object>();
         unmountParams.put("seriesId", seriesId);
         unmountParams.put("currentPath", currentPath);
         tobira.removeSeriesMountPoint(unmountParams);
@@ -1529,6 +1537,10 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       events = searchIndex.getByQuery(query);
       elementsCount += events.getHitCount();
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("Could not perform search query: {}", e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
@@ -1567,12 +1579,16 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       SearchResult<Event> result = searchIndex.getByQuery(query);
       elementsCount = result.getHitCount();
     } catch (SearchIndexException e) {
+      if (e.isBadRequest()) {
+        logger.warn("Could not perform search query: {}", e.getMessage());
+        throw new WebApplicationException(Status.BAD_REQUEST);
+      }
       logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
-    JSONObject jsonReturnObj = new JSONObject();
-    jsonReturnObj.put("hasEvents", elementsCount > 0);
+    JsonObject jsonReturnObj = new JsonObject();
+    jsonReturnObj.addProperty("hasEvents", elementsCount > 0);
     return Response.ok(jsonReturnObj.toString()).build();
   }
 
@@ -1590,8 +1606,8 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
           @RestResponse(responseCode = SC_OK, description = "The access information ")
       })
   public Response getSeriesOptions() {
-    JSONObject jsonReturnObj = new JSONObject();
-    jsonReturnObj.put("deleteSeriesWithEventsAllowed", deleteSeriesWithEventsAllowed);
+    JsonObject jsonReturnObj = new JsonObject();
+    jsonReturnObj.addProperty("deleteSeriesWithEventsAllowed", deleteSeriesWithEventsAllowed);
     return Response.ok(jsonReturnObj.toString()).build();
   }
 

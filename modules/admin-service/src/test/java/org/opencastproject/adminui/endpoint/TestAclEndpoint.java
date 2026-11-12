@@ -93,9 +93,9 @@ public class TestAclEndpoint extends AclEndpoint {
 
     RoleDirectoryService roleDirectoryService = EasyMock.createNiceMock(RoleDirectoryService.class);
     EasyMock.expect(roleDirectoryService.findRoles(EasyMock.eq("%"), EasyMock.anyObject(), EasyMock.eq(1),
-      EasyMock.eq(2))).andReturn(rolesSubset).anyTimes();
+      EasyMock.eq(2), EasyMock.anyObject())).andReturn(rolesSubset).anyTimes();
     EasyMock.expect(roleDirectoryService.findRoles(EasyMock.anyString(), EasyMock.anyObject(), EasyMock.anyInt(),
-      EasyMock.anyInt())).andReturn(roles).anyTimes();
+      EasyMock.anyInt(), EasyMock.anyObject())).andReturn(roles).anyTimes();
     EasyMock.replay(roleDirectoryService);
 
     this.setAclServiceFactory(aclServiceFactory);

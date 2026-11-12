@@ -291,7 +291,7 @@ public abstract class Value {
 
     /** It should not be possible to inherit from outside class {@link Value}. */
     private TypedValue(@Nonnull A value) {
-      this.value = value;
+      this.value = Objects.requireNonNull(value, "value");
     }
 
     @Override public A get() {

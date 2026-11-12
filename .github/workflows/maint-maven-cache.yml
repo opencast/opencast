@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 6 * * 6'
 
+permissions:
+  contents: read
+
 jobs:
   mvn-cache:
     name: build maven cache
@@ -16,7 +19,7 @@ jobs:
           submodules: 'recursive'
 
       - name: setup java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: 'temurin'
           java-version: 21

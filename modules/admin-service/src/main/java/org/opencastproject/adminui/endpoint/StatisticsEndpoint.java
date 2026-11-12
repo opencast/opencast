@@ -21,21 +21,21 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.ProviderQuery;
 import org.opencastproject.adminui.impl.RawProviderQuery;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
@@ -51,10 +51,10 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -106,7 +106,7 @@ public class StatisticsEndpoint {
 
   private SecurityService securityService;
   private IndexService indexService;
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
   private StatisticsService statisticsService;
   private StatisticsExportService statisticsExportService;
 
@@ -121,7 +121,7 @@ public class StatisticsEndpoint {
   }
 
   @Reference
-  public void setSearchIndex(ElasticsearchIndex searchIndex) {
+  public void setSearchIndex(OpenSearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 
@@ -164,13 +164,13 @@ public class StatisticsEndpoint {
       return RestUtil.R.badRequest("invalid value for 'resourceType'");
     }
 
-    JSONArray result = new JSONArray();
+    JsonArray result = new JsonArray();
     statisticsService
         .getProviders(resourceType)
         .stream()
         .map(this::providerToJson)
         .forEach(result::add);
-    return Response.ok(result.toJSONString()).build();
+    return Response.ok(result.toString()).build();
   }
 
   private static String providerTypeString(StatisticsProvider provider) {
@@ -180,20 +180,20 @@ public class StatisticsEndpoint {
     return "unknown";
   }
 
-  private JSONObject providerToJson(StatisticsProvider provider) {
-    final JSONObject providerObj = new JSONObject();
-    providerObj.put("providerId", provider.getId());
-    providerObj.put("providerType", providerTypeString(provider));
-    providerObj.put("title", provider.getTitle());
+  private JsonObject providerToJson(StatisticsProvider provider) {
+    final JsonObject providerObj = new JsonObject();
+    providerObj.addProperty("providerId", provider.getId());
+    providerObj.addProperty("providerType", providerTypeString(provider));
+    providerObj.addProperty("title", provider.getTitle());
     if (provider instanceof TimeSeriesProvider) {
-      providerObj.put("dataResolutions", resolutionsToJson(((TimeSeriesProvider) provider).getDataResolutions()));
+      providerObj.add("dataResolutions", resolutionsToJson(((TimeSeriesProvider) provider).getDataResolutions()));
     }
-    providerObj.put("description", provider.getDescription());
+    providerObj.addProperty("description", provider.getDescription());
     return providerObj;
   }
 
-  private JSONArray resolutionsToJson(Set<DataResolution> resolutions) {
-    JSONArray result = new JSONArray();
+  private JsonArray resolutionsToJson(Set<DataResolution> resolutions) {
+    JsonArray result = new JsonArray();
     for (DataResolution dataResolution : resolutions) {
       result.add(dataResolutionToJson(dataResolution));
     }
@@ -235,7 +235,7 @@ public class StatisticsEndpoint {
       return RestUtil.R.badRequest("Unable to parse data");
     }
 
-    JSONArray result = new JSONArray();
+    JsonArray result = new JsonArray();
     try {
       Arrays
         .stream(dataJson)
@@ -253,7 +253,7 @@ public class StatisticsEndpoint {
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     }
-    return Response.ok(result.toJSONString()).build();
+    return Response.ok(result.toString()).build();
   }
 
   @GET
@@ -299,7 +299,7 @@ public class StatisticsEndpoint {
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (SearchIndexException e) {
-      return RestUtil.R.serverError();
+      return e.isBadRequest() ? RestUtil.R.badRequest(e.getMessage()) : RestUtil.R.serverError();
     } catch (NotFoundException e) {
       return RestUtil.R.notFound(resourceId);
     } catch (UnauthorizedException e) {
@@ -307,14 +307,18 @@ public class StatisticsEndpoint {
     }
   }
 
-  private JSONObject timeSeriesToJson(String providerId, TimeSeries timeSeriesData) {
-    final JSONObject result = new JSONObject();
-    result.put("providerId", providerId);
-    result.put("providerType", "timeSeries");
-    result.put("labels", timeSeriesData.getLabels());
-    result.put("values", timeSeriesData.getValues());
+  private JsonObject timeSeriesToJson(String providerId, TimeSeries timeSeriesData) {
+    final JsonObject result = new JsonObject();
+    result.addProperty("providerId", providerId);
+    result.addProperty("providerType", "timeSeries");
+    final JsonArray labels = new JsonArray();
+    timeSeriesData.getLabels().forEach(labels::add);
+    final JsonArray values = new JsonArray();
+    timeSeriesData.getValues().forEach(values::add);
+    result.add("labels", labels);
+    result.add("values", values);
     if (timeSeriesData.getTotal().isPresent()) {
-      result.put("total", timeSeriesData.getTotal().getAsDouble());
+      result.addProperty("total", timeSeriesData.getTotal().getAsDouble());
     }
     return result;
   }
@@ -360,13 +364,12 @@ public class StatisticsEndpoint {
   private void checkOrganizationAccess(final String orgId) throws UnauthorizedException {
     final User currentUser = securityService.getUser();
     final Organization currentOrg = securityService.getOrganization();
-    final String currentOrgAdminRole = currentOrg.getAdminRole();
     final String currentOrgId = currentOrg.getId();
 
     final boolean userIsInOrg = currentOrgId.equals(orgId);
 
-    boolean userIsAdmin = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-        || (currentUser.hasRole(currentOrgAdminRole) && userIsInOrg);
+    boolean userIsAdmin = SecurityUtil.isGlobalAdmin(currentUser)
+        || (userIsInOrg && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg));
 
     boolean userIsAuthorized = currentUser.hasRole(STATISTICS_ORGANIZATION_UI_ROLE) && userIsInOrg;
 

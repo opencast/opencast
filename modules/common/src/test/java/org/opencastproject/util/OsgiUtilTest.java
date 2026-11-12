@@ -25,6 +25,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -32,7 +34,7 @@ public class OsgiUtilTest {
 
   @Test
   public void testFilterDictionary() throws Exception {
-    final Hashtable<String, String> h = new Hashtable<>();
+    final Dictionary<String, String> h = new Hashtable<>();
     h.put("w.p.key1", "1");
     h.put("x", "2");
     h.put("w.p.key2", "2");
@@ -44,8 +46,21 @@ public class OsgiUtilTest {
   }
 
   @Test
+  public void testFilterMap() throws Exception {
+    final Map<String, String> m = new HashMap<>();
+    m.put("w.p.key1", "1");
+    m.put("x", "2");
+    m.put("w.p.key2", "2");
+    m.put("y", "2");
+    final Map<String, String> f = OsgiUtil.filterByPrefix(m, "w.p.");
+    assertEquals(2, f.size());
+    assertEquals("1", f.get("key1"));
+    assertEquals("2", f.get("key2"));
+  }
+
+  @Test
   public void testGetConfigAsInt() throws Exception {
-    final Hashtable<String, String> h = new Hashtable<>();
+    final Dictionary<String, String> h = new Hashtable<>();
     h.put("a", "");
     h.put("b", "2");
     h.put("c", "d");
@@ -61,6 +76,30 @@ public class OsgiUtilTest {
 
     try {
       OsgiUtil.getCfgAsInt(h, "c");
+      Assert.fail();
+    } catch (org.osgi.service.cm.ConfigurationException e) {
+      Assert.assertNotNull(e);
+    }
+  }
+
+  @Test
+  public void testGetConfigAsIntFromMap() throws Exception {
+    final Map<String, String> m = new HashMap<>();
+    m.put("a", "");
+    m.put("b", "2");
+    m.put("c", "d");
+
+    try {
+      OsgiUtil.getCfgAsInt(m, "a");
+      Assert.fail();
+    } catch (org.osgi.service.cm.ConfigurationException e) {
+      Assert.assertNotNull(e);
+    }
+
+    assertEquals(2, OsgiUtil.getCfgAsInt(m, "b"));
+
+    try {
+      OsgiUtil.getCfgAsInt(m, "c");
       Assert.fail();
     } catch (org.osgi.service.cm.ConfigurationException e) {
       Assert.assertNotNull(e);

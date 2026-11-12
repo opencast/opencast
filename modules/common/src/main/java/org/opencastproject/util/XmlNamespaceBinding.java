@@ -21,10 +21,8 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Declaration of an XML namespace binding which is the association of a prefix to a namespace URI (namespace name).
@@ -69,7 +67,7 @@ public final class XmlNamespaceBinding implements Serializable {
   }
 
   @Override public int hashCode() {
-    return hash(prefix, namespaceURI);
+    return Objects.hash(prefix, namespaceURI);
   }
 
   @Override public boolean equals(Object that) {
@@ -77,6 +75,6 @@ public final class XmlNamespaceBinding implements Serializable {
   }
 
   private boolean eqFields(XmlNamespaceBinding that) {
-    return eq(prefix, that.prefix) && eq(namespaceURI, that.namespaceURI);
+    return Objects.equals(prefix, that.prefix) && Objects.equals(namespaceURI, that.namespaceURI);
   }
 }

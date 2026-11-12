@@ -38,14 +38,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.IndexObject;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
@@ -55,6 +47,7 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.util.RequestUtils;
@@ -81,6 +74,14 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.MetadataList.Locked;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.IndexObject;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -96,6 +97,7 @@ import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -115,6 +117,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -123,17 +126,14 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -149,6 +149,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +160,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -201,7 +203,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     description = "The events endpoint provides resources and operations related to the events")
 @Component(
     immediate = true,
-    service = { EventsEndpoint.class,ManagedService.class },
+    service = { EventsEndpoint.class },
     property = {
         "service.description=External API - Events Endpoint",
         "opencast.service.type=org.opencastproject.external.events",
@@ -209,7 +211,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     }
 )
 @JaxrsResource
-public class EventsEndpoint implements ManagedService {
+public class EventsEndpoint {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
@@ -249,7 +251,7 @@ public class EventsEndpoint implements ManagedService {
 
   /* OSGi service references */
   private AssetManager assetManager;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private IndexService indexService;
   private IngestService ingestService;
   private SecurityService securityService;
@@ -268,8 +270,8 @@ public class EventsEndpoint implements ManagedService {
 
   /** OSGi DI */
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   /** OSGi DI */
@@ -371,19 +373,21 @@ public class EventsEndpoint implements ManagedService {
     return new ArrayList<>(cachedCatalogUIAdapters);
   }
 
-  /** OSGi activation method */
   @Activate
-  void activate(ComponentContext cc) {
-    logger.info("Activating External API - Events Endpoint");
-
+  void activate(ComponentContext cc) throws ConfigurationException {
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
             RestConstants.SERVICE_PATH_PROPERTY);
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
+
+    updated(cc.getProperties());
   }
 
-  /** OSGi callback if properties file is present */
-  @Override
+  @Modified
+  void modified(ComponentContext cc) throws ConfigurationException {
+    updated(cc.getProperties());
+  }
+
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Ensure properties is not null
     if (properties == null) {
@@ -400,12 +404,12 @@ public class EventsEndpoint implements ManagedService {
 
     // Read preview subtype configuration
     // Default to DEFAULT_PREVIEW_SUBTYPE
-    previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    previewSubtype = Objects.toString(properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
 
-    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    retractWorkflowId = Objects.toString(properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
     logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 
@@ -471,7 +475,7 @@ public class EventsEndpoint implements ManagedService {
       // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
       withScheduling = false;
     }
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
       event.updatePreview(previewSubtype);
@@ -513,7 +517,7 @@ public class EventsEndpoint implements ManagedService {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     List<TrackImpl> tracks = new ArrayList<>();
 
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       final MediaPackage mp = indexService.getEventMediapackage(eventOpt.get());
       for (Track track : mp.getTracks()) {
@@ -596,7 +600,7 @@ public class EventsEndpoint implements ManagedService {
       })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws SearchIndexException, UnauthorizedException {
-    final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+    final Optional<Event> event = indexService.getEvent(id, opensearchIndex);
     if (event.isEmpty()) {
       return RestUtil.R.notFound(id);
     }
@@ -663,7 +667,7 @@ public class EventsEndpoint implements ManagedService {
           ? configuredMetadataFields.get("startDate").getPattern() : null;
       String startTimePattern = configuredMetadataFields.containsKey("startTime")
           ? configuredMetadataFields.get("startTime").getPattern() : null;
-      Optional<Event> eventOpt = indexService.getEvent(eventId, elasticsearchIndex);
+      Optional<Event> eventOpt = indexService.getEvent(eventId, opensearchIndex);
       if (eventOpt.isPresent()) {
         Event event = eventOpt.get();
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
@@ -672,11 +676,11 @@ public class EventsEndpoint implements ManagedService {
         // FIXME: All of these update operations should be a part of a transaction to avoid a partially updated event.
         if (eventHttpServletRequest.getMetadataList().isPresent()) {
           indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(),
-              elasticsearchIndex);
+              opensearchIndex);
         }
 
         if (eventHttpServletRequest.getAcl().isPresent()) {
-          indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), elasticsearchIndex);
+          indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), opensearchIndex);
         }
 
         if (eventHttpServletRequest.getProcessing().isPresent()) {
@@ -684,19 +688,17 @@ public class EventsEndpoint implements ManagedService {
           if (!event.isScheduledEvent() || event.hasRecordingStarted()) {
             return RestUtil.R.badRequest("Processing can't be updated for events that are already uploaded.");
           }
-          JSONObject processing = eventHttpServletRequest.getProcessing().get();
+          JsonObject processing = eventHttpServletRequest.getProcessing().get();
 
-          String workflowId = (String) processing.get("workflow");
+          String workflowId = GsonUtil.getStringOrNull(processing, "workflow");
           if (workflowId == null) {
             throw new IllegalArgumentException("No workflow template in metadata");
           }
 
           Map<String, String> configuration = new HashMap<>();
-          if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-            configuration = new HashMap<>(
-                (JSONObject) eventHttpServletRequest
-                    .getProcessing().get()
-                    .get("configuration"));
+          JsonObject configurationJson = GsonUtil.getObjectOrNull(processing, "configuration");
+          if (configurationJson != null) {
+            configuration = GsonUtil.toStringMap(configurationJson);
           }
 
           Optional<Map<String, String>> caMetadataOpt = Optional.empty();
@@ -797,8 +799,8 @@ public class EventsEndpoint implements ManagedService {
             requestedVersion);
       }
 
-      JSONObject source = new JSONObject();
-      source.put("type", "UPLOAD");
+      JsonObject source = new JsonObject();
+      source.addProperty("type", "UPLOAD");
       eventHttpServletRequest.setSource(source);
       String eventId = indexService.createEvent(eventHttpServletRequest);
       JsonObject json = new JsonObject();
@@ -822,12 +824,19 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private Response scheduleNewEvent(EventHttpServletRequest request, JSONObject scheduling, ApiVersion requestedVersion)
+  /** Join array entries with commas using their plain text rather than their JSON representation. */
+  private static String joinAsPlainText(JsonArray array) {
+    return StreamSupport.stream(array.spliterator(), false)
+        .map(e -> e.isJsonPrimitive() ? e.getAsString() : e.toString())
+        .collect(Collectors.joining(","));
+  }
+
+  private Response scheduleNewEvent(EventHttpServletRequest request, JsonObject scheduling, ApiVersion requestedVersion)
           throws MediaPackageException, IOException, IngestException, SchedulerException,
           NotFoundException, UnauthorizedException, SearchIndexException, java.text.ParseException {
 
     final SchedulingInfo schedulingInfo = SchedulingInfo.of(scheduling);
-    final JSONObject source = schedulingInfo.toSource();
+    final JsonObject source = schedulingInfo.toSource();
     request.setSource(source);
 
     try {
@@ -857,7 +866,7 @@ public class EventsEndpoint implements ManagedService {
       logger.debug("Client tried to schedule conflicting event(s).");
       JsonArray conflictArray = new JsonArray();
       for (JsonObject conflict : convertConflictingEvents(
-          Optional.empty(), conflictingEvents, indexService, elasticsearchIndex)) {
+          Optional.empty(), conflictingEvents, indexService, opensearchIndex)) {
         conflictArray.add(conflict);
       }
       return ApiResponseBuilder.Json.conflict(requestedVersion, conflictArray);
@@ -1090,7 +1099,7 @@ public class EventsEndpoint implements ManagedService {
 
         SearchResult<Event> results = null;
         try {
-          results = elasticsearchIndex.getByQuery(query);
+          results = opensearchIndex.getByQuery(query);
         } catch (SearchIndexException e) {
           logger.error("The External Search Index was not able to get the events list", e);
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1178,7 +1187,7 @@ public class EventsEndpoint implements ManagedService {
 
       SearchResult<Event> results = null;
       try {
-        results = elasticsearchIndex.getByQuery(query);
+        results = opensearchIndex.getByQuery(query);
       } catch (SearchIndexException e) {
         logger.error("The External Search Index was not able to get the events list", e);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1383,7 +1392,7 @@ public class EventsEndpoint implements ManagedService {
       })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       AccessControlList acl = getAclFromEvent(eventOpt.get());
       return ApiResponseBuilder.Json.ok(acceptHeader, AclUtils.serializeAclToJson(acl));
@@ -1411,11 +1420,11 @@ public class EventsEndpoint implements ManagedService {
       })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @FormParam("acl") String acl) throws Exception {
-    if (indexService.getEvent(id, elasticsearchIndex).isPresent()) {
+    if (indexService.getEvent(id, opensearchIndex).isPresent()) {
       AccessControlList accessControlList;
       try {
         accessControlList = AclUtils.deserializeJsonToAcl(acl, false);
-      } catch (ParseException e) {
+      } catch (JsonParseException | IllegalStateException e) {
         logger.debug("Unable to update event acl to '{}'", acl, e);
         return R.badRequest(String.format("Unable to parse acl '%s' because '%s'", acl, e.getMessage()));
       } catch (IllegalArgumentException e) {
@@ -1423,9 +1432,9 @@ public class EventsEndpoint implements ManagedService {
         return R.badRequest(e.getMessage());
       }
       try {
-        accessControlList = indexService.updateEventAcl(id, accessControlList, elasticsearchIndex);
+        accessControlList = indexService.updateEventAcl(id, accessControlList, opensearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to update event '{}' acl with '{}'", id, acl, e);
+        logger.debug("Unable to update event '{}' acl with '{}'", id, acl, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1459,7 +1468,7 @@ public class EventsEndpoint implements ManagedService {
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @FormParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       AccessControlList accessControlList = getAclFromEvent(eventOpt.get());
       AccessControlEntry newAce = new AccessControlEntry(role, action, true);
@@ -1485,9 +1494,9 @@ public class EventsEndpoint implements ManagedService {
 
       AccessControlList withNewAce = new AccessControlList(entries);
       try {
-        withNewAce = indexService.updateEventAcl(id, withNewAce, elasticsearchIndex);
+        withNewAce = indexService.updateEventAcl(id, withNewAce, opensearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
+        logger.debug("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1517,7 +1526,7 @@ public class EventsEndpoint implements ManagedService {
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @PathParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       AccessControlList accessControlList = getAclFromEvent(eventOpt.get());
       boolean foundDelete = false;
@@ -1536,9 +1545,9 @@ public class EventsEndpoint implements ManagedService {
 
       AccessControlList withoutDeleted = new AccessControlList(entries);
       try {
-        withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, elasticsearchIndex);
+        withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, opensearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
+        logger.debug("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1624,7 +1633,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   protected Optional<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       return getEventMetadata(eventOpt.get());
     }
@@ -1685,7 +1694,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private Response getEventMetadataByType(String id, String type, ApiVersion requestedVersion) throws Exception {
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
 
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
@@ -1745,19 +1754,21 @@ public class EventsEndpoint implements ManagedService {
       },
       responses = {
           @RestResponse(description = "The metadata of the given namespace has been updated.",
-              responseCode = HttpServletResponse.SC_OK),
+              responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "The request is invalid or inconsistent.",
               responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The specified event does not exist.",
-              responseCode = HttpServletResponse.SC_NOT_FOUND)
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The metadata stored for the specified event is incomplete or invalid and needs "
+              + "to be fixed before it can be updated.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       })
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
     Map<String, String> updatedFields;
-    JSONParser parser = new JSONParser();
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.debug("Unable to update event '{}' with metadata type '{}' and content '{}'", id, type, metadataJSON, e);
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s'", metadataJSON));
     } catch (IllegalArgumentException e) {
@@ -1779,7 +1790,7 @@ public class EventsEndpoint implements ManagedService {
 
     DublinCoreMetadataCollection collection = null;
     EventCatalogUIAdapter adapter = null;
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
       MetadataList metadataList = new MetadataList();
@@ -1811,6 +1822,10 @@ public class EventsEndpoint implements ManagedService {
         return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for event with id '%s'.", type, id);
       }
 
+      // Remember which fields the client actually modified. If storing the metadata fails later on, this tells us
+      // whether the offending field is one the client sent or one which was already invalid in the stored catalog.
+      Set<String> updatedFieldIds = new HashSet<>();
+
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
@@ -1818,10 +1833,19 @@ public class EventsEndpoint implements ManagedService {
           if (error.isPresent()) {
             return error.get();
           }
+          JsonArray subjectArray;
+          try {
+            subjectArray = GsonUtil.parse(updatedFields.get(key)).getAsJsonArray();
+          } catch (JsonParseException | IllegalStateException e) {
+            logger.debug("Unable to update event '{}' as the subjects '{}' are no json array",
+                    id, updatedFields.get(key), e);
+            return R.badRequest(
+                    String.format("Unable to parse subjects '%s' as a json array.", updatedFields.get(key)));
+          }
+          updatedFieldIds.add(field.getInputID());
           collection.removeField(field);
-          JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+                  MetadataJson.copyWithDifferentJsonValue(field, joinAsPlainText(subjectArray)));
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get(key);
@@ -1834,15 +1858,11 @@ public class EventsEndpoint implements ManagedService {
             final String startDate = configuredMetadataFields.get("startDate").getPattern();
             apiPattern = startDate == null ? apiPattern : startDate;
           }
-          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
-          DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
-          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
-          DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(),
-              newStartDate.dayOfMonth().get());
-          collection.removeField(field);
-          collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
+          updatedFieldIds.add(field.getInputID());
+          error = updateStartDate(collection, field, id, apiPattern, updatedFields.get(key), false);
+          if (error.isPresent()) {
+            return error.get();
+          }
         } else if ("startTime".equals(key)) {
           // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get("startDate");
@@ -1855,24 +1875,18 @@ public class EventsEndpoint implements ManagedService {
             final String startTime = configuredMetadataFields.get("startTime").getPattern();
             apiPattern = startTime == null ? apiPattern : startTime;
           }
-          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
-          DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
-          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
-          DateTime updatedStartDate = oldStartDate.withTime(
-                  newStartDate.hourOfDay().get(),
-                  newStartDate.minuteOfHour().get(),
-                  newStartDate.secondOfMinute().get(),
-                  newStartDate.millisOfSecond().get());
-          collection.removeField(field);
-          collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
+          updatedFieldIds.add(field.getInputID());
+          error = updateStartDate(collection, field, id, apiPattern, updatedFields.get(key), true);
+          if (error.isPresent()) {
+            return error.get();
+          }
         } else {
           MetadataField field = collection.getOutputFields().get(key);
           Optional<Response> error = validateField(field, key, id, type, updatedFields);
           if (error.isPresent()) {
             return error.get();
           }
+          updatedFieldIds.add(field.getInputID());
           collection.removeField(field);
           collection.addField(
                   MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
@@ -1880,10 +1894,93 @@ public class EventsEndpoint implements ManagedService {
       }
 
       metadataList.add(adapter, collection);
-      indexService.updateEventMetadata(id, metadataList, elasticsearchIndex);
+      try {
+        indexService.updateEventMetadata(id, metadataList, opensearchIndex);
+      } catch (MetadataValidationException e) {
+        if (updatedFieldIds.contains(e.getFieldId())) {
+          logger.debug("Client sent an invalid value for field '{}' of event '{}'", e.getFieldId(), id, e);
+          return R.badRequest(e.getMessage());
+        }
+        // The client did not touch this field. Its value was already invalid in the stored catalog, so there is
+        // nothing the client can do about this.
+        logger.error("Cannot update metadata of event '{}' since the required field '{}' is empty in the stored "
+                + "catalog. The event needs to be fixed before its metadata can be updated.", id, e.getFieldId());
+        return ApiResponseBuilder.serverError(
+                "Cannot update metadata of event '%s' because its stored metadata is incomplete: %s",
+                id, e.getMessage());
+      } catch (IllegalArgumentException e) {
+        logger.error("Cannot update metadata of event '{}'", id, e);
+        return ApiResponseBuilder.serverError("Cannot update metadata of event '%s': %s", id, e.getMessage());
+      }
       return Response.noContent().build();
     }
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
+  }
+
+  /**
+   * Update the start date field of a metadata collection with a new date or time.
+   * <p>
+   * In API v1 start date and start time are separate fields while the catalog holds a single date. Hence the new value
+   * is merged into the date which is already stored.
+   *
+   * @param collection
+   *          The metadata collection to update.
+   * @param field
+   *          The start date field of that collection.
+   * @param id
+   *          The identifier of the event, used for logging and error messages.
+   * @param apiPattern
+   *          The date pattern the client is expected to use.
+   * @param value
+   *          The new date or time as sent by the client.
+   * @param timeOnly
+   *          If only the time of day shall be updated instead of the date.
+   * @return An error response if either the stored or the new value could not be parsed, empty otherwise.
+   */
+  private Optional<Response> updateStartDate(DublinCoreMetadataCollection collection, MetadataField field, String id,
+          String apiPattern, String value, boolean timeOnly) {
+    final SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
+    final String storedValue = Objects.toString(field.getValue(), null);
+    final DateTime oldStartDate;
+    try {
+      if (storedValue == null) {
+        throw new java.text.ParseException("No start date stored", 0);
+      }
+      oldStartDate = new DateTime(sdf.parse(storedValue), DateTimeZone.UTC);
+    } catch (java.text.ParseException e) {
+      logger.error("Cannot update metadata of event '{}' since its stored start date '{}' does not match the "
+              + "pattern '{}'. The event needs to be fixed before its metadata can be updated.",
+              id, storedValue, field.getPattern());
+      return Optional.of(ApiResponseBuilder.serverError(
+              "Cannot update metadata of event '%s' because its stored start date '%s' cannot be parsed.",
+              id, storedValue));
+    }
+
+    final DateTime newStartDate;
+    try {
+      newStartDate = new DateTime(MetadataField.getSimpleDateFormatter(apiPattern).parse(value), DateTimeZone.UTC);
+    } catch (java.text.ParseException e) {
+      logger.debug("Unable to update event '{}' as '{}' does not match the pattern '{}'", id, value, apiPattern, e);
+      return Optional.of(R.badRequest(
+              String.format("Unable to parse '%s' as a date matching the pattern '%s'.", value, apiPattern)));
+    }
+
+    final DateTime updatedStartDate;
+    if (timeOnly) {
+      updatedStartDate = oldStartDate.withTime(
+              newStartDate.hourOfDay().get(),
+              newStartDate.minuteOfHour().get(),
+              newStartDate.secondOfMinute().get(),
+              newStartDate.millisOfSecond().get());
+    } else {
+      updatedStartDate = oldStartDate.withDate(
+              newStartDate.year().get(),
+              newStartDate.monthOfYear().get(),
+              newStartDate.dayOfMonth().get());
+    }
+    collection.removeField(field);
+    collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
+    return Optional.empty();
   }
 
   private Optional<Response> validateField(MetadataField field, String key, String id, String type,
@@ -1924,7 +2021,7 @@ public class EventsEndpoint implements ManagedService {
       })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
-    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
       if (flavor.isEmpty()) {
@@ -1983,7 +2080,7 @@ public class EventsEndpoint implements ManagedService {
             throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+      final Optional<Event> event = indexService.getEvent(id, opensearchIndex);
       if (event.isPresent()) {
         JsonArray jsonArray = new JsonArray();
         for (JsonElement pub : getPublications(event.get(), sign, includeInternalPublication, requestedVersion)) {
@@ -2186,7 +2283,7 @@ public class EventsEndpoint implements ManagedService {
   private JsonObject getPublication(String eventId, String publicationId, Boolean withSignedUrls,
       ApiVersion requestedVersion)
           throws SearchIndexException, NotFoundException {
-    Optional<Event> eventOpt = indexService.getEvent(eventId, elasticsearchIndex);
+    Optional<Event> eventOpt = indexService.getEvent(eventId, opensearchIndex);
     if (eventOpt.isPresent()) {
       List<Publication> publications;
       publications = eventOpt.get().getPublications().stream()
@@ -2353,7 +2450,7 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
     try {
-      final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+      final Optional<Event> event = indexService.getEvent(id, opensearchIndex);
 
       if (event.isEmpty()) {
         return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
@@ -2403,7 +2500,7 @@ public class EventsEndpoint implements ManagedService {
       @FormParam("scheduling") String scheduling,
       @FormParam("allowConflict") @DefaultValue("false") boolean allowConflict) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+    final Optional<Event> event = indexService.getEvent(id, opensearchIndex);
 
     if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_2_0)) {
       allowConflict = false;
@@ -2411,11 +2508,10 @@ public class EventsEndpoint implements ManagedService {
     if (event.isEmpty()) {
       return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
     }
-    final JSONParser parser = new JSONParser();
-    JSONObject parsedJson;
+    JsonObject parsedJson;
     try {
-      parsedJson = (JSONObject) parser.parse(scheduling);
-    } catch (ParseException e) {
+      parsedJson = GsonUtil.parse(scheduling).getAsJsonObject();
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Client sent unparsable scheduling information for event {}: {}", id, scheduling);
       return RestUtil.R.badRequest("Unparsable scheduling information");
     }
@@ -2424,7 +2520,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private Optional<Response> updateSchedulingInformation(
-      JSONObject parsedScheduling,
+      JsonObject parsedScheduling,
       String id,
       ApiVersion requestedVersion,
       boolean allowConflict) throws Exception {
@@ -2462,7 +2558,7 @@ public class EventsEndpoint implements ManagedService {
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);
       logger.debug("Client tried to change scheduling information causing a conflict for event {}.", id);
       List<JsonObject> conflicts = convertConflictingEvents(
-          Optional.of(id), conflictingEvents, indexService, elasticsearchIndex
+          Optional.of(id), conflictingEvents, indexService, opensearchIndex
       );
 
       JsonArray conflictArray = new JsonArray();
@@ -2517,7 +2613,7 @@ public class EventsEndpoint implements ManagedService {
       String langTag = null;
 
       try {
-        event = indexService.getEvent(id, elasticsearchIndex);
+        event = indexService.getEvent(id, opensearchIndex);
       } catch (SearchIndexException e) {
         return RestUtil.R.badRequest(String.format("Error while searching for event with id %s; %s",
             id, e.getMessage()));
@@ -2557,7 +2653,7 @@ public class EventsEndpoint implements ManagedService {
               tags = List.of(StringUtils.split(tagsString, ','));
               // find lang tag if exists
               for (String tag : tags) {
-                if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+                if (Strings.CS.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
                   // lang tag is set
                   langTag = StringUtils.trimToEmpty(tag);
                   break;

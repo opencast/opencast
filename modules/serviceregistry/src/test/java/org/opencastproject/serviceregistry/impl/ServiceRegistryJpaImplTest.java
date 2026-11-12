@@ -49,12 +49,10 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -211,22 +209,22 @@ public class ServiceRegistryJpaImplTest {
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    final Capture<HttpUriRequest> request = EasyMock.newCapture();
-    final BasicHttpResponse successResponse = new BasicHttpResponse(
-            new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
-    final BasicHttpResponse unavailableResponse = new BasicHttpResponse(
-            new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_SERVICE_UNAVAILABLE, "No message"));
+    final Capture<ClassicHttpRequest> request = EasyMock.newCapture();
+    final BasicClassicHttpResponse successResponse = new BasicClassicHttpResponse(
+            HttpStatus.SC_NO_CONTENT, "No message");
+    final BasicClassicHttpResponse unavailableResponse = new BasicClassicHttpResponse(
+            HttpStatus.SC_SERVICE_UNAVAILABLE, "No message");
     TrustedHttpClient trustedHttpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(trustedHttpClient.execute(EasyMock.capture(request))).andAnswer(new IAnswer<HttpResponse>() {
+    EasyMock.expect(trustedHttpClient.execute(EasyMock.capture(request))).andAnswer(new IAnswer<ClassicHttpResponse>() {
       @Override
-      public HttpResponse answer() throws Throwable {
+      public ClassicHttpResponse answer() throws Throwable {
         if (!request.hasCaptured()) {
           return unavailableResponse;
         }
-        if (request.getValue().getURI().toString().contains(TEST_PATH)) {
+        if (request.getValue().getRequestUri().contains(TEST_PATH)) {
           return unavailableResponse;
         }
-        if (request.getValue().getURI().toString().contains(TEST_PATH_3)) {
+        if (request.getValue().getRequestUri().contains(TEST_PATH_3)) {
           return unavailableResponse;
         }
         return successResponse;
@@ -238,7 +236,10 @@ public class ServiceRegistryJpaImplTest {
     // Setup the job dispatcher
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     Dictionary<String, Object> jdProps = new Hashtable<>();
-    jdProps.put(JobDispatcher.OPT_DISPATCHINTERVAL, "0");
+    // Use a large interval so the periodic auto-dispatch never actually fires during the test (that would race with
+    // the manually-triggered runnable below) while still being > 0 so the dispatch lease manager gets created and
+    // manually-triggered dispatch runs can win the (uncontested) lease.
+    jdProps.put(JobDispatcher.OPT_DISPATCHINTERVAL, "600");
     EasyMock.expect(cc.getProperties()).andReturn(jdProps).anyTimes();
     EasyMock.replay(cc);
     jobDispatcher = new JobDispatcher();
@@ -502,6 +503,19 @@ public class ServiceRegistryJpaImplTest {
     Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
     Assert.assertNotNull(updatedJob.getDateCompleted());
     Assert.assertNotNull(updatedJob.getRunTime());
+  }
+
+  @Test
+  public void testDataFailureDoesNotChangeServiceState() throws Exception {
+    serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);
+
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
+    job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+    job.setProcessingHost(TEST_HOST);
+    serviceRegistryJpaImpl.updateJob(job);
+
+    ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
+    Assert.assertEquals(ServiceState.NORMAL, service.getServiceState());
   }
 
   @Test

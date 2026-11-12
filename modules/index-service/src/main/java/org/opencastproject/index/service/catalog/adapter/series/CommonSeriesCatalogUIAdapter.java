@@ -30,13 +30,12 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.NotFoundException;
 
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIAdapter implements ManagedService {
+public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(CommonSeriesCatalogUIAdapter.class);
 

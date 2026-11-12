@@ -22,9 +22,6 @@
 
 package org.opencastproject.util.data.functions;
 
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.nil;
-
 import java.text.Format;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +33,7 @@ public final class Strings {
   private Strings() {
   }
 
-  private static final List<String> NIL = nil();
+  private static final List<String> NIL = List.of();
   private static final Optional<String> NONE = Optional.empty();
 
   /**
@@ -86,7 +83,7 @@ public final class Strings {
   public static List<String> trimToNil(String a) {
     if (a != null) {
       final String trimmed = a.trim();
-      return trimmed.length() > 0 ? list(trimmed) : NIL;
+      return trimmed.length() > 0 ? List.of(trimmed) : NIL;
     } else {
       return NIL;
     }

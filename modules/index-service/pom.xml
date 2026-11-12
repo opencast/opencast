@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -92,7 +92,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-api</artifactId>
+      <artifactId>opencast-opensearch-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -122,18 +122,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-impl</artifactId>
+      <artifactId>opencast-opensearch-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-ingest-service-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-userdirectory</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -145,13 +139,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-elasticsearch-index</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-themes</artifactId>
+      <artifactId>opencast-opensearch-index</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -162,10 +150,6 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -213,7 +197,6 @@
     <dependency>
       <groupId>uk.co.datumedge</groupId>
       <artifactId>hamcrest-json</artifactId>
-      <version>0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -240,11 +223,9 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredNonTestScopedDependencies>
-            <ignoredNonTestScopedDependency>org.opencastproject:opencast-elasticsearch-impl</ignoredNonTestScopedDependency>
+            <ignoredNonTestScopedDependency>org.opencastproject:opencast-opensearch-impl</ignoredNonTestScopedDependency>
           </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- provides database for testing -->
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
             <!-- ical4j -->

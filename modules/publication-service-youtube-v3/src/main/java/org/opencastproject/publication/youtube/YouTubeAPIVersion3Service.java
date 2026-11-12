@@ -23,13 +23,14 @@ package org.opencastproject.publication.youtube;
 
 import org.opencastproject.publication.youtube.auth.ClientCredentials;
 
+import com.google.api.services.youtube.model.Caption;
 import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.PlaylistListResponse;
-import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -43,16 +44,6 @@ public interface YouTubeAPIVersion3Service {
    * @throws IOException when configuration files not found.
    */
   void initialize(ClientCredentials credentials) throws IOException;
-
-  /**
-   * Search for videos on predefined channel.
-   * @param queryTerm may not be {@code null}
-   * @param pageToken may not be {@code null}
-   * @param maxResults may not be {@code null}
-   * @return zero or more results. Will not be {@code null}.
-   * @throws IOException when search fails.
-   */
-  SearchListResponse searchMyVideos(String queryTerm, String pageToken, long maxResults) throws IOException;
 
   /**
    * Get video by id.
@@ -98,6 +89,15 @@ public interface YouTubeAPIVersion3Service {
   Video addVideoToMyChannel(VideoUpload videoUpload) throws IOException;
 
   /**
+   * Set a thumbnail for a video.
+   * @param videoId the video id
+   * @param thumbnail the thumbnail file
+   * @param mimeType the thumbnail mime type
+   * @throws IOException when transaction fails.
+   */
+  void setThumbnail(String videoId, File thumbnail, String mimeType) throws IOException;
+
+  /**
    * Add a previously uploaded video to specified YouTube playlist.
    * @param playlistId may not be {@code null}
    * @param videoId may not be {@code null}
@@ -110,9 +110,11 @@ public interface YouTubeAPIVersion3Service {
    * Creates YouTube Playlist and adds it to the authorized account.
    * @param title may not be {@code null}
    * @param description may not be {@code null}
+   * @param privacyStatus may not be {@code null}
    * @param tags zero or more tags to be applied to playlist on YouTube.
    */
-  Playlist createPlaylist(String title, String description, String... tags) throws IOException;
+  Playlist createPlaylist(String title, String description, PrivacyStatus privacyStatus, String... tags)
+          throws IOException;
 
   /**
    * Remove a previously uploaded video from YouTube.
@@ -136,4 +138,21 @@ public interface YouTubeAPIVersion3Service {
    */
   void removeMyPlaylist(String playlistId) throws IOException;
 
+  /**
+   * Add captions to a video.
+   * @param videoId the video id
+   * @param file the caption file
+   * @param language the language of the captions
+   * @param name the name of the captions
+   * @return the created caption object
+   * @throws IOException when transaction fails.
+   */
+  Caption addCaptions(String videoId, File file, String language, String name) throws IOException;
+
+  /** Valid values for YouTube privacy statuses */
+  enum PrivacyStatus {
+    PUBLIC,
+    PRIVATE,
+    UNLISTED
+  }
 }

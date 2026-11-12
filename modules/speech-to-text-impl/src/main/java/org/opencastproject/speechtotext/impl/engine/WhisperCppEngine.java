@@ -24,16 +24,17 @@ package org.opencastproject.speechtotext.impl.engine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.speechtotext.util.LangCodeUtil;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.OsgiUtil;
+
+import com.google.gson.JsonObject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -69,6 +70,12 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
   /** Name of the engine. */
   private static final String engineName = "WhisperC++";
+
+  /**
+   * Matches WhisperC++ output reporting that a result file could not be written, e.g.
+   * {@code output_vtt: failed to open '/path/to/file.vtt' for writing}. WhisperC++ still exits
+   * with status 0 in that case, so its output is the only indication that something went wrong.
+   */
 
   /** Config key for setting the path to WhisperC++. */
   private static final String WHISPERCPP_EXECUTABLE_PATH_CONFIG_KEY = "whispercpp.root.path";
@@ -533,11 +540,16 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     File vtt;
 
     try {
-      execCommand(command);
+      List<String> output = execCommand(command);
 
       vtt = new File(workingDirectory, outputName + ".vtt");
       if (!vtt.isFile()) {
-        throw new SpeechToTextEngineException("WhisperC++ produced no output");
+        // WhisperC++ exits with status 0 even when it could not write its output files, reporting
+        // the reason on stdout only. Include that output, or this failure is indistinguishable
+        // from any other cause and the reason is left sitting in a debug log.
+        throw new SpeechToTextEngineException(
+            "WhisperC++ produced no output. Its output was:" + System.lineSeparator()
+                + String.join(System.lineSeparator(), output));
       }
       logger.info("Subtitles file generated successfully: {}", vtt);
     } catch (Exception e) {
@@ -547,14 +559,11 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     // Detect language if not set
     if (subtitleLanguage.isBlank()) {
-      JSONParser jsonParser = new JSONParser();
       File json = new File(workingDirectory, outputName + ".json");
-      try {
-        FileReader reader = new FileReader(json);
-        Object obj = jsonParser.parse(reader);
-        JSONObject jsonObject = (JSONObject) obj;
-        JSONObject result = (JSONObject) jsonObject.get("result");
-        subtitleLanguage = (String) result.get("language");
+      try (FileReader reader = new FileReader(json)) {
+        JsonObject jsonObject = GsonUtil.gson().fromJson(reader, JsonObject.class);
+        JsonObject result = jsonObject.getAsJsonObject("result");
+        subtitleLanguage = GsonUtil.getStringOrNull(result, "language");
         // convert language name to iso3 if necessary or take default
         subtitleLanguage = LangCodeUtil.getIso2FromLang(subtitleLanguage, subtitleLanguage);
         logger.info("Language detected by WhisperC++: {}", subtitleLanguage);
@@ -569,7 +578,20 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     return new Result(subtitleLanguage, vtt);
   }
 
-  private void execCommand(List<String> command) throws IOException, InterruptedException, SpeechToTextEngineException {
+  /**
+   * Run a command, returning everything it wrote to stdout and stderr.
+   *
+   * <p>The output is returned rather than only logged at debug so that a caller which detects a
+   * failure afterwards can put it in the exception. WhisperC++ reports an unwritable output file
+   * on stdout and still exits with status 0, so the reason a result is missing is only ever found
+   * there.
+   *
+   * @param command
+   *          the command to run
+   * @return the process output, one line per element
+   */
+  private List<String> execCommand(List<String> command)
+          throws IOException, InterruptedException, SpeechToTextEngineException {
     logger.info("Executing command: {}", command);
     Process process = null;
 
@@ -581,10 +603,12 @@ public class WhisperCppEngine implements SpeechToTextEngine {
           .redirectOutput(ProcessBuilder.Redirect.PIPE);
       process = processBuilder.start();
 
+      List<String> output = new ArrayList<>();
       try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
         String line;
         while ((line = in.readLine()) != null) { // consume process output
           logger.debug(line);
+          output.add(line.trim());
         }
       }
 
@@ -600,6 +624,8 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         throw new SpeechToTextEngineException(
             String.format("Process exited abnormally with status %d (command: %s) %s", exitCode, command, error));
       }
+
+      return output;
     } finally {
       IoSupport.closeQuietly(process);
     }

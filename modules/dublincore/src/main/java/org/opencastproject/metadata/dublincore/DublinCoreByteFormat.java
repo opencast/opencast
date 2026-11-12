@@ -20,7 +20,6 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -44,15 +43,13 @@ public final class DublinCoreByteFormat {
    * @return the catalog
    * @throws IOException
    *         if the input can't be read
-   * @throws ParseException
-   *         if setting up the JSON parser failed
    * @throws ParserConfigurationException
    *         if setting up the XML parser failed
    * @throws SAXException
    *         if an error occurred while parsing the XML catalog
    */
   public static DublinCoreCatalog read(byte[] bytes)
-          throws IOException, ParseException, ParserConfigurationException, SAXException {
+          throws IOException, ParserConfigurationException, SAXException {
     final String catalogString = new String(bytes, StandardCharsets.UTF_8);
     if (DublinCoreJsonFormat.isJson(catalogString)) {
       return DublinCoreJsonFormat.read(catalogString);

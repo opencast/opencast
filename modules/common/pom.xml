@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -35,16 +35,20 @@
       <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -65,6 +69,10 @@
     <dependency>
       <groupId>org.mnode.ical4j</groupId>
       <artifactId>ical4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.threeten</groupId>
+      <artifactId>threeten-extra</artifactId>
     </dependency>
     <!-- OSGi -->
     <dependency>
@@ -116,11 +124,6 @@
     <!-- REST test environment -->
     <dependency>
       <groupId>io.rest-assured</groupId>
-      <artifactId>json-path</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.rest-assured</groupId>
       <artifactId>xml-path</artifactId>
       <scope>test</scope>
     </dependency>
@@ -132,6 +135,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- JAXB implementation for unit tests; provided by the Karaf runtime in production -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -201,12 +210,14 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <!-- probably needed for the module scheduler-api -->
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
+            <!-- mandatory transitive dependency of ical4j, embedded alongside it -->
+            <ignoredUnusedDeclaredDependency>org.threeten:threeten-extra</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>net.sf.saxon:Saxon-HE</ignoredUnusedDeclaredDependency>
+            <!-- JAXB implementation, discovered via ServiceLoader at test runtime, not a direct import -->
+            <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-runtime</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -237,6 +248,8 @@
               !com.mchange.v2.c3p0.*,
               !com.sun.*,
               !javax.cache.*,
+              !jakarta.el.*,
+              !jakarta.servlet.*,
               !javax.el.*,
               !javax.servlet.jsp.*,
               !org.apache.log.*,
@@ -251,6 +264,10 @@
               !org.zeroturnaround.javarebel.*,
               !groovy.*,
               !org.codehaus.groovy.*,
+              !org.jparsec.*,
+              !org.joda.convert.*,
+              !org.jspecify.annotations.*,
+              !com.github.benmanes.caffeine.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               javax.ws.rs.ext;version=2.0.1,
@@ -259,7 +276,8 @@
             <Embed-Dependency>
               truezip;inline=true,
               freemarker;inline=true,
-              ical4j;inline=true
+              ical4j;inline=true,
+              threeten-extra;inline=true
             </Embed-Dependency>
             <Private-Package>
               freemarker.core,
@@ -270,15 +288,19 @@
               net.fortuna.ical4j.agent,
               net.fortuna.ical4j.data,
               net.fortuna.ical4j.filter,
+              net.fortuna.ical4j.filter.expression,
               net.fortuna.ical4j.model,
               net.fortuna.ical4j.model.component,
               net.fortuna.ical4j.model.parameter,
               net.fortuna.ical4j.model.property,
+              net.fortuna.ical4j.model.property.immutable,
               net.fortuna.ical4j.transform,
+              net.fortuna.ical4j.transform.recurrence,
               net.fortuna.ical4j.util,
               net.fortuna.ical4j.validate,
               net.fortuna.ical4j.validate.component,
-              net.fortuna.ical4j.validate.property
+              net.fortuna.ical4j.validate.property,
+              org.threeten.extra
             </_exportcontents>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,

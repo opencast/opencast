@@ -26,27 +26,36 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.GsonUtil;
+import org.opencastproject.util.HttpUtil;
+import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,14 +70,22 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A UserProvider that reads user roles from Studip.
  */
+@Component(
+    immediate = true,
+    configurationPid = "org.opencastproject.userdirectory.studip",
+    configurationPolicy = ConfigurationPolicy.REQUIRE,
+    service = { UserProvider.class, RoleProvider.class },
+    property = {
+        "service.description=Provides Studip user directory instances"
+    }
+)
 public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   public static final String PROVIDER_NAME = "studip";
@@ -76,17 +93,26 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
   private static final String OC_USERAGENT = "Opencast";
   private static final String STUDIP_GROUP = Group.ROLE_PREFIX + "STUDIP";
 
+  /** The key to look up the organization identifer in the service configuration properties */
+  private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.studip.org";
+
+  /** The key to look up the URL of the Studip instance */
+  private static final String STUDIP_URL_KEY = "org.opencastproject.userdirectory.studip.url";
+
+  /** The key to look up the user token to use for performing searches. */
+  private static final String STUDIP_TOKEN_KEY = "org.opencastproject.userdirectory.studip.token";
+
+  /** The key to look up the number of user records to cache */
+  private static final String CACHE_SIZE = "org.opencastproject.userdirectory.studip.cache.size";
+
+  /** The key to look up the number of minutes to cache users */
+  private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.studip.cache.expiration";
+
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StudipUserProviderInstance.class);
 
   /** The organization */
   private Organization organization = null;
-
-  /** Total number of requests made to load users */
-  private AtomicLong requests = null;
-
-  /** The number of requests made to Studip */
-  private AtomicLong studipLoads = null;
 
   /** A cache of users, which lightens the load on Studip */
   private LoadingCache<String, Object> cache = null;
@@ -100,38 +126,75 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
   /** The URL of the Studip instance */
   private String studipToken = null;
 
-  /**
-   * Constructs an Studip user provider with the needed settings.
-   *
-   * @param pid
-   *          the pid of this service
-   * @param organization
-   *          the organization
-   * @param url
-   *          the url of the Studip server
-   * @param token
-   *          the token to authenticate with
-   * @param cacheSize
-   *          the number of users to cache
-   * @param cacheExpiration
-   *          the number of minutes to cache users
-   */
-  public StudipUserProviderInstance(
-      String pid,
-      Organization organization,
-      URI url,
-      String token,
+  /** The organization directory service */
+  private OrganizationDirectoryService orgDirectory;
 
-      int cacheSize,
-      int cacheExpiration
-  ) {
+  /** OSGi DI */
+  @Reference
+  public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
+    this.orgDirectory = orgDirectory;
+  }
 
-    this.organization = organization;
-    this.studipUrl = url;
-    this.studipToken = token;
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
+    String organizationId = (String) properties.get(ORGANIZATION_KEY);
+    if (StringUtils.isBlank(organizationId)) {
+      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
+    }
 
-    logger.info("Creating new StudipUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={})",
-                 pid, url, cacheSize, cacheExpiration);
+    URI url;
+    try {
+      url = new URI((String) properties.get(STUDIP_URL_KEY));
+    } catch (URISyntaxException e) {
+      throw new ConfigurationException(STUDIP_URL_KEY, "URI is invalid", e);
+    }
+    if (StringUtils.isBlank(url.toString())) {
+      throw new ConfigurationException(STUDIP_URL_KEY, "is not set");
+    }
+
+    String token = (String) properties.get(STUDIP_TOKEN_KEY);
+    if (StringUtils.isBlank(token)) {
+      throw new ConfigurationException(STUDIP_TOKEN_KEY, "is not set");
+    }
+
+    int cacheSize = 1000;
+    try {
+      if (properties.get(CACHE_SIZE) != null) {
+        Integer configuredCacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
+        if (configuredCacheSize != null) {
+          cacheSize = configuredCacheSize.intValue();
+        }
+      }
+    } catch (Exception e) {
+      throw new ConfigurationException("{} could not be loaded", CACHE_SIZE);
+    }
+
+
+    int cacheExpiration = 60;
+    try {
+      if (properties.get(CACHE_EXPIRATION) != null) {
+        Integer configuredCacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
+        if (configuredCacheExpiration != null) {
+          cacheExpiration = configuredCacheExpiration.intValue();
+        }
+      }
+    } catch (Exception e) {
+      throw new ConfigurationException("{} could not be loaded", CACHE_EXPIRATION);
+    }
+
+    try {
+      organization = orgDirectory.getOrganization(organizationId);
+    } catch (NotFoundException e) {
+      logger.warn("Organization {} not found!", organizationId);
+      throw new ConfigurationException(ORGANIZATION_KEY, "not found");
+    }
+
+    studipUrl = url;
+    studipToken = token;
+
+    logger.info("Configured StudipUserProviderInstance(url={}, cacheSize={}, cacheExpiration={})",
+                 url, cacheSize, cacheExpiration);
 
     // Setup the caches
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
@@ -170,7 +233,6 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
   public User loadUser(String userName) {
     logger.debug("loaduser({})", userName);
 
-    requests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
       if (user == nullToken) {
@@ -209,23 +271,20 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
-    // update cache statistics
-    studipLoads.incrementAndGet();
-
     Thread currentThread = Thread.currentThread();
     ClassLoader originalClassloader = currentThread.getContextClassLoader();
     try {
       // Stud.IP userId (internal id), email address and display name
-      JSONObject userJsonObj = getStudipUser(userName);
+      JsonObject userJsonObj = getStudipUser(userName);
       if (userJsonObj == null) {
         return null;
       }
 
       Set<JaxbRole> roles = new HashSet<>();
-      if (userJsonObj.containsKey("roles")) {
-        JSONArray rolesArray = (JSONArray) userJsonObj.get("roles");
-        for (Object r : rolesArray) {
-          roles.add(new JaxbRole(r.toString(), jaxbOrganization, "Studip external role", Role.Type.EXTERNAL));
+      if (userJsonObj.has("roles")) {
+        JsonArray rolesArray = userJsonObj.getAsJsonArray("roles");
+        for (JsonElement r : rolesArray) {
+          roles.add(new JaxbRole(GsonUtil.asText(r), jaxbOrganization, "Studip external role", Role.Type.EXTERNAL));
         }
       }
 
@@ -234,8 +293,8 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
       logger.debug("Returning JaxbRoles: {}", roles);
 
       // Email address
-      var email = Objects.toString(userJsonObj.get("email"), null);
-      var name = Objects.toString(userJsonObj.get("fullname"), null);
+      var email = GsonUtil.getStringOrNull(userJsonObj, "email");
+      var name = GsonUtil.getStringOrNull(userJsonObj, "fullname");
 
       User user = new JaxbUser(userName, null, name, email, PROVIDER_NAME, jaxbOrganization, roles);
 
@@ -244,7 +303,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
       return user;
 
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.error("Exception while parsing response from provider for user {}", userName, e);
       return null;
     } catch (IOException e) {
@@ -264,7 +323,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
    * @param uid Identifier of the user to look for
    * @return JSON object containing user information
    */
-  private JSONObject getStudipUser(String uid) throws URISyntaxException, IOException, ParseException {
+  private JsonObject getStudipUser(String uid) throws URISyntaxException, IOException {
     // Build URL
     var apiPath = new URIBuilder().setPathSegments("opencast", "user", uid).getPath();
     var url = new URIBuilder(studipUrl)
@@ -277,33 +336,28 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
     get.setHeader("User-Agent", OC_USERAGENT);
 
     // Don't wait for responses indefinitely
-    RequestConfig config = RequestConfig.custom()
-        .setConnectTimeout(5000)
-        .setSocketTimeout(10000).build();
-
-    try (CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();) {
+    try (CloseableHttpClient client = HttpUtil.clientBuilder(5000, 10000).build()) {
       try (CloseableHttpResponse resp = client.execute(get)) {
-        var statusCode = resp.getStatusLine().getStatusCode();
+        var statusCode = resp.getCode();
         if (statusCode == 404) {
           // Stud.IP does not know about the user
           return null;
         } else if (statusCode / 100 != 2) {
-          throw new IOException("HttpRequest unsuccessful, reason: " + resp.getStatusLine().getReasonPhrase());
+          throw new IOException("HttpRequest unsuccessful, reason: " + resp.getReasonPhrase());
         }
 
         // Parse response
         BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(reader);
+        JsonElement obj = GsonUtil.gson().fromJson(reader, JsonElement.class);
 
         // Check for errors
-        if (!(obj instanceof JSONObject)) {
+        if (obj == null || !obj.isJsonObject()) {
           throw new IOException("StudIP responded in unexpected format");
         }
 
-        JSONObject jObj = (JSONObject) obj;
-        if (jObj.containsKey("errors")) {
-          throw new IOException("Stud.IP returned an error: " + jObj.toJSONString());
+        JsonObject jObj = obj.getAsJsonObject();
+        if (jObj.has("errors")) {
+          throw new IOException("Stud.IP returned an error: " + jObj);
         }
 
         return jObj;
@@ -316,6 +370,12 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
     if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
+
+    // Only exact usernames can be looked up. A query starting with a wildcard cannot match anything, so do not
+    // bother the external system with it.
+    if (query.startsWith("%")) {
+      return Collections.emptyIterator();
     }
 
     if (query.endsWith("%")) {

@@ -648,7 +648,6 @@ db
   com.mchange                            mchange-commons-java                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
   com.typesafe                           config                                           -
   mysql                                  mysql-connector-java                             The GNU General Public License, Version 2
-  net.java.dev.jna                       jna                                              LGPL, version 2.1-ASL, version 2
   org.postgresql                         postgresql                                       -
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1188,20 +1187,33 @@ search
   GroupId                                ArtifactId                                       Licenses
   com.carrotsearch                       hppc                                             The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
+  io.projectreactor                      reactor-core                                     Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.apache.httpcomponents              httpasyncclient                                  Apache License, Version 2.0
+  org.apache.httpcomponents.client5      httpclient5                                      Apache License, Version 2.0
+  org.apache.httpcomponents.core5        httpcore5                                        Apache License, Version 2.0
+  org.apache.httpcomponents.core5        httpcore5-h2                                     Apache License, Version 2.0
+  org.apache.httpcomponents.core5        httpcore5-reactive                               Apache License, Version 2.0
   org.apache.logging.log4j               log4j-core                                       Apache License, Version 2.0
   org.apache.lucene                      lucene-core                                      Apache 2
   org.apache.lucene                      lucene-join                                      Apache 2
+  org.apache.lucene                      lucene-queries                                   Apache 2
   org.apache.lucene                      lucene-queryparser                               Apache 2
-  org.elasticsearch                      elasticsearch                                    The Apache Software License, Version 2.0
-  org.elasticsearch                      elasticsearch-core                               The Apache Software License, Version 2.0
-  org.elasticsearch                      elasticsearch-x-content                          The Apache Software License, Version 2.0
-  org.elasticsearch.client               elasticsearch-rest-client                        The Apache Software License, Version 2.0
-  org.elasticsearch.client               elasticsearch-rest-high-level-client             The Apache Software License, Version 2.0
-  org.elasticsearch.plugin               lang-mustache-client                             The Apache Software License, Version 2.0
-  org.elasticsearch.plugin               rank-eval-client                                 The Apache Software License, Version 2.0
+  org.opensearch                         opensearch                                       The Apache Software License, Version 2.0
+  org.opensearch                         opensearch-common                                The Apache Software License, Version 2.0
+  org.opensearch                         opensearch-core                                  The Apache Software License, Version 2.0
+  org.opensearch                         opensearch-x-content                             The Apache Software License, Version 2.0
+  org.opensearch.client                  opensearch-rest-client                           The Apache Software License, Version 2.0
+  org.opensearch.client                  opensearch-rest-high-level-client                The Apache Software License, Version 2.0
+  org.opensearch.plugin                  lang-mustache-client                             The Apache Software License, Version 2.0
+  org.opensearch.plugin                  rank-eval-client                                 The Apache Software License, Version 2.0
+  org.reactivestreams                    reactive-streams                                 CC0
   org.slf4j                              slf4j-api                                        MIT License
+  org.snakeyaml                          snakeyaml-engine                                 Apache License, Version 2.0
+  tools.jackson.core                     jackson-core                                     Apache License, Version 2.0
+  tools.jackson.core                     jackson-databind                                 Apache License, Version 2.0
+  tools.jackson.dataformat               jackson-dataformat-cbor                          Apache License, Version 2.0
+  tools.jackson.dataformat               jackson-dataformat-smile                         Apache License, Version 2.0
+  tools.jackson.dataformat               jackson-dataformat-yaml                          Apache License, Version 2.0
 
 
 security-aai
@@ -1213,10 +1225,8 @@ security-aai
 
 security-cas-client-wrapper
   GroupId                                ArtifactId                                       Licenses
-  org.apache.santuario                   xmlsec                                           Apache License, Version 2.0
   org.apache.velocity                    velocity                                         The Apache Software License, Version 2.0
   org.jasig.cas.client                   cas-client-core                                  Apache License Version 2.0
-  org.opensaml                           opensaml                                         Apache 2
   org.owasp.esapi                        esapi                                            BSD-Creative Commons 3.0 BY-SA
 
 

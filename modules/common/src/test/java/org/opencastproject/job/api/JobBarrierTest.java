@@ -23,7 +23,6 @@ package org.opencastproject.job.api;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.toArray;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
@@ -69,7 +68,7 @@ public class JobBarrierTest {
     }).anyTimes();
     EasyMock.replay(sr);
     // wait for all jobs to complete
-    new JobBarrier(null, sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
+    new JobBarrier(null, sr, 10, jobs.values().toArray(Job[]::new)).waitForJobs();
     // check if there are still running jobs
     final boolean noRunningJobs = jobs.values().stream()
         .allMatch(job -> hasJobTerminated(job.getLastReportedStatus()));

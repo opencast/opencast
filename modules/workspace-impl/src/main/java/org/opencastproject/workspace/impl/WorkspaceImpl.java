@@ -23,11 +23,8 @@ package org.opencastproject.workspace.impl;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.IoSupport.locked;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Prelude.sleep;
@@ -45,7 +42,7 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -57,9 +54,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -84,13 +81,13 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
@@ -202,7 +199,7 @@ public final class WorkspaceImpl implements Workspace {
         logger.info("CONFIG " + WORKSPACE_DIR_KEY + ": " + this.wsRoot);
       } else if (ensureContextProp(cc, STORAGE_DIR_KEY)) {
         // create rootDir by adding "workspace" to the default data directory
-        this.wsRoot = PathSupport.concat(cc.getBundleContext().getProperty(STORAGE_DIR_KEY), "workspace");
+        this.wsRoot = Paths.get(cc.getBundleContext().getProperty(STORAGE_DIR_KEY), "workspace").toString();
         logger.warn("CONFIG " + WORKSPACE_DIR_KEY + " is missing: falling back to " + this.wsRoot);
       } else {
         throw new IllegalStateException("Configuration '" + WORKSPACE_DIR_KEY + "' is missing");
@@ -346,10 +343,10 @@ public final class WorkspaceImpl implements Workspace {
       logger.debug("Created unique filename: {}", inWs);
     }
 
-    if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
-            && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
-      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
-        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+    final String lookupUri = UrlSupport.withoutQueryAndFragment(uri);
+    if (hasPathMappable()) {
+      if (lookupUri.startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = lookupUri.substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist and is it up to date?
         logger.trace("Looking up {} at {}", uri.toString(), wfrCopy.getAbsolutePath());
@@ -391,9 +388,10 @@ public final class WorkspaceImpl implements Workspace {
   public InputStream read(final URI uri) throws NotFoundException, IOException {
 
     // Check if we can get the file from the working file repository directly
-    if (pathMappable != null) {
-      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
-        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+    final String lookupUri = UrlSupport.withoutQueryAndFragment(uri);
+    if (hasPathMappable()) {
+      if (lookupUri.startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = lookupUri.substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist?
         logger.trace("Looking up {} at {} for read", uri, wfrCopy);
@@ -445,10 +443,10 @@ public final class WorkspaceImpl implements Workspace {
    * @throws IOException
    *           in case of any IO related issues
    */
-  private Either<String, Optional<File>> handleDownloadResponse(HttpResponse response, URI src, File dst)
+  private Either<String, Optional<File>> handleDownloadResponse(ClassicHttpResponse response, URI src, File dst)
           throws IOException {
     final String url = src.toString();
-    final int status = response.getStatusLine().getStatusCode();
+    final int status = response.getCode();
     switch (status) {
       case HttpServletResponse.SC_NOT_FOUND:
         return right(Optional.empty());
@@ -497,7 +495,7 @@ public final class WorkspaceImpl implements Workspace {
     while (true) {
       // run the http request and handle its response
       try {
-        HttpResponse response = null;
+        ClassicHttpResponse response = null;
         final Either<String, Optional<File>> result;
         try {
           response = trustedHttpClient.execute(get);
@@ -546,7 +544,7 @@ public final class WorkspaceImpl implements Workspace {
    *
    * @return the destination file
    */
-  private static File downloadTo(final HttpResponse response, final File dst) throws IOException {
+  private static File downloadTo(final ClassicHttpResponse response, final File dst) throws IOException {
     // ignore return value
     dst.createNewFile();
     try (InputStream in = response.getEntity().getContent()) {
@@ -795,7 +793,7 @@ public final class WorkspaceImpl implements Workspace {
   File toWorkspaceFile(URI uri) {
     // MH-11497: Fix for compatibility with stream security: the query parameters are deleted.
     // TODO Refactor this class to use the URI class and methods instead of String for handling URIs
-    String uriString = UriBuilder.fromUri(uri).replaceQuery(null).build().toString();
+    String uriString = UrlSupport.withoutQueryAndFragment(uri);
     String wfrPrefix = wfr.getBaseUri().toString();
     String serverPath = FilenameUtils.getPath(uriString);
     if (uriString.startsWith(wfrPrefix)) {
@@ -803,7 +801,7 @@ public final class WorkspaceImpl implements Workspace {
     } else {
       serverPath = serverPath.replaceAll(":/*", "_");
     }
-    String wsDirectoryPath = PathSupport.concat(wsRoot, serverPath);
+    String wsDirectoryPath = Paths.get(wsRoot, serverPath).toString();
     File wsDirectory = new File(wsDirectoryPath);
     wsDirectory.mkdirs();
 
@@ -816,12 +814,22 @@ public final class WorkspaceImpl implements Workspace {
 
   /** Return a file object pointing into the workspace. */
   private File workspaceFile(String... path) {
-    return new File(path(cons(String.class, wsRoot, path)));
+    return Paths.get(wsRoot, path).toFile();
+  }
+
+  /**
+   * Whether files of the working file repository can be accessed directly on the file system, which needs a path and
+   * a URL prefix.
+   */
+  private boolean hasPathMappable() {
+    return pathMappable != null
+        && StringUtils.isNotBlank(pathMappable.getPathPrefix())
+        && StringUtils.isNotBlank(pathMappable.getUrlPrefix());
   }
 
   /** Return a file object pointing into the working file repository. */
   private File workingFileRepositoryFile(String... path) {
-    return new File(path(cons(String.class, pathMappable.getPathPrefix(), path)));
+    return Paths.get(pathMappable.getPathPrefix(), path).toFile();
   }
 
   /**
@@ -903,7 +911,7 @@ public final class WorkspaceImpl implements Workspace {
           .fold(
               chuck(),
               status -> {
-                if (ne(status, expectedStatus)) {
+                if (!Objects.equals(status, expectedStatus)) {
                   final String msg = String.format(errorMsg, uri.toString());
                   logger.warn(msg);
                   chuck(new IOException(msg));

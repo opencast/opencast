@@ -26,17 +26,19 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.Jsons;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +76,7 @@ final class Harvest {
 
   private static final Logger logger = LoggerFactory.getLogger(Harvest.class);
 
-  static Jsons.Obj harvest(
+  static JsonObject harvest(
       int preferredAmount,
       Date since,
       SearchService searchService,
@@ -87,8 +89,7 @@ final class Harvest {
     final var org = securityService.getOrganization().getId();
 
     var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    var isAdmin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    var isAdmin = SecurityUtil.isAdmin(user, securityService.getOrganization());
     if (!isAdmin) {
       throw new UnauthorizedException(user, "Only (org-) admins can access the Tobira harvest API");
     }
@@ -225,14 +226,12 @@ final class Harvest {
 
 
     // Assembly full response.
-    final var outItems = items.stream()
-        .map(item -> item.getJson())
-        .collect(Collectors.toCollection(ArrayList::new));
-    final var json = Jsons.obj(
-        Jsons.p("includesItemsUntil", includesItemsUntil),
-        Jsons.p("hasMore", hasMore),
-        Jsons.p("items", Jsons.arr(outItems))
-    );
+    final var outItems = new JsonArray();
+    items.forEach(item -> outItems.add(item.getJson()));
+    final var json = new JsonObject();
+    json.addProperty("includesItemsUntil", includesItemsUntil);
+    json.addProperty("hasMore", hasMore);
+    json.add("items", outItems);
     logger.debug(
         "Returning {} items from harvesting (hasMore = {}, includesItemsUntil = {})",
         items.size(),

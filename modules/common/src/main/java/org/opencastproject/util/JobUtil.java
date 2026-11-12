@@ -21,10 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Tuple.tuple;
-
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
@@ -34,12 +30,13 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
-import org.apache.http.HttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -165,7 +162,7 @@ public final class JobUtil {
    * @return the job barrier result
    */
   public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Collection<Job> jobs) {
-    return waitForJobs(waiter, reg, toArray(Job.class, jobs));
+    return waitForJobs(waiter, reg, jobs.toArray(Job[]::new));
   }
 
   /**
@@ -191,7 +188,7 @@ public final class JobUtil {
       case DELETED:
       case FAILED:
       case FINISHED:
-        return new JobBarrier.Result(map(tuple(job, status)));
+        return new JobBarrier.Result(Map.of(job, status));
       default:
         if (timeout.isPresent()) {
           return waitForJobs(waiter, reg, timeout.get(), job);
@@ -286,7 +283,7 @@ public final class JobUtil {
     return payloadAsMediaPackageElement(null, reg, job);
   }
 
-  public static Optional<Job> jobFromHttpResponse(HttpResponse response) {
+  public static Optional<Job> jobFromHttpResponse(ClassicHttpResponse response) {
     try {
       return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
     } catch (Exception e) {

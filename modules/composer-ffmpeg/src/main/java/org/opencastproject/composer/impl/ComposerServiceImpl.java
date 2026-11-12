@@ -64,13 +64,12 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.UnknownFileTypeException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -81,6 +80,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -114,6 +114,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -269,7 +270,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
-    ffmpegBinary = StringUtils.defaultString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
+    ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
             FFMPEG_BINARY_DEFAULT);
     logger.debug("ffmpeg binary: {}", ffmpegBinary);
     logger.info("Activating composer service");
@@ -422,7 +423,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Handle lang:<LOCALE> tags
     tracks.entrySet().stream()
         .map(e -> new Tuple<>(e.getKey(), Arrays.stream(e.getValue().getTags())
-            .filter(t -> StringUtils.startsWith(t, "lang:"))
+            .filter(t -> Strings.CS.startsWith(t, "lang:"))
             .map(t -> StringUtils.substring(t, 5))
             .filter(StringUtils::isNotBlank)
             .findFirst()))
@@ -709,7 +710,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   @Override
   public Job mux(Track videoTrack, Track audioTrack, String profileId) throws EncoderException, MediaPackageException {
-    return mux(Collections.map(Tuple.tuple("video", videoTrack), Tuple.tuple("audio", audioTrack)), profileId);
+    return mux(Map.of("video", videoTrack, "audio", audioTrack), profileId);
   }
 
   /**
@@ -766,21 +767,21 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     List<String> arguments = new ArrayList<>(10);
     arguments.add(PROFILE_ID_INDEX, profileId);
     arguments.add(LOWER_TRACK_INDEX, MediaPackageElementParser.getAsXml(lowerTrack.getElement()));
-    arguments.add(LOWER_TRACK_LAYOUT_INDEX, Serializer.json(lowerTrack.getLayout()).toJson());
+    arguments.add(LOWER_TRACK_LAYOUT_INDEX, Serializer.json(lowerTrack.getLayout()).toString());
     if (upperTrack.isEmpty()) {
       arguments.add(UPPER_TRACK_INDEX, NOT_AVAILABLE);
       arguments.add(UPPER_TRACK_LAYOUT_INDEX, NOT_AVAILABLE);
     } else {
       arguments.add(UPPER_TRACK_INDEX, MediaPackageElementParser.getAsXml(upperTrack.get().getElement()));
-      arguments.add(UPPER_TRACK_LAYOUT_INDEX, Serializer.json(upperTrack.get().getLayout()).toJson());
+      arguments.add(UPPER_TRACK_LAYOUT_INDEX, Serializer.json(upperTrack.get().getLayout()).toString());
     }
-    arguments.add(COMPOSITE_TRACK_SIZE_INDEX, Serializer.json(compositeTrackSize).toJson());
+    arguments.add(COMPOSITE_TRACK_SIZE_INDEX, Serializer.json(compositeTrackSize).toString());
     arguments.add(BACKGROUND_COLOR_INDEX, background);
     arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     if (watermark.isPresent()) {
       LaidOutElement<Attachment> watermarkLaidOutElement = watermark.get();
       arguments.add(WATERMARK_INDEX, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
-      arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
+      arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toString());
     }
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
@@ -986,7 +987,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     ArrayList<String> arguments = new ArrayList<String>();
     arguments.add(0, profileId);
     if (outputDimension != null) {
-      arguments.add(1, Serializer.json(outputDimension).toJson());
+      arguments.add(1, Serializer.json(outputDimension).toString());
     } else {
       arguments.add(1, "");
     }
@@ -1541,7 +1542,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       switch (op) {
         case Encode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
-          serialized = serializeOrEmpty(encode(job, Collections.map(tuple("video", firstTrack)), encodingProfile));
+          serialized = serializeOrEmpty(encode(job, Map.of("video", firstTrack), encodingProfile));
           break;
         case ParallelEncode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
@@ -1587,7 +1588,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Composite:
           Attachment watermarkAttachment;
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(LOWER_TRACK_INDEX));
-          Layout lowerLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(LOWER_TRACK_LAYOUT_INDEX)));
+          Layout lowerLayout = Serializer.layout(
+                  GsonUtil.parse(arguments.get(LOWER_TRACK_LAYOUT_INDEX)).getAsJsonObject());
           LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<>(firstTrack, lowerLayout);
           Optional<LaidOutElement<Track>> upperLaidOutElement = Optional.empty();
           if (NOT_AVAILABLE.equals(arguments.get(UPPER_TRACK_INDEX))
@@ -1595,11 +1597,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
             logger.trace("This composite action does not use a second track.");
           } else {
             secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(UPPER_TRACK_INDEX));
-            Layout upperLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(UPPER_TRACK_LAYOUT_INDEX)));
+            Layout upperLayout = Serializer.layout(
+                    GsonUtil.parse(arguments.get(UPPER_TRACK_LAYOUT_INDEX)).getAsJsonObject());
             upperLaidOutElement = Optional.ofNullable(new LaidOutElement<Track>(secondTrack, upperLayout));
           }
           Dimension compositeTrackSize = Serializer
-                  .dimension(JsonObj.jsonObj(arguments.get(COMPOSITE_TRACK_SIZE_INDEX)));
+                  .dimension(GsonUtil.parse(arguments.get(COMPOSITE_TRACK_SIZE_INDEX)).getAsJsonObject());
           String backgroundColor = arguments.get(BACKGROUND_COLOR_INDEX);
           String audioSourceName = arguments.get(AUDIO_SOURCE_INDEX);
 
@@ -1607,7 +1610,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           //If there is a watermark defined, it needs both args 8 and 9
           if (arguments.size() > WATERMARK_INDEX && arguments.size() <= WATERMARK_LAYOUT_INDEX + 1) {
             watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
-            Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(WATERMARK_LAYOUT_INDEX)));
+            Layout watermarkLayout = Serializer.layout(
+                    GsonUtil.parse(arguments.get(WATERMARK_LAYOUT_INDEX)).getAsJsonObject());
             watermarkOption = Optional.of(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
           } else if (arguments.size() > WATERMARK_LAYOUT_INDEX + 1) {
             throw new IndexOutOfBoundsException("Too many composite arguments!");
@@ -1622,7 +1626,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           String frameRateString = arguments.get(2);
           Dimension outputDimension = null;
           if (StringUtils.isNotBlank(dimensionString)) {
-            outputDimension = Serializer.dimension(JsonObj.jsonObj(dimensionString));
+            outputDimension = Serializer.dimension(GsonUtil.parse(dimensionString).getAsJsonObject());
           }
           float outputFrameRate = NumberUtils.toFloat(frameRateString, -1.0f);
           boolean sameCodec = Boolean.parseBoolean(arguments.get(3));
@@ -1792,16 +1796,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     if (profile == null) {
       final String msg = format("Profile %s is unknown", profileId);
       logger.error(msg);
-      incident().recordFailure(job, PROFILE_NOT_FOUND, Collections.map(tuple("profile", profileId)));
+      incident().recordFailure(job, PROFILE_NOT_FOUND, Map.of("profile", profileId));
       throw new EncoderException(msg);
     }
     return profile;
   }
 
   private Map<String, String> getWorkspaceMediapackageParams(String description, MediaPackageElement element) {
-    return Collections.map(tuple("description", description),
-            tuple("type", element.getElementType().toString()),
-            tuple("url", element.getURI().toString()));
+    return Map.of("description", description,
+            "type", element.getElementType().toString(),
+            "url", element.getURI().toString());
   }
 
   private Map<String, String> getWorkspaceCollectionParams(String description, String collectionId, URI url) {

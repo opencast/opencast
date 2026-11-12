@@ -507,3 +507,156 @@ An entry for a playlist as a JSON object. There are different kinds of entries:
 | `id`        | [`long`](types.md#basic)   | Identifier. Will be created if not set.                                                                                                                               |
 | `contentId` | [`string`](types.md#basic) | Identifier for the content of the entry. What the "content" is is defined by `type`.                                                                                  |
 | `type`      | [`string`](types.md#basic) | Enumeration, current possible values are EVENT, INACCESSIBLE. Typically EVENT, set to INACCESSIBLE by Opencast if the requesting user lacks permissions on the event. |
+
+## LifeCycle Management
+
+### LifeCycle Policy Action Parameters
+
+#### START_WORKFLOW Action Parameters
+
+A JSON object that expects specific fields.
+
+| Field                | Type                       | Description                                  |
+|----------------------|----------------------------|----------------------------------------------|
+| `workflowId`         | [`string`](types.md#basic) | Required. Identifier of the workflow to run. |
+| `workflowParameters` | [`object`](types.md#basic) | Workflow config. Key-Value pairs.            |
+
+```json
+{
+  "workflowId": "schedule-and-publish",
+  "workflowParameters": {
+    "straightToPublishing": true
+  }
+}
+```
+
+### LifeCycle Policy Filters
+
+A JSON object specifying "fields" that events can be filtered by.
+
+| Field   | Type                            | Description                                                                       |
+|---------|---------------------------------|-----------------------------------------------------------------------------------|
+| `value` | [`object`](types.md#basic)      | Required. The value to filter the field by.                                       |
+| `type`  | [`enumeration`](types.md#basic) | Query type. Possible values: SEARCH, WILDCARD. Default: SEARCH                    |
+| `must`  | [`boolean`](types.md#basic)     | Whether the value must be in the field or must not be in the field. Default: true |
+
+Example: Get all events with the series "banana", which do not have the word "conference" anywhere in their description.
+
+```json
+{
+  "series_name": {
+    "value": "banana"
+  },
+  "description": {
+    "value": "*conference*",
+    "type": "WILDCARD",
+    "must": false
+  }
+}
+```
+
+Example: Get all events whose start date lies in a specified range, that do not have "Albert Einstein" as a presenter
+and "conference" anywhere in their title.
+
+```json
+{
+  "start_date_range": {
+    "value": "2023-11-30T16:16:47Z/2025-11-30T16:16:47Z"
+  },
+  "presenter": {
+    "value": "Albert Einstein",
+    "must": false
+  },
+  "title": {
+    "value": "*conference*",
+    "type": "WILDCARD",
+    "must": false
+  }
+}
+```
+
+Example: Get all events with a start date older than 2 years from now (where "now" is every time the policy runs)
+that do not have "Albert Einstein" as a presenter, "conference" anywhere in their title and the series "Archive".
+
+```json
+{
+  "start_date_relative": {
+    "value": "-P2Y0M0D",
+    "type": "LESS_THAN"
+  },
+  "presenter": {
+    "value": "Albert Einstein",
+    "must": false
+  },
+  "title": {
+    "value": "*conference*",
+    "type": "WILDCARD",
+    "must": false
+  },
+  "series_name": {
+    "value": "Archive",
+    "must": false
+  }
+}
+```
+
+Example: Get all events with series “08/15 Algebra - 2024” three days after the actual lecture recording happened.
+
+```json
+{
+  "series_name": {
+    "value": "08/15 Algebra - 2024"
+  } ,
+  "start_date_relative": {
+    "value": "-P0Y0M3D",
+    "type": "LESS_THAN"
+  }
+}
+```
+
+#### Types
+
+- SEARCH: The given value must match the value in the field exactly. (default)
+- WILDCARD: The given string must match the value in the field exactly, unless wildcard characters are specified.
+  Supported wildcard characters are:
+  - `?`, which matches any single character
+  - `*`, which can match zero or more characters, including an empty one
+  Avoid beginning patterns with * or ?. This can increase the iterations needed to find matching terms and slow search performance.
+  Matches alphabetically, and not by date.  `2024-10-*` will not match dates in October of 2024.
+- GREATER_THAN: The given value is greater than the value in field.
+  Can only be used for dates.
+- LESS_THAN: The given value is less than the value in field.
+  Can only be used for dates.
+
+#### Supported filter fields
+
+| Field                 | Type                       | Description                                                                                                           |
+|-----------------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `title`               | [`string`](types.md#basic) | Metadata title                                                                                                        |
+| `description`         | [`string`](types.md#basic) | Metadata description                                                                                                  |
+| `presenter`           | [`string`](types.md#basic) | Metadata presenter. Can be specified multiple times                                                                   |
+| `contributor`         | [`string`](types.md#basic) | Metadata contributor. Can be specified multiple times                                                                 |
+| `subject`             | [`string`](types.md#basic) | Metadata subject                                                                                                      |
+| `location`            | [`string`](types.md#basic) | Metadata location                                                                                                     |
+| `series_id`           | [`string`](types.md#basic) | Metadata series id                                                                                                    |
+| `series_name`         | [`string`](types.md#basic) | Metadata series name                                                                                                  |
+| `language`            | [`string`](types.md#basic) | Metadata language                                                                                                     |
+| `source`              | [`string`](types.md#basic) | Metadata source                                                                                                       |
+| `created`             | [`date`](types.md#basic)   | Metadata created                                                                                                      |
+| `creator`             | [`string`](types.md#basic) | Metadata creator                                                                                                      |
+| `publisher`           | [`string`](types.md#basic) | Metadata publisher                                                                                                    |
+| `license`             | [`string`](types.md#basic) | Metadata license                                                                                                      |
+| `rights`              | [`string`](types.md#basic) | Metadata rights                                                                                                       |
+| `start_date`          | [`string`](types.md#basic) | Metadata start date                                                                                                   |
+| `start_date_relative` | [`string`](types.md#basic) | Period. Added to "now" when policy is checked and compared to the Metadata start date. Format: period (i.e. -P0Y0M2D) |
+
+
+Fields that are also supported, but for which only a value can be specified:
+
+| Field                 | Type                       | Description                                                                                                           |
+|-----------------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `identifier`          | [`string`](types.md#basic) | Metadata id                                                                                                           |
+| `start_date_range`    | [`string`](types.md#basic) | Metadata start date in between two dates. Format: date/date                                                           |
+
+
+

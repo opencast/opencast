@@ -640,6 +640,31 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         } catch (IOException e) {
           throw new IllegalStateException("Error unmarshaling job", e);
         }
+        if (job.getParentJobId() != null && job.getParentJobId().equals(id)) {
+          result.add(job);
+        }
+      }
+    }
+    result.sort(Comparator.comparing(Job::getDateCreated));
+    return result;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getDescendantJobs(long)
+   */
+  @Override
+  public List<Job> getDescendantJobs(long id) throws ServiceRegistryException {
+    List<Job> result = new ArrayList<Job>();
+    synchronized (jobs) {
+      for (String serializedJob : jobs.values()) {
+        Job job = null;
+        try {
+          job = JobParser.parseJob(serializedJob);
+        } catch (IOException e) {
+          throw new IllegalStateException("Error unmarshaling job", e);
+        }
         if (job.getParentJobId() == null) {
           continue;
         }

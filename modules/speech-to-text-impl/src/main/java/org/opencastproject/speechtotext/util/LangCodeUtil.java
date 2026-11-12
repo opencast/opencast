@@ -43,8 +43,8 @@ public final class LangCodeUtil {
 
   static {
     for (String languageCode : Locale.getISOLanguages()) {
-      Locale locale = new Locale(languageCode);
-      String languageName = locale.getDisplayLanguage(new Locale("en"));
+      Locale locale = Locale.of(languageCode);
+      String languageName = locale.getDisplayLanguage(Locale.of("en"));
       langNameToIso2Map.put(languageName, languageCode);
       String languageISO3 = locale.getISO3Language();
       iso3ToIso2Map.put(languageISO3, languageCode);

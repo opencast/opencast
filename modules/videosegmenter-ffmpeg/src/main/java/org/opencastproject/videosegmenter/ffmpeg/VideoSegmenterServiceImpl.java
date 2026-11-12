@@ -814,13 +814,18 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
       // calculate errors for "normal" and filtered segmentation
       // and compare them to find better optimization.
       // "normal"
-      OptimizationStep currentStep = new OptimizationStep(changesThresholdLocal, segments.size(), prefNumberLocal,
-              mpeg7, segments);
+      OptimizationStep currentStep = new OptimizationStep(
+          changesThresholdLocal,
+          segments.size(),
+          prefNumberLocal,
+          mpeg7, segments);
       // filtered
       LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
       OptimizationStep currentStepFiltered = new OptimizationStep(
-              changesThresholdLocal, 0,
-              prefNumberLocal, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
+          changesThresholdLocal,
+          0,
+          prefNumberLocal,
+          filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
       currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
 
       logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
@@ -969,8 +974,13 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
 
     // if no reasonable segmentation could be found, instead return a uniform segmentation
     if (tmpSegments.size() < absoluteMinLocal || tmpSegments.size() > absoluteMaxLocal) {
-      mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
+      //NB: run these log lines first!  The uniformSegmentation below *overwrites* tmpSegments!
       logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
+      logger.debug("{}, too few segments? {}, {} < {}",
+          track.getIdentifier(), tmpSegments.size() < absoluteMinLocal, tmpSegments.size(), absoluteMinLocal);
+      logger.debug("{} too many segments? {}, {} > {}",
+          track.getIdentifier(), tmpSegments.size() > absoluteMaxLocal, tmpSegments.size(), absoluteMaxLocal);
+      mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
     }
 
     return mpeg7;
@@ -1056,7 +1066,8 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
               .createSegment("segment-" + segmentcount);
           segment.setMediaTime(new MediaRelTimeImpl(starttime,
               endtime - starttime));
-          logger.debug("Created segment {} at start time {} with duration {}", segmentcount, starttime, endtime);
+          logger.debug("Created segment {} at start time {} with duration {}", segmentcount,
+              starttime, endtime - starttime);
           segments.add(segment);
           segmentcount++;
           starttime = endtime;

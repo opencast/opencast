@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>22-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -53,6 +53,10 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
@@ -118,6 +122,11 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-gvt</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-i18n</artifactId>
       <version>${batik.version}</version>
     </dependency>
     <dependency>
@@ -205,8 +214,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <!-- provide a logger for tests -->
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>javax.servlet:javax.servlet-api</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.osgi:osgi.core</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-anim</ignoredUnusedDeclaredDependency>
@@ -218,17 +225,17 @@
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-dom</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-ext</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-gvt</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-js</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-i18n</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-parser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-script</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-svggen</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-svg-dom</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-transcoder</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-xml</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-svgrasterizer</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-rasterizer</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-util</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:xmlgraphics-commons</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>xml-apis:xml-apis</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>xml-apis:xml-apis-ext</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.mozilla:rhino</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
@@ -262,6 +269,7 @@
               batik-dom;inline=true,
               batik-ext;inline=true,
               batik-gvt;inline=true,
+              batik-i18n;inline=true,
               batik-parser;inline=true,
               batik-rasterizer;inline=true,
               batik-svgrasterizer;inline=true,

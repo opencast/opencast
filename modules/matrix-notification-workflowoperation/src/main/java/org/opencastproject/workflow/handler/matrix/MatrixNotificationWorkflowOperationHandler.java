@@ -21,11 +21,12 @@
 package org.opencastproject.workflow.handler.matrix;
 
 import static java.lang.String.format;
-import static org.apache.http.HttpStatus.SC_ACCEPTED;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.hc.core5.http.HttpStatus.SC_ACCEPTED;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.util.HttpUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -36,10 +37,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -230,21 +230,12 @@ public class MatrixNotificationWorkflowOperationHandler extends AbstractWorkflow
 
     logger.debug("Executing Matrix notification request on target {}, {} attempts left", apiUrl, maxRetry);
 
-    var config = RequestConfig.custom()
-        .setConnectTimeout(timeout * 1000)
-        .setConnectionRequestTimeout(timeout * 1000)
-        .setSocketTimeout(timeout * 1000)
-        .build();
-
-    try (var httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build()) {
+    try (var httpClient = HttpUtil.clientBuilder(timeout * 1000, timeout * 1000).build()) {
       var request = new HttpPost(apiUrl);
       request.setHeader("Authorization", "Bearer " + accessToken);
-      request.setHeader("Content-Type", "application/json");
-      request.setEntity(new StringEntity(payload));
+      request.setEntity(new StringEntity(payload, ContentType.APPLICATION_JSON));
 
-      var response = httpClient.execute(request);
-
-      var statusCode = response.getStatusLine().getStatusCode();
+      var statusCode = httpClient.execute(request, response -> response.getCode());
       if (statusCode == SC_OK || statusCode == SC_NO_CONTENT || statusCode == SC_ACCEPTED) {
         logger.debug("Matrix request successfully executed on target {}, status code: {}", apiUrl, statusCode);
         return;

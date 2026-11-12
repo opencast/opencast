@@ -34,6 +34,9 @@ public class VideoUpload {
 
   private final String title;
   private final String description;
+  private final String metadataLanguage;
+  private final String audioLanguage;
+  private final License license;
   private final String privacyStatus;
   private final File videoFile;
   private final MediaHttpUploaderProgressListener progressListener;
@@ -42,6 +45,9 @@ public class VideoUpload {
   /**
    * @param title may not be {@code null}.
    * @param description may be {@code null}.
+   * @param metadataLanguage may be {@code null}.
+   * @param audioLanguage may be {@code null}.
+   * @param license may be {@code null}.
    * @param privacyStatus may not be {@code null}.
    * @param videoFile may not be {@code null}.
    * @param progressListener may be {@code null}.
@@ -50,6 +56,9 @@ public class VideoUpload {
   public VideoUpload(
       final String title,
       final String description,
+      final String metadataLanguage,
+      final String audioLanguage,
+      final License license,
       final String privacyStatus,
       final File videoFile,
       final MediaHttpUploaderProgressListener progressListener,
@@ -57,6 +66,9 @@ public class VideoUpload {
   ) {
     this.title = title;
     this.description = description;
+    this.metadataLanguage = metadataLanguage;
+    this.audioLanguage = audioLanguage;
+    this.license = license;
     this.privacyStatus = privacyStatus;
     this.videoFile = videoFile;
     this.progressListener = progressListener;
@@ -77,6 +89,29 @@ public class VideoUpload {
    */
   public String getDescription() {
     return description;
+  }
+
+  /**
+   * The video's language.
+   * The value may be {@code null}.
+   */
+  public String getMetadataLanguage() {
+    return metadataLanguage;
+  }
+
+  /**
+   * The video's audio language.
+   * The value may be {@code null}.
+   */
+  public String getAudioLanguage() {
+    return audioLanguage;
+  }
+
+  /**
+   * The video's license.
+   */
+  public License getLicense() {
+    return license;
   }
 
   /**
@@ -109,5 +144,9 @@ public class VideoUpload {
    */
   public String[] getTags() {
     return tags;
+  }
+
+  public enum License {
+    creativeCommon, youtube
   }
 }

@@ -24,6 +24,7 @@ package org.opencastproject.capture.admin.impl;
 import static org.opencastproject.capture.admin.api.AgentState.CAPTURING;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.security.api.DefaultOrganization;
 
@@ -31,6 +32,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Properties;
 
 public class AgentTest {
   private Agent agent = null;
@@ -71,5 +74,22 @@ public class AgentTest {
     if (agent.getLastHeardFrom() <= time || agent.getLastHeardFrom() > System.currentTimeMillis()) {
       Assert.fail("Invalid checkin time");
     }
+  }
+
+  @Test
+  public void onlyKeysStartingWithTheDevicePrefixBecomeCapabilities() {
+    Properties configuration = new Properties();
+    configuration.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA");
+    configuration.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src", "/dev/video0");
+    configuration.setProperty("legacy." + CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src", "/dev/video9");
+
+    agent.setConfiguration(configuration);
+
+    Properties capabilities = agent.getCapabilities();
+    Assert.assertEquals("CAMERA", capabilities.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+    Assert.assertEquals("/dev/video0",
+        capabilities.getProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src"));
+    Assert.assertFalse("A key merely containing the device prefix must not become a capability",
+        capabilities.containsKey("legacy." + CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src"));
   }
 }

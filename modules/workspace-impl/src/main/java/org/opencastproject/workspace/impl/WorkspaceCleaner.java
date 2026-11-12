@@ -121,13 +121,6 @@ public class WorkspaceCleaner {
     }
   }
 
-  // just to make sure Quartz is being shut down...
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    shutdown();
-  }
-
   // --
 
   /** Quartz work horse. */

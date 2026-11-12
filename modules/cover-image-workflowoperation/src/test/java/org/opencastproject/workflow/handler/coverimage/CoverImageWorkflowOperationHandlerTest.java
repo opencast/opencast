@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -61,7 +62,7 @@ public class CoverImageWorkflowOperationHandlerTest {
     String fileUrlString = "file:/path/to/the/image.png";
     String httpUrlString = "http://foo.bar/image.png";
     String fileHttpUrlString = "file:/path/to/storage/foo_bar_image.png";
-    URL httpUri = new URL(httpUrlString);
+    URL httpUri = URI.create(httpUrlString).toURL();
     File httpFile = new File(fileHttpUrlString);
 
     // setup mock

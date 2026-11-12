@@ -21,8 +21,6 @@
 
 package org.opencastproject.graphql.command;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.event.GqlDeleteEventPayload;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
@@ -30,6 +28,8 @@ import org.opencastproject.graphql.exception.GraphQLUnauthorizedException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -47,7 +47,7 @@ public class DeleteEventCommand extends AbstractCommand<GqlDeleteEventPayload> {
   public GqlDeleteEventPayload execute() {
     OpencastContext context = OpencastContextManager.getCurrentContext();
     final IndexService indexService = context.getService(IndexService.class);
-    final ElasticsearchIndex index = context.getService(ElasticsearchIndex.class);
+    final OpenSearchIndex index = context.getService(OpenSearchIndex.class);
 
     IndexService.EventRemovalResult result;
     try {

@@ -21,10 +21,10 @@
 package org.opencastproject.security.impl.jpa;
 
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -295,7 +295,7 @@ public class JpaOrganization implements Organization {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(id);
+    return Objects.hash(id);
   }
 
   @Override

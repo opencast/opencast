@@ -21,13 +21,13 @@
 
 package org.opencastproject.security.api;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Tuple;
@@ -117,7 +117,7 @@ public final class AccessControlUtil {
     }
 
     // Check for the global and local admin role
-    if (user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole())) {
+    if (SecurityUtil.isAdmin(user, org)) {
       return true;
     }
 

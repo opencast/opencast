@@ -21,6 +21,8 @@
 
 package org.opencastproject.security.api;
 
+import java.util.Comparator;
+
 /**
  * Represent a role in Opencast
  */
@@ -48,6 +50,13 @@ public interface Role {
   enum Target {
     USER, ACL, ALL;
   }
+
+  /**
+   * Orders roles by name, ignoring case, so that e.g. "anna" is listed between "Anna" and "Leon". Names that only
+   * differ in case are ordered by their case, to keep the order stable.
+   */
+  Comparator<Role> BY_NAME = Comparator.comparing(Role::getName, String.CASE_INSENSITIVE_ORDER)
+      .thenComparing(Role::getName);
 
   /**
    * Gets the role name

@@ -20,13 +20,11 @@
  */
 package org.opencastproject.playlists;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.playlists.persistence.PlaylistDatabaseException;
 import org.opencastproject.playlists.persistence.PlaylistDatabaseService;
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
@@ -39,6 +37,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
@@ -80,7 +79,7 @@ public class PlaylistService {
   /** The authorization service */
   protected AuthorizationService authorizationService = null;
 
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
 
   /**
    * Callback to set the playlist database
@@ -116,8 +115,8 @@ public class PlaylistService {
   }
 
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Activate
@@ -170,8 +169,7 @@ public class PlaylistService {
   public List<Playlist> getAllForAdministrativeRead(Date from, Date to, int limit)
           throws IllegalStateException, UnauthorizedException {
     final var user = securityService.getUser();
-    final var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+    if (!SecurityUtil.isAdmin(user, securityService.getOrganization())) {
       throw new UnauthorizedException("Only (org-)admins can call this method");
     }
 
@@ -429,7 +427,7 @@ public class PlaylistService {
         if (entry.getType() == PlaylistEntryType.EVENT) {
 
           // We only get an event from the index if we have permission to do so (and if it exists ofc)
-          SearchResult<Event> result = elasticsearchIndex.getByQuery(
+          SearchResult<Event> result = opensearchIndex.getByQuery(
               new EventSearchQuery(org, user).withIdentifier(contentId));
           if (result.getPageSize() != 0) {
             Event event = result.getItems()[0].getSource();
@@ -456,11 +454,10 @@ public class PlaylistService {
   private boolean checkPermission(Playlist playlist, Permissions.Action action) {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
-    String currentOrgAdminRole = currentOrg.getAdminRole();
-    String currentOrgId = currentOrg.getId();
 
-    return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-        || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(playlist.getOrganization()))
+    return SecurityUtil.isGlobalAdmin(currentUser)
+        || (currentOrg.getId().equals(playlist.getOrganization())
+            && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg))
         || authorizationService.hasPermission(getAccessControlList(playlist), action.toString());
   }
 

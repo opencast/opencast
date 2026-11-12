@@ -62,8 +62,8 @@ accomplished by running the following:
 
     apt-get install opensearch opensearch-analysis-icu
 
-If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
-and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
+If you wish to use the upstream OpenSearch repository directly be aware that Opencast requires OpenSearch 3.x
+and will not work with OpenSearch 1.x or 2.x anymore.
 
 Configure OpenSearch
 --------------------
@@ -71,7 +71,7 @@ Configure OpenSearch
 After installing OpenSearch please make sure to install all necessary plugins and update the configuration.
 For details, please follow:
 
-* [Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md)
+* [Opencast OpenSearch Documentation](../configuration/searchindex/opensearch.md)
 
 When the configuration is done, start and enable OpenSearch:
 
