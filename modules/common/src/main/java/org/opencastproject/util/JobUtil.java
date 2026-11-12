@@ -30,7 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
-import org.apache.http.HttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -283,7 +283,7 @@ public final class JobUtil {
     return payloadAsMediaPackageElement(null, reg, job);
   }
 
-  public static Optional<Job> jobFromHttpResponse(HttpResponse response) {
+  public static Optional<Job> jobFromHttpResponse(ClassicHttpResponse response) {
     try {
       return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
     } catch (Exception e) {

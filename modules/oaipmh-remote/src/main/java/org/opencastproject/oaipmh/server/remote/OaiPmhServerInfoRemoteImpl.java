@@ -30,16 +30,16 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.UrlSupport;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component(
     immediate = true,
@@ -58,28 +58,30 @@ public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServ
   }
 
   @Override public boolean hasRepo(String id) {
-    Optional<HttpResponse> r = Optional.ofNullable(
-        getResponse(get(UrlSupport.concat("hasrepo", id)), HttpStatus.SC_OK)
-    );
-    if (r.isPresent()) {
+    final ClassicHttpResponse response = getResponse(get(UrlSupport.concat("hasrepo", id)), HttpStatus.SC_OK);
+    if (response != null) {
       try {
-        return Boolean.parseBoolean(EntityUtils.toString(r.get().getEntity()));
-      } catch (IOException e) {
+        return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()));
+      } catch (IOException | ParseException e) {
         logger.error("Cannot contact remote service", e);
         chuck(e);
+      } finally {
+        closeConnection(response);
       }
     }
     return false;
   }
 
   @Override public String getMountPoint() {
-    Optional<HttpResponse> r = Optional.ofNullable(getResponse(get("mountpoint"), HttpStatus.SC_OK));
-    if (r.isPresent()) {
+    final ClassicHttpResponse response = getResponse(get("mountpoint"), HttpStatus.SC_OK);
+    if (response != null) {
       try {
-        return EntityUtils.toString(r.get().getEntity());
-      } catch (IOException e) {
+        return EntityUtils.toString(response.getEntity());
+      } catch (IOException | ParseException e) {
         logger.error("Cannot contact remote service", e);
         return chuck(e);
+      } finally {
+        closeConnection(response);
       }
     }
     throw new RuntimeException("Cannot contact remote service");

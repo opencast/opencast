@@ -40,12 +40,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -102,7 +102,7 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
   @Override
   public Set<StatisticsProvider> getProviders() {
     final HttpGet get = new HttpGet("providers.json");
-    final HttpResponse response = getResponse(get, SC_OK);
+    final ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
         return jsonToProviders(EntityUtils.toString(response.getEntity(), UTF_8));
@@ -141,8 +141,8 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     queryStringParams.add(new BasicNameValuePair("resolution", resolution.name()));
     queryStringParams.add(new BasicNameValuePair("zoneId", zoneId.getId()));
     final HttpGet get = new HttpGet("timeseries/" + provider.getId() + ".json?"
-        + URLEncodedUtils.format(queryStringParams, UTF_8));
-    final HttpResponse response = getResponse(get, SC_OK);
+        + WWWFormCodec.format(queryStringParams, UTF_8));
+    final ClassicHttpResponse response = getResponse(get, SC_OK);
     try {
       if (response != null) {
         return jsonToTimeSeries(EntityUtils.toString(response.getEntity(), UTF_8));
@@ -167,8 +167,8 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     queryStringParams.add(new BasicNameValuePair("temporalResolution", temporalResolution.toString()));
     queryStringParams.add(new BasicNameValuePair("duration", duration.toString()));
 
-    final HttpGet get = new HttpGet("/writeDuration?" + URLEncodedUtils.format(queryStringParams, UTF_8));
-    final HttpResponse response = getResponse(get, SC_OK);
+    final HttpGet get = new HttpGet("/writeDuration?" + WWWFormCodec.format(queryStringParams, UTF_8));
+    final ClassicHttpResponse response = getResponse(get, SC_OK);
     closeConnection(response);
     throw new RuntimeException("Unable to get time series data from remote service");
   }
