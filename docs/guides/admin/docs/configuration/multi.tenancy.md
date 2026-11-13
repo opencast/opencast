@@ -48,7 +48,7 @@ installation, on each of the nodes.  As an example, this is what the admin node 
 
     id=tenant1
     name=Tenant 1
-    admin_role=ROLE_ADMIN
+    admin_role=ROLE_TENANT1_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
     # Hostname URL mapping
@@ -63,6 +63,13 @@ installation, on each of the nodes.  As an example, this is what the admin node 
     # Default properties for the user interface
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
+
+Give each tenant its own administrator role instead of reusing `ROLE_ADMIN`. `ROLE_ADMIN` is Opencast's *global*
+administrator role and grants administrative access across all tenants. Setting `admin_role` to a tenant-specific
+value such as `ROLE_TENANT1_ADMIN` keeps that tenant's administrators scoped to their own tenant. Note that the
+default organization (`mh_default_org`) intentionally keeps `admin_role=ROLE_ADMIN`, because its administrator is the
+system-wide administrator. When you pick a tenant-specific admin role here, make sure the tenant's security
+configuration grants it access (see Step 2).
 
 There are more options available than in this example. The easiest way of creating that file is probably to create a
 copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
@@ -92,6 +99,13 @@ used to authenticate users. The file follows the standard ways on configuring Sp
 anything that can go into a Spring Security configuration.
 
 The easiest way of creating that file is probably to create a copy of the already existing `mh_default_org.xml`.
+
+The access rules in `mh_default_org.xml` grant access using the global administrator role `ROLE_ADMIN`. If you gave the
+tenant its own administrator role in Step 1, that role needs to be granted access here as well; otherwise its
+administrators cannot use the parts of the Admin UI protected by these rules. Add the tenant-specific role alongside
+`ROLE_ADMIN` in the access rules, for example by replacing every `'ROLE_ADMIN'` with
+`'ROLE_ADMIN', 'ROLE_TENANT1_ADMIN'`. Keeping `ROLE_ADMIN` leaves access for the system-wide administrator intact. Take
+care not to alter unrelated roles that merely start with the same text, such as `ROLE_ADMIN_UI`.
 
 ### Step 3: Other Configuration
 
