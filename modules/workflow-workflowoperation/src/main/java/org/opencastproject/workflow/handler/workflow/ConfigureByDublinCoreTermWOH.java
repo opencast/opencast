@@ -84,7 +84,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
   public static final String COPY_PROPERTY = "copy";
 
   /** Name of the configuration option that enables regex matching. */
-  public static final String CHECK_REGEX = "check-regex";
+  public static final String CHECK_REGEX_PROPERTY = "check-regex";
 
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
@@ -118,8 +118,16 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     EName configuredDCTerm = EName.fromString(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
-    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX));
+    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX_PROPERTY));
 
+    Pattern pattern = null;
+    if (configuredCheckRegex) {
+      try {
+        pattern = Pattern.compile(configuredMatchValue);
+      } catch (PatternSyntaxException e) {
+        logger.warn("Skipping regex check due to invalid regex: '{}': {}", configuredMatchValue, e.getMessage());
+      }
+    }
     // Find Catalog
     Catalog[] catalogs = mediaPackage
             .getCatalogs(new MediaPackageElementFlavor(catalogType, StringUtils.lowerCase(configuredCatalog)));
@@ -137,19 +145,28 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
           if (configuredDefaultValue != null) {
             foundValue = configuredDefaultValue.equals(configuredMatchValue);
           }
-        } else if (configuredCheckRegex && isMatchValueValidRegex(configuredMatchValue)) { // Checking regex.
+        } else {
+          foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
+        }
+
+        // As a final step, we check for a regex match if none has been found so far,
+        // allowing the default checker to do their job.
+        if (configuredCheckRegex && !foundValue && !values.isEmpty() && pattern != null) {
           // We need to check each value to ensure it matches the Regex.
           for (int i = 0; i < values.size(); i++) {
             String valueString = values.get(i).getValue();
             // If any of the values match the Regex, we consider it as found.
             // We don't care about those that don't match here!
-            if (valueString.matches(configuredMatchValue)) {
+            if (pattern.matcher(valueString).matches()) {
               foundValue = true;
-              break;
+              break; // Break out of the inner loop to exit the single-value check.
             }
           }
-        } else {
-          foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
+        }
+
+        // Break out of the outer loop here to prevent foundValue from being overwritten in multi-catalog scenarios.
+        if (foundValue) {
+          break;
         }
       }
 
@@ -159,7 +176,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
         for (String key : currentOperation.getConfigurationKeys()) {
           // Ignore this operations configuration
           if (DCCATALOG_PROPERTY.equals(key) || DCTERM_PROPERTY.equals(key) || DEFAULT_VALUE_PROPERTY.equals(key)
-                  || MATCH_VALUE_PROPERTY.equals(key)) {
+                  || MATCH_VALUE_PROPERTY.equals(key) || CHECK_REGEX_PROPERTY.equals(key)) {
             continue;
           }
 
@@ -175,22 +192,5 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     } // if catalogs
 
     return createResult(mediaPackage, Action.CONTINUE);
-  }
-
-  /**
-   * Ensures that the match value is a valid regex to check each dublin core values against.
-   * @param configuredMatchValue
-   * @return
-   */
-  private Boolean isMatchValueValidRegex(String configuredMatchValue) {
-    if (configuredMatchValue == null || configuredMatchValue.isBlank()) {
-      return false;
-    }
-    try {
-      Pattern.compile(configuredMatchValue);
-      return true;
-    } catch (PatternSyntaxException e) {
-      return false;
-    }
   }
 }

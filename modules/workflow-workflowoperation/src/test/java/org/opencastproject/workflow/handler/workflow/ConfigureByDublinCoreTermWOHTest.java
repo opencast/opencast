@@ -48,12 +48,14 @@ public class ConfigureByDublinCoreTermWOHTest {
   private WorkflowOperationInstance operation;
   private MediaPackage mp;
   private Workspace workspace;
+  private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
   @Before
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(this.getClass().getResourceAsStream("/archive_mediapackage.xml"));
     mp.getCatalog("catalog-1").setURI(this.getClass().getResource("/dublincore.xml").toURI());
+    mp.getCatalog("catalog-2").setURI(this.getClass().getResource("/dublincore_second.xml").toURI());
 
     // set up the handler
     operationHandler = new ConfigureByDublinCoreTermWOH();
@@ -164,5 +166,86 @@ public class ConfigureByDublinCoreTermWOHTest {
     Map<String, String> properties = result.getProperties();
 
     Assert.assertTrue(properties == null);
+  }
+
+  @Test
+  public void testMatchCreatorEmailWithRegex() throws Exception {
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
+    operation.setConfiguration("newConfigProperty", "true");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    Map<String, String> properties = result.getProperties();
+
+    Assert.assertNotNull(properties);
+    Assert.assertTrue(properties.containsKey("newConfigProperty"));
+    Assert.assertEquals("true", properties.get("newConfigProperty"));
+  }
+
+  @Test
+  public void testNoMatchCreatorEmailWhenRegexDisabled() throws Exception {
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "false");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
+    operation.setConfiguration("newConfigProperty", "true");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    Map<String, String> properties = result.getProperties();
+
+    Assert.assertNull(properties);
+  }
+
+  @Test
+  public void testNoMatchNonEmailDCTermWithEmailRegex() throws Exception {
+    // Publisher is "University of Opencast", which is not an email
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}publisher");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
+    operation.setConfiguration("newConfigProperty", "true");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    Map<String, String> properties = result.getProperties();
+
+    Assert.assertNull(properties);
+  }
+
+  @Test
+  public void testInvalidEmailRegexDoesNotCrash() throws Exception {
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "^[a-zA-Z0-9._%+-]+@[unclosed");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
+    operation.setConfiguration("newConfigProperty", "true");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    Map<String, String> properties = result.getProperties();
+
+    Assert.assertNull(properties);
+  }
+
+  @Test
+  public void testMultiCatalogMatchPreservedWhenSecondCatalogDoesNotMatch() throws Exception {
+    // catalog-1 matches the email regex in creator, catalog-2 does not match
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
+    operation.setConfiguration("newConfigProperty", "true");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    Map<String, String> properties = result.getProperties();
+
+    Assert.assertNotNull(properties);
+    Assert.assertTrue(properties.containsKey("newConfigProperty"));
+    Assert.assertEquals("true", properties.get("newConfigProperty"));
   }
 }

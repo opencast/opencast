@@ -20,15 +20,15 @@ Parameter Table
 
 Tags and flavors can be used in combination.
 
-| configuration keys | example                              | description                                                                                        | default value |
-|--------------------|--------------------------------------|----------------------------------------------------------------------------------------------------|---------------|
-| dccatalog          | "episode" or "series"                | the subtype of catalog in which to search for `dcterm`                                             | EMPTY         |
-| dccatalog-type     | "dublincore"                         | the type of catalog in which to search for `dcterm`                                                | "dublincore"  |
-| dcterm             | "{http://purl.org/dc/terms/}creator" | the XML Expanded Name, consists of a namespace and the name of the Dublin Core term which to check | EMPTY         |
-| match-value        | "Joe Bloggs"                         | the Dublin Core term value to check for                                                            | EMPTY         |
-| default-value      | "Anon"                               | the implied value if the dubincore term is not present in the catalog                              | EMPTY         |
-| *configProperty*   | true / false                         | a configuration property and the value it will be given if a match is found                        | EMPTY         |
-| check-regex        | true / false                         | enables regex matching for the dcterm value against match-value when set to true.                  | FALSE         |
+| configuration keys | example                              | description                                                                                         | default value |
+|--------------------|--------------------------------------|-----------------------------------------------------------------------------------------------------|---------------|
+| dccatalog          | "episode" or "series"                | the subtype of catalog in which to search for `dcterm`                                              | EMPTY         |
+| dccatalog-type     | "dublincore"                         | the type of catalog in which to search for `dcterm`                                                 | "dublincore"  |
+| dcterm             | "{http://purl.org/dc/terms/}creator" | the XML Expanded Name, consists of a namespace and the name of the Dublin Core term which to check  | EMPTY         |
+| match-value        | "Joe Bloggs"                         | the Dublin Core term value to check for                                                             | EMPTY         |
+| default-value      | "Anon"                               | the implied value if the dubincore term is not present in the catalog, overriding all other checks. | EMPTY         |
+| *configProperty*   | true / false                         | a configuration property and the value it will be given if a match is found                         | EMPTY         |
+| check-regex        | true / false                         | enables regex matching for the dcterm value against match-value when set to true.                   | FALSE         |
 
 ### dccatalog
 

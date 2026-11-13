@@ -15,6 +15,12 @@
   <dcterms:publisher>
     University of Opencast
     </dcterms:publisher>
+  <dcterms:creator>
+    John Doe
+    </dcterms:creator>
+  <dcterms:creator>
+    john.doe@opencast.org
+    </dcterms:creator>
   <dcterms:identifier>
     10.0000/5819
     </dcterms:identifier>
