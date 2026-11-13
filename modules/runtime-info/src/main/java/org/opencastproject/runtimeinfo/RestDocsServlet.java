@@ -25,7 +25,6 @@ import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
 import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
 
 import org.opencastproject.runtimeinfo.rest.RestDocData;
-import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
@@ -45,8 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.Servlet;
@@ -80,21 +77,9 @@ public class RestDocsServlet extends HttpServlet {
   /** The OSGI bundle context */
   protected BundleContext bundleContext;
 
-  /** A map of global macro values for REST documentation. */
-  private Map<String, String> globalMacro;
-
   @Activate
   public void start(BundleContext bundleContext) throws Exception {
     this.bundleContext = bundleContext;
-    prepareMacros();
-  }
-
-  /** Add a list of global information, such as the server URL, to the globalMacro map. */
-  private void prepareMacros() {
-    globalMacro = new HashMap<String, String>();
-    globalMacro.put("PING_BACK_URL", bundleContext.getProperty("org.opencastproject.anonymous.feedback.url"));
-    globalMacro.put("HOST_URL", bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY));
-    globalMacro.put("LOCAL_STORAGE_DIRECTORY", bundleContext.getProperty("org.opencastproject.storage.dir"));
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
@@ -131,7 +116,6 @@ public class RestDocsServlet extends HttpServlet {
       final Object restService = bundleContext.getService(reference);
       findRestAnnotation(restService.getClass()).ifPresentOrElse(
           annotation -> {
-            globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
             RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes());
             data.setAbstract(annotation.abstractText());
 
