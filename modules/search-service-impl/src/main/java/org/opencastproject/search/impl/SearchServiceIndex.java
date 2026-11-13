@@ -265,7 +265,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
       Date modificationDate = persistence.getModificationDate(mediaPackageId);
       Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-      indexMediaPackage(mp, acl, modificationDate, deletionDate);
+      indexMediaPackage(mp, acl, modificationDate, deletionDate, Set.of());
     } catch (RuntimeException e) {
       logSkippingElement(logger, "event", mediaPackageId, e);
     }
@@ -273,10 +273,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl)
           throws SearchException, SearchServiceDatabaseException {
-    indexMediaPackage(mediaPackage, acl, null, null);
+    indexMediaPackage(mediaPackage, acl, null, null, Set.of());
   }
 
-  private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate)
+  private Set<String> indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate,
+      Set<String> processedSeriesIds)
           throws SearchException, SearchServiceDatabaseException {
     String mediaPackageId = mediaPackage.getIdentifier().toString();
     String orgId = securityService.getOrganization().getId();
@@ -322,9 +323,13 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       throw new SearchException(e);
     }
 
+    Set<String> newlyIndexed = Set.of();
     // Elasticsearch series
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      if (processedSeriesIds.contains(seriesId)) {
+        continue;
+      }
       AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
           .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
           .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
@@ -338,10 +343,12 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         request.source(seriesData);
         esIndex.getClient().index(request, RequestOptions.DEFAULT);
         logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
+        newlyIndexed.add(seriesId);
       } catch (IOException e) {
         throw new SearchException(e);
       }
     }
+    return newlyIndexed;
   }
 
   /**
@@ -525,6 +532,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       AtomicInteger current = new AtomicInteger(1);
       logIndexRebuildBegin(logger, total, "search");
       List<Tuple<MediaPackage, String>> page = null;
+      Set<String> indexedSeries = new HashSet<>();
 
       do {
         page = persistence.getAllMediaPackages(pageSize, pageOffset).collect(Collectors.toList());
@@ -544,7 +552,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
             current.getAndIncrement();
 
-            indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
+            indexedSeries.addAll(indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, indexedSeries));
           } catch (SearchServiceDatabaseException e) {
             logIndexRebuildError(logger, total, current.get(), e);
             //NB: Runtime exception thrown to escape the functional interfacing
