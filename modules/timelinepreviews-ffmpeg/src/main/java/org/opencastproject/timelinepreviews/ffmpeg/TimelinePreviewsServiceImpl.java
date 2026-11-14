@@ -102,7 +102,7 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
   public static final String OPT_RESOLUTION_X = "resolutionX";
 
   /** Default value for the horizontal resolution */
-  public static final int DEFAULT_RESOLUTION_X = 160;
+  public static final int DEFAULT_RESOLUTION_X = 320;
 
   /** Name of the constant used to retrieve the vertical resolution */
   public static final String OPT_RESOLUTION_Y = "resolutionY";
