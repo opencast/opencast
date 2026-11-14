@@ -86,10 +86,8 @@
     <feature version="[5.7.12,5.8)">spring-security</feature>
 
     <!-- LDAP support, used by opencast-security-ldap and opencast-userdirectory-ldap -->
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/${spring-security-ldap-servicemix.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/${spring-security-servicemix.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-ldap/2.4.1_1</bundle>
-    <!-- spring-security-ldap has a mandatory import of org.apache.mina.transport.socket. -->
-    <bundle>mvn:org.apache.mina/mina-core/2.1.13</bundle>
 
     <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
     <bundle>wrap:mvn:com.google.crypto.tink/tink/1.16.0$Bundle-SymbolicName=com.google.crypto.tink;Bundle-Version=1.16.0</bundle>
@@ -634,7 +632,7 @@
     <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk18on/1.78.1</bundle>
     <bundle start-level="82">mvn:org.bouncycastle/bcpkix-jdk18on/1.78.1</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas-client-wrapper/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-cas/5.7.12_4</bundle>
+    <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-cas/${spring-security-servicemix.version}</bundle>
     <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/2.6.11_1</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas/${project.version}</bundle>
   </feature>

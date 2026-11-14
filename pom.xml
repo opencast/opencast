@@ -69,11 +69,10 @@
     <spotless.version>3.10.3</spotless.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
-    <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
-    <!-- Compile-time artifact and the ServiceMix OSGi repackage installed by feature.xml must stay in
-         sync; the suffixed version is the ServiceMix rebuild of the same upstream release. -->
-    <spring-security-ldap.version>5.8.6</spring-security-ldap.version>
-    <spring-security-ldap-servicemix.version>5.8.6_1</spring-security-ldap-servicemix.version>
+    <!-- ServiceMix OSGi rebuild of ${spring-security.version}, used for the Spring Security bundles which
+         Karaf's spring-security feature does not include (CAS, LDAP). Keep both versions and the
+         spring-security feature version range in feature.xml in sync. -->
+    <spring-security-servicemix.version>5.7.12_4</spring-security-servicemix.version>
   </properties>
   <modules>
     <module>modules/admin-service</module>
@@ -1162,12 +1161,12 @@
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.spring-security-cas</artifactId>
-        <version>${spring-security-cas.version}</version>
+        <version>${spring-security-servicemix.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-ldap</artifactId>
-        <version>${spring-security-ldap.version}</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jasig.cas.client</groupId>
