@@ -42,7 +42,7 @@
     <httpcomponents-core5.version>5.4.3</httpcomponents-core5.version>
     <jackson.version>2.22.4</jackson.version>
     <jackson.annotations.version>2.22</jackson.annotations.version>
-    <jakarta.mail.version>1.6.8</jakarta.mail.version>
+    <jakarta.mail.version>2.0.2</jakarta.mail.version>
     <java.release>21</java.release>
     <jakarta.activation.version>1.2.1</jakarta.activation.version>
     <jakarta.annotation.version>1.3.5</jakarta.annotation.version>
