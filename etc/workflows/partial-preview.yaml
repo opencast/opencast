@@ -64,7 +64,7 @@ operations:
       - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
       - width: 1920
       - height: 1080
-      - target-flavor: presenter/image+work
+      - target-flavor: 'presenter/video+preview'
 
   - id: cover-image
     if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presentation_source_audio}
@@ -73,13 +73,13 @@ operations:
       - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
       - width: 1920
       - height: 1080
-      - target-flavor: 'presentation/image+work'
+      - target-flavor: 'presentation/video+preview'
 
   - id: image-to-video
     if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presenter_source_audio}
     description: Composite
     configurations:
-      - source-flavor: 'presenter/image+work'
+      - source-flavor: 'presenter/video+preview'
       - target-flavor: 'presenter/video+work'
       - duration: ${presenter_source_duration}
       - profile: image-movie.work
@@ -88,7 +88,7 @@ operations:
     if: NOT (${presenter_source_video} OR ${presentation_source_video}) AND ${presentation_source_audio}
     description: Composite
     configurations:
-      - source-flavor: 'presentation/image+work'
+      - source-flavor: 'presentation/video+preview'
       - target-flavor: 'presentation/video+work'
       - duration: ${presentation_source_duration}
       - profile: image-movie.work
@@ -115,6 +115,14 @@ operations:
     description: Tagging media package elements
     configurations:
       - source-flavors: 'presenter/preview, presentation/preview'
+      - target-tags: preview
+      - copy: false
+
+  - id: tag
+    # Adding this tags the */video+preview so that thumbnails work in direct-to-editor workflows
+    description: Tagging video preview media package elements
+    configurations:
+      - source-flavors: '*/video+preview,'
       - target-tags: preview
       - copy: false
 
