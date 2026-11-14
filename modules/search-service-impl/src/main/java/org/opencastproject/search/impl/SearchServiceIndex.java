@@ -323,7 +323,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       throw new SearchException(e);
     }
 
-    Set<String> newlyIndexed = Set.of();
+    Set<String> newlyIndexed = new HashSet<>();
     // Elasticsearch series
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
