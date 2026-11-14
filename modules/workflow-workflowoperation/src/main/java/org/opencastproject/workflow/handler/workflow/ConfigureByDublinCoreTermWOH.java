@@ -36,6 +36,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -46,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -80,6 +83,9 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
 
+  /** Name of the configuration option that enables regex matching. */
+  public static final String CHECK_REGEX_PROPERTY = "check-regex";
+
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
@@ -112,7 +118,16 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     EName configuredDCTerm = EName.fromString(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
+    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX_PROPERTY));
 
+    Pattern pattern = null;
+    if (configuredCheckRegex) {
+      try {
+        pattern = Pattern.compile(configuredMatchValue);
+      } catch (PatternSyntaxException e) {
+        logger.warn("Skipping regex check due to invalid regex: '{}': {}", configuredMatchValue, e.getMessage());
+      }
+    }
     // Find Catalog
     Catalog[] catalogs = mediaPackage
             .getCatalogs(new MediaPackageElementFlavor(catalogType, StringUtils.lowerCase(configuredCatalog)));
@@ -133,6 +148,26 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
         } else {
           foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
         }
+
+        // As a final step, we check for a regex match if none has been found so far,
+        // allowing the default checker to do their job.
+        if (configuredCheckRegex && !foundValue && !values.isEmpty() && pattern != null) {
+          // We need to check each value to ensure it matches the Regex.
+          for (int i = 0; i < values.size(); i++) {
+            String valueString = values.get(i).getValue();
+            // If any of the values match the Regex, we consider it as found.
+            // We don't care about those that don't match here!
+            if (pattern.matcher(valueString).matches()) {
+              foundValue = true;
+              break; // Break out of the inner loop to exit the single-value check.
+            }
+          }
+        }
+
+        // Break out of the outer loop here to prevent foundValue from being overwritten in multi-catalog scenarios.
+        if (foundValue) {
+          break;
+        }
       }
 
       if (foundValue) {
@@ -141,7 +176,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
         for (String key : currentOperation.getConfigurationKeys()) {
           // Ignore this operations configuration
           if (DCCATALOG_PROPERTY.equals(key) || DCTERM_PROPERTY.equals(key) || DEFAULT_VALUE_PROPERTY.equals(key)
-                  || MATCH_VALUE_PROPERTY.equals(key)) {
+                  || MATCH_VALUE_PROPERTY.equals(key) || CHECK_REGEX_PROPERTY.equals(key)) {
             continue;
           }
 
