@@ -1,0 +1,15 @@
+meta {
+  name: get_event_invalid_id
+  type: http
+  seq: 28
+}
+
+get {
+  url: {{baseUrl}}/api/events/non-existent-event-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

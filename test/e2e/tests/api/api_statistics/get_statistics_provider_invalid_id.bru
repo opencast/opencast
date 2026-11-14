@@ -1,0 +1,15 @@
+meta {
+  name: get_statistics_provider_invalid_id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/statistics/providers/non-existent-provider-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}

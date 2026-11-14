@@ -1,0 +1,27 @@
+meta {
+  name: post_statistics_data
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/statistics/data/query
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  data: [{"provider":{"identifier":"a-statistics-provider"},"parameters":{"resourceId":"23413432-5a15-328e-aafe-562a2bae6800","from":"2019-04-10T13:45:32Z","to":"2019-04-12T00:00:00Z","dataResolution":"daily"}}]
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Querying an unknown statistics provider should be rejected", function() {
+    // develop.opencast.org has no statistics providers (InfluxDB) configured,
+    // so querying deterministically returns 400.
+    expect(res.status).to.equal(400);
+  });
+}

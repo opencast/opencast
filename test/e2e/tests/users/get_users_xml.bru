@@ -1,0 +1,25 @@
+meta {
+  name: get_users_xml
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/users/users.xml
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Users XML response should have correct tags", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<users");
+    expect(body).to.include("<user");
+  });
+}

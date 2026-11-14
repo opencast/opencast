@@ -1,0 +1,35 @@
+meta {
+  name: get_agents
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/agents
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Response should be an array of capture agents", function() {
+    expect(res.getBody()).to.be.an('array');
+  });
+  
+  test("Capture agent properties should have correct types", function() {
+    const body = res.getBody();
+    if (body.length > 0) {
+      const agent = body[0];
+      expect(agent.agent_id).to.be.a('string');
+      expect(agent.status).to.be.a('string');
+      expect(agent.inputs).to.be.an('array');
+      if (agent.update) {
+        expect(agent.update).to.be.a('string');
+      }
+      expect(agent.url).to.be.a('string');
+    }
+  });
+}

@@ -1,0 +1,19 @@
+meta {
+  name: delete_group
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/groups/:groupId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  groupId: {{groupId}}
+}
+
+assert {
+  res.status: eq 204
+}

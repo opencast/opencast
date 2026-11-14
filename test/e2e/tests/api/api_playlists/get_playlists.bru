@@ -1,0 +1,40 @@
+meta {
+  name: get_playlists
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/playlists
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Playlists structure should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      const playlists = Array.isArray(body) ? body : (body.playlist || []);
+      expect(playlists).to.be.an('array');
+      if (playlists.length > 0) {
+        const pl = playlists[0].playlist || playlists[0];
+        expect(pl.title).to.be.a('string');
+        expect(pl.description).to.be.a('string');
+        expect(pl.id).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+        if (pl.organization !== undefined) expect(pl.organization).to.be.a('string');
+        if (pl.creator !== undefined) expect(pl.creator).to.be.a('string');
+        expect(pl.updated).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+        expect(pl.entries).to.be.an('array');
+        expect(pl.accessControlEntries).to.be.an('array');
+      }
+    }
+  });
+}

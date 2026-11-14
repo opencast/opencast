@@ -1,0 +1,35 @@
+meta {
+  name: post_series
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/series
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  metadata: [{"flavor": "dublincore/series", "fields": [{"id": "title", "value": "Test Series"}]}]
+  acl: [{"allow": true, "action": "read", "role": "ROLE_ANONYMOUS"}]
+}
+
+vars:post-response {
+  identifier: res.body.identifier
+}
+
+assert {
+  res.status: eq 201
+  res.body.identifier: isDefined
+}
+
+tests {
+  test("Create series response should have correct types", function() {
+    if (res.status === 201) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      expect(body.identifier).to.be.a('string');
+    }
+  });
+}

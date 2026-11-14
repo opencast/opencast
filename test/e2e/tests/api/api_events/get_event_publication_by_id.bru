@@ -1,0 +1,26 @@
+meta {
+  name: get_event_publication_by_id
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId/publications/:publicationId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+  publicationId: engage-player
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Publication should not be found as the event is not published", function() {
+    expect(res.status).to.equal(404);
+  });
+}

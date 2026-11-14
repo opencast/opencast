@@ -1,0 +1,30 @@
+meta {
+  name: get_workflow_definitions
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/workflow-definitions?limit=5&offset=0
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Workflow definitions list should have correct types", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    if (body.length > 0) {
+      const item = body[0];
+      expect(item.title).to.be.a('string');
+      expect(item.description).to.be.a('string');
+      expect(item.tags).to.be.an('array');
+      if (item.configuration_panel !== undefined) expect(item.configuration_panel).to.be.a('string');
+      if (item.operations !== undefined) expect(item.operations).to.be.an('array');
+    }
+  });
+}

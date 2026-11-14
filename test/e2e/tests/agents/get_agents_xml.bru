@@ -1,0 +1,23 @@
+meta {
+  name: get_agents_xml
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/agents.xml
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get capture agents XML should return valid XML document", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.match(/<(ns2:)?agents/);
+  });
+}
