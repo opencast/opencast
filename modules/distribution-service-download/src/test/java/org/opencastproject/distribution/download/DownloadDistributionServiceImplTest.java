@@ -68,6 +68,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -167,7 +168,7 @@ public class DownloadDistributionServiceImplTest {
     EasyMock.expect(cc.getProperties()).andReturn(p).anyTimes();
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
     EasyMock.replay(bc, cc);
-    service.activate(cc);
+    service.activate(cc, new HashMap<>());
   }
 
   @After

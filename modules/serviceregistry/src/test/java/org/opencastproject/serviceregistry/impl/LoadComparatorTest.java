@@ -34,9 +34,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -144,7 +144,7 @@ public class LoadComparatorTest {
 
   @Test
   public void testLoadComparatorEncodingObeysGeneralContractWithEncodingWorkers() throws Exception {
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(ServiceRegistryJpaImpl.OPT_ENCODING_THRESHOLD, "0.5");
     for (long seed = 0; seed < 10; seed++) {
       SystemLoad systemLoad = new SystemLoad();

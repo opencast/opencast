@@ -27,13 +27,14 @@ import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SigningMediaPackageSerializerTest {
   @Test
   public void testUpdated() throws ConfigurationException {
     Long testValue = 1339L;
-    Properties properties = new Properties();
+    Map<String, Object> properties = new HashMap<>();
     SigningMediaPackageSerializer serializer = new SigningMediaPackageSerializer();
     assertEquals(new Long(UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION),
         serializer.getExpirationSeconds());

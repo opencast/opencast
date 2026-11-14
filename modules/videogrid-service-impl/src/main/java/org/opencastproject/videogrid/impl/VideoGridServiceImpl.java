@@ -45,10 +45,10 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,19 +63,18 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 /** Create video grids */
 @Component(
     immediate = true,
-    service = { VideoGridService.class,ManagedService.class },
+    service = { VideoGridService.class },
     property = {
-        "service.description=Video Grid Service",
-        "service.pid=org.opencastproject.videogrid.impl.VideoGridServiceImpl"
+        "service.description=Video Grid Service"
     }
 )
-public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGridService, ManagedService {
+public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGridService {
 
   /** Configuration key for this operation's job load */
   private static final String JOB_LOAD_CONFIG = "job.load.videogrid";
@@ -107,18 +106,15 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
     super(JOB_TYPE);
   }
 
-  @Override
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
+    updated(properties);
     logger.debug("Activated videogrid service");
   }
 
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties == null) {
-      return;
-    }
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     logger.debug("Start updating videogrid service");
 
     jobLoad = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_CONFIG, JOB_LOAD_DEFAULT, serviceRegistry);
