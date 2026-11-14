@@ -22,10 +22,10 @@ h2 {
   margin-top: 35px;
 }
 
-summary {
+.abstract {
   background-color: #24425c;
   padding: 20px;
-  padding-top:30px;
+  padding-top: 30px;
   color: #ccc;
 }
 
@@ -40,6 +40,7 @@ summary {
 }
 
 .center {
+  display: block;
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -93,4 +94,20 @@ div.spaced {
 
 td.form_label {
   width: 10%;
+}
+
+details > summary {
+  cursor: pointer;
+  padding: 4px 0px;
+  text-decoration: underline;
+}
+
+.test_form_response pre {
+  width: 100%;
+  border-left: 4px solid #999;
+  padding-left: 10px;
+}
+
+.form_field_description {
+  color: #555;
 }

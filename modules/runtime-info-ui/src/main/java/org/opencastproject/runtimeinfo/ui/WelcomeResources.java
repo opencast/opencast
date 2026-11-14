@@ -67,30 +67,20 @@ public class WelcomeResources {
 
   @GET
   @Path("{path: .*}")
-  public Response img(@PathParam("path") String path) {
-    if ("".equals(path)) {
-      path = "index.html";
-    }
-    InputStream resource = getClass().getClassLoader().getResourceAsStream("ui/" + path);
-    return Objects.isNull(resource)
-        ? Response.status(NOT_FOUND).build()
-        : Response.ok().entity(resource).build();
-  }
-
-  @GET
-  @Path("{path: (img|scripts|styles)/.*}")
   public Response staticResources(@PathParam("path") final String path) {
-    InputStream resource = getClass().getClassLoader().getResourceAsStream("ui/" + path);
+    final String resourcePath = "".equals(path) ? "index.html" : path;
+    InputStream resource = getClass().getClassLoader().getResourceAsStream("ui/" + resourcePath);
+    if (Objects.isNull(resource)) {
+      return Response.status(NOT_FOUND).build();
+    }
 
-    Response.ResponseBuilder builder = Objects.isNull(resource)
-        ? Response.status(NOT_FOUND)
-        : Response.ok().entity(resource);
+    Response.ResponseBuilder builder = Response.ok().entity(resource);
 
-    int index = path.lastIndexOf(".");
+    int index = resourcePath.lastIndexOf(".");
     if (index != -1) {
-      String extension = path.substring(index + 1);
-      if (MEDIA_TYPES.containsKey(extension)) {
-        builder.type(MEDIA_TYPES.get(extension));
+      MediaType mediaType = MEDIA_TYPES.get(resourcePath.substring(index + 1));
+      if (mediaType != null) {
+        builder.type(mediaType);
       }
     }
 
