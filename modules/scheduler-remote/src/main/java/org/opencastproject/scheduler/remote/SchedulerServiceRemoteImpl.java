@@ -76,6 +76,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -192,7 +194,20 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     try {
       if (response != null && SC_CREATED == response.getCode()) {
         logger.info("Successfully added events to the scheduler service");
-        return null;
+        String eventsJson = EntityUtils.toString(response.getEntity(), UTF_8);
+        JsonArray eventsArray = GsonUtil.parse(eventsJson).getAsJsonArray();
+        Map<String, Period<ZonedDateTime>> events = new HashMap<>();
+        for (JsonElement eventElement : eventsArray) {
+          JsonObject eventJson = eventElement.getAsJsonObject();
+          ZonedDateTime eventStart = ZonedDateTime.ofInstant(
+                  Instant.ofEpochMilli(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(eventJson, "start"))),
+                  ZoneOffset.UTC);
+          ZonedDateTime eventEnd = ZonedDateTime.ofInstant(
+                  Instant.ofEpochMilli(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(eventJson, "end"))),
+                  ZoneOffset.UTC);
+          events.put(GsonUtil.getStringOrNull(eventJson, "id"), new Period<>(eventStart, eventEnd));
+        }
+        return events;
       } else if (response != null && SC_CONFLICT == response.getCode()) {
         String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
         JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
