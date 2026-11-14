@@ -50,7 +50,7 @@ public class OaiPmhElementEntity {
 
   /** The XML serialized media package element content */
   @Lob
-  @Column(name = "xml", length = 65535, nullable = false)
+  @Column(name = "xml", nullable = false)
   private String xml;
 
   /** The OAI-PMH entity belongs to this element */

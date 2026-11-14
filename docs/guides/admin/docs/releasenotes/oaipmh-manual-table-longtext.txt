@@ -1,0 +1,13 @@
+Fixed the manually created `oc_oaipmh` table DDL in the database configuration guide, which declared
+`mediapackage_xml TEXT(65535) NOT NULL`. `TEXT` in MariaDB caps the column at 65,535 *bytes* regardless of the
+`(65535)` length hint, while every other way this table can come into existence (letting Opencast/EclipseLink
+generate it) produces an unbounded `LONGTEXT` column. An oversized manifest hit the cap and failed to insert.
+
+If you created `oc_oaipmh` by hand using the old documentation, run the following to match the column Opencast
+itself would generate:
+
+    ALTER TABLE oc_oaipmh MODIFY COLUMN mediapackage_xml LONGTEXT NOT NULL;
+
+If your `oc_oaipmh` table was instead created automatically, no action is needed; it already has the correct type.
+
+See [opencast/opencast#7907](https://github.com/opencast/opencast/issues/7907).
