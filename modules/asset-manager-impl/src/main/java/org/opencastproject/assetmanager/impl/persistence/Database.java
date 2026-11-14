@@ -42,7 +42,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -117,7 +119,35 @@ public class Database {
     });
   }
 
-
+  /**
+   * Replace all properties of a media package in the given namespace.
+   *
+   * All existing properties in the namespace are deleted and the given properties are inserted in a single
+   * transaction. This avoids running one existence check and one update per property, which is a major bottleneck
+   * when storing large ACLs during a snapshot.
+   *
+   * @param mediaPackageId
+   *          The media package identifier
+   * @param namespace
+   *          The namespace whose properties are replaced
+   * @param properties
+   *          The properties to store
+   */
+  public void replaceProperties(final String mediaPackageId, final String namespace,
+          final Collection<Property> properties) {
+    db.execTx(em -> {
+      PropertyDto.deleteQuery(mediaPackageId, namespace).apply(em);
+      // Keep the last value for duplicate property IDs, matching the behavior of saving properties one by one.
+      final Map<PropertyId, Property> uniqueProperties = new LinkedHashMap<>();
+      for (final Property property : properties) {
+        uniqueProperties.put(property.getId(), property);
+      }
+      for (final Property property : uniqueProperties.values()) {
+        em.persist(PropertyDto.mk(property));
+      }
+      return null;
+    });
+  }
 
   /**
    * Claim a new version for media package <code>mpId</code>, atomically: concurrent callers are serialized by
