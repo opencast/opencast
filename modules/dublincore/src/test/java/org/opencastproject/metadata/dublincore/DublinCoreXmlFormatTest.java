@@ -94,12 +94,12 @@ public class DublinCoreXmlFormatTest {
     final Node mpNode = Xpath.mk(doc, ctx).node("//inlined:inlined/mp:mediapackage").get();
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mpNode);
     assertNotNull(mp);
-    assertEquals("10.0000/5820", mp.getIdentifier().toString());
+    assertEquals("10.0000-5820", mp.getIdentifier().toString());
     // extract episode DublinCore
     final Node dcNode = Xpath.mk(doc, ctx).node("//inlined:inlined/inlined:episode-dc/dc:dublincore").get();
     final DublinCoreCatalog dc = DublinCoreXmlFormat.read(dcNode);
     assertNotNull(dc);
-    assertEquals("10.0000/5820", DublinCores.mkOpencastEpisode(dc).getDcIdentifier().get());
+    assertEquals("10.0000-5820", DublinCores.mkOpencastEpisode(dc).getDcIdentifier().get());
   }
 
   @Test

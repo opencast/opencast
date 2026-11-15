@@ -269,7 +269,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
         final URI uri = (URI) EasyMock.getCurrentArguments()[0];
         if ("file".equals(uri.getScheme())) {
           return new File(uri);
-        } else if (uri.toString().startsWith("http://episodes/10.0000/1/publish-catalog-1/1/")) {
+        } else if (uri.toString().startsWith("http://episodes/10.0000-1/publish-catalog-1/1/")) {
           return new File(getClass().getResource("/dublincore.xml").toURI());
         } else {
           return new File(getClass().getResource("/" + uri.toString()).toURI());

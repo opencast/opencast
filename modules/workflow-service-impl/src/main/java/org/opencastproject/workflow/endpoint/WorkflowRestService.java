@@ -534,6 +534,14 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     if (mp == null || StringUtils.isBlank(workflowDefinitionXmlOrId)) {
       throw new WebApplicationException(Status.BAD_REQUEST);
     }
+    // The media package form parameter is converted by JAX-RS through
+    // MediaPackageImpl.valueOf(String), which already validates the identifiers; repeat the
+    // check here so the endpoint stays safe even if the conversion path ever changes.
+    try {
+      MediaPackageSupport.checkPathSafety(mp);
+    } catch (IllegalArgumentException e) {
+      throw new WebApplicationException(e, Status.BAD_REQUEST);
+    }
 
     WorkflowDefinition workflowDefinition;
     try {

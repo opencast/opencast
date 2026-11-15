@@ -30,7 +30,6 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -58,6 +57,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -135,7 +135,18 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         TypedQuery<SearchEntity> q = em.createNamedQuery("Search.getNoSeries", SearchEntity.class);
         List<SearchEntity> seriesList = q.getResultList();
         for (SearchEntity series : seriesList) {
-          String mpSeriesId = MediaPackageParser.getFromXml(series.getMediaPackageXML()).getSeries();
+          String mpSeriesId;
+          try {
+            mpSeriesId = MediaPackageParser.getFromXml(series.getMediaPackageXML()).getSeries();
+          } catch (Exception e) {
+            // A single broken or invalid media package (e.g. one persisted with an unsafe
+            // identifier by an older version) must not keep the search service from starting
+            logger.error(
+                "Could not parse media package {} during series data population, skipping: {}",
+                series.getMediaPackageId(),
+                e.getMessage());
+            continue;
+          }
           if (StringUtils.isNotBlank(mpSeriesId) && !mpSeriesId.equals(series.getSeriesId())) {
             logger.info("Fixing missing series ID for episode {}, series is {}", series.getMediaPackageId(),
                 mpSeriesId);
@@ -231,10 +242,14 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
                 MediaPackage mediaPackage = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
                 return Tuple.tuple(mediaPackage, entity.getOrganization().getId());
               } catch (Exception e) {
-                logger.error("Could not parse series entity: {}", e.getMessage());
-                throw new RuntimeException(e);
+                // A single broken or invalid media package (e.g. one persisted with an unsafe
+                // identifier by an older version) must not abort the whole search index rebuild
+                logger.error("Could not parse media package {}, skipping: {}", entity.getMediaPackageId(),
+                        e.getMessage());
+                return null;
               }
-            });
+            })
+            .filter(Objects::nonNull);
     } catch (Exception e) {
       logger.error("Could not parse series entity: {}", e.getMessage());
       throw new SearchServiceDatabaseException(e);
@@ -311,13 +326,18 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     try {
       for (SearchEntity entity: q.getResultList()) {
         if (entity.getMediaPackageXML() != null) {
-          episodes.add(Pair.of(
-              entity.getOrganization(),
-              MediaPackageParser.getFromXml(entity.getMediaPackageXML())));
+          try {
+            episodes.add(Pair.of(
+                entity.getOrganization(),
+                MediaPackageParser.getFromXml(entity.getMediaPackageXML())));
+          } catch (Exception e) {
+            // A single broken or invalid media package (e.g. one persisted with an unsafe
+            // identifier by an older version) must not hide the other episodes of the series
+            logger.error("Could not parse media package {}, skipping: {}", entity.getMediaPackageId(),
+                    e.getMessage());
+          }
         }
       }
-    } catch (MediaPackageException e) {
-      throw new SearchServiceDatabaseException(e);
     } finally {
       em.close();
     }
