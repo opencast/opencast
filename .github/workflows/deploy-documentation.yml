@@ -51,6 +51,8 @@ jobs:
     - name: build landing page
       if: github.ref == 'refs/heads/develop'
       working-directory: docs/guides/.infrastructure/
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         ./generate-versions
 
