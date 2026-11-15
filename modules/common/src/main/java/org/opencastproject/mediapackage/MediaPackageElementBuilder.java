@@ -22,23 +22,18 @@
 
 package org.opencastproject.mediapackage;
 
-import org.w3c.dom.Node;
-
 import java.net.URI;
 
 /**
- * A media package element builder provides factory methods for the creation and loading of media package elements from
- * files.
+ * A media package element builder provides factory methods for the creation of media package elements.
+ * <p>
+ * To read media package elements from XML, use {@link MediaPackageElementParser} instead.
+ * </p>
  */
 public interface MediaPackageElementBuilder {
 
   /**
-   * Creates a media package element from the given file that was previously accepted.
-   * <p>
-   * Since only the file is given, it is possible, that the best builder plugin cannot be uniquely identified and may
-   * require additional contraints, e. g. a matching filename. Be sure to check the documentation of the corresponding
-   * plugin for details.
-   * </p>
+   * Creates an attachment for the given location.
    *
    * @param uri
    *          the element location
@@ -49,49 +44,33 @@ public interface MediaPackageElementBuilder {
   MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException;
 
   /**
-   * Creates a media package element from the given file that was previously accepted, while <code>type</code> and
-   * <code>flavor</code> may be taken as strong hints and may both be <code>null</code>.
+   * Creates a media package element of the given type and flavor for the given location.
    * <p>
-   * If only the file is given, it is possible, that the best suited builder plugin cannot be uniquely identified and
-   * may require additional contraints, e. g. a matching filename. Be sure to check the documentation of the
-   * corresponding builder plugin for details.
+   * If <code>type</code> is <code>null</code>, an attachment is created. In that case, <code>flavor</code> must be
+   * either <code>null</code> or {@link Attachment#FLAVOR}.
    * </p>
    *
    * @param uri
    *          the element location
    * @param type
-   *          the element type
+   *          the element type, may be <code>null</code>
    * @param flavor
-   *          the element flavor
+   *          the element flavor, may be <code>null</code>
    * @return the new media package element
    * @throws UnsupportedElementException
-   *           if creating the media package element fails
+   *           if no element can be created for this type and flavor
    */
   MediaPackageElement elementFromURI(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor)
           throws UnsupportedElementException;
 
   /**
-   * Creates a media package element from the DOM element.
-   *
-   * @param elementNode
-   *          the DOM node
-   * @param serializer
-   *          the media package serializer
-   * @return the media package element
-   * @throws UnsupportedElementException
-   *           if reading the file from manifest fails
-   */
-  MediaPackageElement elementFromManifest(Node elementNode, MediaPackageSerializer serializer)
-          throws UnsupportedElementException;
-
-  /**
-   * Creates a new media package elment of the specified type.
+   * Creates a new media package element of the specified type.
    *
    * @param type
    *          the element type
    * @param flavor
    *          the element flavor
-   * @return the new media package element
+   * @return the new media package element or <code>null</code> if elements of this type cannot be created
    */
   MediaPackageElement newElement(MediaPackageElement.Type type, MediaPackageElementFlavor flavor);
 

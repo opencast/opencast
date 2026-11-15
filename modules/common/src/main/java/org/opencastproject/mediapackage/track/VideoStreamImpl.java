@@ -25,7 +25,6 @@ package org.opencastproject.mediapackage.track;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.VideoStream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,9 +36,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathException;
 
 /**
  * Implementation of {@link org.opencastproject.mediapackage.VideoStream}.
@@ -82,69 +78,6 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
 
   public VideoStreamImpl(String identifier) {
     super(identifier);
-  }
-
-  /**
-   * Create a video stream from the XML manifest.
-   *
-   * @param streamIdHint
-   *          stream ID that has to be used if the manifest does not provide one. This is the case when reading an old
-   *          manifest.
-   */
-  public static VideoStreamImpl fromManifest(String streamIdHint, Node node, XPath xpath) throws IllegalStateException,
-          XPathException {
-    // Create stream
-    String sid = (String) xpath.evaluate("@id", node, XPathConstants.STRING);
-    if (StringUtils.isEmpty(sid)) {
-      sid = streamIdHint;
-    }
-    VideoStreamImpl vs = new VideoStreamImpl(sid);
-    partialFromManifest(vs, node, xpath);
-
-    // bit rate
-    try {
-      String strBitrate = (String) xpath.evaluate("bitrate/text()", node, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(strBitrate)) {
-        vs.bitRate = Float.valueOf(strBitrate.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
-    }
-
-    // frame rate
-    try {
-      String strFrameRate = (String) xpath.evaluate("framerate/text()", node, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(strFrameRate)) {
-        vs.frameRate = Float.valueOf(strFrameRate.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Frame rate was malformatted: " + e.getMessage());
-    }
-
-    // resolution
-    String res = (String) xpath.evaluate("resolution/text()", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(res)) {
-      vs.resolution = res;
-    }
-
-    // interlacing
-    String scanType = (String) xpath.evaluate("scantype/@type", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(scanType)) {
-      if (vs.scanType == null) {
-        vs.scanType = new Scan();
-      }
-      vs.scanType.type = ScanType.fromString(scanType);
-    }
-
-    String scanOrder = (String) xpath.evaluate("interlacing/@order", node, XPathConstants.STRING);
-    if (StringUtils.isNotEmpty(scanOrder)) {
-      if (vs.scanType == null) {
-        vs.scanType = new Scan();
-      }
-      vs.scanType.order = ScanOrder.fromString(scanOrder);
-    }
-
-    return vs;
   }
 
   /**

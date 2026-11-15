@@ -24,7 +24,6 @@ package org.opencastproject.mediapackage.track;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.SubtitleStream;
 
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,9 +33,6 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathException;
 
 /**
  * Implementation of {@link org.opencastproject.mediapackage.SubtitleStream}.
@@ -50,26 +46,6 @@ public class SubtitleStreamImpl extends AbstractStreamImpl implements SubtitleSt
 
   public SubtitleStreamImpl(String identifier) {
     super(identifier);
-  }
-
-  /**
-   * Create a subtitle stream from the XML manifest.
-   *
-   * @param streamIdHint
-   *          stream ID that has to be used if the manifest does not provide one. This is the case when reading an old
-   *          manifest.
-   */
-  public static SubtitleStreamImpl fromManifest(String streamIdHint, Node node, XPath xpath)
-          throws IllegalStateException, XPathException {
-    // Create stream
-    String sid = (String) xpath.evaluate("@id", node, XPathConstants.STRING);
-    if (StringUtils.isEmpty(sid)) {
-      sid = streamIdHint;
-    }
-    SubtitleStreamImpl ss = new SubtitleStreamImpl(sid);
-    partialFromManifest(ss, node, xpath);
-
-    return ss;
   }
 
   /**

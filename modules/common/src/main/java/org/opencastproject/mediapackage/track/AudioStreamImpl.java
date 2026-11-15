@@ -25,7 +25,6 @@ package org.opencastproject.mediapackage.track;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,9 +35,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathException;
 
 /**
  * Implementation of {@link org.opencastproject.mediapackage.AudioStream}.
@@ -132,96 +128,6 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
       node.appendChild(rmspeakdbNode);
     }
     return node;
-  }
-
-  /**
-   * Create an audio stream from the XML manifest.
-   *
-   * @param streamIdHint
-   *          stream ID that has to be used if the manifest does not provide one. This is the case when reading an old
-   *          manifest.
-   */
-  public static AudioStreamImpl fromManifest(String streamIdHint, Node node, XPath xpath) throws IllegalStateException,
-          XPathException {
-    // Create stream
-    String sid = (String) xpath.evaluate("@id", node, XPathConstants.STRING);
-    if (StringUtils.isEmpty(sid)) {
-      sid = streamIdHint;
-    }
-    AudioStreamImpl as = new AudioStreamImpl(sid);
-    partialFromManifest(as, node, xpath);
-
-    // bit depth
-    try {
-      String bd = (String) xpath.evaluate("bitdepth/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(bd)) {
-        as.bitdepth = Integer.valueOf(bd.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Bit depth was malformatted: " + e.getMessage());
-    }
-
-    // channels
-    try {
-      String strChannels = (String) xpath.evaluate("channels/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(strChannels)) {
-        as.channels = Integer.valueOf(strChannels.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Number of channels was malformatted: " + e.getMessage());
-    }
-
-    // sampling rate
-    try {
-      String sr = (String) xpath.evaluate("framerate/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(sr)) {
-        as.samplingrate = Integer.valueOf(sr.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Frame rate was malformatted: " + e.getMessage());
-    }
-
-    // Bit rate
-    try {
-      String br = (String) xpath.evaluate("bitrate/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(br)) {
-        as.bitrate = Float.valueOf(br.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
-    }
-
-    // Pk lev dB
-    try {
-      String pkLev = (String) xpath.evaluate("peakleveldb/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(pkLev)) {
-        as.pkLevDb = Float.valueOf(pkLev.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("Pk lev dB was malformatted: " + e.getMessage());
-    }
-
-    // RMS lev dB
-    try {
-      String rmsLev = (String) xpath.evaluate("rmsleveldb/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(rmsLev)) {
-        as.rmsLevDb = Float.valueOf(rmsLev.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("RMS lev dB was malformatted: " + e.getMessage());
-    }
-
-    // RMS Pk dB
-    try {
-      String rmsPk = (String) xpath.evaluate("rmspeakdb/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(rmsPk)) {
-        as.rmsPkDb = Float.valueOf(rmsPk.trim());
-      }
-    } catch (NumberFormatException e) {
-      throw new IllegalStateException("RMS Pk dB was malformatted: " + e.getMessage());
-    }
-
-    return as;
   }
 
   @Override

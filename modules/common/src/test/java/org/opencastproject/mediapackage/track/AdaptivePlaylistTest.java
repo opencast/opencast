@@ -27,17 +27,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.AdaptivePlaylist.HLSMediaPackageCheck;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
@@ -52,7 +49,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
@@ -79,7 +75,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
 
 /**
  * Test case to Test the implementation of {@link AdaptivePlaylist}.
@@ -315,18 +310,6 @@ public class AdaptivePlaylistTest {
     }
   }
 
-  /**
-   * Test method for
-   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type,
- *          org.opencastproject.mediapackage.MediaPackageElementFlavor)}
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testPresenterTrackAccept() throws Exception {
-    assertTrue(new TrackBuilderPlugin().accept(new URI("uri"), Track.TYPE, MediaPackageElements.PRESENTER_SOURCE));
-  }
-
   @Test
   public void testFlavorMarshalling() throws Exception {
     adaptiveplaylist.setFlavor(MediaPackageElements.PRESENTATION_SOURCE);
@@ -363,16 +346,6 @@ public class AdaptivePlaylistTest {
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(adaptiveplaylist);
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
-
-    // And finally, using the element builder
-    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-
-    Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals(hlsUrl.toURL().toExternalForm(), t3.getURI().toURL().toExternalForm());
-
   }
 
   @Test
@@ -415,16 +388,6 @@ public class AdaptivePlaylistTest {
     String xmlFromTrack = MediaPackageElementParser.getAsXml(fragmentedFile);
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
     Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<logicalname>" + logicalName + "</logicalname>"));
-
-    // And finally, using the element builder
-    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-
-    Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals(fmp4Url, t3.getURI());
-    Assert.assertEquals(logicalName, t3.getLogicalName());
   }
 
   @Test
@@ -472,16 +435,6 @@ public class AdaptivePlaylistTest {
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
     Assert.assertFalse(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
     Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<master>true</master>"));
-
-    // And finally, using the element builder
-    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-
-    Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m3u8", t3.getURI().toURL().toExternalForm());
-    Assert.assertEquals(logicalName, t3.getLogicalName());
   }
 
   @Test
