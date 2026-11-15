@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,9 +111,10 @@ public class EventTest {
     agentConfiguration.put(agentConfigurationKey2, agentConfigurationValue2);
     agentConfiguration.put(agentConfigurationKey3, agentConfigurationValue3);
     // Setup results
-    eventJson = IOUtils.toString(getClass().getResource("/adminui_event_metadata.json"));
-    eventXml = IOUtils.toString(getClass().getResource("/adminui_event_metadata.xml"));
-    eventCAConfigJson = IOUtils.toString(getClass().getResource("/adminui_event_metadata_agent_configuration.json"));
+    eventJson = IOUtils.toString(getClass().getResource("/adminui_event_metadata.json"), StandardCharsets.UTF_8);
+    eventXml = IOUtils.toString(getClass().getResource("/adminui_event_metadata.xml"), StandardCharsets.UTF_8);
+    eventCAConfigJson = IOUtils.toString(getClass().getResource("/adminui_event_metadata_agent_configuration.json"),
+        StandardCharsets.UTF_8);
   }
 
   @Test

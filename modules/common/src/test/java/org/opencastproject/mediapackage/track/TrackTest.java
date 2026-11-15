@@ -43,6 +43,7 @@ import org.w3c.dom.Document;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -133,7 +134,7 @@ public class TrackTest {
     String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\">"
         + "<oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration>"
         + "</oc:track>";
-    inputStream = IOUtils.toInputStream(xml);
+    inputStream = IOUtils.toInputStream(xml, StandardCharsets.UTF_8);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
@@ -148,7 +149,7 @@ public class TrackTest {
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(IOUtils.toInputStream(xml));
+    Document doc = docBuilder.parse(IOUtils.toInputStream(xml, StandardCharsets.UTF_8));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
@@ -180,7 +181,7 @@ public class TrackTest {
     String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\">"
         + "<oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration>"
         + "<oc:live>true</oc:live></oc:track>";
-    inputStream = IOUtils.toInputStream(xml);
+    inputStream = IOUtils.toInputStream(xml, StandardCharsets.UTF_8);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
       Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
@@ -197,7 +198,7 @@ public class TrackTest {
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(IOUtils.toInputStream(xml));
+    Document doc = docBuilder.parse(IOUtils.toInputStream(xml, StandardCharsets.UTF_8));
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());

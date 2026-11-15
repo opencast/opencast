@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -106,7 +107,8 @@ public class UrlSigningFilterTest {
     urlSigningVerifier.updated(keys);
 
     Properties properties = new Properties();
-    properties.load(IOUtils.toInputStream(IOUtils.toString(getClass().getResource("/UrlSigningFilter.properties"))));
+    properties.load(IOUtils.toInputStream(IOUtils.toString(getClass().getResource("/UrlSigningFilter.properties"),
+        StandardCharsets.UTF_8), StandardCharsets.UTF_8));
     UrlSigningFilter filter = new UrlSigningFilter();
     filter.updated(new HashMap<>(properties.entrySet().stream()
             .collect(Collectors.toMap(

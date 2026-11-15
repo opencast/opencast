@@ -78,6 +78,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -161,7 +162,7 @@ public class VideoEditorTest {
     URL mediaUrl = VideoEditorTest.class.getResource(mediaResource);
     URL smilUrl = VideoEditorTest.class.getResource(smilResource);
     URL subtitleUrl = VideoEditorTest.class.getResource(subtitleResource);
-    String smilString = IOUtils.toString(smilUrl);
+    String smilString = IOUtils.toString(smilUrl, StandardCharsets.UTF_8);
 
     String trackParamGroupId = "pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f";
     String trackParamGroupId2 = "pg-ed341a28-c40e-4ba2-b5d1-bb4df4a5a5be";

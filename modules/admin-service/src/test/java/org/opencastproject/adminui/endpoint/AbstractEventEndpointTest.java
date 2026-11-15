@@ -114,7 +114,7 @@ public class AbstractEventEndpointTest {
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/publications.json"));
 
-    String eventString = IOUtils.toString(getClass().getResource("/eventPublications.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventPublications.json"), StandardCharsets.UTF_8);
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/publications.json")).asString();
@@ -124,7 +124,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventComments() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventComments.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventComments.json"), StandardCharsets.UTF_8);
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/comments")).asString();
@@ -134,7 +134,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventComment() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"), StandardCharsets.UTF_8);
 
     // wrong event id
     given().pathParam("eventId", "notExists").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NOT_FOUND)
@@ -152,7 +152,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testUpdateEventComment() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"), StandardCharsets.UTF_8);
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).contentType(ContentType.URLENC)
             .expect().statusCode(HttpStatus.SC_OK).when().put(rt.host("{eventId}/comment/{commentId}")).asString();
@@ -178,7 +178,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testResolveEventComment() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventCommentResolved.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventCommentResolved.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NOT_FOUND)
             .when().post(rt.host("{eventId}/comment/{commentId}"));
@@ -200,7 +200,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testDeleteEventCommentReply() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventCommentNoReply.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventCommentNoReply.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77).expect()
             .statusCode(HttpStatus.SC_NOT_FOUND).when().delete(rt.host("{eventId}/comment/{commentId}/{replyId}"));
@@ -249,7 +249,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventMetadata() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventMetadata.json"),
+        StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/metadata.json"));
@@ -268,7 +269,8 @@ public class AbstractEventEndpointTest {
     given().formParam("eventIds", "[\"notExists\", \"notExists2\"]").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
       .post(rt.host("events/metadata.json"));
 
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventsMetadata.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventsMetadata.json"),
+        StandardCharsets.UTF_8);
     String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"exists2\"]").expect()
         .statusCode(HttpStatus.SC_OK).when().post(rt.host("events/metadata.json")).asString();
 
@@ -278,7 +280,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testUpdateEventMetadata() throws Exception {
-    String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
+    String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").formParam("metadata", "metadata").expect()
             .statusCode(HttpStatus.SC_NOT_FOUND).when().put(rt.host("{eventId}/metadata"));
@@ -290,12 +292,13 @@ public class AbstractEventEndpointTest {
   @Test
   public void testUpdateEventsMetadata() throws Exception {
 
-    String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
+    String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"), StandardCharsets.UTF_8);
 
     given().formParam("eventIds", "[\"exists\", \"exists2\"]").formParam("metadata", metadataJson).expect()
       .statusCode(HttpStatus.SC_NO_CONTENT).when().put(rt.host("events/metadata"));
 
-    String updateErrors = IOUtils.toString(getClass().getResource("/eventsMetadataUpdateErrors.json"));
+    String updateErrors = IOUtils.toString(getClass().getResource("/eventsMetadataUpdateErrors.json"),
+        StandardCharsets.UTF_8);
     String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"updateFailure\"]").
         formParam("metadata", "metadata").expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when()
         .put(rt.host("events/metadata")).asString();
@@ -305,7 +308,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventScheduling() throws Exception {
-    String eventSchedulingString = IOUtils.toString(getClass().getResource("/eventScheduling.json"));
+    String eventSchedulingString = IOUtils.toString(getClass().getResource("/eventScheduling.json"),
+        StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/scheduling.json"));
@@ -339,7 +343,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetAssetList() throws Exception {
-    String assetString = IOUtils.toString(getClass().getResource("/assets.json"));
+    String assetString = IOUtils.toString(getClass().getResource("/assets.json"), StandardCharsets.UTF_8);
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/asset/assets.json")).asString();
@@ -349,7 +353,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetMediaList() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/eventMedia.json"));
+    String expected = IOUtils.toString(getClass().getResource("/eventMedia.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/asset/media/media.json"));
@@ -362,7 +366,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetMedia() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/eventMediaDetail.json"));
+    String expected = IOUtils.toString(getClass().getResource("/eventMediaDetail.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "asdasd").pathParam("id", "notFound").expect().statusCode(HttpStatus.SC_NOT_FOUND)
             .when().get(rt.host("{eventId}/asset/media/{id}.json"));
@@ -375,7 +379,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventCatalogs() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalogs.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalogs.json"),
+        StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/asset/catalog/catalogs.json"));
@@ -388,7 +393,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetCatalog() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalog.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalog.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").pathParam("id", "publish-catalog-1").expect()
             .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host("{eventId}/asset/catalog/{id}.json"));
@@ -404,7 +409,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetAttachmentsList() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventAttachments.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventAttachments.json"),
+        StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/asset/attachment/attachments.json"));
@@ -417,7 +423,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetAttachment() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/eventAttachmentSingle.json"));
+    String expected = IOUtils.toString(getClass().getResource("/eventAttachmentSingle.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").pathParam("id", "publish-attachment-2").expect()
             .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host("{eventId}/asset/attachment/{id}.json"));
@@ -437,7 +443,8 @@ public class AbstractEventEndpointTest {
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/workflows.json")).asString();
 
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflows.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflows.json"),
+        StandardCharsets.UTF_8);
 
     String result = given().pathParam("eventId", "workflowid").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/workflows.json")).asString();
@@ -447,7 +454,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventWorkflow() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflow.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflow.json"),
+        StandardCharsets.UTF_8);
 
     String path = "{eventId}/workflows/{workflowId}";
     given().pathParam("eventId", "notExists").pathParam("workflowId", "asdasd").expect()
@@ -467,7 +475,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventOperations() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperations.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperations.json"),
+        StandardCharsets.UTF_8);
 
     String path = "{eventId}/workflows/{workflowId}/operations.json";
     given().pathParam("eventId", "notExists").pathParam("workflowId", "notExists").expect()
@@ -487,7 +496,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventOperation() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperation.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperation.json"),
+        StandardCharsets.UTF_8);
 
     String path = "{eventId}/workflows/{workflowId}/operations/{operationPosition}";
 
@@ -513,7 +523,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventErrors() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventErrors.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventErrors.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").expect().statusCode(HttpStatus.SC_BAD_REQUEST)
             .when().get(rt.host("{eventId}/workflows/{workflowId}/errors.json"));
@@ -530,7 +540,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEventAccessInformation() throws Exception {
-    String eventAccessJson = IOUtils.toString(getClass().getResource("/eventAccess.json"));
+    String eventAccessJson = IOUtils.toString(getClass().getResource("/eventAccess.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/access.json"));
@@ -565,13 +575,15 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetNewProcessing() throws Exception {
-    String eventProcessingString = IOUtils.toString(getClass().getResource("/newEventProcessing.json"));
+    String eventProcessingString = IOUtils.toString(getClass().getResource("/newEventProcessing.json"),
+        StandardCharsets.UTF_8);
 
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("new/processing")).asString();
 
     assertThat(result, SameJSONAs.sameJSONAs(eventProcessingString));
 
-    eventProcessingString = IOUtils.toString(getClass().getResource("/newEventProcessing2.json"));
+    eventProcessingString = IOUtils.toString(getClass().getResource("/newEventProcessing2.json"),
+        StandardCharsets.UTF_8);
 
     result = given().queryParam("tags", "test,upload").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("new/processing")).asString();
@@ -610,8 +622,8 @@ public class AbstractEventEndpointTest {
     given().formParam("metadata", "asdt").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
             .post(rt.host("new/conflicts"));
 
-    String expected = IOUtils.toString(getClass().getResource("/conflicts.json"));
-    String metadataString = IOUtils.toString(getClass().getResource("/conflictRequest.json"));
+    String expected = IOUtils.toString(getClass().getResource("/conflicts.json"), StandardCharsets.UTF_8);
+    String metadataString = IOUtils.toString(getClass().getResource("/conflictRequest.json"), StandardCharsets.UTF_8);
 
     String result = given().formParam("metadata", metadataString).expect().statusCode(HttpStatus.SC_CONFLICT).when()
             .post(rt.host("new/conflicts")).asString();
@@ -632,7 +644,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEvents() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/events.json"));
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/events.json"), StandardCharsets.UTF_8);
 
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("events.json")).asString();
 
@@ -673,7 +685,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetPublication() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/publication.json"));
+    String expected = IOUtils.toString(getClass().getResource("/publication.json"), StandardCharsets.UTF_8);
 
     given().pathParam("eventId", "notExists").pathParam("id", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND)
             .when().get(rt.host("{eventId}/asset/publication/{id}.json"));
@@ -692,7 +704,7 @@ public class AbstractEventEndpointTest {
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/asset/publication/publications.json"));
 
-    String expected = IOUtils.toString(getClass().getResource("/publications.json"));
+    String expected = IOUtils.toString(getClass().getResource("/publications.json"), StandardCharsets.UTF_8);
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
         .get(rt.host("{eventId}/asset/publication/publications.json")).asString();

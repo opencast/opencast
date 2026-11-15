@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -382,8 +383,8 @@ public class OaiPmhRepositoryTest {
   private SearchResultItem searchResultItem(String id, Date modified, boolean deleted) {
     final String seriesDcXml = IoSupport.loadFileFromClassPathAsString("/series-dublincore.xml").get();
     final String episodeDcXml = IoSupport.loadFileFromClassPathAsString("/episode-dublincore.xml").get();
-    final DublinCoreCatalog seriesDc = DublinCores.read(IOUtils.toInputStream(seriesDcXml));
-    final DublinCoreCatalog episodeDc = DublinCores.read(IOUtils.toInputStream(episodeDcXml));
+    final DublinCoreCatalog seriesDc = DublinCores.read(IOUtils.toInputStream(seriesDcXml, StandardCharsets.UTF_8));
+    final DublinCoreCatalog episodeDc = DublinCores.read(IOUtils.toInputStream(episodeDcXml, StandardCharsets.UTF_8));
     final String mpXml = IoSupport.loadFileFromClassPathAsString("/manifest-full.xml").get();
     final String xacml = IoSupport.loadFileFromClassPathAsString("/xacml.xml").get();
     //

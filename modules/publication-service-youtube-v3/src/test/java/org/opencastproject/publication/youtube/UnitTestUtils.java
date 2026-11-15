@@ -25,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public final class UnitTestUtils {
 
@@ -38,7 +39,7 @@ public final class UnitTestUtils {
         + "\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],"
         + "\"client_x509_cert_url\":\"\",\"client_id\":\"" + clientId
         + "\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}";
-    FileUtils.writeStringToFile(file, jsonContents);
+    FileUtils.writeStringToFile(file, jsonContents, StandardCharsets.UTF_8);
     return file;
   }
 }

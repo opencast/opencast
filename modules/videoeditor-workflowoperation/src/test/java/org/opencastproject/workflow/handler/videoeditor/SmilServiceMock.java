@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public final class SmilServiceMock {
   public static SmilService createSmilServiceMock(URI mpSmilURI)
           throws IOException, SmilException, URISyntaxException, JAXBException, SAXException {
     /* Start of Smil mockups */
-    String smilString = IOUtils.toString(mpSmilURI);
+    String smilString = IOUtils.toString(mpSmilURI, StandardCharsets.UTF_8);
     String trackSrc = "abc";
 
     String trackParamGroupId = "pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f";

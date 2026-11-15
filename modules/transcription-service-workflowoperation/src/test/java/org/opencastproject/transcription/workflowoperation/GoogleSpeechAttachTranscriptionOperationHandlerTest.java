@@ -48,6 +48,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -84,11 +85,11 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
         .toURI();
     mediaPackage = builder.loadFromXml(mediaPackageURI.toURL().openStream());
     URI catalogURI = GoogleSpeechStartTranscriptionOperationHandlerTest.class.getResource("/catalog_mpe.xml").toURI();
-    String catalogXml = FileUtils.readFileToString(new File(catalogURI));
+    String catalogXml = FileUtils.readFileToString(new File(catalogURI), StandardCharsets.UTF_8);
     Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(catalogXml);
     URI attachmentURI = GoogleSpeechStartTranscriptionOperationHandlerTest.class.getResource("/attachment_mpe.xml")
         .toURI();
-    String attachmentXml = FileUtils.readFileToString(new File(attachmentURI));
+    String attachmentXml = FileUtils.readFileToString(new File(attachmentURI), StandardCharsets.UTF_8);
     Attachment attachment = (Attachment) MediaPackageElementParser.getFromXml(attachmentXml);
 
     // Service registry set up

@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 /** Test cases for {@link PublicationImpl} */
 public class PublicationImplTest {
@@ -101,14 +102,15 @@ public class PublicationImplTest {
     final String xml = MediaPackageElementParser.getAsXml(pub);
 
     final String blueprint = IOUtils.toString(PublicationImpl.class
-            .getResourceAsStream("/publication-with-elements.xml"));
+            .getResourceAsStream("/publication-with-elements.xml"), StandardCharsets.UTF_8);
     assertThat(the(xml), isEquivalentTo(the(blueprint)));
   }
 
   @Test
   public void testXmlDeserialization() throws Exception {
     final Publication pubFromXml = (Publication) MediaPackageElementParser.getFromXml(IOUtils
-            .toString(PublicationImpl.class.getResourceAsStream("/publication-with-elements.xml")));
+            .toString(PublicationImpl.class.getResourceAsStream("/publication-with-elements.xml"),
+                StandardCharsets.UTF_8));
 
     assertEquals(1, pubFromXml.getCatalogs().length);
     assertEquals(1, pubFromXml.getTracks().length);

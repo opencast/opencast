@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -52,7 +53,8 @@ public class IncidentParserTest {
     logger.info(marshaled);
     assertThat(the(marshaled),
         similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get())));
-    final Incident unmarshaled = IncidentParser.I.parseIncidentFromXml(IOUtils.toInputStream(marshaled)).toIncident();
+    final Incident unmarshaled = IncidentParser.I.parseIncidentFromXml(IOUtils.toInputStream(marshaled,
+        StandardCharsets.UTF_8)).toIncident();
     assertEquals(incident, unmarshaled);
   }
 
@@ -70,7 +72,8 @@ public class IncidentParserTest {
     assertThat(the(marshaled),
         similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml")
             .get())));
-    final IncidentTree unmarshaled = IncidentParser.I.parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled))
+    final IncidentTree unmarshaled = IncidentParser.I.parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled,
+        StandardCharsets.UTF_8))
             .toIncidentTree();
     assertEquals(tree, unmarshaled);
   }

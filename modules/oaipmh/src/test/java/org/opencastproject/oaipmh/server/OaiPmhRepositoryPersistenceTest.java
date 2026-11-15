@@ -60,6 +60,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -252,7 +253,8 @@ public class OaiPmhRepositoryPersistenceTest {
       EasyMock.replay(secSvc);
       // series service
       final SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
-      final String xacml = IOUtils.toString(OaiPmhRepositoryPersistenceTest.class.getResource("/xacml.xml").toURI());
+      final String xacml = IOUtils.toString(OaiPmhRepositoryPersistenceTest.class.getResource("/xacml.xml").toURI(),
+          StandardCharsets.UTF_8);
       final AccessControlList securityACL = AccessControlParser.parseAcl(xacml);
       EasyMock.expect(seriesService.getSeriesAccessControl("10.0000/1")).andReturn(securityACL).anyTimes();
       EasyMock.replay(seriesService);
