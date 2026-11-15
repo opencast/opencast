@@ -29,6 +29,7 @@ import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.assetmanager.util.AssetStoreDirectory;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -57,6 +58,10 @@ public class AbstractFileSystemAssetStoreTest {
   private static final String ORG_ID = "sampleOrgId";
 
   private static final String MP_ID = "sampleMediaPackageId";
+
+  private static final String PREFIXED_MP_ID = "prefixedMediaPackageId";
+
+  private static final int PREFIX_LENGTH = 2;
 
   private static final String MP_ELEM_ID = "sampleMediaPackageElementId";
 
@@ -99,10 +104,9 @@ public class AbstractFileSystemAssetStoreTest {
         return workspace;
       }
     };
-    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
-    rootDirectories.setAccessible(true);
-    rootDirectories.set(repo, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
-    repo.setupCache();
+    // The first root uses the flat layout, the second one prefix directories
+    setRootDirectories(new AssetStoreDirectory(tmpRoot.getAbsolutePath(), 0),
+        new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH));
 
     sampleElemDir = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString()).toFile();
     FileUtils.forceMkdir(sampleElemDir);
@@ -110,9 +114,71 @@ public class AbstractFileSystemAssetStoreTest {
     FileUtils.copyFile(asset, new File(sampleElemDir, MP_ELEM_ID + XML_EXTENSTION));
   }
 
+  private void setRootDirectories(AssetStoreDirectory... directories) throws Exception {
+    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
+    rootDirectories.setAccessible(true);
+    rootDirectories.set(repo, new ArrayList<>(Arrays.asList(directories)));
+    repo.setupCache();
+  }
+
+  /** The directory of a media package in the prefixed root */
+  private File prefixedMpDir(String mpId) {
+    return Paths.get(tmpRoot2.toString(), ORG_ID, AssetStoreDirectory.prefix(mpId, PREFIX_LENGTH), mpId).toFile();
+  }
+
   @After
   public void tearDown() throws Exception {
     FileUtils.forceDelete(tmpRoot);
+  }
+
+  @Test
+  public void testPutIntoPrefixedRoot() throws Exception {
+    // New media packages go to the root with the most usable space. With only the prefixed root configured, the
+    // choice does not depend on the free space of the temporary folders.
+    setRootDirectories(new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH));
+
+    StoragePath storagePath = new StoragePath(ORG_ID, PREFIXED_MP_ID, VERSION_1, MP_ELEM_ID);
+    repo.put(storagePath, Source.mk(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
+
+    File versionDir = new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_1.toString());
+    assertEquals("pr", prefixedMpDir(PREFIXED_MP_ID).getParentFile().getName());
+    assertTrue(versionDir + " should be a directory", versionDir.isDirectory());
+    assertEquals(1, versionDir.listFiles().length);
+    assertTrue(repo.contains(storagePath));
+    assertTrue(repo.get(storagePath).isPresent());
+
+    // Further versions are stored in the same root even if a flat root is searched first
+    setRootDirectories(new AssetStoreDirectory(tmpRoot.getAbsolutePath(), 0),
+        new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH));
+    StoragePath version2 = new StoragePath(ORG_ID, PREFIXED_MP_ID, VERSION_2, MP_ELEM_ID);
+    assertTrue(repo.copy(storagePath, version2));
+    assertTrue(new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_2.toString()).isDirectory());
+    assertFalse(Paths.get(tmpRoot.toString(), ORG_ID, PREFIXED_MP_ID).toFile().exists());
+  }
+
+  @Test
+  public void testDeleteFromPrefixedRoot() throws Exception {
+    File versionDir = new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_1.toString());
+    FileUtils.forceMkdir(versionDir);
+    FileUtils.copyFile(IoSupport.classPathResourceAsFile("/" + FILE_NAME).get(),
+        new File(versionDir, MP_ELEM_ID + XML_EXTENSTION));
+    StoragePath storagePath = new StoragePath(ORG_ID, PREFIXED_MP_ID, VERSION_1, MP_ELEM_ID);
+    assertTrue(repo.contains(storagePath));
+
+    assertTrue(repo.delete(DeletionSelector.delete(ORG_ID, PREFIXED_MP_ID, VERSION_1)));
+    assertFalse(repo.contains(storagePath));
+    assertFalse(prefixedMpDir(PREFIXED_MP_ID).exists());
+    // The prefix directory is kept
+    assertTrue(prefixedMpDir(PREFIXED_MP_ID).getParentFile().isDirectory());
+  }
+
+  @Test
+  public void testUnknownMediaPackage() throws Exception {
+    StoragePath storagePath = new StoragePath(ORG_ID, "unknown", VERSION_1, MP_ELEM_ID);
+    assertFalse(repo.contains(storagePath));
+    assertFalse(repo.get(storagePath).isPresent());
+    assertFalse(repo.copy(storagePath, new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID)));
+    assertFalse(repo.delete(DeletionSelector.deleteAll(ORG_ID, "unknown")));
   }
 
   @Test
@@ -238,8 +304,8 @@ public class AbstractFileSystemAssetStoreTest {
         return null;
       }
 
-      @Override protected String getRootDirectory(String orgId, String mpId) {
-        final String rootDirectory = super.getRootDirectory(orgId, mpId);
+      @Override protected AssetStoreDirectory getRootDirectory(String orgId, String mpId) {
+        final AssetStoreDirectory rootDirectory = super.getRootDirectory(orgId, mpId);
         // drop the cached entry so that every further lookup is resolved from disk again, just like it would be
         // after the cache entry expired
         onDeleteMediaPackage(orgId, mpId);
@@ -248,7 +314,9 @@ public class AbstractFileSystemAssetStoreTest {
     };
     Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
     rootDirectories.setAccessible(true);
-    rootDirectories.set(store, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
+    rootDirectories.set(store, new ArrayList<>(Arrays.asList(
+        new AssetStoreDirectory(tmpRoot.getAbsolutePath(), 0),
+        new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH))));
     store.setupCache();
 
     assertTrue(store.delete(DeletionSelector.deleteAll(ORG_ID, MP_ID)));
