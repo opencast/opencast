@@ -101,7 +101,7 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED);
     EasyMock.expect(job.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job.getDateStarted()).andReturn(new Date());
-    EasyMock.expect(job.getQueueTime()).andReturn(new Long(0));
+    EasyMock.expect(job.getQueueTime()).andReturn(Long.valueOf(0));
     EasyMock.expect(job.getPayload()).andReturn(MediaPackageElementParser.getArrayAsXml(Arrays.asList(encodedTracks)))
             .anyTimes();
     EasyMock.replay(job);

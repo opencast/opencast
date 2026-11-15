@@ -77,7 +77,7 @@ public class CropWorkflowOperationHandlerTest {
     EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED);
     EasyMock.expect(job.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job.getDateStarted()).andReturn(new Date());
-    EasyMock.expect(job.getQueueTime()).andReturn(new Long(0)).anyTimes();
+    EasyMock.expect(job.getQueueTime()).andReturn(Long.valueOf(0)).anyTimes();
     EasyMock.replay(job);
 
     // set up mock service registry

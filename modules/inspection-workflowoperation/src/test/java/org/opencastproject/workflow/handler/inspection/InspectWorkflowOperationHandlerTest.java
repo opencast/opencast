@@ -138,7 +138,7 @@ public class InspectWorkflowOperationHandlerTest {
     // set up mock receipt and inspect service providing it
     job = EasyMock.createNiceMock(Job.class);
     EasyMock.expect(job.getPayload()).andReturn(MediaPackageElementParser.getAsXml(newTrack)).anyTimes();
-    EasyMock.expect(job.getId()).andReturn(new Long(123));
+    EasyMock.expect(job.getId()).andReturn(Long.valueOf(123));
     EasyMock.expect(job.getStatus()).andReturn(Status.FINISHED);
     EasyMock.expect(job.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job.getDateStarted()).andReturn(new Date());
