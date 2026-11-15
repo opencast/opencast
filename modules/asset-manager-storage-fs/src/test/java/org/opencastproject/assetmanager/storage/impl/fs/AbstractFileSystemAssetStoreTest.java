@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
@@ -232,5 +233,75 @@ public class AbstractFileSystemAssetStoreTest {
     DeletionSelector versionSelector = DeletionSelector.delete(ORG_ID, MP_ID, VERSION_1);
     repo.delete(versionSelector);
     assertTrue(sampleElemDir.exists());
+  }
+
+  /**
+   * A media package identifier that is the current or parent directory reference or the empty
+   * string resolves the root directory lookup successfully (it collapses into an existing
+   * parent directory). The deletion must still be rejected before any file is touched.
+   */
+  @Test
+  public void testDeleteWithUnsafeMediaPackageIdIsRejected() throws Exception {
+    for (String badId : new String[] { "", ".", ".." }) {
+      try {
+        repo.delete(DeletionSelector.delete(ORG_ID, badId, VERSION_2));
+        Assert.fail("Expected the media package ID '" + badId + "' to be rejected");
+      } catch (AssetStoreException e) {
+        // intended
+      }
+    }
+    assertTrue("The stored data must be intact", sampleElemDir.exists());
+    assertEquals(1, sampleElemDir.listFiles().length);
+  }
+
+  /**
+   * A media package identifier containing a path separator can address an existing directory
+   * of another media package (here: version 2 of the sample media package, as if it was a
+   * media package of its own). The deletion must be rejected.
+   */
+  @Test
+  public void testDeleteWithSeparatorInMediaPackageIdIsRejected() throws Exception {
+    for (String badId : new String[] { MP_ID + "/" + VERSION_2, MP_ID + "\\" + VERSION_2, "x/../" + MP_ID }) {
+      try {
+        repo.delete(DeletionSelector.deleteAll(ORG_ID, badId));
+        Assert.fail("Expected the media package ID '" + badId + "' to be rejected");
+      } catch (AssetStoreException e) {
+        // intended
+      }
+    }
+    assertTrue("The stored data must be intact", sampleElemDir.exists());
+    assertEquals(1, sampleElemDir.listFiles().length);
+  }
+
+  /**
+   * Organization, media package and element identifiers are joined into the storage path, so
+   * each of them must be rejected if it is unsafe as a path component, both for writing and
+   * for reading.
+   */
+  @Test
+  public void testUnsafeStoragePathComponentsAreRejected() throws Exception {
+    final Source source = Source.mk(getClass().getClassLoader().getResource(FILE_NAME).toURI());
+    for (String bad : new String[] { "", ".", "..", "a/b", "a\\b", "../" + MP_ID }) {
+      final StoragePath[] paths = {
+          new StoragePath(bad, MP_ID, VERSION_2, MP_ELEM_ID),
+          new StoragePath(ORG_ID, bad, VERSION_2, MP_ELEM_ID),
+          new StoragePath(ORG_ID, MP_ID, VERSION_2, bad) };
+      for (StoragePath path : paths) {
+        try {
+          repo.put(path, source);
+          Assert.fail("Expected put to reject the storage path " + path);
+        } catch (AssetStoreException e) {
+          // intended
+        }
+        try {
+          repo.get(path);
+          Assert.fail("Expected get to reject the storage path " + path);
+        } catch (AssetStoreException e) {
+          // intended
+        }
+      }
+    }
+    assertEquals("Nothing must have been written next to the sample element", 1, sampleElemDir.listFiles().length);
+    assertEquals("Nothing must have been written to the store root", 1, tmpRoot.listFiles().length);
   }
 }

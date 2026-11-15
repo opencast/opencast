@@ -25,9 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.IoSupport.locked;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Prelude.sleep;
@@ -819,6 +817,7 @@ public final class WorkspaceImpl implements Workspace {
     }
     String wsDirectoryPath = PathSupport.concat(wsRoot, serverPath);
     File wsDirectory = new File(wsDirectoryPath);
+    FileSupport.requireWithinRoot(wsDirectory, new File(wsRoot));
     wsDirectory.mkdirs();
 
     String safeFileName = toSafeName(FilenameUtils.getName(uriString));
@@ -828,14 +827,28 @@ public final class WorkspaceImpl implements Workspace {
     return new File(wsDirectory, safeFileName);
   }
 
-  /** Return a file object pointing into the workspace. */
+  /**
+   * Return a file object pointing into the workspace. The path components (media package and
+   * element identifiers) are checked to stay within the workspace root (see
+   * {@link FileSupport#requireWithinRoot(File, File)}).
+   *
+   * @throws IllegalStateException
+   *         if the file is outside the workspace root
+   */
   private File workspaceFile(String... path) {
-    return new File(path(cons(String.class, wsRoot, path)));
+    return FileSupport.requireWithinRoot(Paths.get(wsRoot, path).toFile(), new File(wsRoot));
   }
 
-  /** Return a file object pointing into the working file repository. */
+  /**
+   * Return a file object pointing into the working file repository.
+   *
+   * @throws IllegalStateException
+   *         if the file is outside the working file repository root
+   */
   private File workingFileRepositoryFile(String... path) {
-    return new File(path(cons(String.class, pathMappable.getPathPrefix(), path)));
+    return FileSupport.requireWithinRoot(
+            Paths.get(pathMappable.getPathPrefix(), path).toFile(),
+            new File(pathMappable.getPathPrefix()));
   }
 
   /**

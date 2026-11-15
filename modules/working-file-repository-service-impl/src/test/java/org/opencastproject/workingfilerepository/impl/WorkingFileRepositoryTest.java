@@ -29,6 +29,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -40,6 +41,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -268,6 +271,149 @@ public class WorkingFileRepositoryTest {
     } catch (NotFoundException e) {
       Assert.assertNull(file);
     }
+  }
+
+  /**
+   * The identifier rule applies to all operations: the empty identifier, the current and parent
+   * directory references and path separators must be rejected before any file system access
+   */
+  @Test
+  public void testUnsafeIdsAreRejected() throws Exception {
+    String[] unsafeIds = new String[] { "", ".", "..", "a/b", "a\\b", "../etc" };
+    for (String badId : unsafeIds) {
+      assertIllegalArgument(() -> {
+        InputStream in = null;
+        try {
+          in = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
+          repo.put(badId, mediaPackageElementID, "file.gif", in);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
+      }, "put with unsafe media package ID '" + badId + "'");
+      assertIllegalArgument(() -> {
+        InputStream in = null;
+        try {
+          in = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
+          repo.put(mediaPackageID, badId, "file.gif", in);
+        } finally {
+          IOUtils.closeQuietly(in);
+        }
+      }, "put with unsafe element ID '" + badId + "'");
+      assertIllegalArgument(() -> repo.get(badId, mediaPackageElementID),
+              "get with unsafe media package ID '" + badId + "'");
+      assertIllegalArgument(() -> repo.get(mediaPackageID, badId), "get with unsafe element ID '" + badId + "'");
+      assertIllegalArgument(
+              () -> repo.delete(badId, mediaPackageElementID), "delete with unsafe media package ID '" + badId + "'");
+      assertIllegalArgument(() -> repo.delete(mediaPackageID, badId), "delete with unsafe element ID '" + badId + "'");
+      assertIllegalArgument(
+              () -> repo.copyTo(collectionId, filename, badId, mediaPackageElementID, "file.gif"),
+              "copyTo with unsafe media package ID '" + badId + "'");
+      assertIllegalArgument(() -> repo.copyTo(collectionId, filename, mediaPackageID, badId, "file.gif"),
+              "copyTo with unsafe element ID '" + badId + "'");
+      assertIllegalArgument(
+              () -> repo.moveTo(collectionId, filename, badId, mediaPackageElementID, "file.gif"),
+              "moveTo with unsafe media package ID '" + badId + "'");
+      assertIllegalArgument(() -> repo.moveTo(collectionId, filename, mediaPackageID, badId, "file.gif"),
+              "moveTo with unsafe element ID '" + badId + "'");
+    }
+  }
+
+  /**
+   * The collection identifier is joined into the collection path, so the read-only collection
+   * operations must reject unsafe identifiers as well, not only the ones that write to it
+   */
+  @Test
+  public void testUnsafeCollectionIdsAreRejected() throws Exception {
+    String[] unsafeIds = new String[] { "", ".", "..", "a/b", "a\\b", "../etc" };
+    for (String badId : unsafeIds) {
+      assertIllegalArgument(
+              () -> repo.getCollectionSize(badId), "getCollectionSize with unsafe collection ID '" + badId + "'");
+      assertIllegalArgument(
+              () -> repo.getCollectionContents(badId),
+              "getCollectionContents with unsafe collection ID '" + badId + "'");
+      assertIllegalArgument(
+              () -> repo.cleanupOldFilesFromCollection(badId, 3),
+              "cleanupOldFilesFromCollection with unsafe collection ID '" + badId + "'");
+      assertIllegalArgument(
+              () -> repo.getFromCollection(badId, filename),
+              "getFromCollection with unsafe collection ID '" + badId + "'");
+    }
+  }
+
+  /**
+   * A {@code ..} sequence inside an identifier component is a harmless literal file system name
+   * and must stay usable
+   */
+  @Test
+  public void testIdWithDoubleDotSequenceIsAccepted() throws Exception {
+    String mpId = "mediapackage..1";
+    String elemId = "element..1";
+    InputStream in = null;
+    try {
+      in = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
+      repo.put(mpId, elemId, "file.gif", in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+    InputStream fromRepo = null;
+    InputStream headerIn = null;
+    try {
+      fromRepo = repo.get(mpId, elemId);
+      headerIn = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
+      Assert.assertTrue(Arrays.equals(IOUtils.toByteArray(headerIn), IOUtils.toByteArray(fromRepo)));
+    } finally {
+      IOUtils.closeQuietly(fromRepo);
+      IOUtils.closeQuietly(headerIn);
+    }
+  }
+
+  /**
+   * An incomplete element (a payload without its MD5 checksum, e.g. left behind by a previously
+   * failed move) may already exist at the destination. A failed move must not delete it
+   */
+  @Test
+  public void testMoveToKeepsPreExistingDestinationOnFailure() throws Exception {
+    String toMpId = "orphan-mediapackage";
+    String toElemId = "orphan-element";
+    File destDir = Paths
+            .get(repo.rootDirectory, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, toMpId, toElemId).toFile();
+    FileUtils.forceMkdir(destDir);
+    File dest = new File(destDir, repo.toSafeName(filename));
+    FileUtils.writeStringToFile(dest, "orphan-payload", StandardCharsets.UTF_8);
+
+    try {
+      repo.moveTo(collectionId, filename, toMpId, toElemId, filename);
+      fail("Moving over a pre-existing destination must fail");
+    } catch (IllegalStateException e) {
+      // intended: the destination file already exists
+    }
+
+    // The pre-existing payload must survive the failed move untouched
+    Assert.assertTrue("Pre-existing destination must survive a failed move", dest.exists());
+    Assert.assertEquals("orphan-payload", FileUtils.readFileToString(dest, StandardCharsets.UTF_8));
+    // and so must the source in the collection
+    InputStream in = null;
+    try {
+      in = repo.getFromCollection(collectionId, filename);
+      Assert.assertNotNull(in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+  }
+
+  private static void assertIllegalArgument(ThrowingRunnable runnable, String description) {
+    try {
+      runnable.run();
+      fail(description + " must be rejected");
+    } catch (IllegalArgumentException e) {
+      // intended
+    } catch (Exception e) {
+      fail(description + " was rejected with " + e + " instead of IllegalArgumentException");
+    }
+  }
+
+  private interface ThrowingRunnable {
+    void run() throws Exception;
   }
 
 }

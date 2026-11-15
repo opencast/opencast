@@ -28,6 +28,7 @@ import static org.opencastproject.util.IoSupport.file;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
+import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -50,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public abstract class AbstractFileSystemAssetStore implements AssetStore {
@@ -146,8 +148,11 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   @Override
   public boolean delete(DeletionSelector sel) throws AssetStoreException {
-    File dir = getDeletionSelectorDir(sel);
-    if (dir == null) {
+    // Reject unsafe identifiers before they are used for anything, including the lookup of
+    // the root directory, which joins them into a path as well
+    ensureDeletionSelectorComponents(sel);
+    final File mpRootDir = new File(getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()));
+    if (mpRootDir == null) {
       // MediaPackage could not be found locally. This could mean
       //   - all snapshots live in a remote asset store
       //   - mount failed and files are temporary not available
@@ -156,6 +161,15 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
       // In any case, we cannot continue and return "false" to indicate that the files could not be found.
       return false;
     }
+    final File dir = getDeletionSelectorDir(sel);
+    // The deletion target must be exactly the media package directory (or one of its version
+    // sub-directories) below the store root — never a parent of it. The organization and
+    // media package identifiers are joined into the path, so an identifier that is the
+    // current or parent directory reference ('.' or '..') or the empty string would collapse
+    // the path into the parent directory; the check verifies the exact path shape instead of
+    // relying on lexical containment alone.
+    ensureMediaPackageShape(dir, getRootDirectory(), sel.getOrganizationId(), sel.getMediaPackageId(),
+        sel.getVersion());
     try {
       FileUtils.deleteDirectory(dir);
       // also delete the media package directory if all versions have been deleted
@@ -169,6 +183,101 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     } catch (IOException e) {
       logger.error("Error deleting directory from archive {}", dir);
       throw new AssetStoreException(e);
+    }
+  }
+
+  /**
+   * Ensures the given file lies within the given root directory (see
+   * {@link FileSupport#ensureWithinRoot(File, File)}).
+   *
+   * @param target
+   *          the file to check
+   * @param root
+   *          the root directory the file must be contained in
+   * @throws AssetStoreException
+   *         if the file is not within the root directory
+   */
+  private void ensureWithinRoot(File target, String root) throws AssetStoreException {
+    try {
+      FileSupport.ensureWithinRoot(target, new File(root));
+    } catch (IllegalArgumentException e) {
+      throw new AssetStoreException("Path is outside the asset store root " + new File(root).getAbsolutePath(), e);
+    }
+  }
+
+  /**
+   * Ensures the given directory is exactly the media package directory below the given store
+   * root, or — if a version is present — one of its version sub-directories, and nothing else.
+   * The organization and media package identifiers are joined into the path, so an identifier
+   * that is the current or parent directory reference ({@code .} or {@code ..}) or the empty
+   * string would collapse the path into a parent (or sibling) directory. Such components are
+   * already rejected by {@link #ensureDeletionSelectorComponents(DeletionSelector)}, before
+   * any lexical normalization can hide them; here, the resulting path must have exactly the
+   * shape {@code <root>/<organization>/[<prefix>/]<mediaPackage>[/version]}.
+   *
+   * @param dir
+   *          the directory to check
+   * @param rootDirectory
+   *          the store root the directory is below
+   * @param organizationId
+   *          the organization identifier
+   * @param mediaPackageId
+   *          the media package identifier
+   * @param version
+   *          the version, present if the directory is a version sub-directory
+   * @throws AssetStoreException
+   *         if the directory does not have the expected shape
+   */
+  private void ensureMediaPackageShape(File dir, String rootDirectory, String organizationId,
+          String mediaPackageId, Optional<Version> version) throws AssetStoreException {
+    // The path of the root directory is absolute and normalized, and the identifiers are
+    // resolved against it as they are
+    Path expected = new File(getRootDirectory(organizationId, mediaPackageId)).toPath()
+        .resolve(organizationId)
+        .resolve(mediaPackageId);
+    if (version.isPresent()) {
+      expected = expected.resolve(version.get().toString());
+    }
+    Path actual = dir.toPath().toAbsolutePath().normalize();
+    if (!actual.equals(expected)) {
+      throw new AssetStoreException("Deletion target " + actual + " does not point to the media package "
+              + mediaPackageId + " (expected " + expected + ")");
+    }
+  }
+
+  /**
+   * Whether the given string is unsafe to use as a single file system path component, i.e. it
+   * is the current or parent directory reference or the empty string, or it contains a path
+   * separator.
+   */
+  private static boolean isUnsafePathComponent(String component) {
+    return component == null || component.isEmpty() || ".".equals(component) || "..".equals(component)
+            || component.indexOf('/') >= 0 || component.indexOf('\\') >= 0;
+  }
+
+  /**
+   * Rejects deletion selectors whose organization or media package identifiers are unsafe as
+   * file system path components (see {@link #isUnsafePathComponent(String)}).
+   */
+  private void ensureDeletionSelectorComponents(DeletionSelector sel) throws AssetStoreException {
+    if (isUnsafePathComponent(sel.getOrganizationId()) || isUnsafePathComponent(sel.getMediaPackageId())) {
+      throw new AssetStoreException("Unsafe organization or media package identifier in deletion path: '"
+              + sel.getOrganizationId() + "/" + sel.getMediaPackageId() + "'");
+    }
+  }
+
+  /**
+   * Rejects storage paths whose organization, media package or element identifiers are unsafe
+   * as file system path components (see {@link #isUnsafePathComponent(String)}), so that the
+   * path below the store root cannot collapse into a parent (or sibling) directory.
+   */
+  private void ensureStoragePathComponents(StoragePath p) throws AssetStoreException {
+    if (isUnsafePathComponent(p.getOrganizationId()) || isUnsafePathComponent(p.getMediaPackageId())
+            || isUnsafePathComponent(p.getMediaPackageElementId())) {
+      throw new AssetStoreException(
+              "Unsafe organization, media package or element identifier in storage path: '"
+                      + p.getOrganizationId() + "/" + p.getMediaPackageId() + "/" + p.getMediaPackageElementId()
+                      + "'");
     }
   }
 
@@ -241,32 +350,48 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   /** Create a file from a storage path and an optional extension. */
   private File createFile(StoragePath p, Optional<String> extension) {
+    ensureStoragePathComponents(p);
     String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
     if (rootDirectory == null) {
       rootDirectory = getRootDirectory();
     }
-    return file(
+    final File destination = file(
             rootDirectory,
             p.getOrganizationId(),
             p.getMediaPackageId(),
             p.getVersion().toString(),
             extension.isPresent() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
                     .getMediaPackageElementId());
+    ensureWithinRoot(destination, getRootDirectory());
+    return destination;
   }
 
   /** Returns a file from a storage path if it exists, null otherwise */
   private File getExistingFile(StoragePath p, Optional<String> extension) {
+    ensureStoragePathComponents(p);
     String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
     if (rootDirectory == null) {
       return null;
     }
-    return file(
-            rootDirectory,
-            p.getOrganizationId(),
-            p.getMediaPackageId(),
-            p.getVersion().toString(),
-            extension.isPresent() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
-                    .getMediaPackageElementId());
+    final File existingFile = file(
+        rootDirectory,
+        p.getOrganizationId(),
+        p.getMediaPackageId(),
+        p.getVersion().toString(),
+        extension.isPresent() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
+            .getMediaPackageElementId());
+    ensureWithinRoot(existingFile, rootDirectory);
+    return existingFile;
+  }
+
+  /** The file of a storage path within a root directory */
+  private File filenew(String rootDirectory, StoragePath p, Optional<String> extension) {
+    return new File(getRootDirectory(p.getOrganizationId(), p.getMediaPackageId())).toPath()
+            .resolve(p.getVersion().toString())
+            .resolve(extension.isPresent()
+                ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get()
+                : p.getMediaPackageElementId())
+            .toFile();
   }
 
   /**
