@@ -436,6 +436,18 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     // Allow this if:
     //  - no previous snapshot exists
     //  - the user has write access to the previous snapshot
+    //
+    // The first-snapshot exemption is intentional: a genuinely new media package has no ACL
+    // yet, so the capture agent (and any other authenticated caller) must be able to create
+    // the first snapshot of an unknown id. This means the first snapshot of *any* id can be
+    // created without prior write access. It is not considered exploitable, because the
+    // media package id is validated against path traversal at the parse boundary (see
+    // MediaPackageSupport.checkPathSafety) and can no longer contain path separators, the
+    // organization segment of the store path is taken from the caller's security context,
+    // and the file system stores enforce that every stored path stays within the configured
+    // store roots — so a first snapshot can only be created within the caller's own
+    // organization. Changing the authorization semantics here would break standard
+    // capture-agent ingest and is therefore deliberately not part of the traversal fix.
     if (firstSnapshot) {
       // if it's the first snapshot, ensure that old, leftover properties are removed
       deleteProperties(mediaPackageId);
@@ -1134,6 +1146,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
                     snapshotOrg, t);
               }
+            }
+            // Flush what is left of this organization's snapshots. The condition above only
+            // flushes the last batch if every counted snapshot is actually processed, which
+            // is not the case if unparseable snapshots have been skipped.
+            if (!updatedEventRange.isEmpty()) {
+              index.bulkEventUpdate(updatedEventRange, securityService.getOrganization());
+              logIndexRebuildProgress(logger, total, current, n);
+              updatedEventRange.clear();
             }
           } catch (Throwable t) {
             logIndexRebuildError(logger, t, originalOrg);

@@ -399,6 +399,56 @@ public final class FileSupport {
   }
 
   /**
+   * Ensures the given file lies within the given root directory (or is the root directory
+   * itself). Organization, media package and element identifiers are joined into file system
+   * paths by several components, so every sink that builds such paths must verify the result
+   * to rule out path traversal (e.g. {@code ..} sequences) that would resolve outside the
+   * expected directory. The check is purely lexical: both paths are made absolute and
+   * normalized, and the normalized file path must start with the normalized root path. It
+   * does not resolve symlinks, so deployments that keep parts of a storage tree in symlinked
+   * directories (e.g. on separate mounts) keep working.
+   *
+   * @param file
+   *          the file to check
+   * @param root
+   *          the directory the file must be contained in
+   * @return the checked file
+   * @throws IllegalArgumentException
+   *         if the file is not within the root directory
+   */
+  public static File ensureWithinRoot(File file, File root) {
+    final Path normalizedRoot = root.toPath().toAbsolutePath().normalize();
+    final Path normalizedFile = file.toPath().toAbsolutePath().normalize();
+    if (!normalizedFile.equals(normalizedRoot) && !normalizedFile.startsWith(normalizedRoot)) {
+      throw new IllegalArgumentException("Path " + normalizedFile + " is outside of " + normalizedRoot);
+    }
+    return file;
+  }
+
+  /**
+   * Like {@link #ensureWithinRoot(File, File)}, but throws an {@link IllegalStateException}.
+   * This is the variant for code running inside a job or workflow operation: the service
+   * registry dispatcher and the workflow service interpret an {@link IllegalArgumentException}
+   * as "this service can't handle operations of this type", which would hide the rejected
+   * path behind a misleading error.
+   *
+   * @param file
+   *          the file to check
+   * @param root
+   *          the directory the file must be contained in
+   * @return the checked file
+   * @throws IllegalStateException
+   *         if the file is not within the root directory
+   */
+  public static File requireWithinRoot(File file, File root) {
+    try {
+      return ensureWithinRoot(file, root);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalStateException(e.getMessage(), e);
+    }
+  }
+
+  /**
    * Deletes the specified file and returns <code>true</code> if the file was deleted.
    * <p>
    * If <code>f</code> is a directory, it will only be deleted if it doesn't contain any other files or directories. To

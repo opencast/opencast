@@ -404,6 +404,39 @@ public class WorkspaceImplTest {
     Assert.assertEquals(expectedFile, resultingFile);
   }
 
+  /**
+   * The media package and element identifiers are joined into the workspace path. Identifiers
+   * that resolve outside the workspace root must be reported as an IllegalStateException, not
+   * as an IllegalArgumentException (which the workflow service would misinterpret)
+   */
+  @Test
+  public void testDeleteWithUnsafeMediaPackageIdThrowsIllegalStateException() throws Exception {
+    try {
+      workspace.delete("..", "../evil");
+      Assert.fail("Expected unsafe identifiers to be rejected");
+    } catch (IllegalStateException e) {
+      // intended
+    }
+  }
+
+  /**
+   * A URI with traversal segments in its path must not resolve outside the workspace root
+   */
+  @Test
+  public void testGetWithUnsafeUriThrowsIllegalStateException() throws Exception {
+    WorkingFileRepository repo = EasyMock.createNiceMock(WorkingFileRepository.class);
+    EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
+    EasyMock.replay(repo);
+    workspace.setRepository(repo);
+
+    try {
+      workspace.get(URI.create("http://foo.com/../../../evil/file.bin"));
+      Assert.fail("Expected a URI with traversal segments to be rejected");
+    } catch (IllegalStateException e) {
+      // intended
+    }
+  }
+
   @Test
   public void testCleanup() throws Exception {
     workspace.cleanup(-1);
