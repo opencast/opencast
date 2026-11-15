@@ -27,7 +27,6 @@ import static org.opencastproject.util.data.functions.Strings.split;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.rest.ErrorCodeException;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
@@ -46,6 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -56,39 +56,54 @@ public final class RestUtil {
   }
 
   /**
-   * Return the endpoint's server URL and the service path by extracting the relevant parameters from the
-   * ComponentContext.
+   * Return the service path of a REST endpoint. This is the value of the class-level JAX-RS {@link Path} annotation of
+   * the endpoint class or of its closest annotated superclass.
    *
-   * @param cc
-   *          ComponentContext to get configuration from
-   * @return (serverUrl, servicePath)
-   * @throws Error
-   *           if the service path is not configured for this component
+   * @param endpointClass
+   *          the class of the REST endpoint
+   * @return the service path, e.g. <code>/series</code>
+   * @throws IllegalArgumentException
+   *           if neither the class nor any of its superclasses is annotated with {@link Path}
    */
-  public static Tuple<String, String> getEndpointUrl(ComponentContext cc) {
-    return getEndpointUrl(cc, OpencastConstants.SERVER_URL_PROPERTY, RestConstants.SERVICE_PATH_PROPERTY);
+  public static String getServicePath(Class<?> endpointClass) {
+    for (Class<?> c = endpointClass; c != null; c = c.getSuperclass()) {
+      Path path = c.getAnnotation(Path.class);
+      if (path != null) {
+        return path.value();
+      }
+    }
+    throw new IllegalArgumentException(endpointClass.getName() + " is not annotated with @Path");
   }
 
   /**
-   * Return the endpoint's server URL and the service path by extracting the relevant parameters from the
-   * ComponentContext.
+   * Return the endpoint's server URL and service path.
    *
    * @param cc
-   *          ComponentContext to get configuration from
+   *          ComponentContext to get the server URL from
+   * @param endpointClass
+   *          the class of the REST endpoint, see {@link #getServicePath(Class)}
+   * @return (serverUrl, servicePath)
+   */
+  public static Tuple<String, String> getEndpointUrl(ComponentContext cc, Class<?> endpointClass) {
+    return getEndpointUrl(cc, OpencastConstants.SERVER_URL_PROPERTY, endpointClass);
+  }
+
+  /**
+   * Return the endpoint's server URL and service path.
+   *
+   * @param cc
+   *          ComponentContext to get the server URL from
    * @param serverUrlKey
    *          Configuration key for the server URL
-   * @param servicePathKey
-   *          Configuration key for the service path
+   * @param endpointClass
+   *          the class of the REST endpoint, see {@link #getServicePath(Class)}
    * @return (serverUrl, servicePath)
-   * @throws Error
-   *           if the service path is not configured for this component
    */
-  public static Tuple<String, String> getEndpointUrl(ComponentContext cc, String serverUrlKey, String servicePathKey) {
+  public static Tuple<String, String> getEndpointUrl(ComponentContext cc, String serverUrlKey,
+          Class<?> endpointClass) {
     final String serverUrl = Optional.ofNullable(cc.getBundleContext().getProperty(serverUrlKey)).orElse(
             UrlSupport.DEFAULT_BASE_URL);
-    final String servicePath = Optional.ofNullable((String) cc.getProperties().get(servicePathKey)).orElseThrow(
-        () -> new Error(RestConstants.SERVICE_PATH_PROPERTY + " property not configured"));
-    return tuple(serverUrl, servicePath);
+    return tuple(serverUrl, getServicePath(endpointClass));
   }
 
   /** Create a file response. */

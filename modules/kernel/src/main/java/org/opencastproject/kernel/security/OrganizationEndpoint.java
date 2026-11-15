@@ -49,7 +49,6 @@ import javax.ws.rs.core.MediaType;
     property = {
         "service.description=Organization listing REST endpoint",
         "opencast.service.type=org.opencastproject.organization",
-        "opencast.service.path=/org",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

@@ -105,7 +105,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Admin UI - Groups Endpoint",
         "opencast.service.type=org.opencastproject.adminui.GroupsEndpoint",
-        "opencast.service.path=/admin-ng/groups",
     }
 )
 @JaxrsResource

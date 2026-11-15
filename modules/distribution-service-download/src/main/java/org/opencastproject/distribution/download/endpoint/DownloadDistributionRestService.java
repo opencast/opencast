@@ -84,7 +84,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Download Distribution REST Endpoint",
         "opencast.service.type=org.opencastproject.distribution.download",
-        "opencast.service.path=/distribution/download",
         "opencast.service.jobproducer=true"
     }
 )

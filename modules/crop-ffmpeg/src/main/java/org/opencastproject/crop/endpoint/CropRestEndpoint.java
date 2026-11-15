@@ -68,7 +68,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Video Crop REST Endpoint",
         "opencast.service.type=org.opencastproject.crop",
-        "opencast.service.path=/crop",
         "opencast.service.jobproducer=true"
     }
 )

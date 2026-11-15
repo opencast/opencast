@@ -87,7 +87,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Streaming Distribution REST Endpoint",
         "opencast.service.type=org.opencastproject.distribution.streaming",
-        "opencast.service.path=/distribution/streaming",
         "opencast.service.jobproducer=true"
     }
 )

@@ -38,8 +38,7 @@ import javax.ws.rs.Path;
 @Component(
     property = {
         "service.description=Editor REST Endpoint",
-        "opencast.service.type=org.opencastproject.editor",
-        "opencast.service.path=/editor"
+        "opencast.service.type=org.opencastproject.editor"
     },
     immediate = true,
     service = EditorServiceEndpoint.class

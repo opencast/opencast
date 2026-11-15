@@ -112,7 +112,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Admin UI - ACL Endpoint",
         "opencast.service.type=org.opencastproject.adminui.AclEndpoint",
-        "opencast.service.path=/admin-ng/acl",
     }
 )
 @JaxrsResource

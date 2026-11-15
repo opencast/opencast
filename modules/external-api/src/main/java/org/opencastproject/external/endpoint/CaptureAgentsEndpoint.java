@@ -71,8 +71,7 @@ import javax.ws.rs.core.Response;
     service = CaptureAgentsEndpoint.class,
     property = {
         "service.description=External API - Capture Agents Endpoint",
-        "opencast.service.type=org.opencastproject.external.agents",
-        "opencast.service.path=/api/agents"
+        "opencast.service.type=org.opencastproject.external.agents"
     }
 )
 @JaxrsResource

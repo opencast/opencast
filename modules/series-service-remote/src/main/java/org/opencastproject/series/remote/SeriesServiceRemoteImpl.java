@@ -116,7 +116,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Series Remote Service Proxy",
         "opencast.service.type=org.opencastproject.series",
-        "opencast.service.path=/series",
         "opencast.service.publish=false"
     },
     immediate = true,

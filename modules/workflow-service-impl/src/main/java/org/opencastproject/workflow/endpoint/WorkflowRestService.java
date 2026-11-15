@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -46,6 +45,7 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -127,7 +127,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Workflow REST Endpoint",
         "opencast.service.type=org.opencastproject.workflow",
-        "opencast.service.path=/workflow",
         "opencast.service.jobproducer=true"
     }
 )
@@ -209,7 +208,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       } else {
         serverUrl = ccServerUrl;
       }
-      serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      serviceUrl = RestUtil.getServicePath(getClass());
     }
   }
 

@@ -39,7 +39,6 @@ import javax.ws.rs.Path;
     property = {
         "service.description=Editor Remote REST Endpoint",
         "opencast.service.type=org.opencastproject.editor.remote",
-        "opencast.service.path=/editor",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

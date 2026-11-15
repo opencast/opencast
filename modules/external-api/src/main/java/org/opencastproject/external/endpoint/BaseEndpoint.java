@@ -27,7 +27,6 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -90,8 +89,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     service = BaseEndpoint.class,
     property = {
         "service.description=External API - Base Endpoint",
-        "opencast.service.type=org.opencastproject.external",
-        "opencast.service.path=/api"
+        "opencast.service.type=org.opencastproject.external"
     }
 )
 @JaxrsResource
@@ -118,7 +116,7 @@ public class BaseEndpoint {
     logger.info("Activating External API - Base Endpoint");
 
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
-            RestConstants.SERVICE_PATH_PROPERTY);
+            getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }

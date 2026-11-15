@@ -65,8 +65,7 @@ import javax.ws.rs.core.Response;
 @Component(
     property = {
         "service.description=Smil Service REST Endpoint",
-        "opencast.service.type=org.opencastproject.smil",
-        "opencast.service.path=/smil"
+        "opencast.service.type=org.opencastproject.smil"
     },
     immediate = true,
     service = { SmilServiceRest.class }

@@ -41,7 +41,6 @@ import javax.ws.rs.Path;
     property = {
         "service.description=OAI-PMH server REST endpoint",
         "opencast.service.type=org.opencastproject.oaipmhinfo",
-        "opencast.service.path=/oaipmhinfo",
         "opencast.service.jobproducer=false"
     }
 )

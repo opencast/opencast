@@ -54,7 +54,6 @@ import javax.ws.rs.core.UriInfo;
     property = {
         "service.description=Redirection REST Endpoints",
         "opencast.service.type=org.opencastproject.redirect",
-        "opencast.service.path=/redirect",
         "opencast.service.jobproducer=false"
     }
 )

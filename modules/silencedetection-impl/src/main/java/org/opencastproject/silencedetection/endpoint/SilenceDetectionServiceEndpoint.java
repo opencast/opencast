@@ -62,7 +62,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Silence Detection Service REST Endpoint",
         "opencast.service.type=org.opencastproject.silencedetection",
-        "opencast.service.path=/silencedetection",
         "opencast.service.jobproducer=true"
     },
     immediate = true,

@@ -21,7 +21,6 @@
 
 package org.opencastproject.usertracking.impl;
 
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -37,8 +36,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-
-import java.util.Dictionary;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -64,13 +61,8 @@ public class UserTrackingRestServiceTest {
     EasyMock.expect(bc.getProperty(OpencastConstants.SERVER_URL_PROPERTY)).andReturn("http://www.example.org:8080")
             .anyTimes();
 
-    @SuppressWarnings("rawtypes")
-    Dictionary dict = EasyMock.createMock(Dictionary.class);
-    EasyMock.expect(dict.get(RestConstants.SERVICE_PATH_PROPERTY)).andReturn("/usertracking").anyTimes();
-
     ComponentContext context = EasyMock.createMock(ComponentContext.class);
     EasyMock.expect(context.getBundleContext()).andReturn(bc).anyTimes();
-    EasyMock.expect(context.getProperties()).andReturn(dict).anyTimes();
 
     UserActionImpl ua = EasyMock.createMock(UserActionImpl.class);
     EasyMock.expect(ua.getId()).andReturn(4L).anyTimes();
@@ -79,7 +71,7 @@ public class UserTrackingRestServiceTest {
     EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class), EasyMock.isA(UserSession.class)))
         .andReturn(ua).anyTimes();
 
-    EasyMock.replay(security, bc, dict, context, ua, usertracking);
+    EasyMock.replay(security, bc, context, ua, usertracking);
 
     service = new UserTrackingRestService();
     service.setSecurityService(security);

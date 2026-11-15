@@ -96,8 +96,7 @@ import javax.ws.rs.core.Response;
     service = StatisticsEndpoint.class,
     property = {
         "service.description=External API - Statistics Endpoint",
-        "opencast.service.type=org.opencastproject.external.statistics",
-        "opencast.service.path=/api/statistics"
+        "opencast.service.type=org.opencastproject.external.statistics"
     }
 )
 @JaxrsResource

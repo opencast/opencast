@@ -24,6 +24,7 @@ package org.opencastproject.serviceregistry.internal;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.RestUtil;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -32,7 +33,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +53,6 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
 
   private static final Logger logger = LoggerFactory.getLogger(RestServiceTracker.class);
 
-  protected static final String FILTER = "(" +  JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
-
   protected BundleContext bundleContext;
 
   private final ServiceRegistry serviceRegistry;
@@ -62,7 +60,7 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
   @Activate
   public RestServiceTracker(@Reference ServiceRegistry serviceRegistry, BundleContext bundleContext)
           throws InvalidSyntaxException {
-    super(bundleContext, bundleContext.createFilter(FILTER), null);
+    super(bundleContext, bundleContext.createFilter(RestConstants.SERVICES_FILTER), null);
     this.bundleContext = bundleContext;
     this.serviceRegistry = serviceRegistry;
     this.open(true);
@@ -75,9 +73,14 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
 
   @Override
   public Object addingService(ServiceReference reference) {
-    String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-    String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
+    // We need the service object to determine the service path from its @Path annotation
+    Object service = super.addingService(reference);
+    if (service == null) {
+      logger.debug("REST service {} is not available, not registering it in the service registry", reference);
+      return null;
+    }
 
+    String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
     boolean publishFlag = Boolean.parseBoolean(
         Objects.requireNonNullElse(
           reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY), "true").toString()
@@ -90,17 +93,20 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
     // Only register services that have the "publish" flag set to "true"
     if (publishFlag) {
       try {
+        String servicePath = RestUtil.getServicePath(service.getClass());
         serviceRegistry.registerService(serviceType, serviceRegistry.getRegistryHostname(), servicePath,
             jobProducer);
       } catch (ServiceRegistryException e) {
         logger.warn("Unable to register job producer of type " + serviceType + " on host "
             + serviceRegistry.getRegistryHostname());
+      } catch (IllegalArgumentException e) {
+        logger.warn("Unable to register service of type {}: {}", serviceType, e.getMessage());
       }
     } else {
       logger.debug("Not registering service " + serviceType + " in service registry by configuration");
     }
 
-    return super.addingService(reference);
+    return service;
   }
 
   @Override

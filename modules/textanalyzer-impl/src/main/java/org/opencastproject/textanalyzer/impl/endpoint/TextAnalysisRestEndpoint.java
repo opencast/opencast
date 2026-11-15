@@ -72,7 +72,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Text Analysis REST Endpoint",
         "opencast.service.type=org.opencastproject.textanalyzer",
-        "opencast.service.path=/analysis/text",
         "opencast.service.jobproducer=true"
     }
 )
@@ -96,7 +95,6 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
    */
   @Activate
   public void activate(ComponentContext cc) {
-    // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
   @POST

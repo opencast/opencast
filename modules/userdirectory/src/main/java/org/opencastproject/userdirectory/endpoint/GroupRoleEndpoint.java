@@ -83,8 +83,7 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Group Role REST EndPoint",
         "opencast.service.type=org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint",
-        "opencast.service.jobproducer=false",
-        "opencast.service.path=/groups"
+        "opencast.service.jobproducer=false"
     },
     immediate = false,
     service = { GroupRoleEndpoint.class }

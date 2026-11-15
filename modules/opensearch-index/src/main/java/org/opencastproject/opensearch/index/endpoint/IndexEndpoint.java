@@ -69,8 +69,7 @@ import javax.ws.rs.core.Response;
         immediate = true,
         property = {
                 "service.description=Index Endpoint",
-                "opencast.service.type=org.opencastproject.opensearch.index.endpoint",
-                "opencast.service.path=/index"
+                "opencast.service.type=org.opencastproject.opensearch.index.endpoint"
         },
         service = { IndexEndpoint.class }
 )

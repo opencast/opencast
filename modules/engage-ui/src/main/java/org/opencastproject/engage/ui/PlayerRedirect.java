@@ -66,8 +66,7 @@ import javax.ws.rs.core.UriInfo;
     service = PlayerRedirect.class,
     property = {
         "service.description=Configurable Player Endpoint",
-        "opencast.service.type=org.opencastproject.engage.ui.player.redirect",
-        "opencast.service.path=/play"
+        "opencast.service.type=org.opencastproject.engage.ui.player.redirect"
     }
 )
 @JaxrsResource

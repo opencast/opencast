@@ -48,7 +48,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Hello World REST Endpoint",
         "opencast.service.type=org.opencastproject.helloworld",
-        "opencast.service.path=/helloworld",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

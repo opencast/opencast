@@ -66,7 +66,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Google Speech Transcription REST Endpoint",
         "opencast.service.type=org.opencastproject.transcription.googlespeech",
-        "opencast.service.path=/transcripts/googlespeech",
         "opencast.service.jobproducer=true"
     }
 )
