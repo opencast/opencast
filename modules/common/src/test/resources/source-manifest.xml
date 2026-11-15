@@ -1,4 +1,4 @@
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="10.0000/2" start="2007-12-05T13:40:00" duration="10044">
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="10.0000-2" start="2007-12-05T13:40:00" duration="10044">
   <oc:media>
     <!-- also contained in target by id and urlname -->
     <oc:track transport="FILE" id="track-1" type="presentation/source">

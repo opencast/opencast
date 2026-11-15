@@ -43,6 +43,7 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.Checksum;
@@ -153,6 +154,18 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               responseCode = SC_INTERNAL_SERVER_ERROR)},
       returnDescription = "No content is returned.")
   public Response snapshot(@FormParam("mediapackage") final MediaPackageImpl mediaPackage) {
+    if (mediaPackage == null) {
+      return badRequest("Missing mediapackage");
+    }
+    // The form parameter is converted by JAX-RS through MediaPackageImpl.valueOf(String),
+    // which already validates the identifiers; repeat the check here so the endpoint stays
+    // safe even if the conversion path ever changes.
+    try {
+      MediaPackageSupport.checkPathSafety(mediaPackage);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Rejected snapshot: invalid mediapackage identifiers", e);
+      return badRequest("Invalid mediapackage identifiers");
+    }
     try {
       getAssetManager().takeSnapshot(DEFAULT_OWNER, mediaPackage);
       return noContent();

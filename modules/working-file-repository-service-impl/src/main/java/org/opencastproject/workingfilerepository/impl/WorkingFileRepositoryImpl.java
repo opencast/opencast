@@ -22,6 +22,7 @@
 package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -489,8 +490,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     if (id == null) {
       throw new NullPointerException("IDs can not be null");
     }
-    if (id.indexOf("..") > -1 || id.indexOf(File.separator) > -1) {
-      throw new IllegalArgumentException("Invalid media package, element ID, or file name");
+    if (MediaPackageSupport.containsPathTraversal(id)) {
+      throw new IllegalArgumentException("Invalid media package, element ID, or file name: must not be "
+              + "empty, must not be '.' or '..' and must not contain path separators");
     }
   }
 
@@ -588,10 +590,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @return the collection directory or <code>null</code> if it does not exist and should not be created
    * @throws IOException
    *         if creating a non-existing directory fails
+   * @throws IllegalArgumentException
+   *         if the collection identifier is unsafe
    */
   private File getCollectionDirectory(String collectionId, boolean create) throws IOException {
-    File collectionDir = new File(
-            PathSupport.concat(new String[]{rootDirectory, COLLECTION_PATH_PREFIX, collectionId}));
+    // The collection identifier is joined into the collection path, so it is checked here
+    // to cover all callers, not only the ones that checked it themselves
+    checkPathSafe(collectionId);
+    File collectionDir = Paths.get(rootDirectory, COLLECTION_PATH_PREFIX, collectionId).toFile();
     if (!collectionDir.exists()) {
       if (!create) {
         return null;
@@ -708,12 +714,15 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
   public URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
                     String toFileName) throws NotFoundException, IOException {
+    checkPathSafe(toMediaPackage);
+    checkPathSafe(toMediaPackageElement);
     File source = getFileFromCollection(fromCollection, fromFileName);
     if (source == null) {
       throw new IllegalArgumentException("Source file " + fromCollection + "/" + fromFileName + " does not exist");
     }
     File destDir = getElementDirectory(toMediaPackage, toMediaPackageElement);
-    if (!destDir.exists()) {
+    final boolean createdDestDir = !destDir.exists();
+    if (createdDestDir) {
       // we needed to create the directory, but couldn't
       try {
         FileUtils.forceMkdir(destDir);
@@ -722,13 +731,28 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
                                                 + "' : " + e);
       }
     }
-    File destFile;
+    final File destFile = new File(destDir, toSafeName(toFileName));
     try {
-      destFile = new File(destDir, toSafeName(toFileName));
+      // link() throws when the destination exists, so afterwards the file is guaranteed to
+      // have been created by this call
       FileSupport.link(source, destFile);
+    } catch (IOException e) {
+      // Never touch a pre-existing destination file; only remove the directory this call
+      // created, and report the failure instead of a bogus success URI
+      if (createdDestDir) {
+        destDir.delete();
+      }
+      throw new IOException("Unable to copy file to " + destFile.getAbsolutePath(), e);
+    }
+    try {
       createMd5(destFile);
-    } catch (Exception e) {
-      FileUtils.deleteDirectory(destDir);
+    } catch (IOException e) {
+      // the file was created by this call, so it may be removed
+      FileUtils.deleteQuietly(destFile);
+      if (createdDestDir) {
+        destDir.delete();
+      }
+      throw e;
     }
     return getURI(toMediaPackage, toMediaPackageElement, toFileName);
   }
@@ -742,13 +766,16 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   @Override
   public URI moveTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
                     String toFileName) throws NotFoundException, IOException {
+    checkPathSafe(toMediaPackage);
+    checkPathSafe(toMediaPackageElement);
     File source = getFileFromCollection(fromCollection, fromFileName);
     File sourceMd5 = getMd5File(source);
     File destDir = getElementDirectory(toMediaPackage, toMediaPackageElement);
 
     logger.debug("Moving {} from {} to {}/{}", new String[]{fromFileName, fromCollection, toMediaPackage,
         toMediaPackageElement});
-    if (!destDir.exists()) {
+    final boolean createdDestDir = !destDir.exists();
+    if (createdDestDir) {
       // we needed to create the directory, but couldn't
       try {
         FileUtils.forceMkdir(destDir);
@@ -766,13 +793,32 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     } catch (NotFoundException e) {
       dest = new File(getElementDirectory(toMediaPackage, toMediaPackageElement), toSafeName(toFileName));
     }
+    // An incomplete element (a payload without its MD5 checksum, e.g. left behind by a
+    // previously failed move) may already exist at the destination. It must not be touched
+    // on failure: deleting it would lose data this call never created.
+    final boolean destPreExisted = dest.exists();
 
+    boolean payloadMoved = false;
     try {
       FileUtils.moveFile(source, dest);
+      payloadMoved = true;
       FileUtils.moveFile(sourceMd5, getMd5File(dest));
     } catch (IOException e) {
-      FileUtils.deleteDirectory(destDir);
-      throw new IllegalStateException("unable to copy file" + e);
+      if (payloadMoved) {
+        // The payload is already at its destination; deleting it would lose the data, so the
+        // element is left in place (with a missing MD5 checksum) and the failure is reported
+        logger.error("Moved file {} to {} but could not move its MD5 checksum", source, dest, e);
+      } else {
+        // Nothing was moved; remove whatever partial state this call left behind — but never
+        // a file that already existed before this call
+        if (!destPreExisted) {
+          FileUtils.deleteQuietly(dest);
+        }
+        if (createdDestDir) {
+          destDir.delete();
+        }
+      }
+      throw new IllegalStateException("Unable to move file to " + dest.getAbsolutePath() + ": " + e, e);
     }
     return getURI(toMediaPackage, toMediaPackageElement, dest.getName());
   }
