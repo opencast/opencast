@@ -52,7 +52,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -66,6 +65,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -166,7 +166,7 @@ public class LifeCycleTaskRunner {
     if (properties == null) {
       return;
     }
-    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    retractWorkflowId = Objects.toString(properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
     logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 

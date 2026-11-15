@@ -23,6 +23,7 @@ package org.opencastproject.userdirectory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
@@ -42,17 +43,13 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class JpaGroupRoleProviderTest {
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private JpaGroupRoleProvider provider = null;
   private static JpaOrganization org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
@@ -142,19 +139,13 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(securityService);
     provider.setSecurityService(securityService);
 
-    try {
-      // try add ROLE_USER
-      thrown.expect(UnauthorizedException.class);
-      provider.updateGroup(group.getGroupId(),
-              group.getName(), group.getDescription(), "ROLE_USER, " + SecurityConstants.GLOBAL_ADMIN_ROLE, null);
+    // try add ROLE_USER
+    assertThrows(UnauthorizedException.class, () -> provider.updateGroup(group.getGroupId(),
+            group.getName(), group.getDescription(), "ROLE_USER, " + SecurityConstants.GLOBAL_ADMIN_ROLE, null));
 
-      // try remove ROLE_ADMIN
-      thrown.expect(UnauthorizedException.class);
-      provider.updateGroup(group.getGroupId(), group.getName(), group.getDescription(), "ROLE_USER", null);
-
-    } catch (NotFoundException e) {
-      fail("The existing group isn't found");
-    }
+    // try remove ROLE_ADMIN
+    assertThrows(UnauthorizedException.class, () -> provider.updateGroup(group.getGroupId(),
+            group.getName(), group.getDescription(), "ROLE_USER", null));
   }
 
   @Test
@@ -176,8 +167,7 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(securityService);
     provider.setSecurityService(securityService);
 
-    thrown.expect(UnauthorizedException.class);
-    provider.removeGroup(group.getGroupId());
+    assertThrows(UnauthorizedException.class, () -> provider.removeGroup(group.getGroupId()));
   }
 
   @Test
@@ -185,8 +175,8 @@ public class JpaGroupRoleProviderTest {
     // create the group, not exception thrown
     provider.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
     // try create again and expect a conflict
-    thrown.expect(ConflictException.class);
-    provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
+    assertThrows(ConflictException.class,
+        () -> provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin"));
   }
 
   @Test
@@ -204,8 +194,7 @@ public class JpaGroupRoleProviderTest {
 
   @Test
   public void testCreateGroupWithoutName() throws Exception {
-    thrown.expect(IllegalArgumentException.class);
-    provider.createGroup(null, "Test group", null, null);
+    assertThrows(IllegalArgumentException.class, () -> provider.createGroup(null, "Test group", null, null));
   }
 
   @Test
