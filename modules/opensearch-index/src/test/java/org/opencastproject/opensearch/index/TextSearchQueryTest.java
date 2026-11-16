@@ -93,19 +93,73 @@ public class TextSearchQueryTest {
     assertTrue(collectMultiMatches(toJson(new EventQueryBuilder(events))).isEmpty());
   }
 
-  /** Long texts are only matched, not phrase ranked: the queries would exceed the clause limit of OpenSearch. */
+  /** Long texts are only matched, not phrase ranked or matched with typos: the queries are slow. */
   @Test
   public void testLongTextIsNotPhraseRanked() throws Exception {
     String tenWords = "one two three four five six seven eight nine ten";
     EventSearchQuery events = new EventSearchQuery(ORGANIZATION, admin);
     events.withText(tenWords);
-    assertEquals(3, collectMultiMatches(toJson(new EventQueryBuilder(events))).size());
+    assertEquals(4, collectMultiMatches(toJson(new EventQueryBuilder(events))).size());
 
     events = new EventSearchQuery(ORGANIZATION, admin);
     events.withText(tenWords + " eleven");
     List<JsonObject> matches = collectMultiMatches(toJson(new EventQueryBuilder(events)));
     assertEquals(1, matches.size());
     assertEquals("bool_prefix", matches.get(0).get("type").getAsString());
+  }
+
+  /** The prefix query does not tolerate typos in the last word, so the fuzzy query is an alternative to it. */
+  @Test
+  public void testLastWordMayContainTypos() throws Exception {
+    SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("biolgy");
+    JsonObject json = toJson(new SeriesQueryBuilder(query));
+    List<JsonObject> matches = collectMultiMatches(json);
+
+    List<JsonObject> fuzzy = byType(matches, "best_fields");
+    assertEquals(1, fuzzy.size());
+    assertEquals("biolgy", fuzzy.get(0).get("query").getAsString());
+    assertEquals("AND", fuzzy.get(0).get("operator").getAsString());
+    assertEquals("AUTO:4,8", fuzzy.get(0).get("fuzziness").getAsString());
+    assertEquals(1, fuzzy.get(0).get("prefix_length").getAsInt());
+    assertTrue(fuzzy.get(0).get("lenient").getAsBoolean());
+    assertTrue("The fuzzy query must not influence the score", json.toString().contains("\"constant_score\""));
+
+    // Either of the two is enough to match
+    assertEquals(1, byType(matches, "bool_prefix").size());
+    assertEquals("biolgy", byType(matches, "bool_prefix").get(0).get("query").getAsString());
+    assertFalse("The prefix query is one of two alternatives", isRequired(json, fuzzy.get(0)));
+  }
+
+  /** Numbers and long texts do not get the fuzzy query: it would match unrelated words or be too slow. */
+  @Test
+  public void testFuzzyQueryIsLimited() throws Exception {
+    assertEquals("AUTO:4,8", byType(fuzzyMatches("biolgy"), "best_fields").get(0).get("fuzziness").getAsString());
+    String elevenWords = "one two three four five six seven eight nine ten eleven";
+    for (String text : new String[] {"2024", "vorlesung 2024", "*", "   ", elevenWords}) {
+      assertTrue("No fuzzy query expected for '" + text + "'", byType(fuzzyMatches(text), "best_fields").isEmpty());
+    }
+    assertEquals(1, byType(fuzzyMatches("2024 vorlesung"), "best_fields").size());
+  }
+
+  private List<JsonObject> fuzzyMatches(String text) throws Exception {
+    SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText(text);
+    return collectMultiMatches(toJson(new SeriesQueryBuilder(query)));
+  }
+
+  /** Without fuzzy search there is no fuzzy query. */
+  @Test
+  public void testNoFuzzyQueryWithoutFuzzySearch() throws Exception {
+    SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText(false, "biology");
+    JsonObject json = toJson(new SeriesQueryBuilder(query));
+    List<JsonObject> matches = collectMultiMatches(json);
+
+    assertTrue(byType(matches, "best_fields").isEmpty());
+    assertEquals(1, byType(matches, "bool_prefix").size());
+    assertFalse(byType(matches, "bool_prefix").get(0).has("fuzziness"));
+    assertTrue("The prefix query must be required", isRequired(json, byType(matches, "bool_prefix").get(0)));
   }
 
   /** The weights of fields can be configured, separately for series and events. */
@@ -212,7 +266,8 @@ public class TextSearchQueryTest {
       assertEquals(type + " query must weight the title higher than the other fields",
           AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS.get("title"), fieldWeight(match, "title"), 0.0f);
     }
-    assertEquals(3, matches.size());
+    // The fuzzy words query is the fourth one (see testLastWordMayContainTypos)
+    assertEquals(4, matches.size());
 
     // Whole words must count more than a prefix, which favors long words
     float phraseBoost = byType(matches, "phrase").get(0).get("boost").getAsFloat();
@@ -226,7 +281,6 @@ public class TextSearchQueryTest {
 
     // Ranking is optional, matching is not
     assertFalse("Ranking queries must be optional", isRequired(json, byType(matches, "phrase").get(0)));
-    assertTrue("The prefix query must be required", isRequired(json, prefix.get(0)));
   }
 
   private static JsonObject toJson(QueryBuilder queryBuilder) throws IOException {

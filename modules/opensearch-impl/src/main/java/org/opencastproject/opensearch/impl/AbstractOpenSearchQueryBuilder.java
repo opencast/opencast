@@ -66,8 +66,11 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
   /** Score boost for documents containing the search text as a phrase whose last word may be a prefix */
   private static final float PHRASE_PREFIX_MATCH_BOOST = 0.5f;
 
-  /** Longer texts are not phrase ranked: the queries expand to a clause per word and field and exceed the limit. */
-  private static final int MAX_PHRASE_RANKING_WORDS = 10;
+  /** Longer texts are not phrase ranked or matched with typos: the queries are slow and exceed the clause limit. */
+  private static final int MAX_EXTRA_QUERY_WORDS = 10;
+
+  /** Stricter than AUTO, which allows typos in short words and numbers ("2023" matches "2024"). */
+  private static final Fuzziness LAST_WORD_FUZZINESS = Fuzziness.build("AUTO:4,8");
 
   /** The default weights of fields in text searches: a match in the title counts three times as much. */
   public static final Map<String, Float> DEFAULT_FIELD_BOOSTS = Map.of("title", 3.0f);
@@ -226,8 +229,22 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       // of phrase and phrase prefix counts, and the latter is weighted low: it favors long words over the exact one.
       // The title is weighted above other fields, as a short value elsewhere would otherwise outrank it.
       // Lenient, as not every "*.search" field is a text field and phrase queries fail on the others.
-      BoolQueryBuilder textQuery = QueryBuilders.boolQuery().must(queryBuilder);
-      if (text.trim().split("[^\\p{L}\\p{N}]+").length <= MAX_PHRASE_RANKING_WORDS) {
+      String[] words = text.trim().split("[^\\p{L}\\p{N}]+");
+      boolean shortText = words.length <= MAX_EXTRA_QUERY_WORDS;
+      // Numbers are not matched with typos (a text of only symbols has no words at all)
+      boolean lastWordHasLetters = words.length > 0 && words[words.length - 1].matches(".*\\p{L}.*");
+      BoolQueryBuilder textQuery = QueryBuilders.boolQuery();
+      if (fuzzy && shortText && lastWordHasLetters) {
+        // The prefix query does not tolerate typos in the last word, so also accept documents containing all words
+        // with typos. Constant score: only the ranking queries below should influence the order.
+        textQuery.must(QueryBuilders.boolQuery()
+            .should(queryBuilder)
+            .should(QueryBuilders.constantScoreQuery(fuzzyWordsQuery()))
+            .minimumShouldMatch(1));
+      } else {
+        textQuery.must(queryBuilder);
+      }
+      if (shortText) {
         DisMaxQueryBuilder phraseQuery = QueryBuilders.disMaxQuery();
         phraseQuery.add(searchableFieldsQuery(MultiMatchQueryBuilder.Type.PHRASE).boost(PHRASE_MATCH_BOOST));
         phraseQuery.add(searchableFieldsQuery(MultiMatchQueryBuilder.Type.PHRASE_PREFIX)
@@ -261,6 +278,18 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       this.queryBuilder = booleanQuery;
     }
 
+  }
+
+  /** Matches fields containing all words of the search text, each of them with typos allowed. */
+  private MultiMatchQueryBuilder fuzzyWordsQuery() {
+    return QueryBuilders.multiMatchQuery(text)
+        .field("*" + SEARCH_FIELD_NAME_EXTENSION)
+        .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+        .operator(Operator.AND)
+        .fuzziness(LAST_WORD_FUZZINESS)
+        // A fixed first letter is much cheaper
+        .prefixLength(1)
+        .lenient(true);
   }
 
   /** Creates a lenient query of the given type on all searchable fields, weighted by the configured boosts. */
