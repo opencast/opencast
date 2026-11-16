@@ -23,17 +23,6 @@ package org.opencastproject.external.common;
 /** The existing External API versions */
 public enum ApiVersion {
 
-  VERSION_1_0_0(1, 0, 0),
-  VERSION_1_1_0(1, 1, 0),
-  VERSION_1_2_0(1, 2, 0),
-  VERSION_1_3_0(1, 3, 0),
-  VERSION_1_4_0(1, 4, 0),
-  VERSION_1_5_0(1, 5, 0),
-  VERSION_1_6_0(1, 6, 0),
-  VERSION_1_7_0(1, 7, 0),
-  VERSION_1_8_0(1, 8, 0),
-  VERSION_1_9_0(1, 9, 0),
-  VERSION_1_10_0(1, 10, 0),
   VERSION_1_11_0(1, 11, 0),
   VERSION_1_12_0(1, 12, 0);
 

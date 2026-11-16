@@ -26,17 +26,6 @@ public final class ApiMediaType {
 
   public static final String VERSION_1_12_0 = "application/v1.12.0+json";
   public static final String VERSION_1_11_0 = "application/v1.11.0+json";
-  public static final String VERSION_1_10_0 = "application/v1.10.0+json";
-  public static final String VERSION_1_9_0 = "application/v1.9.0+json";
-  public static final String VERSION_1_8_0 = "application/v1.8.0+json";
-  public static final String VERSION_1_7_0 = "application/v1.7.0+json";
-  public static final String VERSION_1_6_0 = "application/v1.6.0+json";
-  public static final String VERSION_1_5_0 = "application/v1.5.0+json";
-  public static final String VERSION_1_4_0 = "application/v1.4.0+json";
-  public static final String VERSION_1_3_0 = "application/v1.3.0+json";
-  public static final String VERSION_1_2_0 = "application/v1.2.0+json";
-  public static final String VERSION_1_1_0 = "application/v1.1.0+json";
-  public static final String VERSION_1_0_0 = "application/v1.0.0+json";
   public static final String JSON = "application/json";
 
   private static final String APPLICATION_ANY = "application/*";
@@ -60,28 +49,6 @@ public final class ApiMediaType {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_12_0, ApiFormat.JSON, VERSION_1_12_0);
     } else if (acceptHeader.contains(VERSION_1_11_0)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_11_0, ApiFormat.JSON, VERSION_1_11_0);
-    } else if (acceptHeader.contains(VERSION_1_10_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_10_0, ApiFormat.JSON, VERSION_1_10_0);
-    } else if (acceptHeader.contains(VERSION_1_9_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_9_0, ApiFormat.JSON, VERSION_1_9_0);
-    } else if (acceptHeader.contains(VERSION_1_8_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_8_0, ApiFormat.JSON, VERSION_1_8_0);
-    } else if (acceptHeader.contains(VERSION_1_7_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_7_0, ApiFormat.JSON, VERSION_1_7_0);
-    } else if (acceptHeader.contains(VERSION_1_6_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_6_0, ApiFormat.JSON, VERSION_1_6_0);
-    } else if (acceptHeader.contains(VERSION_1_5_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_5_0, ApiFormat.JSON, VERSION_1_5_0);
-    } else if (acceptHeader.contains(VERSION_1_4_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_4_0, ApiFormat.JSON, VERSION_1_4_0);
-    } else if (acceptHeader.contains(VERSION_1_3_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_3_0, ApiFormat.JSON, VERSION_1_3_0);
-    } else if (acceptHeader.contains(VERSION_1_2_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_2_0, ApiFormat.JSON, VERSION_1_2_0);
-    } else if (acceptHeader.contains(VERSION_1_1_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_1_0, ApiFormat.JSON, VERSION_1_1_0);
-    } else if (acceptHeader.contains(VERSION_1_0_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_0_0, ApiFormat.JSON, VERSION_1_0_0);
     } else {
       throw ApiMediaTypeException.invalidVersion(acceptHeader);
     }

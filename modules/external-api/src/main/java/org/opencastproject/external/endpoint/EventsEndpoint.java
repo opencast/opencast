@@ -21,10 +21,6 @@
 package org.opencastproject.external.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_11_0;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_7_0;
 import static org.opencastproject.external.util.SchedulingUtils.SchedulingInfo;
 import static org.opencastproject.external.util.SchedulingUtils.convertConflictingEvents;
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
@@ -191,11 +187,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/api/events")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 @Tag(name = "External API")
@@ -471,10 +463,6 @@ public class EventsEndpoint {
       @QueryParam("includeInternalPublication") Boolean includeInternalPublication)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-      // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
-      withScheduling = false;
-    }
     Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
@@ -514,7 +502,6 @@ public class EventsEndpoint {
   })
   public Response getEventMedia(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     List<TrackImpl> tracks = new ArrayList<>();
 
     Optional<Event> eventOpt = indexService.getEvent(id, opensearchIndex);
@@ -552,12 +539,10 @@ public class EventsEndpoint {
         }
         trackJson.addProperty("size", track.getSize());
 
-        if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
-          trackJson.addProperty("has_video", track.hasVideo());
-          trackJson.addProperty("has_audio", track.hasAudio());
-          trackJson.addProperty("is_master_playlist", track.isMaster());
-          trackJson.addProperty("is_live", track.isLive());
-        }
+        trackJson.addProperty("has_video", track.hasVideo());
+        trackJson.addProperty("has_audio", track.hasAudio());
+        trackJson.addProperty("is_master_playlist", track.isMaster());
+        trackJson.addProperty("is_live", track.isLive());
 
         if (track.getStreams() != null) {
           JsonObject streamsJson = new JsonObject();
@@ -721,8 +706,7 @@ public class EventsEndpoint {
           }
         }
 
-        if (eventHttpServletRequest.getScheduling().isPresent() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-          // Scheduling is only available for version 1.1.0 and above
+        if (eventHttpServletRequest.getScheduling().isPresent()) {
           Optional<Response> clientError = updateSchedulingInformation(
               eventHttpServletRequest.getScheduling().get(), eventId, requestedVersion, false);
           if (clientError.isPresent()) {
@@ -793,8 +777,7 @@ public class EventsEndpoint {
           ingestService, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
       // If scheduling information is provided, the source has to be "SCHEDULE_SINGLE" or "SCHEDULE_MULTIPLE".
-      if (eventHttpServletRequest.getScheduling().isPresent() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-        // Scheduling is only available for version 1.1.0 and above
+      if (eventHttpServletRequest.getScheduling().isPresent()) {
         return scheduleNewEvent(eventHttpServletRequest, eventHttpServletRequest.getScheduling().get(),
             requestedVersion);
       }
@@ -924,10 +907,6 @@ public class EventsEndpoint {
           @QueryParam("withpublications") Boolean withPublications,
           @QueryParam("includeInternalPublication") Boolean includeInternalPublication) {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-      // withscheduling was added for version 1.1.0 and should be ignored for smaller versions.
-      withScheduling = false;
-    }
 
     Optional<Integer> optLimit = Optional.ofNullable(limit);
     Optional<Integer> optOffset = Optional.ofNullable(offset);
@@ -939,273 +918,170 @@ public class EventsEndpoint {
       optLimit = Optional.empty();
     }
 
-    //List of all events from the filters
-    List<IndexObject> allEvents = new ArrayList<>();
-
     if (!isNullOrEmpty(filter)) {
-      // API version 1.5.0: Additive filter
-      if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_5_0)) {
-        filter = filter.subList(0,1);
-      }
-      for (String filterPart : filter) {
-        // Parse the filters
-
-        for (String f : filterPart.split(",")) {
-          String[] filterTuple = f.split(":");
-          if (filterTuple.length < 2) {
-            logger.debug("No value for filter {} in filters list: {}", filterTuple[0], filter);
-            continue;
-          }
-
-          String name = filterTuple[0];
-          String value;
-
-          if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-            // MH-13038 - 1.1.0 and higher support colons in values
-            value = f.substring(name.length() + 1);
-          } else {
-            value = filterTuple[1];
-          }
-
-          if ("presenters".equals(name)) {
-            query.withPresenter(value);
-          } else if ("contributors".equals(name)) {
-            query.withContributor(value);
-          } else if ("location".equals(name)) {
-            query.withLocation(value);
-          } else if ("textFilter".equals(name)) {
-            query.withText(value);
-          } else if ("series".equals(name)) {
-            query.withSeriesId(value);
-          } else if ("subject".equals(name)) {
-            query.withSubject(value);
-          } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-            // additional filters only available with Version 1.1.0 or higher
-            if ("identifier".equals(name)) {
-              query.withIdentifier(value);
-            } else if ("title".equals(name)) {
-              query.withTitle(value);
-            } else if ("description".equals(name)) {
-              query.withDescription(value);
-            } else if ("series_name".equals(name)) {
-              query.withSeriesName(value);
-            } else if ("language".equals(name)) {
-              query.withLanguage(value);
-            } else if ("created".equals(name)) {
-              query.withCreated(value);
-            } else if ("license".equals(name)) {
-              query.withLicense(value);
-            } else if ("rightsholder".equals(name)) {
-              query.withRights(value);
-            } else if ("is_part_of".equals(name)) {
-              query.withSeriesId(value);
-            } else if ("source".equals(name)) {
-              query.withSource(value);
-            } else if ("status".equals(name)) {
-              query.withEventStatus(value);
-            } else if ("agent_id".equals(name)) {
-              query.withAgentId(value);
-            } else if ("start".equals(name)) {
-              try {
-                Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-                query.withStartFrom(fromAndToCreationRange.getA());
-                query.withStartTo(fromAndToCreationRange.getB());
-              } catch (Exception e) {
-                return RestUtil.R
-                        .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
-
-              }
-            } else if ("technical_start".equals(name)) {
-              try {
-                Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-                query.withTechnicalStartFrom(fromAndToCreationRange.getA());
-                query.withTechnicalStartTo(fromAndToCreationRange.getB());
-              } catch (Exception e) {
-                return RestUtil.R
-                        .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
-
-              }
-            } else {
-              logger.warn("Unknown filter criteria {}", name);
-              return RestUtil.R.badRequest(String.format("Unknown filter criterion in request: %s", name));
-
-            }
-          }
+      // Only the first filter parameter is evaluated
+      for (String f : filter.get(0).split(",")) {
+        String[] filterTuple = f.split(":");
+        if (filterTuple.length < 2) {
+          logger.debug("No value for filter {} in filters list: {}", filterTuple[0], filter);
+          continue;
         }
 
-        if (optSort.isPresent()) {
-          ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-          for (SortCriterion criterion : sortCriteria) {
+        // Use substring since values may contain colons
+        String name = filterTuple[0];
+        String value = f.substring(name.length() + 1);
 
-            switch (criterion.getFieldName()) {
-              case EventIndexSchema.TITLE:
-                query.sortByTitle(criterion.getOrder());
-                break;
-              case EventIndexSchema.PRESENTER:
-                query.sortByPresenter(criterion.getOrder());
-                break;
-              case EventIndexSchema.TECHNICAL_START:
-              case "technical_date":
-                query.sortByTechnicalStartDate(criterion.getOrder());
-                break;
-              case EventIndexSchema.TECHNICAL_END:
-                query.sortByTechnicalEndDate(criterion.getOrder());
-                break;
-              case EventIndexSchema.START_DATE:
-              case "date":
-                query.sortByStartDate(criterion.getOrder());
-                break;
-              case EventIndexSchema.END_DATE:
-                query.sortByEndDate(criterion.getOrder());
-                break;
-              case EventIndexSchema.WORKFLOW_STATE:
-                query.sortByWorkflowState(criterion.getOrder());
-                break;
-              case EventIndexSchema.SERIES_NAME:
-                query.sortBySeriesName(criterion.getOrder());
-                break;
-              case EventIndexSchema.LOCATION:
-                query.sortByLocation(criterion.getOrder());
-                break;
-              // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria
-              // (MH-13407)
-              case "review_status":
-              case "scheduling_status":
-                break;
-              default:
-                return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s",
-                    criterion.getFieldName()));
-            }
-          }
-        }
-
-        // TODO: Add the comment resolution filter to the query
-        if (StringUtils.isNotBlank(resolutionFilter)) {
+        if ("presenters".equals(name)) {
+          query.withPresenter(value);
+        } else if ("contributors".equals(name)) {
+          query.withContributor(value);
+        } else if ("location".equals(name)) {
+          query.withLocation(value);
+        } else if ("textFilter".equals(name)) {
+          query.withText(value);
+        } else if ("series".equals(name)) {
+          query.withSeriesId(value);
+        } else if ("subject".equals(name)) {
+          query.withSubject(value);
+        } else if ("identifier".equals(name)) {
+          query.withIdentifier(value);
+        } else if ("title".equals(name)) {
+          query.withTitle(value);
+        } else if ("description".equals(name)) {
+          query.withDescription(value);
+        } else if ("series_name".equals(name)) {
+          query.withSeriesName(value);
+        } else if ("language".equals(name)) {
+          query.withLanguage(value);
+        } else if ("created".equals(name)) {
+          query.withCreated(value);
+        } else if ("license".equals(name)) {
+          query.withLicense(value);
+        } else if ("rightsholder".equals(name)) {
+          query.withRights(value);
+        } else if ("is_part_of".equals(name)) {
+          query.withSeriesId(value);
+        } else if ("source".equals(name)) {
+          query.withSource(value);
+        } else if ("status".equals(name)) {
+          query.withEventStatus(value);
+        } else if ("agent_id".equals(name)) {
+          query.withAgentId(value);
+        } else if ("start".equals(name)) {
           try {
-            CommentResolution.valueOf(resolutionFilter);
+            Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+            query.withStartFrom(fromAndToCreationRange.getA());
+            query.withStartTo(fromAndToCreationRange.getB());
           } catch (Exception e) {
-            logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
-            return Response.status(Status.BAD_REQUEST).build();
+            return RestUtil.R
+                    .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
+
           }
-        }
+        } else if ("technical_start".equals(name)) {
+          try {
+            Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+            query.withTechnicalStartFrom(fromAndToCreationRange.getA());
+            query.withTechnicalStartTo(fromAndToCreationRange.getB());
+          } catch (Exception e) {
+            return RestUtil.R
+                    .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
 
-        if (optLimit.isPresent()) {
-          query.withLimit(optLimit.get());
-        }
-        if (optOffset.isPresent()) {
-          query.withOffset(offset);
-        }
-        // TODO: Add other filters to the query
-
-        SearchResult<Event> results = null;
-        try {
-          results = opensearchIndex.getByQuery(query);
-        } catch (SearchIndexException e) {
-          logger.error("The External Search Index was not able to get the events list", e);
-          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        }
-
-        SearchResultItem<Event>[] items = results.getItems();
-        List<IndexObject> events = new ArrayList<>();
-        for (SearchResultItem<Event> item : items) {
-          Event source = item.getSource();
-          source.updatePreview(previewSubtype);
-          events.add(source);
-        }
-        //Append  filtered results to the list
-        allEvents.addAll(events);
-      }
-    } else {
-      if (optSort.isPresent()) {
-        ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-        for (SortCriterion criterion : sortCriteria) {
-
-          switch (criterion.getFieldName()) {
-            case EventIndexSchema.TITLE:
-              query.sortByTitle(criterion.getOrder());
-              break;
-            case EventIndexSchema.PRESENTER:
-              query.sortByPresenter(criterion.getOrder());
-              break;
-            case EventIndexSchema.TECHNICAL_START:
-            case "technical_date":
-              query.sortByTechnicalStartDate(criterion.getOrder());
-              break;
-            case EventIndexSchema.TECHNICAL_END:
-              query.sortByTechnicalEndDate(criterion.getOrder());
-              break;
-            case EventIndexSchema.START_DATE:
-            case "date":
-              query.sortByStartDate(criterion.getOrder());
-              break;
-            case EventIndexSchema.END_DATE:
-              query.sortByEndDate(criterion.getOrder());
-              break;
-            case EventIndexSchema.WORKFLOW_STATE:
-              query.sortByWorkflowState(criterion.getOrder());
-              break;
-            case EventIndexSchema.SERIES_NAME:
-              query.sortBySeriesName(criterion.getOrder());
-              break;
-            case EventIndexSchema.LOCATION:
-              query.sortByLocation(criterion.getOrder());
-              break;
-            // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria
-            // (MH-13407)
-            case "review_status":
-            case "scheduling_status":
-              break;
-            default:
-              return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s",
-                  criterion.getFieldName()));
           }
+        } else {
+          logger.warn("Unknown filter criteria {}", name);
+          return RestUtil.R.badRequest(String.format("Unknown filter criterion in request: %s", name));
+
         }
       }
+    }
 
-      // TODO: Add the comment resolution filter to the query
-      if (StringUtils.isNotBlank(resolutionFilter)) {
-        try {
-          CommentResolution.valueOf(resolutionFilter);
-        } catch (Exception e) {
-          logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
-          return Response.status(Status.BAD_REQUEST).build();
+    if (optSort.isPresent()) {
+      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      for (SortCriterion criterion : sortCriteria) {
+
+        switch (criterion.getFieldName()) {
+          case EventIndexSchema.TITLE:
+            query.sortByTitle(criterion.getOrder());
+            break;
+          case EventIndexSchema.PRESENTER:
+            query.sortByPresenter(criterion.getOrder());
+            break;
+          case EventIndexSchema.TECHNICAL_START:
+          case "technical_date":
+            query.sortByTechnicalStartDate(criterion.getOrder());
+            break;
+          case EventIndexSchema.TECHNICAL_END:
+            query.sortByTechnicalEndDate(criterion.getOrder());
+            break;
+          case EventIndexSchema.START_DATE:
+          case "date":
+            query.sortByStartDate(criterion.getOrder());
+            break;
+          case EventIndexSchema.END_DATE:
+            query.sortByEndDate(criterion.getOrder());
+            break;
+          case EventIndexSchema.WORKFLOW_STATE:
+            query.sortByWorkflowState(criterion.getOrder());
+            break;
+          case EventIndexSchema.SERIES_NAME:
+            query.sortBySeriesName(criterion.getOrder());
+            break;
+          case EventIndexSchema.LOCATION:
+            query.sortByLocation(criterion.getOrder());
+            break;
+          // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria
+          // (MH-13407)
+          case "review_status":
+          case "scheduling_status":
+            break;
+          default:
+            return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s",
+                criterion.getFieldName()));
         }
       }
+    }
 
-      if (optLimit.isPresent()) {
-        query.withLimit(optLimit.get());
-      }
-      if (optOffset.isPresent()) {
-        query.withOffset(offset);
-      }
-
-      if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
-        query.withoutActions();
-        query.withAction(Permissions.Action.WRITE);
-      }
-      // TODO: Add other filters to the query
-
-      SearchResult<Event> results = null;
+    // TODO: Add the comment resolution filter to the query
+    if (StringUtils.isNotBlank(resolutionFilter)) {
       try {
-        results = opensearchIndex.getByQuery(query);
-      } catch (SearchIndexException e) {
-        logger.error("The External Search Index was not able to get the events list", e);
-        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        CommentResolution.valueOf(resolutionFilter);
+      } catch (Exception e) {
+        logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
+        return Response.status(Status.BAD_REQUEST).build();
       }
+    }
 
-      SearchResultItem<Event>[] items = results.getItems();
-      List<IndexObject> events = new ArrayList<>();
-      for (SearchResultItem<Event> item : items) {
-        Event source = item.getSource();
-        source.updatePreview(previewSubtype);
-        events.add(source);
-      }
-      //Append  filtered results to the list
-      allEvents.addAll(events);
+    if (optLimit.isPresent()) {
+      query.withLimit(optLimit.get());
+    }
+    if (optOffset.isPresent()) {
+      query.withOffset(offset);
+    }
+
+    if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
+      query.withoutActions();
+      query.withAction(Permissions.Action.WRITE);
+    }
+    // TODO: Add other filters to the query
+
+    SearchResult<Event> results = null;
+    try {
+      results = opensearchIndex.getByQuery(query);
+    } catch (SearchIndexException e) {
+      logger.error("The External Search Index was not able to get the events list", e);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    SearchResultItem<Event>[] items = results.getItems();
+    List<IndexObject> events = new ArrayList<>();
+    for (SearchResultItem<Event> item : items) {
+      Event source = item.getSource();
+      source.updatePreview(previewSubtype);
+      events.add(source);
     }
     try {
       return getJsonEvents(
-          acceptHeader, allEvents, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication,
+          acceptHeader, events, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication,
           sign, requestedVersion);
     } catch (Exception e) {
       logger.error("Unable to get events", e);
@@ -1287,15 +1163,13 @@ public class EventsEndpoint {
     json.addProperty("location", safeString(event.getLocation()));
     json.add("presenter", collectionToJsonArray(event.getPresenters()));
 
-    if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-      json.addProperty("language", safeString(event.getLanguage()));
-      json.addProperty("rightsholder", safeString(event.getRights()));
-      json.addProperty("license", safeString(event.getLicense()));
-      json.addProperty("is_part_of", safeString(event.getSeriesId()));
-      json.addProperty("series", safeString(event.getSeriesName()));
-      json.addProperty("source", safeString(event.getSource()));
-      json.addProperty("status", safeString(event.getEventStatus()));
-    }
+    json.addProperty("language", safeString(event.getLanguage()));
+    json.addProperty("rightsholder", safeString(event.getRights()));
+    json.addProperty("license", safeString(event.getLicense()));
+    json.addProperty("is_part_of", safeString(event.getSeriesId()));
+    json.addProperty("series", safeString(event.getSeriesName()));
+    json.addProperty("source", safeString(event.getSource()));
+    json.addProperty("status", safeString(event.getEventStatus()));
 
     JsonArray publicationIds = new JsonArray();
     if (event.getPublications() != null) {
@@ -1306,20 +1180,11 @@ public class EventsEndpoint {
     json.add("publication_status", publicationIds);
     json.addProperty("processing_state", safeString(event.getWorkflowState()));
 
-    if (requestedVersion.isSmallerThan(VERSION_1_4_0)) {
-      json.addProperty("start", safeString(event.getTechnicalStartTime()));
-      if (event.getTechnicalEndTime() != null) {
-        long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
-            - new DateTime(event.getTechnicalStartTime()).getMillis();
-        json.addProperty("duration", duration);
-      }
+    json.addProperty("start", safeString(event.getRecordingStartDate()));
+    if (event.getDuration() != null) {
+      json.addProperty("duration", event.getDuration());
     } else {
-      json.addProperty("start", safeString(event.getRecordingStartDate()));
-      if (event.getDuration() != null) {
-        json.addProperty("duration", event.getDuration());
-      } else {
-        json.add("duration", JsonNull.INSTANCE);
-      }
+      json.add("duration", JsonNull.INSTANCE);
     }
 
     if (StringUtils.trimToNull(event.getSubject()) != null) {
@@ -1353,8 +1218,7 @@ public class EventsEndpoint {
     }
 
     if (withPublications != null && withPublications) {
-      List<JsonObject> publications = getPublications(event, withSignedUrls, includeInternalPublication,
-          requestedVersion);
+      List<JsonObject> publications = getPublications(event, withSignedUrls, includeInternalPublication);
       JsonArray pubDetails = new JsonArray();
       for (JsonObject pub : publications) {
         pubDetails.add(pub);
@@ -2079,11 +1943,10 @@ public class EventsEndpoint {
       @QueryParam("sign") boolean sign, @QueryParam("includeInternalPublication") boolean includeInternalPublication)
             throws Exception {
     try {
-      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
       final Optional<Event> event = indexService.getEvent(id, opensearchIndex);
       if (event.isPresent()) {
         JsonArray jsonArray = new JsonArray();
-        for (JsonElement pub : getPublications(event.get(), sign, includeInternalPublication, requestedVersion)) {
+        for (JsonElement pub : getPublications(event.get(), sign, includeInternalPublication)) {
           jsonArray.add(pub);
         }
         return ApiResponseBuilder.Json.ok(acceptHeader, jsonArray);
@@ -2096,24 +1959,18 @@ public class EventsEndpoint {
     }
   }
 
-  private List<JsonObject> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication,
-      ApiVersion requestedVersion) {
+  private List<JsonObject> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication) {
     return event.getPublications().stream()
         .filter(publication -> {
-          boolean isInternalAllowed = includeInternalPublication != null && includeInternalPublication
-              && !requestedVersion.isSmallerThan(VERSION_1_11_0);
+          boolean isInternalAllowed = includeInternalPublication != null && includeInternalPublication;
           return isInternalAllowed || EventUtils.internalChannelFilter.test(publication);
         })
-        .map(p -> getPublication(p, withSignedUrls, requestedVersion))
+        .map(p -> getPublication(p, withSignedUrls))
         .collect(Collectors.toList());
   }
 
-  public JsonObject getPublication(Publication publication, Boolean sign, ApiVersion requestedVersion) {
-    // Signing URLs introduced in version 1.7.0
-    URI publicationUrl = publication.getURI();
-    if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
-      publicationUrl = getSignedUrl(publicationUrl, sign);
-    }
+  public JsonObject getPublication(Publication publication, Boolean sign) {
+    URI publicationUrl = getSignedUrl(publication.getURI(), sign);
 
     JsonObject json = new JsonObject();
     json.addProperty("id", publication.getIdentifier());
@@ -2121,7 +1978,7 @@ public class EventsEndpoint {
     json.addProperty("mediatype", safeString(publication.getMimeType()));
     json.addProperty("url", publicationUrl != null ? publicationUrl.toString() : "");
     JsonArray mediaArray = new JsonArray();
-    for (JsonObject trackJson : getPublicationTracksJson(publication, sign, requestedVersion)) {
+    for (JsonObject trackJson : getPublicationTracksJson(publication, sign)) {
       mediaArray.add(trackJson);
     }
     json.add("media", mediaArray);
@@ -2154,8 +2011,7 @@ public class EventsEndpoint {
     return url;
   }
 
-  private List<JsonObject> getPublicationTracksJson(Publication publication, Boolean sign,
-      ApiVersion requestedVersion) {
+  private List<JsonObject> getPublicationTracksJson(Publication publication, Boolean sign) {
     List<JsonObject> tracksJson = new ArrayList<>();
 
     for (Track track : publication.getTracks()) {
@@ -2194,10 +2050,8 @@ public class EventsEndpoint {
         }
       }
 
-      if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
-        trackJson.addProperty("is_master_playlist", track.isMaster());
-        trackJson.addProperty("is_live", track.isLive());
-      }
+      trackJson.addProperty("is_master_playlist", track.isMaster());
+      trackJson.addProperty("is_live", track.isLive());
 
       tracksJson.add(trackJson);
     }
@@ -2269,8 +2123,7 @@ public class EventsEndpoint {
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
           @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign) throws Exception {
     try {
-      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      return ApiResponseBuilder.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign, requestedVersion));
+      return ApiResponseBuilder.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign));
     } catch (NotFoundException e) {
       return ApiResponseBuilder.notFound(e.getMessage());
     } catch (SearchIndexException e) {
@@ -2280,19 +2133,13 @@ public class EventsEndpoint {
   }
 
 
-  private JsonObject getPublication(String eventId, String publicationId, Boolean withSignedUrls,
-      ApiVersion requestedVersion)
+  private JsonObject getPublication(String eventId, String publicationId, Boolean withSignedUrls)
           throws SearchIndexException, NotFoundException {
     Optional<Event> eventOpt = indexService.getEvent(eventId, opensearchIndex);
     if (eventOpt.isPresent()) {
-      List<Publication> publications;
-      publications = eventOpt.get().getPublications().stream()
-          .filter(publication -> (!requestedVersion.isSmallerThan(VERSION_1_11_0)
-              || EventUtils.internalChannelFilter.test(publication)))
-          .collect(Collectors.toList());
-      for (Publication publication : publications) {
+      for (Publication publication : eventOpt.get().getPublications()) {
         if (publicationId.equals(publication.getIdentifier())) {
-          return getPublication(publication, withSignedUrls, requestedVersion);
+          return getPublication(publication, withSignedUrls);
         }
       }
       throw new NotFoundException(
@@ -2428,10 +2275,7 @@ public class EventsEndpoint {
 
   @GET
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
   @RestQuery(
       name = "geteventscheduling",
       description = "Returns an event's scheduling information.",
@@ -2469,10 +2313,7 @@ public class EventsEndpoint {
 
   @PUT
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
   @RestQuery(
       name = "updateeventscheduling",
       description = "Update an event's scheduling information.",
@@ -2502,9 +2343,6 @@ public class EventsEndpoint {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     final Optional<Event> event = indexService.getEvent(id, opensearchIndex);
 
-    if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_2_0)) {
-      allowConflict = false;
-    }
     if (event.isEmpty()) {
       return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
     }

@@ -21,6 +21,7 @@
 package org.opencastproject.external.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -51,62 +52,7 @@ public class ApiMediaTypeTest {
 
   @Test
   public void testParseJsonWithVersion() throws Exception {
-    ApiMediaType type = ApiMediaType.parse("application/v1.0.0+json");
-    assertEquals(ApiVersion.VERSION_1_0_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.0.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.1.0+json");
-    assertEquals(ApiVersion.VERSION_1_1_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.1.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.2.0+json");
-    assertEquals(ApiVersion.VERSION_1_2_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.2.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.3.0+json");
-    assertEquals(ApiVersion.VERSION_1_3_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.3.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.4.0+json");
-    assertEquals(ApiVersion.VERSION_1_4_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.4.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.5.0+json");
-    assertEquals(ApiVersion.VERSION_1_5_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.5.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.6.0+json");
-    assertEquals(ApiVersion.VERSION_1_6_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.6.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.7.0+json");
-    assertEquals(ApiVersion.VERSION_1_7_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.7.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.8.0+json");
-    assertEquals(ApiVersion.VERSION_1_8_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.8.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.9.0+json");
-    assertEquals(ApiVersion.VERSION_1_9_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.9.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.10.0+json");
-    assertEquals(ApiVersion.VERSION_1_10_0, type.getVersion());
-    assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.10.0+json", type.toExternalForm());
-
-    type = ApiMediaType.parse("application/v1.11.0+json");
+    ApiMediaType type = ApiMediaType.parse("application/v1.11.0+json");
     assertEquals(ApiVersion.VERSION_1_11_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
     assertEquals("application/v1.11.0+json", type.toExternalForm());
@@ -120,5 +66,18 @@ public class ApiMediaTypeTest {
   @Test(expected = ApiMediaTypeException.class)
   public void testParseJsonWithInvalidVersion() throws Exception {
     ApiMediaType.parse("application/v0.0.0+json");
+  }
+
+  @Test
+  public void testParseJsonWithRemovedVersion() throws Exception {
+    for (int minor = 0; minor <= 10; minor++) {
+      String header = "application/v1." + minor + ".0+json";
+      try {
+        ApiMediaType.parse(header);
+        fail("Removed version should not be accepted: " + header);
+      } catch (ApiMediaTypeException e) {
+        // expected
+      }
+    }
   }
 }
