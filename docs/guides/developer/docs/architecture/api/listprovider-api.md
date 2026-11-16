@@ -2,8 +2,6 @@
 
 # Information
 
-The ListProvider API is available since API version 1.10.0.
-
 ### GET /api/listproviders/providers.json
 
 Returns a list of listproviders.

@@ -2,8 +2,6 @@
 
 # General
 
-The Statistics API is available since API version 1.3.0.
-
 ### GET /api/statistics/providers
 
 Returns a list of statistics providers.

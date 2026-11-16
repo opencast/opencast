@@ -29,13 +29,11 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
-import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.common.query.GroupsListQuery;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
@@ -54,7 +52,6 @@ import org.opencastproject.util.requests.SortCriterion;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -64,15 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -89,11 +81,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 @Path("/api/groups")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0, ApiMediaType.VERSION_1_13_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0, ApiMediaType.VERSION_1_13_0 })
 @RestService(
     name = "externalapigroups",
     title = "External API Groups Service",
@@ -168,7 +156,6 @@ public class GroupsEndpoint {
       })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     Optional<Integer> optLimit = Optional.ofNullable(limit);
     Optional<Integer> optOffset = Optional.ofNullable(offset);
 
@@ -196,53 +183,8 @@ public class GroupsEndpoint {
 
     ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
 
-    // sorting by members & roles is not supported by the database, so we do this afterwards
-    Set<SortCriterion> deprecatedSortCriteria = new HashSet<>();
-    if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
-      deprecatedSortCriteria = sortCriteria.stream().filter(
-              sortCriterion -> sortCriterion.getFieldName().equals("members")
-                      || sortCriterion.getFieldName().equals("roles")).collect(Collectors.toSet());
-      sortCriteria.removeAll(deprecatedSortCriteria);
-    }
-
     List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter,
         Optional.empty(), Optional.empty(), sortCriteria);
-
-    // sorting by members & roles is only available for api versions < 1.6.0
-    if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
-      List<Comparator<JpaGroup>> comparators = new ArrayList<>();
-      for (SortCriterion sortCriterion : deprecatedSortCriteria) {
-        Comparator<JpaGroup> comparator;
-        switch (sortCriterion.getFieldName()) {
-          case "members":
-            comparator = new GroupComparator() {
-              @Override
-              public Set<String> getGroupAttribute(JpaGroup jpaGroup) {
-                return jpaGroup.getMembers();
-              }
-            };
-            break;
-          case "roles":
-            comparator = new GroupComparator() {
-              @Override
-              public Set<String> getGroupAttribute(JpaGroup jpaGroup) {
-                return jpaGroup.getRoleNames();
-              }
-            };
-            break;
-          default:
-            continue;
-        }
-
-        if (sortCriterion.getOrder() == SortCriterion.Order.Descending) {
-          comparator = comparator.reversed();
-        }
-        comparators.add(comparator);
-      }
-      if (!comparators.isEmpty()) {
-        Collections.sort(results, ComparatorUtils.chainedComparator(comparators));
-      }
-    }
 
     List<JsonObject> groupsJson = new ArrayList<>();
     for (JpaGroup group : results) {
@@ -262,30 +204,6 @@ public class GroupsEndpoint {
     groupsJson.forEach(responseArray::add);
 
     return ApiResponseBuilder.Json.ok(acceptHeader, responseArray);
-  }
-
-  /**
-   * Compare groups by set attributes like members or roles.
-   */
-  private abstract class GroupComparator implements Comparator<JpaGroup> {
-
-    public abstract Set<String> getGroupAttribute(JpaGroup jpaGroup);
-
-    @Override
-    public int compare(JpaGroup group1, JpaGroup group2) {
-      List<String> members1 = new ArrayList<>(getGroupAttribute(group1));
-      List<String> members2 = new ArrayList<>(getGroupAttribute(group2));
-
-      for (int i = 0; i < members1.size() && i < members2.size(); i++) {
-        String member1 = members1.get(i);
-        String member2 = members2.get(i);
-        int result = member1.compareTo(member2);
-        if (result != 0) {
-          return result;
-        }
-      }
-      return (members1.size() - members2.size());
-    }
   }
 
   @GET

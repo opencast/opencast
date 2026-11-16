@@ -29,8 +29,6 @@ Sort Criteria | Description
 `name`        | By the group name
 `description` | By the group description
 `role`        | By the group role
-`members`     | By the group members (only for api versions < 1.6.0)
-`roles`       | By the group roles (only for api versions < 1.6.0)
 
 __Sample request__
 ```

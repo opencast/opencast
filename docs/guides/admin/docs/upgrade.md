@@ -15,3 +15,9 @@ TODO
   the results using `limit` and `offset`. The response contains no total count, so a client can only tell that more
   results exist if it receives exactly as many results as it asked for. Clients which request API version 1.12.0 or
   older keep the previous behavior.
+
+## External API
+
+The External API versions 1.0.0 to 1.10.0 have been removed. Requests explicitly asking for one of these versions in
+their `Accept` header are now rejected with `406 Not Acceptable`. If you are running integrations that pin an old
+External API version, update them to use version 1.11.0 or later before upgrading.
