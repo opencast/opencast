@@ -93,19 +93,44 @@ public class TextSearchQueryTest {
     assertTrue(collectMultiMatches(toJson(new EventQueryBuilder(events))).isEmpty());
   }
 
-  /** Long texts are only matched, not phrase ranked or matched with typos: the queries are slow. */
+  /** Long texts are only matched, not phrase ranked: the queries would exceed the clause limit. Camel case counts. */
   @Test
   public void testLongTextIsNotPhraseRanked() throws Exception {
     String tenWords = "one two three four five six seven eight nine ten";
-    EventSearchQuery events = new EventSearchQuery(ORGANIZATION, admin);
-    events.withText(tenWords);
-    assertEquals(4, collectMultiMatches(toJson(new EventQueryBuilder(events))).size());
+    assertEquals(1, byType(textMatches(tenWords), "phrase").size());
+    assertTrue(byType(textMatches(tenWords + " eleven"), "phrase").isEmpty());
 
-    events = new EventSearchQuery(ORGANIZATION, admin);
-    events.withText(tenWords + " eleven");
-    List<JsonObject> matches = collectMultiMatches(toJson(new EventQueryBuilder(events)));
-    assertEquals(1, matches.size());
-    assertEquals("bool_prefix", matches.get(0).get("type").getAsString());
+    // Two words, but ten and eleven tokens
+    assertEquals(1, byType(textMatches("AlphaBravoCharlieDelta EchoFoxtrotGolfHotelIndiaJuliet"), "phrase").size());
+    List<JsonObject> eleven = textMatches("AlphaBravoCharlieDelta EchoFoxtrotGolfHotelIndiaJulietKilo");
+    assertTrue(byType(eleven, "phrase").isEmpty());
+    assertEquals(1, eleven.size());
+  }
+
+  /** Matching with typos and in different fields is expensive, so it is only done for short texts. */
+  @Test
+  public void testFuzzyMatchingIsOnlyForShortTexts() throws Exception {
+    String sixWords = "one two three four five six";
+    List<JsonObject> six = textMatches(sixWords);
+    assertEquals("The text with typos", 1, byType(wordQueries(six, sixWords), "best_fields").size());
+    assertEquals("The words in any field", 1, wordQueries(six, "one").size());
+    assertEquals("The words in any field", 1, wordQueries(six, "six").size());
+
+    List<JsonObject> seven = textMatches(sixWords + " seven");
+    assertTrue(byType(seven, "best_fields").isEmpty());
+    assertEquals(1, byType(seven, "bool_prefix").size());
+    assertEquals(1, byType(seven, "phrase").size());
+
+    // Two words, but seven tokens
+    List<JsonObject> camel = textMatches("AlphaBravoCharlie DeltaEchoFoxtrotGolf");
+    assertTrue(byType(camel, "best_fields").isEmpty());
+    assertEquals(1, byType(camel, "phrase").size());
+  }
+
+  private List<JsonObject> textMatches(String text) throws Exception {
+    EventSearchQuery query = new EventSearchQuery(ORGANIZATION, admin);
+    query.withText(text);
+    return collectMultiMatches(toJson(new EventQueryBuilder(query)));
   }
 
   /** The prefix query does not tolerate typos in the last word, so the fuzzy query is an alternative to it. */
@@ -138,9 +163,10 @@ public class TextSearchQueryTest {
     assertEquals("AUTO:4,8", byType(fuzzyMatches("biolgy"), "best_fields").get(0).get("fuzziness").getAsString());
     String elevenWords = "one two three four five six seven eight nine ten eleven";
     for (String text : new String[] {"2024", "vorlesung 2024", "*", "   ", elevenWords}) {
-      assertTrue("No fuzzy query expected for '" + text + "'", byType(fuzzyMatches(text), "best_fields").isEmpty());
+      assertTrue("No fuzzy query expected for '" + text + "'",
+          byType(wordQueries(fuzzyMatches(text), text), "best_fields").isEmpty());
     }
-    assertEquals(1, byType(fuzzyMatches("2024 vorlesung"), "best_fields").size());
+    assertEquals(1, byType(wordQueries(fuzzyMatches("2024 vorlesung"), "2024 vorlesung"), "best_fields").size());
   }
 
   private List<JsonObject> fuzzyMatches(String text) throws Exception {
@@ -173,6 +199,63 @@ public class TextSearchQueryTest {
     query = new SeriesSearchQuery(ORGANIZATION, admin);
     query.withText("one two three four five six seven eight nine ten eleven");
     assertFalse(toJson(new SeriesQueryBuilder(query)).toString().contains("\"span_first\""));
+  }
+
+  /** The words may be in different fields: every word has to match in any field, the last one as a prefix. */
+  @Test
+  public void testWordsMayBeInDifferentFields() throws Exception {
+    SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("analysis 2024 arnold");
+    JsonObject json = toJson(new SeriesQueryBuilder(query));
+    List<JsonObject> matches = collectMultiMatches(json);
+
+    JsonObject word = wordQuery(matches, "analysis");
+    assertEquals("best_fields", word.get("type").getAsString());
+    assertEquals("AUTO:4,8", word.get("fuzziness").getAsString());
+    assertEquals(1, word.get("prefix_length").getAsInt());
+    assertTrue(word.get("lenient").getAsBoolean());
+    assertEquals("The title has to count more than the other fields",
+        AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS.get("title"), fieldWeight(word, "title"), 0.0f);
+
+    JsonObject number = wordQuery(matches, "2024");
+    assertEquals("best_fields", number.get("type").getAsString());
+    assertFalse("A number is not matched with typos", number.has("fuzziness"));
+
+    JsonObject last = wordQuery(matches, "arnold");
+    assertEquals("The last word may be the beginning of a word", "bool_prefix", last.get("type").getAsString());
+    assertFalse(last.has("fuzziness"));
+    assertTrue(last.get("lenient").getAsBoolean());
+
+    // An alternative to the other queries, not required on its own
+    JsonObject prefix = byType(wordQueries(matches, "analysis 2024 arnold"), "bool_prefix").get(0);
+    assertFalse(isRequired(json, prefix));
+    assertTrue(json.toString().contains("\"minimum_should_match\":\"1\""));
+
+    // A single word is the same in any field, nothing to add
+    query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("analysis");
+    assertTrue(wordQueries(collectMultiMatches(toJson(new SeriesQueryBuilder(query))), "analysis").size() == 4);
+
+    // Without fuzzy search there are no typos
+    query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText(false, "analysis arnold");
+    assertFalse(wordQuery(collectMultiMatches(toJson(new SeriesQueryBuilder(query))), "analysis").has("fuzziness"));
+  }
+
+  private static JsonObject wordQuery(List<JsonObject> matches, String word) {
+    List<JsonObject> found = wordQueries(matches, word);
+    assertEquals("Expected one query for " + word, 1, found.size());
+    return found.get(0);
+  }
+
+  private static List<JsonObject> wordQueries(List<JsonObject> matches, String word) {
+    List<JsonObject> found = new ArrayList<>();
+    for (JsonObject match : matches) {
+      if (word.equals(match.get("query").getAsString())) {
+        found.add(match);
+      }
+    }
+    return found;
   }
 
   /** Without fuzzy search there is no fuzzy query. */

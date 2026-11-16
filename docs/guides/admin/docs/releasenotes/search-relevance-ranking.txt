@@ -12,7 +12,16 @@ to Biology". Titles which start with the search text rank before titles which on
 
 The search also tolerates typos in the last word of the search text, which was only the case for the other words
 before. For example, `vorlesng` now finds "Vorlesung". Words up to three characters long and numbers are not matched
-with typos, and neither are search texts of more than ten words.
+with typos.
+
+The words of the search text no longer have to be in the same field. Searching for a word of the title together with
+the name of the presenter or a word of the description, for example `analysis arnold`, finds the matching events and
+series. Before, such a search found nothing unless all words were in one field. Searches for several words may
+therefore list more results than before.
+
+Searching with typos or with the words in different fields is only done for search texts of up to six words (camel
+case words like "AnalysisTwo" count for every part), as it makes the search slower with every word. The ranking of
+results by phrase and by the start of the title is done for up to ten words. Longer texts are matched as before.
 
 By default, a match in the title counts three times as much as a match in another field, so that a word which is the
 entire value of a short field, like the series or description of an event, does not rank above the same word in a longer
