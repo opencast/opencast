@@ -32,6 +32,7 @@ import org.opensearch.common.unit.Fuzziness;
 import org.opensearch.core.common.io.stream.StreamOutput;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.DisMaxQueryBuilder;
 import org.opensearch.index.query.MatchAllQueryBuilder;
 import org.opensearch.index.query.MultiMatchQueryBuilder;
 import org.opensearch.index.query.Operator;
@@ -58,6 +59,12 @@ import java.util.stream.Collectors;
  * Opencast implementation of the OpenSearch query builder.
  */
 public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> implements QueryBuilder {
+
+  /** Score boost for documents containing the search text as a phrase of complete words */
+  private static final float PHRASE_MATCH_BOOST = 3.0f;
+
+  /** Score boost for documents containing the search text as a phrase whose last word may be a prefix */
+  private static final float PHRASE_PREFIX_MATCH_BOOST = 0.5f;
 
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
@@ -200,8 +207,23 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       if (fuzzy) {
         queryBuilder.fuzziness(Fuzziness.AUTO);
       }
+      // The prefix query scores every match the same, so rank the results by optional phrase queries. Only the better
+      // of phrase and phrase prefix counts, and the latter is weighted low: it favors long words over the exact one.
+      // Lenient, as not every "*.search" field is a text field and phrase queries fail on the others.
+      DisMaxQueryBuilder phraseQuery = QueryBuilders.disMaxQuery();
+      phraseQuery.add(QueryBuilders.multiMatchQuery(text)
+          .field("*" + SEARCH_FIELD_NAME_EXTENSION)
+          .type(MultiMatchQueryBuilder.Type.PHRASE)
+          .lenient(true)
+          .boost(PHRASE_MATCH_BOOST));
+      phraseQuery.add(QueryBuilders.multiMatchQuery(text)
+          .field("*" + SEARCH_FIELD_NAME_EXTENSION)
+          .type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX)
+          .lenient(true)
+          .boost(PHRASE_PREFIX_MATCH_BOOST));
+      BoolQueryBuilder textQuery = QueryBuilders.boolQuery().must(queryBuilder).should(phraseQuery);
       booleanQuery.minimumShouldMatch(1);
-      booleanQuery.should(queryBuilder);
+      booleanQuery.should(textQuery);
       this.queryBuilder = booleanQuery;
     }
 

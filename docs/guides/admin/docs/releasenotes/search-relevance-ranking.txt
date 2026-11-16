@@ -1,0 +1,16 @@
+Text searches for series and events are now sorted by relevance
+
+Searching for a series or event by text, for example with the search field in the admin UI, found the right results
+but did not rank them: every match got the same score, so the order of the results was effectively arbitrary
+(typically the order in which the documents were indexed) and a good match could end up behind a poor one.
+
+Matches are now ranked. Results rank higher if they contain the search text as a phrase, with the words in the typed
+order, and results with shorter matching fields come first. For example, searching for `biology` now lists a series
+titled "Biology" before one titled "An Introduction to Probability Theory and Stochastic Processes with Applications
+to Biology". Which results are found does not change, and partially typed words still match.
+
+This applies wherever the search index is queried with a text filter, which includes the series and event lists in the
+admin UI and the corresponding External API endpoints. An explicit sort order, such as clicking a column header, still
+takes precedence over relevance.
+
+This change does not include a database schema change or a search index change. No rebuild of the index is needed.
