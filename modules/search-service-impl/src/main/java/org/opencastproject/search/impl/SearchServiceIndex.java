@@ -529,54 +529,67 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = securityService.getUser();
 
+    int total;
     try {
-      int total = persistence.countMediaPackages();
-      int pageSize = 50;
-      int pageOffset = 0;
-      AtomicInteger current = new AtomicInteger(1);
-      logIndexRebuildBegin(logger, total, "search");
-      List<Tuple<MediaPackage, String>> page = null;
+      total = persistence.countMediaPackages();
+    } catch (SearchServiceDatabaseException e) {
+      throw new IndexRebuildException("Index Rebuild Failure", e);
+    }
+    AtomicInteger current = new AtomicInteger(1);
+    logIndexRebuildBegin(logger, total, "search");
+
+    List<Organization> orgs = organizationDirectory.getOrganizations();
+    for (Organization org : orgs) {
       Set<String> indexedSeries = new HashSet<>();
 
-      do {
-        page = persistence.getAllMediaPackages(pageSize, pageOffset).collect(Collectors.toList());
-        page.forEach(tuple -> {
-          try {
-            MediaPackage mediaPackage = tuple.getA();
-            Organization organization = organizationDirectory.getOrganization(tuple.getB());
-            final var systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
-            securityService.setUser(systemUser);
-            securityService.setOrganization(organization);
+      try {
+        int pageSize = 50;
+        int pageOffset = 0;
+        do {
+          List<Tuple<MediaPackage, String>> page = null;
 
-            String mediaPackageId = mediaPackage.getIdentifier().toString();
+          page = persistence.getAllMediaPackages(org, pageSize, pageOffset).collect(Collectors.toList());
+          page.forEach(tuple -> {
+            try {
+              MediaPackage mediaPackage = tuple.getA();
+              Organization organization = organizationDirectory.getOrganization(tuple.getB());
+              final var systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+              securityService.setUser(systemUser);
+              securityService.setOrganization(organization);
 
-            AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-            Date modificationDate = persistence.getModificationDate(mediaPackageId);
-            Date deletionDate = persistence.getDeletionDate(mediaPackageId);
+              String mediaPackageId = mediaPackage.getIdentifier().toString();
 
-            current.getAndIncrement();
+              AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
+              Date modificationDate = persistence.getModificationDate(mediaPackageId);
+              Date deletionDate = persistence.getDeletionDate(mediaPackageId);
 
-            indexedSeries.addAll(indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, indexedSeries));
-          } catch (SearchServiceDatabaseException e) {
-            logIndexRebuildError(logger, total, current.get(), e);
-            //NB: Runtime exception thrown to escape the functional interfacing
-            throw new RuntimeException("Internal Index Rebuild Failure", e);
-          } catch (RuntimeException | NotFoundException e) {
-            logSkippingElement(logger, "event", tuple.getA().getIdentifier().toString(), e);
-          }
-        });
-        //Current is the *page* index, so we remove one since each page only has pageSize entries
-        logIndexRebuildProgress(logger, total, current.get() - 1, pageSize);
-        pageOffset += 1;
-      } while (pageOffset * pageSize <= total);
-      //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
-    } catch (SearchServiceDatabaseException | RuntimeException e) {
-      logIndexRebuildError(logger, e);
-      throw new IndexRebuildException("Index Rebuild Failure", e);
-    } finally {
-      securityService.setUser(originalUser);
-      securityService.setOrganization(originalOrg);
+              current.getAndIncrement();
+
+              indexedSeries.addAll(indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, indexedSeries));
+            } catch (SearchServiceDatabaseException e) {
+              logIndexRebuildError(logger, total, current.get(), e);
+              //NB: Runtime exception thrown to escape the functional interfacing
+              throw new RuntimeException("Internal Index Rebuild Failure", e);
+            } catch (RuntimeException | NotFoundException e) {
+              logSkippingElement(logger, "event", tuple.getA().getIdentifier().toString(), e);
+            }
+          });
+          //Current is the *page* index, so we remove one since each page only has pageSize entries
+          logIndexRebuildProgress(logger, total, current.get() - 1, pageSize);
+          pageOffset += 1;
+        } while (pageOffset * pageSize <= total);
+        //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
+      } catch (SearchServiceDatabaseException | RuntimeException e) {
+        logIndexRebuildError(logger, e);
+        throw new IndexRebuildException("Index Rebuild Failure", e);
+      } finally {
+        securityService.setUser(originalUser);
+        securityService.setOrganization(originalOrg);
+      }
+      // We keep track of series based on the org, so we clear the list at this point
+      indexedSeries.clear();
     }
+
   }
 
   @Reference
