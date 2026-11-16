@@ -98,6 +98,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -290,20 +291,26 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     List<DublinCoreCatalog> seriesList = Collections.emptyList();
     if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF)) {
       //Find the series (if any), filter for those which exist to prevent linking non-existent series
-      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF).stream().map(DublinCoreValue::getValue).map(s -> {
-        try {
-          return seriesService.getSeries(s);
-        } catch (NotFoundException e) {
-          logger.warn("Series {} not found during index of event {}, omitting the link from the indexed data", s,
-              mediaPackageId);
-        } catch (UnauthorizedException e) {
-          logger.warn("Not authorized for series {} during index of event {}, omitting the link from the indexed data",
-              s, mediaPackageId);
-        } catch (SeriesException e) {
-          throw new SearchException(e);
-        }
-        return null;
-      }).filter(Objects::nonNull).collect(Collectors.toList());
+      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF)
+        .stream()
+        .map(DublinCoreValue::getValue)
+        .filter(Predicate.not(processedSeriesIds::contains))
+        .map(s -> {
+          try {
+            return seriesService.getSeries(s);
+          } catch (NotFoundException e) {
+            logger.warn("Series {} not found during index of event {}, omitting the link from the indexed data", s,
+                mediaPackageId);
+          } catch (UnauthorizedException e) {
+            logger.warn("Not authorized for series {} during index of event {}, omitting the link from the index",
+                s, mediaPackageId);
+          } catch (SeriesException e) {
+            throw new SearchException(e);
+          }
+          return null;
+        })
+        .filter(Objects::nonNull)
+        .toList();
     }
 
     // Add custom roles if enabled
@@ -327,9 +334,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     // Elasticsearch series
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      if (processedSeriesIds.contains(seriesId)) {
-        continue;
-      }
       AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
           .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
           .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
