@@ -34,6 +34,7 @@ import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.index.query.BoolQueryBuilder;
 import org.opensearch.index.query.DisMaxQueryBuilder;
 import org.opensearch.index.query.MatchAllQueryBuilder;
+import org.opensearch.index.query.MatchNoneQueryBuilder;
 import org.opensearch.index.query.MultiMatchQueryBuilder;
 import org.opensearch.index.query.Operator;
 import org.opensearch.index.query.QueryBuilder;
@@ -41,16 +42,20 @@ import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.index.query.QueryRewriteContext;
 import org.opensearch.index.query.QueryShardContext;
 import org.opensearch.index.query.RangeQueryBuilder;
+import org.opensearch.index.query.SpanNearQueryBuilder;
+import org.opensearch.index.query.SpanQueryBuilder;
 import org.opensearch.index.query.TermsQueryBuilder;
 import org.opensearch.index.query.WildcardQueryBuilder;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -65,6 +70,9 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
 
   /** Score boost for documents containing the search text as a phrase whose last word may be a prefix */
   private static final float PHRASE_PREFIX_MATCH_BOOST = 0.5f;
+
+  /** Score boost for documents whose title starts with the search text (the last word may be a prefix) */
+  private static final float TITLE_START_MATCH_BOOST = 10.0f;
 
   /** Longer texts are not phrase ranked or matched with typos: the queries are slow and exceed the clause limit. */
   private static final int MAX_EXTRA_QUERY_WORDS = 10;
@@ -236,10 +244,10 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       BoolQueryBuilder textQuery = QueryBuilders.boolQuery();
       if (fuzzy && shortText && lastWordHasLetters) {
         // The prefix query does not tolerate typos in the last word, so also accept documents containing all words
-        // with typos. Constant score: only the ranking queries below should influence the order.
+        // with typos. Scored, so that these results are ordered by relevance too.
         textQuery.must(QueryBuilders.boolQuery()
             .should(queryBuilder)
-            .should(QueryBuilders.constantScoreQuery(fuzzyWordsQuery()))
+            .should(fuzzyWordsQuery())
             .minimumShouldMatch(1));
       } else {
         textQuery.must(queryBuilder);
@@ -250,6 +258,8 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
         phraseQuery.add(searchableFieldsQuery(MultiMatchQueryBuilder.Type.PHRASE_PREFIX)
             .boost(PHRASE_PREFIX_MATCH_BOOST));
         textQuery.should(phraseQuery);
+        // Rank titles starting with the text before those which merely contain it
+        textQuery.should(titleStartQuery());
       }
       booleanQuery.minimumShouldMatch(1);
       booleanQuery.should(textQuery);
@@ -280,16 +290,38 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
 
   }
 
+  /** Matches titles starting with the search text, the last word as a prefix. Only ranks, so constant score. */
+  private QueryBuilder titleStartQuery() {
+    // Approximates the analysis of the field: where it deviates, the title is still found, but not boosted
+    String normalized = Normalizer.normalize(text.toLowerCase(Locale.ROOT), Normalizer.Form.NFKD)
+        .replaceAll("\\p{M}+", "").replace("ß", "ss");
+    List<String> terms = Arrays.stream(normalized.split("[^\\p{L}\\p{N}]+"))
+        .filter(term -> !term.isEmpty())
+        .collect(Collectors.toList());
+    if (terms.isEmpty()) {
+      return new MatchNoneQueryBuilder();
+    }
+    String field = "title" + SEARCH_FIELD_NAME_EXTENSION;
+    int last = terms.size() - 1;
+    SpanQueryBuilder lastWord = QueryBuilders.spanMultiTermQueryBuilder(
+        QueryBuilders.prefixQuery(field, terms.get(last)));
+    SpanQueryBuilder title = lastWord;
+    if (last > 0) {
+      SpanNearQueryBuilder words = QueryBuilders.spanNearQuery(QueryBuilders.spanTermQuery(field, terms.get(0)), 0);
+      terms.subList(1, last).forEach(term -> words.addClause(QueryBuilders.spanTermQuery(field, term)));
+      title = words.addClause(lastWord).inOrder(true);
+    }
+    return QueryBuilders.constantScoreQuery(QueryBuilders.spanFirstQuery(title, terms.size()))
+        .boost(TITLE_START_MATCH_BOOST);
+  }
+
   /** Matches fields containing all words of the search text, each of them with typos allowed. */
   private MultiMatchQueryBuilder fuzzyWordsQuery() {
-    return QueryBuilders.multiMatchQuery(text)
-        .field("*" + SEARCH_FIELD_NAME_EXTENSION)
-        .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+    return searchableFieldsQuery(MultiMatchQueryBuilder.Type.BEST_FIELDS)
         .operator(Operator.AND)
         .fuzziness(LAST_WORD_FUZZINESS)
         // A fixed first letter is much cheaper
-        .prefixLength(1)
-        .lenient(true);
+        .prefixLength(1);
   }
 
   /** Creates a lenient query of the given type on all searchable fields, weighted by the configured boosts. */

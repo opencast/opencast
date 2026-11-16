@@ -123,7 +123,8 @@ public class TextSearchQueryTest {
     assertEquals("AUTO:4,8", fuzzy.get(0).get("fuzziness").getAsString());
     assertEquals(1, fuzzy.get(0).get("prefix_length").getAsInt());
     assertTrue(fuzzy.get(0).get("lenient").getAsBoolean());
-    assertTrue("The fuzzy query must not influence the score", json.toString().contains("\"constant_score\""));
+    assertEquals("The fuzzy query must weight the title like the ranking queries",
+        AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS.get("title"), fieldWeight(fuzzy.get(0), "title"), 0.0f);
 
     // Either of the two is enough to match
     assertEquals(1, byType(matches, "bool_prefix").size());
@@ -146,6 +147,32 @@ public class TextSearchQueryTest {
     SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
     query.withText(text);
     return collectMultiMatches(toJson(new SeriesQueryBuilder(query)));
+  }
+
+  /** Titles which start with the search text rank higher, with the words normalized like the indexed ones. */
+  @Test
+  public void testTitleStartIsBoosted() throws Exception {
+    SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("Über Analy");
+    String json = toJson(new SeriesQueryBuilder(query)).toString();
+
+    assertTrue(json.contains("\"span_first\""));
+    assertTrue(json.contains("\"end\":2"));
+    assertTrue(json.contains("\"span_term\":{\"title.search\":{\"value\":\"uber\""));
+    assertTrue(json.contains("\"prefix\":{\"title.search\":{\"value\":\"analy\""));
+    assertTrue("The words have to be in the typed order", json.contains("\"in_order\":true"));
+
+    // A single word needs no span_near
+    query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("analysis");
+    json = toJson(new SeriesQueryBuilder(query)).toString();
+    assertTrue(json.contains("\"span_first\""));
+    assertFalse(json.contains("\"span_near\""));
+
+    // Long texts are not ranked this way, like they are not phrase ranked
+    query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("one two three four five six seven eight nine ten eleven");
+    assertFalse(toJson(new SeriesQueryBuilder(query)).toString().contains("\"span_first\""));
   }
 
   /** Without fuzzy search there is no fuzzy query. */

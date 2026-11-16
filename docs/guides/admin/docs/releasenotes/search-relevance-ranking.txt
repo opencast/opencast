@@ -7,7 +7,8 @@ but did not rank them: every match got the same score, so the order of the resul
 Matches are now ranked. Results rank higher if they contain the search text as a phrase, with the words in the typed
 order, and results with shorter matching fields come first. For example, searching for `biology` now lists a series
 titled "Biology" before one titled "An Introduction to Probability Theory and Stochastic Processes with Applications
-to Biology". Partially typed words still match.
+to Biology". Titles which start with the search text rank before titles which only contain it, so `analysis` lists
+"Analysis II" before "Medical Image Analysis". Partially typed words still match.
 
 The search also tolerates typos in the last word of the search text, which was only the case for the other words
 before. For example, `vorlesng` now finds "Vorlesung". Words up to three characters long and numbers are not matched
