@@ -66,6 +66,12 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
   /** Score boost for documents containing the search text as a phrase whose last word may be a prefix */
   private static final float PHRASE_PREFIX_MATCH_BOOST = 0.5f;
 
+  /** Longer texts are not phrase ranked: the queries expand to a clause per word and field and exceed the limit. */
+  private static final int MAX_PHRASE_RANKING_WORDS = 10;
+
+  /** The default weights of fields in text searches: a match in the title counts three times as much. */
+  public static final Map<String, Float> DEFAULT_FIELD_BOOSTS = Map.of("title", 3.0f);
+
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
   private Map<String, Set<Object>> searchTermsNot = null;
@@ -95,6 +101,9 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
   /** Fuzzy text query */
   protected boolean fuzzy = false;
 
+  /** Score boosts of fields when searching by text, by field name */
+  private final Map<String, Float> fieldBoosts;
+
   /** The original search query */
   private final T query;
 
@@ -108,7 +117,13 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
    *          the search query
    */
   public AbstractOpenSearchQueryBuilder(T query) {
+    this(query, DEFAULT_FIELD_BOOSTS);
+  }
+
+  /** Creates a new OpenSearch query based on the raw query, with the weights of fields in text searches. */
+  public AbstractOpenSearchQueryBuilder(T query, Map<String, Float> fieldBoosts) {
     this.query = query;
+    this.fieldBoosts = fieldBoosts;
     buildQuery(query);
     createQuery();
   }
@@ -209,19 +224,16 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       }
       // The prefix query scores every match the same, so rank the results by optional phrase queries. Only the better
       // of phrase and phrase prefix counts, and the latter is weighted low: it favors long words over the exact one.
+      // The title is weighted above other fields, as a short value elsewhere would otherwise outrank it.
       // Lenient, as not every "*.search" field is a text field and phrase queries fail on the others.
-      DisMaxQueryBuilder phraseQuery = QueryBuilders.disMaxQuery();
-      phraseQuery.add(QueryBuilders.multiMatchQuery(text)
-          .field("*" + SEARCH_FIELD_NAME_EXTENSION)
-          .type(MultiMatchQueryBuilder.Type.PHRASE)
-          .lenient(true)
-          .boost(PHRASE_MATCH_BOOST));
-      phraseQuery.add(QueryBuilders.multiMatchQuery(text)
-          .field("*" + SEARCH_FIELD_NAME_EXTENSION)
-          .type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX)
-          .lenient(true)
-          .boost(PHRASE_PREFIX_MATCH_BOOST));
-      BoolQueryBuilder textQuery = QueryBuilders.boolQuery().must(queryBuilder).should(phraseQuery);
+      BoolQueryBuilder textQuery = QueryBuilders.boolQuery().must(queryBuilder);
+      if (text.trim().split("[^\\p{L}\\p{N}]+").length <= MAX_PHRASE_RANKING_WORDS) {
+        DisMaxQueryBuilder phraseQuery = QueryBuilders.disMaxQuery();
+        phraseQuery.add(searchableFieldsQuery(MultiMatchQueryBuilder.Type.PHRASE).boost(PHRASE_MATCH_BOOST));
+        phraseQuery.add(searchableFieldsQuery(MultiMatchQueryBuilder.Type.PHRASE_PREFIX)
+            .boost(PHRASE_PREFIX_MATCH_BOOST));
+        textQuery.should(phraseQuery);
+      }
       booleanQuery.minimumShouldMatch(1);
       booleanQuery.should(textQuery);
       this.queryBuilder = booleanQuery;
@@ -249,6 +261,20 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       this.queryBuilder = booleanQuery;
     }
 
+  }
+
+  /** Creates a lenient query of the given type on all searchable fields, weighted by the configured boosts. */
+  private MultiMatchQueryBuilder searchableFieldsQuery(MultiMatchQueryBuilder.Type type) {
+    MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text)
+        .field("*" + SEARCH_FIELD_NAME_EXTENSION)
+        .type(type)
+        .lenient(true);
+    fieldBoosts.forEach((field, boost) -> {
+      if (boost != 1.0f) {
+        queryBuilder.field(field + SEARCH_FIELD_NAME_EXTENSION, boost);
+      }
+    });
+    return queryBuilder;
   }
 
   /**

@@ -9,6 +9,12 @@ order, and results with shorter matching fields come first. For example, searchi
 titled "Biology" before one titled "An Introduction to Probability Theory and Stochastic Processes with Applications
 to Biology". Which results are found does not change, and partially typed words still match.
 
+By default, a match in the title counts three times as much as a match in another field, so that a word which is the
+entire value of a short field, like the series or description of an event, does not rank above the same word in a longer
+title. The weight of any field can be changed separately for events and series with `search.boost.event` and
+`search.boost.series` in `org.opencastproject.opensearch.index.OpenSearchIndex.cfg`, for example
+`search.boost.event=title^3.0,series_name^1.5,description^0.5`. See the OpenSearch configuration documentation.
+
 This applies wherever the search index is queried with a text filter, which includes the series and event lists in the
 admin UI and the corresponding External API endpoints. An explicit sort order, such as clicking a column header, still
 takes precedence over relevance.

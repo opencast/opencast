@@ -54,6 +54,11 @@ public class EventQueryBuilder extends AbstractOpenSearchQueryBuilder<EventSearc
     super(query);
   }
 
+  /** Creates a new OpenSearch query based on the query, with the weights of fields in text searches. */
+  public EventQueryBuilder(EventSearchQuery query, Map<String, Float> fieldBoosts) {
+    super(query, fieldBoosts);
+  }
+
   @Override
   public void buildQuery(EventSearchQuery query) {
     // Organization

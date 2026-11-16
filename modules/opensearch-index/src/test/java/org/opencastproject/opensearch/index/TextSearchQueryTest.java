@@ -25,8 +25,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.opensearch.impl.AbstractOpenSearchQueryBuilder;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventQueryBuilder;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.SeriesQueryBuilder;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.JaxbOrganization;
@@ -49,6 +52,7 @@ import org.opensearch.index.query.QueryBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -89,6 +93,106 @@ public class TextSearchQueryTest {
     assertTrue(collectMultiMatches(toJson(new EventQueryBuilder(events))).isEmpty());
   }
 
+  /** Long texts are only matched, not phrase ranked: the queries would exceed the clause limit of OpenSearch. */
+  @Test
+  public void testLongTextIsNotPhraseRanked() throws Exception {
+    String tenWords = "one two three four five six seven eight nine ten";
+    EventSearchQuery events = new EventSearchQuery(ORGANIZATION, admin);
+    events.withText(tenWords);
+    assertEquals(3, collectMultiMatches(toJson(new EventQueryBuilder(events))).size());
+
+    events = new EventSearchQuery(ORGANIZATION, admin);
+    events.withText(tenWords + " eleven");
+    List<JsonObject> matches = collectMultiMatches(toJson(new EventQueryBuilder(events)));
+    assertEquals(1, matches.size());
+    assertEquals("bool_prefix", matches.get(0).get("type").getAsString());
+  }
+
+  /** The weights of fields can be configured, separately for series and events. */
+  @Test
+  public void testFieldBoostsAreConfigurable() throws Exception {
+    SeriesSearchQuery series = new SeriesSearchQuery(ORGANIZATION, admin);
+    series.withText("biology");
+    EventSearchQuery events = new EventSearchQuery(ORGANIZATION, admin);
+    events.withText("biology");
+
+    List<JsonObject> seriesMatches = collectMultiMatches(
+        toJson(new SeriesQueryBuilder(series, Map.of("title", 5.0f, "description", 0.5f))));
+    for (String type : new String[] {"phrase", "phrase_prefix"}) {
+      JsonObject match = byType(seriesMatches, type).get(0);
+      assertEquals(5.0f, fieldWeight(match, "title"), 0.0f);
+      assertEquals(0.5f, fieldWeight(match, "description"), 0.0f);
+      assertEquals(1.0f, fieldWeight(match, "creator"), 0.0f);
+    }
+
+    // The configuration of events does not affect series and the other way around
+    List<JsonObject> eventMatches = collectMultiMatches(
+        toJson(new EventQueryBuilder(events, Map.of("series_name", 2.5f))));
+    for (String type : new String[] {"phrase", "phrase_prefix"}) {
+      JsonObject match = byType(eventMatches, type).get(0);
+      assertEquals(2.5f, fieldWeight(match, "series_name"), 0.0f);
+      assertEquals(1.0f, fieldWeight(match, "title"), 0.0f);
+    }
+
+    // Without configuration the title is weighted higher
+    assertRankedTextQuery(toJson(new SeriesQueryBuilder(series)));
+  }
+
+  /** A boost of 1, like no configuration, leaves the field out of the query. */
+  @Test
+  public void testFieldsAreNotWeightedWithBoostOfOne() throws Exception {
+    SeriesSearchQuery query = new SeriesSearchQuery(ORGANIZATION, admin);
+    query.withText("biology");
+
+    for (Map<String, Float> boosts : List.of(Map.of("title", 1.0f, "description", 1.0f), Map.<String, Float>of())) {
+      for (JsonObject match : collectMultiMatches(toJson(new SeriesQueryBuilder(query, boosts)))) {
+        for (JsonElement field : match.getAsJsonArray("fields")) {
+          assertFalse("Unexpected field " + field, field.getAsString().startsWith("title.search"));
+          assertFalse("Unexpected field " + field, field.getAsString().startsWith("description.search"));
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testParseFieldBoosts() {
+    Set<String> known = Set.of("title", "description", "series_name");
+    Map<String, Float> defaults = AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS;
+
+    assertEquals(Map.of("title", 3.0f, "description", 1.0f),
+        OpenSearchIndex.parseFieldBoosts("title^3.0,description^1.0", "test", known));
+    assertEquals(Map.of("title", 4.5f, "series_name", 0.5f),
+        OpenSearchIndex.parseFieldBoosts("  title^4.5 , series_name ^ 0.5 ,", "test", known));
+    assertEquals(Map.of("title", 2.0f), OpenSearchIndex.parseFieldBoosts("title^2", "test", known));
+
+    // Not configured: the default. Configured as empty: no boosts at all
+    assertEquals(defaults, OpenSearchIndex.parseFieldBoosts(null, "test", known));
+    assertEquals(Map.of(), OpenSearchIndex.parseFieldBoosts("", "test", known));
+    assertEquals(Map.of(), OpenSearchIndex.parseFieldBoosts("  ", "test", known));
+
+    // Invalid entries are ignored, but do not affect the valid ones
+    assertEquals(Map.of("title", 2.0f),
+        OpenSearchIndex.parseFieldBoosts("title^2,description,series_name^high,description^0,description^-1,"
+            + "series_name^NaN,series_name^Infinity,^3,desc ription^2", "test", known));
+
+    // The last boost of a field wins
+    assertEquals(Map.of("title", 5.0f), OpenSearchIndex.parseFieldBoosts("title^2,title^5", "test", known));
+
+    // Unknown fields are kept (they warn), as extended metadata fields depend on the configuration
+    assertEquals(Map.of("title", 2.0f, "extended_metadata_tiss_courseNumber", 4.0f, "nothing", 1.5f),
+        OpenSearchIndex.parseFieldBoosts("title^2,extended_metadata_tiss_courseNumber^4,nothing^1.5", "test", known));
+  }
+
+  @Test
+  public void testSchemaFields() {
+    Set<String> series = OpenSearchIndex.schemaFields(SeriesIndexSchema.class);
+    assertTrue(series.containsAll(Set.of("title", "uid", "description", "creator")));
+    assertFalse(series.contains("series_name"));
+
+    Set<String> events = OpenSearchIndex.schemaFields(EventIndexSchema.class);
+    assertTrue(events.containsAll(Set.of("title", "uid", "description", "series_name", "presenter", "location")));
+  }
+
   private static void assertRankedTextQuery(JsonObject json) {
     List<JsonObject> matches = collectMultiMatches(json);
 
@@ -105,6 +209,8 @@ public class TextSearchQueryTest {
       assertEquals("biology", match.get("query").getAsString());
       assertTrue(type + " query must be lenient", match.has("lenient") && match.get("lenient").getAsBoolean());
       assertTrue(type + " query must boost the score", match.has("boost") && match.get("boost").getAsFloat() > 0.0f);
+      assertEquals(type + " query must weight the title higher than the other fields",
+          AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS.get("title"), fieldWeight(match, "title"), 0.0f);
     }
     assertEquals(3, matches.size());
 
@@ -164,6 +270,22 @@ public class TextSearchQueryTest {
       }
     }
     return found;
+  }
+
+  /** Returns the weight of a field relative to the other searchable fields, or 1 if it is not weighted. */
+  private static float fieldWeight(JsonObject multiMatch, String field) {
+    float others = 1.0f;
+    float weight = 1.0f;
+    for (JsonElement f : multiMatch.getAsJsonArray("fields")) {
+      String[] parts = f.getAsString().split("\\^");
+      float boost = parts.length > 1 ? Float.parseFloat(parts[1]) : 1.0f;
+      if (parts[0].equals(field + ".search")) {
+        weight = boost;
+      } else if (parts[0].equals("*.search")) {
+        others = boost;
+      }
+    }
+    return weight / others;
   }
 
   private static List<JsonObject> byType(List<JsonObject> matches, String type) {
