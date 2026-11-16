@@ -41,8 +41,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
-import org.opencastproject.statistics.export.api.StatisticsExportService;
-import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -50,7 +48,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -61,13 +58,9 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
@@ -107,7 +100,6 @@ public class StatisticsEndpoint {
   private IndexService indexService;
   private OpenSearchIndex opensearchIndex;
   private StatisticsService statisticsService;
-  private StatisticsExportService statisticsExportService;
 
   @Reference
   public void setSecurityService(SecurityService securityService) {
@@ -127,11 +119,6 @@ public class StatisticsEndpoint {
   @Reference
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
-  }
-
-  @Reference
-  public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
-    this.statisticsExportService = statisticsExportService;
   }
 
   /** OSGi activation method */
@@ -279,83 +266,6 @@ public class StatisticsEndpoint {
         .forEach(result::add);
 
     return ApiResponseBuilder.Json.ok(acceptHeader, result.toString());
-  }
-
-  @POST
-  @Produces({ ApiMediaType.JSON })
-  @Path("data/export.csv")
-  @RestQuery(
-      name = "getexportcsv",
-      description = "Returns a statistics csv export",
-      returnDescription = "The requested statistics csv export",
-      restParameters = {
-          @RestParameter(
-              name = "data", description = "A JSON object describing the query to be executed",
-              isRequired = true, type = RestParameter.Type.TEXT),
-          @RestParameter(
-              name = "limit", description = "Limit for pagination.",
-              isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(
-              name = "offset", description = "Offset for pagination.",
-              isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(
-              name = "filter", description = "Usage [Filter Name]:[Value to Filter With]. Multiple filters can be used "
-              + "by combining them with commas \",\".", isRequired = false, type = RestParameter.Type.STRING)
-      },
-      responses = {
-          @RestResponse(
-              description = "Returns the csv data as requested by the query as plain text",
-              responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(
-              description = "If the current user is not authorized to perform this action",
-              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-  })
-  public Response getExportCSV(
-          @HeaderParam("Accept") String acceptHeader,
-          @FormParam("data") String data,
-          @FormParam("limit") Integer limit,
-          @FormParam("offset") Integer offset,
-          @FormParam("filter") String filter
-  ) throws NotFoundException, SearchIndexException, UnauthorizedException {
-
-    final int lim = limit != null ? Math.max(0, limit) : 0;
-    final int off = offset != null ? Math.max(0, offset) : 0;
-
-    final Map<String, String> filters = Arrays.stream(Optional.ofNullable(filter).orElse("")
-            .split(","))
-            .filter(f -> f.contains(":"))
-            .collect(Collectors.toMap(
-                    f -> f.substring(0, f.indexOf(":")),
-                    f -> f.substring(f.indexOf(":") + 1)));
-
-    QueryUtils.Query query = null;
-    try {
-      query = QueryUtils.parseQuery(data, statisticsService);
-    } catch (Exception e) {
-      logger.debug("Unable to parse form parameter 'data' {}, exception", data, e);
-      return RestUtil.R.badRequest("Unable to parse form parameter 'data': " + e.getMessage());
-    }
-    checkAccess(query.getParameters().getResourceId(), query.getProvider().getResourceType());
-
-    final QueryUtils.ExportParameters parameters = (QueryUtils.ExportParameters) query.getParameters();
-    final String result = statisticsExportService.getCSV(
-            query.getProvider(),
-            parameters.getResourceId(),
-            parameters.getFrom(),
-            parameters.getTo(),
-            parameters.getDataResolution(),
-            this.opensearchIndex,
-            ZoneId.systemDefault(),
-            true,
-            parameters.getDetailLevel(),
-            lim,
-            off,
-            filters
-    );
-
-    JsonObject csvJson = new JsonObject();
-    csvJson.addProperty("csv", result);
-    return ApiResponseBuilder.Json.ok(acceptHeader, csvJson.toString());
   }
 
   private void checkAccess(final String resourceId, final ResourceType resourceType) {

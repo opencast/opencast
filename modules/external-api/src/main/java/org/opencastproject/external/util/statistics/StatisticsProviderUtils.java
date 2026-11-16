@@ -22,12 +22,10 @@ package org.opencastproject.external.util.statistics;
 
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
-import org.opencastproject.statistics.export.api.DetailLevel;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import java.util.Set;
 
 public final class StatisticsProviderUtils {
 
@@ -64,8 +62,6 @@ public final class StatisticsProviderUtils {
       addParameter(parameters, "to", PARAMETER_TYPE_DATETIME, false);
       addEnumParameter(parameters, "dataResolution",
           DataResolutionUtils.toJson(((TimeSeriesProvider) provider).getDataResolutions()), false);
-      addEnumParameter(parameters, "detailLevel",
-              DetailLevelUtils.toJson(Set.of(DetailLevel.values())), true);
       result.add("parameters", parameters);
     }
     return result;
