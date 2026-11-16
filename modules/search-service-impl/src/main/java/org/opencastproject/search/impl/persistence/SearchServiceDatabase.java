@@ -41,8 +41,10 @@ import java.util.stream.Stream;
 public interface SearchServiceDatabase {
 
   /**
-   * Returns all search entries in persistent storage.
+   * Returns all search entries in persistent storage for a given organization.
    *
+   * @param organization
+   *          the organization to filter the returned mediapackages by
    * @param pagesize
    *          the number of results to get from the database at once
    * @param offset
@@ -51,7 +53,7 @@ public interface SearchServiceDatabase {
    * @throws SearchServiceDatabaseException
    *           if exception occurs
    */
-  Stream<Tuple<MediaPackage, String>> getAllMediaPackages(int pagesize, int offset)
+  Stream<Tuple<MediaPackage, String>> getAllMediaPackages(Organization organization, int pagesize, int offset)
           throws SearchServiceDatabaseException;
 
   /**

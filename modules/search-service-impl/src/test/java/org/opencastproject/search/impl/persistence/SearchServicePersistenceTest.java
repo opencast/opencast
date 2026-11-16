@@ -64,6 +64,7 @@ public class SearchServicePersistenceTest {
   private MediaPackage mediaPackage;
   private AccessControlList accessControlList;
   private SecurityService securityService;
+  private JpaOrganization jpaOrganization;
 
   /**
    * @throws java.lang.Exception
@@ -85,6 +86,10 @@ public class SearchServicePersistenceTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
+
+    jpaOrganization = new JpaOrganization(defaultOrganization.getId(), defaultOrganization.getName(),
+        defaultOrganization.getServers(), defaultOrganization.getAdminRole(), defaultOrganization.getAnonymousRole(),
+        defaultOrganization.getProperties());
 
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
@@ -111,8 +116,7 @@ public class SearchServicePersistenceTest {
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modificationDate);
     Assert.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
 
-    Stream<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages(50, 0);
-    mediaPackages.forEach(mediaPackage -> {
+    searchDatabase.getAllMediaPackages(jpaOrganization, 50, 0).forEach(mediaPackage -> {
 
       String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
 
@@ -180,18 +184,18 @@ public class SearchServicePersistenceTest {
     Assert.assertFalse(searchDatabase.isAvailable(mediaPackage.getIdentifier().toString()));
     Assert.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
 
-    Stream<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);
+    Stream<Tuple<MediaPackage, String>> allMps = searchDatabase.getAllMediaPackages(jpaOrganization, 50, 0);
     AtomicInteger i = new AtomicInteger(0);
-    allMediaPackages.forEach(mediaPackage -> {
+    allMps.forEach(mediaPackage -> {
       i.incrementAndGet();
     });
     Assert.assertEquals(1, i.get());
 
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, new Date());
 
-    allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);
+    allMps = searchDatabase.getAllMediaPackages(jpaOrganization, 50, 0);
     AtomicInteger x = new AtomicInteger(0);
-    allMediaPackages.forEach(mediaPackage -> {
+    allMps.forEach(mediaPackage -> {
       x.incrementAndGet();
     });
     Assert.assertEquals(1, x.get());

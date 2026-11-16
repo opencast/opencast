@@ -50,7 +50,7 @@ import javax.persistence.TemporalType;
     }
 )
 @NamedQueries({
-    @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
+    @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s WHERE s.organization=:organization"),
     @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
     @NamedQuery(
         name = "Search.findById",
