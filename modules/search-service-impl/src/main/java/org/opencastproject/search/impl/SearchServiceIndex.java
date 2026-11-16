@@ -93,6 +93,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -266,7 +267,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
       Date modificationDate = persistence.getModificationDate(mediaPackageId);
       Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-      indexMediaPackage(mp, acl, modificationDate, deletionDate, Set.of());
+      indexMediaPackage(mp, acl, modificationDate, deletionDate, new LinkedHashSet<>());
     } catch (RuntimeException e) {
       logSkippingElement(logger, "event", mediaPackageId, e);
     }
@@ -274,10 +275,10 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl)
           throws SearchException, SearchServiceDatabaseException {
-    indexMediaPackage(mediaPackage, acl, null, null, Set.of());
+    indexMediaPackage(mediaPackage, acl, null, null, new LinkedHashSet<>());
   }
 
-  private Set<String> indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate,
+  private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate,
       Set<String> processedSeriesIds)
           throws SearchException, SearchServiceDatabaseException {
     String mediaPackageId = mediaPackage.getIdentifier().toString();
@@ -330,7 +331,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       throw new SearchException(e);
     }
 
-    Set<String> newlyIndexed = new HashSet<>();
     // Elasticsearch series
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
@@ -347,12 +347,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         request.source(seriesData);
         esIndex.getClient().index(request, RequestOptions.DEFAULT);
         logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
-        newlyIndexed.add(seriesId);
+        processedSeriesIds.add(seriesId);
       } catch (IOException e) {
         throw new SearchException(e);
       }
     }
-    return newlyIndexed;
   }
 
   /**
@@ -565,7 +564,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
               current.getAndIncrement();
 
-              indexedSeries.addAll(indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, indexedSeries));
+              indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, indexedSeries);
             } catch (SearchServiceDatabaseException e) {
               logIndexRebuildError(logger, total, current.get(), e);
               //NB: Runtime exception thrown to escape the functional interfacing
