@@ -28,9 +28,10 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -86,7 +87,7 @@ public class BasicStatisticsSecretRemote extends RemoteBase implements BasicStat
     }
 
     HttpGet get = new HttpGet("/daily-secret");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
     try {
       if (response != null) {
         String secret = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8).trim();
@@ -95,7 +96,7 @@ public class BasicStatisticsSecretRemote extends RemoteBase implements BasicStat
         cached = new CachedSecret(decoded, now);
         return decoded;
       }
-    } catch (IOException | IllegalArgumentException e) {
+    } catch (IOException | ParseException | IllegalArgumentException e) {
       throw new BasicStatisticsSecretServiceException(e);
     } finally {
       closeConnection(response);
