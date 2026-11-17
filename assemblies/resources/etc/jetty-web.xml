@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!--
+  Jetty context configuration.
+
+  This file is not used unless `org.ops4j.pax.web.context.file` is set in `org.ops4j.pax.web.cfg`.
+
+  This file exists so that Karaf does not create it with example content at runtime, which would fail on a read-only
+  configuration directory. Do not remove it.
+-->
+<Configure id="Context">
+</Configure>

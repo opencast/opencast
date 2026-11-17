@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# Ensure Opencast does not modify its configuration directory at runtime.
+#
+# Packages may ship the configuration directory read-only. This works only if no component creates, modifies or
+# removes files in `etc` at runtime. Karaf features, for example, may install example files into `etc` unless these
+# already exist.
+#
+# Usage:
+#   check-etc-unchanged snapshot <distribution-dir>...   (before starting Opencast)
+#   check-etc-unchanged verify <distribution-dir>...     (after running Opencast)
+
+set -eu
+
+# Print one line per entry in the etc directory of the given distribution:
+# <path> TAB <type> <mode> <size> <mtime> <sha256>
+state() {
+  (
+    cd "${1}"
+    find etc -printf '%p\t%y %m %s %T@\n' | LC_ALL=C sort | while IFS=$'\t' read -r path meta; do
+      if [ -f "${path}" ]; then
+        printf '%s\t%s %s\n' "${path}" "${meta}" "$(sha256sum < "${path}" | cut -d' ' -f1)"
+      else
+        printf '%s\t%s -\n' "${path}" "${meta}"
+      fi
+    done
+  )
+}
+
+mode="${1:-}"
+shift || true
+if [ "${mode}" != snapshot ] && [ "${mode}" != verify ] || [ $# -eq 0 ]; then
+  echo "Usage: ${0} snapshot|verify <distribution-dir>..." >&2
+  exit 2
+fi
+
+failed=0
+for dist in "$@"; do
+  dist="${dist%/}"
+  snapshot="${dist}.etc-snapshot"
+
+  if [ "${mode}" = snapshot ]; then
+    state "${dist}" > "${snapshot}"
+    echo "Recorded state of ${dist}/etc ($(wc -l < "${snapshot}") entries)"
+    continue
+  fi
+
+  current="$(mktemp)"
+  state "${dist}" > "${current}"
+  changes="$(LC_ALL=C join -t $'\t' -a 1 -a 2 -e MISSING -o 0,1.2,2.2 "${snapshot}" "${current}" \
+    | awk -F '\t' '
+      $2 == "MISSING" { print "added:    " $1; next }
+      $3 == "MISSING" { print "removed:  " $1; next }
+      $2 != $3        { print "modified: " $1 }')"
+  rm -f "${current}"
+
+  if [ -z "${changes}" ]; then
+    echo "${dist}/etc is unchanged"
+    continue
+  fi
+
+  failed=1
+  echo "::error title=Configuration directory modified at runtime::Opencast modified ${dist}/etc at runtime"
+  echo "Opencast modified ${dist}/etc at runtime:"
+  echo "${changes}" | sed 's/^/  /'
+done
+
+if [ "${failed}" -ne 0 ]; then
+  cat <<EOF
+
+Opencast must not modify its configuration directory at runtime, since packages may install it read-only.
+
+If a file was added (e.g. a Karaf feature installs a default configuration file), add that file to the 'etc'
+directory of the Opencast repository, or to 'assemblies/resources/etc' if it is purely technical and not meant to be
+configured by users. If a file was modified or removed, find and fix the component writing to the configuration
+directory.
+EOF
+  exit 1
+fi

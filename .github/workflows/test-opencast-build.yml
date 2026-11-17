@@ -8,6 +8,7 @@ on:
       - 'docs/checkstyle/**'
       - 'docs/log4j/**'
       - 'assemblies/**'
+      - 'etc/**'
       - '.github/**'
       - 'mvnw'
       - '.mvn/**'
@@ -18,6 +19,7 @@ on:
       - 'docs/checkstyle/**'
       - 'docs/log4j/**'
       - 'assemblies/**'
+      - 'etc/**'
       - '.github/**'
       - 'mvnw'
       - '.mvn/**'
@@ -112,6 +114,14 @@ jobs:
           curl -fisS --retry 60 --retry-delay 1 --retry-all-errors
           http://localhost:9200/
 
+      - name: record state of configuration directories
+        if: matrix.java == 21
+        run: >
+          .github/check-etc-unchanged snapshot
+          build/opencast-dist-admin
+          build/opencast-dist-presentation
+          build/opencast-dist-worker
+
       - name: start admin
         if: matrix.java == 21
         run: ./build/opencast-dist-admin/bin/start-opencast daemon &
@@ -178,6 +188,14 @@ jobs:
           jq < instances.json
           jq -r '.workflows.workflow.state' < instances.json | tee status
           grep -q SUCCEEDED status
+
+      - name: ensure configuration directories were not modified at runtime
+        if: matrix.java == 21
+        run: >
+          .github/check-etc-unchanged verify
+          build/opencast-dist-admin
+          build/opencast-dist-presentation
+          build/opencast-dist-worker
 
       - name: show admin logs
         if: always()
