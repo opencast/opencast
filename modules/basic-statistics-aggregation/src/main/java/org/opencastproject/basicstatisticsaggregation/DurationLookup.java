@@ -20,8 +20,8 @@
  */
 package org.opencastproject.basicstatisticsaggregation;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.User;
@@ -38,7 +38,7 @@ import java.util.Optional;
 /**
  * Resolves a video's total duration in seconds, used for the "70% of video length" part of the view threshold.
  *
- * Looks it up via the elasticsearch index to avoid loading/parsing mediapackages. Also adds in a cache to maybe
+ * Looks it up via the OpenSearch index to avoid loading/parsing mediapackages. Also adds in a cache to maybe
  * not tax the index as much.
  *
  * Side note: We are effectively assuming that a video's duration does not change (or not change much) once it is
@@ -53,12 +53,12 @@ public class DurationLookup {
   /** Bounds memory use; large enough to comfortably cover everything actively watched at any one time. */
   private static final long MAX_CACHED_ITEMS = 1000;
 
-  private final ElasticsearchIndex index;
+  private final OpenSearchIndex index;
   private final OrganizationDirectoryService organizationDirectoryService;
   private final String systemUserName;
   private final Cache<String, Long> cache = CacheBuilder.newBuilder().maximumSize(MAX_CACHED_ITEMS).build();
 
-  public DurationLookup(ElasticsearchIndex index, OrganizationDirectoryService organizationDirectoryService,
+  public DurationLookup(OpenSearchIndex index, OrganizationDirectoryService organizationDirectoryService,
       String systemUserName) {
     this.index = index;
     this.organizationDirectoryService = organizationDirectoryService;

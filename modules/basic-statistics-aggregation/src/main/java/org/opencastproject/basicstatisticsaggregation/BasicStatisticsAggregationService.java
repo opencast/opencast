@@ -26,7 +26,7 @@ import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseEx
 import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseService;
 import org.opencastproject.basicstatisticsaggregation.persistence.BasicStatisticsAggregationDatabaseException;
 import org.opencastproject.basicstatisticsaggregation.persistence.BasicStatisticsAggregationDatabaseService;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
@@ -82,7 +82,7 @@ public class BasicStatisticsAggregationService {
 
   private BasicStatisticsDatabaseService rawEventDatabase;
   private BasicStatisticsAggregationDatabaseService aggregationDatabase;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex openSearchIndex;
   private OrganizationDirectoryService organizationDirectoryService;
   private SecurityService securityService;
 
@@ -105,8 +105,8 @@ public class BasicStatisticsAggregationService {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex openSearchIndex) {
+    this.openSearchIndex = openSearchIndex;
   }
 
   @Reference
@@ -123,7 +123,7 @@ public class BasicStatisticsAggregationService {
   public void activate(ComponentContext cc) {
     try {
       String systemUserName = SecurityUtil.getSystemUserName(cc);
-      durationLookup = new DurationLookup(elasticsearchIndex, organizationDirectoryService, systemUserName);
+      durationLookup = new DurationLookup(openSearchIndex, organizationDirectoryService, systemUserName);
 
       quartz = new StdSchedulerFactory().getScheduler();
       quartz.start();
