@@ -117,6 +117,10 @@ settings or fail to work properly.
       and metadata language in YouTube (`languageTarget`, `languagePatterns.*`), to set the Creative Commons license in
       YouTube (`ccLicenses`), and to set the visibility of newly created playlists (`playlistPrivacy`, default:
       `public`).
+- **HTTP idle timeout**
+    - `etc/jetty-opencast.xml` has been removed. If you enabled it by setting `org.ops4j.pax.web.config.file` in
+      `etc/org.ops4j.pax.web.cfg` to raise the HTTP idle timeout, remove that setting and configure the timeout with
+      `org.ops4j.pax.web.server.connector.idleTimeout` (in milliseconds) in the same file instead.
 
 ### Other Changes
 
