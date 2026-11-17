@@ -103,7 +103,7 @@ public class LifeCycleTaskRunner {
   private Organization defaultOrganization;
   private final int maxConcurrentTasks = 1000;
   /** Default ID of the workflow used to retract published events */
-  private static final String DEFAULT_RETRACT_WORKFLOW = "delete";
+  private static final String DEFAULT_RETRACT_WORKFLOW = "retract-for-deletion";
   private static final String RETRACT_WORKFLOW = "retract.workflow.id";
   private String retractWorkflowId = DEFAULT_RETRACT_WORKFLOW;
 
