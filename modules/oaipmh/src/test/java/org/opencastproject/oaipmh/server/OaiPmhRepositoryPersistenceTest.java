@@ -96,9 +96,9 @@ public class OaiPmhRepositoryPersistenceTest {
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, null, null, null))),
             allOf(hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(),
                     equalTo(3.0)),
-                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000/11']", NS_CTX),
-                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000/12']", NS_CTX),
-                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000/13']", NS_CTX)));
+                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000-11']", NS_CTX),
+                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000-12']", NS_CTX),
+                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000-13']", NS_CTX)));
     assertThat("List records from time in the past yields 3 records",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(now), null, null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(3.0)));

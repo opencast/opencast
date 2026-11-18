@@ -1,5 +1,5 @@
-<!-- insane media package, has no id -->
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="" start="2007-12-05T13:40:00" duration="1004400000">
+<!-- media package without an id attribute; the identifier is generated automatically -->
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" start="2007-12-05T13:40:00" duration="1004400000">
   <oc:metadata>
     <oc:catalog id="catalog-1" type="dublincore/episode">
       <oc:mimetype>text/xml</oc:mimetype>

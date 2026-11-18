@@ -89,7 +89,13 @@ public final class MediaPackageElementParser {
     Unmarshaller m = null;
     try {
       m = MediaPackageImpl.context.createUnmarshaller();
-      return (MediaPackageElement) m.unmarshal(XmlSafeParser.parse(toInputStream(xml, StandardCharsets.UTF_8)));
+      MediaPackageElement element =
+              (MediaPackageElement) m.unmarshal(XmlSafeParser.parse(toInputStream(xml, StandardCharsets.UTF_8)));
+      if (MediaPackageSupport.containsPathTraversal(element.getIdentifier())) {
+        throw new MediaPackageException("Element ID must not contain path traversal sequences: "
+                + element.getIdentifier());
+      }
+      return element;
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
     } catch (IOException | SAXException e) {

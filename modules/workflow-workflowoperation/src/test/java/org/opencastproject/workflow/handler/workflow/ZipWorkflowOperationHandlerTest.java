@@ -24,6 +24,8 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -73,6 +75,10 @@ public class ZipWorkflowOperationHandlerTest {
             new File(getClass().getResource("/dublincore.xml").toURI())).anyTimes();
     EasyMock.replay(workspace);
     operationHandler.setWorkspace(workspace);
+
+    // the handler is not OSGi-activated in this test, so point its temp storage dir at a
+    // local directory like activate() would
+    operationHandler.tempStorageDir = new File("target/zip-workflow-test");
   }
 
   /*
@@ -151,5 +157,42 @@ public class ZipWorkflowOperationHandlerTest {
       Assert.fail("missing target-flavor and no default value kicked in: " + e);
     }
 
+  }
+
+  /**
+   * The media package identifier is joined into a path below the temp storage directory. An
+   * identifier that resolves outside of it (which can only be built programmatically, as the
+   * parse boundary rejects it) must be rejected with a WorkflowOperationException before any
+   * file is touched
+   */
+  @Test
+  public void testUnsafeMediaPackageIdentifierIsRejected() throws Exception {
+    WorkflowInstance instance = new WorkflowInstance();
+    List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
+    WorkflowOperationInstance operation = new WorkflowOperationInstance("test", OperationState.INSTANTIATED);
+    ops.add(operation);
+    instance.setOperations(ops);
+
+    MediaPackageImpl unsafeMp = (MediaPackageImpl) mp.clone();
+    unsafeMp.setIdentifier(new IdImpl() {
+      {
+        this.id = "..";
+      }
+    });
+    instance.setMediaPackage(unsafeMp);
+
+    operation.setConfiguration(ZipWorkflowOperationHandler.ZIP_COLLECTION_PROPERTY, "failed-zips");
+    operation.setConfiguration(ZipWorkflowOperationHandler.INCLUDE_FLAVORS_PROPERTY, "*/source,dublincore/*");
+    operation.setConfiguration(ZipWorkflowOperationHandler.TARGET_FLAVOR_PROPERTY, "archive/zip");
+    operation.setConfiguration(ZipWorkflowOperationHandler.COMPRESS_PROPERTY, "false");
+
+    try {
+      operationHandler.start(instance, null);
+      Assert.fail("An unsafe media package identifier must be rejected");
+    } catch (WorkflowOperationException e) {
+      Assert.assertTrue("Unexpected cause " + e.getCause(),
+              e.getCause() instanceof WorkflowOperationException
+                      && "Invalid media package identifier".equals(e.getCause().getMessage()));
+    }
   }
 }
