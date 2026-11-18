@@ -52,6 +52,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      # The Maven wrapper jar and the Maven distribution it downloads are not part of the local
+      # repository. Caching them avoids downloading them on every run. The key changes with the
+      # wrapper configuration, so updating the wrapper or Maven invalidates the cache. Do not add
+      # restore-keys: mvnw only checks that the jar exists, so an outdated jar would be used silently.
+      # The key must not start with `<os>-maven-`, or the repository cache above could restore it.
+      - name: cache maven wrapper
+        uses: actions/cache@v6
+        with:
+          path: |
+            .mvn/wrapper/maven-wrapper.jar
+            ~/.m2/wrapper
+          key: ${{ runner.os }}-mvnw-${{ hashFiles('mvnw', '.mvn/wrapper/maven-wrapper.properties') }}
+
       - name: setup java
         uses: actions/setup-java@v6.1.0
         with:
