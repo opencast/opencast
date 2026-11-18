@@ -1,6 +1,28 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.6 (2026-11-18)
+
+- [[#8283](https://github.com/opencast/opencast/pull/8283)] -
+  Recommend tenant-specific admin role in multi-tenancy guide
+- [[#8165](https://github.com/opencast/opencast/pull/8165)] -
+  Asset manager prefix dirs
+- [[#8162](https://github.com/opencast/opencast/pull/8162)] -
+  Use first matching asset manager directory for local file access
+- [[#8161](https://github.com/opencast/opencast/pull/8161)] -
+  Document multiple asset manager storage directories
+- [[#8112](https://github.com/opencast/opencast/pull/8112)] -
+  Skip wildcard-led queries in LMS user providers
+
+### Admin Interface
+
+- [[#1679](https://github.com/opencast/admin-interface/pull/1679)] -
+  Restore table spinner
+- [[#1678](https://github.com/opencast/admin-interface/pull/1678)] -
+  Ignore responses of outdated table fetches
+- [[#1676](https://github.com/opencast/admin-interface/pull/1676)] -
+  Skip overlapping table fetch requests
+
 ## Opencast 20.5 (2026-10-29)
 
 - [[#8123](https://github.com/opencast/opencast/pull/8123)] -
