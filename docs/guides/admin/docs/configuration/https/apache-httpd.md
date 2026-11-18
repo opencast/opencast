@@ -60,9 +60,17 @@ The main goals of this set-up are:
   SSLCertificateKeyFile   /etc/ssl/private/oc-key.key
   SSLCertificateChainFile /etc/ssl/certs/oc-chain.crt
 
-  # Make sure Opencast knows about HTTPS being used
+  # Make sure Opencast knows about HTTPS being used. Using `set` rather than
+  # `append` means a value sent by the client is replaced instead of extended.
+  # Opencast will only believe these headers if this proxy is listed in its
+  # trusted proxies (see the Trusted Proxies documentation).
   RequestHeader set X-Forwarded-SSL "on"
   RequestHeader set X-Forwarded-Proto "https"
+
+  # mod_proxy appends the client address to X-Forwarded-For, keeping whatever
+  # the client sent. Drop that first so the header holds the client address
+  # and nothing else.
+  RequestHeader unset X-Forwarded-For
 
   # Make sure to serve cookies only via secure connections.
   Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure

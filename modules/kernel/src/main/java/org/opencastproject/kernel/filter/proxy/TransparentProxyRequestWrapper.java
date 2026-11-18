@@ -21,8 +21,6 @@
 
 package org.opencastproject.kernel.filter.proxy;
 
-import static org.opencastproject.kernel.filter.proxy.TransparentProxyFilter.X_FORWARDED_FOR;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -39,15 +37,17 @@ class TransparentProxyRequestWrapper extends HttpServletRequestWrapper {
    *
    * @param request
    *          the original request
+   * @param originalIP
+   *          the client's address as reported by the proxy
    */
-  TransparentProxyRequestWrapper(HttpServletRequest request) {
+  TransparentProxyRequestWrapper(HttpServletRequest request, String originalIP) {
     super(request);
-    originalIP = request.getHeader(X_FORWARDED_FOR);
+    this.originalIP = originalIP;
   }
 
   /**
-   * Overwrites the original behavior by returning the address transported in the <code>X-FORWARDED-FOR</code> request
-   * header instead of the proxy's ip.
+   * Overwrites the original behavior by returning the address the proxy reported in the
+   * <code>X-Forwarded-For</code> request header instead of the proxy's ip.
    *
    * @see javax.servlet.ServletRequestWrapper#getRemoteAddr()
    */
@@ -57,8 +57,8 @@ class TransparentProxyRequestWrapper extends HttpServletRequestWrapper {
   }
 
   /**
-   * Overwrites the original behavior by returning the address transported in the <code>X-FORWARDED-FOR</code> request
-   * header instead of the proxy's hostname.
+   * Overwrites the original behavior by returning the address the proxy reported in the
+   * <code>X-Forwarded-For</code> request header instead of the proxy's hostname.
    *
    * @see javax.servlet.ServletRequestWrapper#getRemoteHost()
    */

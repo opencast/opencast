@@ -30,6 +30,11 @@ The most important changes are:
 - The plugin `opencast-plugin-legacy-annotation` has been removed from `org.opencastproject.plugin.impl.PluginManagerImpl.cfg`.
   [[#6902](https://github.com/opencast/opencast/pull/6902)]
 - Target tag handling has changed with [[#6648](https://github.com/opencast/opencast/pull/6648)]:
+- The `X-Forwarded-For`, `X-Forwarded-Proto` and `X-Forwarded-SSL` headers are now only honored if the request came
+  from a reverse proxy listed in the new `etc/org.opencastproject.kernel.filter.proxy.TrustedProxies.cfg`. Its default
+  covers loopback and the private address ranges, so the usual set-up with a proxy next to Opencast keeps working. If
+  your proxy reaches Opencast from a public address, add it there, or Opencast will log the proxy as the client and
+  serve plain HTTP URLs. See [Trusted Proxies](configuration/trusted-proxies.md).
 
 ## Database Upgrade
 

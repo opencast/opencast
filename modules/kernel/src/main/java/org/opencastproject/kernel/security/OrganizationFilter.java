@@ -26,7 +26,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -65,8 +64,6 @@ import javax.servlet.http.HttpServletResponse;
 @HttpWhiteboardFilterPattern("/*")
 @HttpWhiteboardContextSelect("(osgi.http.whiteboard.context.name=opencast)")
 public class OrganizationFilter implements Filter {
-
-  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OrganizationFilter.class);
@@ -142,14 +139,10 @@ public class OrganizationFilter implements Filter {
       }
       securityService.setOrganization(org);
 
-      // Set the client's IP address
-      if (StringUtils.isNotBlank(httpRequest.getHeader(X_FORWARDED_FOR))) {
-        logger.trace("Found '{}' header for client IP '{}'", X_FORWARDED_FOR, httpRequest.getHeader(X_FORWARDED_FOR));
-        securityService.setUserIP(httpRequest.getHeader(X_FORWARDED_FOR));
-      } else {
-        logger.trace("Using client IP from request '{}'", httpRequest.getRemoteAddr());
-        securityService.setUserIP(httpRequest.getRemoteAddr());
-      }
+      // Set the client's IP address. TransparentProxyFilter has already replaced this with the address a trusted
+      // reverse proxy reported, so there is no need to look at any forwarding header here.
+      logger.trace("Using client IP from request '{}'", httpRequest.getRemoteAddr());
+      securityService.setUserIP(httpRequest.getRemoteAddr());
 
       chain.doFilter(request, response);
 
