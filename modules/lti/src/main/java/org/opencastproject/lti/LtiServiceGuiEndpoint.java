@@ -286,7 +286,11 @@ public class LtiServiceGuiEndpoint {
       }
   )
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id) {
-    service.delete(id);
-    return Response.noContent().build();
+    try {
+      service.delete(id);
+      return Response.noContent().build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.UNAUTHORIZED).build();
+    }
   }
 }
