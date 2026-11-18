@@ -178,6 +178,41 @@ public class EmailDataTest {
     Assert.assertNotNull(orgProp);
     Assert.assertTrue(orgProp instanceof Map);
     Assert.assertEquals("http://engage.my.edu", ((Map) orgProp).get("org.opencastproject.engage.ui.url"));
+
+    Object customProp = map.get("emailAddress");
+    Assert.assertEquals("user@domain.com", customProp);
+
+    Object orgPropKey = map.get("org_org_opencastproject_engage_ui_url");
+    Assert.assertEquals("http://engage.my.edu", orgPropKey);
+
+    // The dotted form documented in the workflow configuration guide: ${org_org.opencastproject.engage.ui.url}
+    Object nestedOrg = map.get("org_org");
+    Assert.assertTrue(nestedOrg instanceof Map);
+    Object nestedOpencastproject = ((Map) nestedOrg).get("opencastproject");
+    Assert.assertTrue(nestedOpencastproject instanceof Map);
+    Object nestedEngage = ((Map) nestedOpencastproject).get("engage");
+    Assert.assertTrue(nestedEngage instanceof Map);
+    Object nestedUi = ((Map) nestedEngage).get("ui");
+    Assert.assertTrue(nestedUi instanceof Map);
+    Assert.assertEquals("http://engage.my.edu", ((Map) nestedUi).get("url"));
+  }
+
+  @Test
+  public void testToMapWithCollidingWorkflowProperty() throws Exception {
+    // A workflow property whose name collides with a canonical data model key and with an
+    // organization property
+    workflowInstance.setConfiguration("mediaPackage", "should-not-win");
+    orgProperties.put("transcriber", "org-value");
+    workflowInstance.setConfiguration("org_transcriber", "wf-value");
+
+    EmailData emailData = new EmailData("data1", workflowInstance, catalogs, failedOperation, incidents, orgProperties);
+    Map<String, Object> map = emailData.toMap();
+
+    // The canonical data model entry takes precedence over the workflow property
+    Assert.assertTrue(map.get("mediaPackage") instanceof MediaPackage);
+    Assert.assertEquals(mp, map.get("mediaPackage"));
+    // The workflow property takes precedence over the organization property with the same name
+    Assert.assertEquals("wf-value", map.get("org_transcriber"));
   }
 
 }

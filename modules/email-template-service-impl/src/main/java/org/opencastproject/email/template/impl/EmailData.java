@@ -23,6 +23,7 @@ package org.opencastproject.email.template.impl;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.doc.DocData;
+import org.opencastproject.util.doc.OrganizationTemplateData;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 
@@ -96,6 +97,13 @@ public class EmailData extends DocData {
   @Override
   public Map<String, Object> toMap() throws IllegalStateException {
     LinkedHashMap<String, Object> m = new LinkedHashMap<String, Object>();
+    // Organization properties first, then the workflow properties, so that a workflow property takes
+    // precedence over an organization property with the same name, matching the workflow service's
+    // variable resolution; the canonical entries below take precedence over both
+    OrganizationTemplateData.addOrganizationProperties(m, orgProperties);
+    for (String key : workflow.getConfigurationKeys()) {
+      m.put(key, workflow.getConfiguration(key));
+    }
     m.put("meta", meta);
     m.put("notes", notes);
     m.put("mediaPackage", mediaPackage);

@@ -21,6 +21,7 @@
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -168,6 +169,7 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getMediaPackage()).andStubReturn(mediapackage);
     EasyMock.expect(workflowInstance.getCurrentOperation()).andStubReturn(op);
+    EasyMock.expect(workflowInstance.getConfigurations()).andStubReturn(new HashMap<String, String>());
     EasyMock.replay(workflowInstance);
 
     JobContext jobContext = EasyMock.createNiceMock(JobContext.class);
@@ -276,18 +278,20 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.expect(element.getURI()).andStubReturn(elementUri);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andStubReturn(org);
-    EasyMock.replay(element, mp, securityService);
+    WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
+    EasyMock.expect(workflowInstance.getConfigurations()).andStubReturn(new HashMap<String, String>());
+    EasyMock.replay(element, mp, securityService, workflowInstance);
 
     // Test player path and mediapackage id
     ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
-    URI result = configurePublish.populateUrlWithVariables("${player_path}${event_id}", mp, pubUUID);
+    URI result = configurePublish.populateUrlWithVariables("${player_path}${event_id}", workflowInstance, mp, pubUUID);
     assertEquals(examplePlayer + "mp-id", result.toString());
 
     // Test without series
     configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
-    result = configurePublish.populateUrlWithVariables("${series_id}/${event_id}", mp, pubUUID);
+    result = configurePublish.populateUrlWithVariables("${series_id}/${event_id}", workflowInstance, mp, pubUUID);
     assertEquals("/mp-id", result.toString());
 
     // Test with series
@@ -298,13 +302,64 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
 
     configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
-    result = configurePublish.populateUrlWithVariables("${series_id}/${event_id}", mp, pubUUID);
+    result = configurePublish.populateUrlWithVariables("${series_id}/${event_id}", workflowInstance, mp, pubUUID);
     assertEquals("series-id/mp-id", result.toString());
 
     // Test publication uuid
     configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
-    result = configurePublish.populateUrlWithVariables("${publication_id}", mp, pubUUID);
+    result = configurePublish.populateUrlWithVariables("${publication_id}", workflowInstance, mp, pubUUID);
     assertEquals(pubUUID, result.toString());
+  }
+
+  @Test
+  public void testTemplateReplacementWithWorkflowProperties() throws WorkflowOperationException, URISyntaxException {
+    String mpId = "mp-id";
+    String pubUUID = "test-uuid";
+
+    MediaPackage mp = EasyMock.createNiceMock(MediaPackage.class);
+    Id id = new IdImpl(mpId);
+    EasyMock.expect(mp.getIdentifier()).andStubReturn(id);
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andStubReturn(org);
+    EasyMock.replay(mp, securityService);
+
+    // An organization property (mapped to org_transcriber) colliding with a workflow property
+    org.getProperties().put("transcriber", "org-value");
+    // A dotted organization property, as found in the default organization configuration
+    org.getProperties().put("my.var", "dotted-value");
+    // A workflow property colliding with a canonical data model key, plus custom properties
+    Map<String, String> properties = new HashMap<>();
+    properties.put("event_id", "should-not-win");
+    properties.put("custom_suffix", "v1");
+    properties.put("org_transcriber", "wf-value");
+    WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
+    EasyMock.expect(workflowInstance.getConfigurations()).andStubReturn(properties);
+    EasyMock.replay(workflowInstance);
+
+    ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler();
+    configurePublish.setSecurityService(securityService);
+
+    // The canonical event id takes precedence over a workflow property with the same name
+    URI result = configurePublish.populateUrlWithVariables("${event_id}", workflowInstance, mp, pubUUID);
+    assertEquals(mpId, result.toString());
+
+    // Custom workflow properties are available as template data
+    result = configurePublish.populateUrlWithVariables("${event_id}-${custom_suffix}", workflowInstance, mp, pubUUID);
+    assertEquals(mpId + "-v1", result.toString());
+
+    // A workflow property takes precedence over an organization property with the same name
+    result = configurePublish.populateUrlWithVariables("${org_transcriber}", workflowInstance, mp, pubUUID);
+    assertEquals("wf-value", result.toString());
+
+    // The dotted organization property form documented in the workflow configuration guide is available
+    result = configurePublish.populateUrlWithVariables("${org_my.var}", workflowInstance, mp, pubUUID);
+    assertEquals("dotted-value", result.toString());
+
+    // The synthetic keys are added to a copy and must not pollute the organization's own property map
+    assertFalse(org.getProperties().containsKey("id"));
+    assertFalse(org.getProperties().containsKey("name"));
+    assertFalse(org.getProperties().containsKey("admin_role"));
+    assertFalse(org.getProperties().containsKey("anonymous_role"));
   }
 }

@@ -311,4 +311,31 @@ public class EmailWorkflowOperationHandlerTest {
     Assert.assertEquals(Action.SKIP, result.getAction());
   }
 
+  @Test
+  public void testRenderFailureFailsTheOperationNamingTheKey() throws Exception {
+    EmailTemplateService failingTemplateService = EasyMock.createMock(EmailTemplateService.class);
+    EasyMock.expect(failingTemplateService.applyTemplate(
+            EasyMock.anyString(), EasyMock.eq("${missing}"), EasyMock.eq(workflowInstance)))
+        .andThrow(new RuntimeException("Failed while processing the template"));
+    EasyMock.replay(failingTemplateService);
+
+    UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
+    EasyMock.replay(userDirectoryService);
+
+    EmailWorkflowOperationHandler handler = new EmailWorkflowOperationHandler();
+    handler.setEmailTemplateService(failingTemplateService);
+    handler.setUserDirectoryService(userDirectoryService);
+
+    operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, DEFAULT_TO);
+    operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, "${missing}");
+
+    try {
+      handler.start(workflowInstance, null);
+      Assert.fail("Expected a WorkflowOperationException");
+    } catch (WorkflowOperationException e) {
+      // The exception names the configuration key that failed to render
+      Assert.assertTrue(e.getMessage().contains(EmailWorkflowOperationHandler.SUBJECT_PROPERTY));
+    }
+  }
+
 }

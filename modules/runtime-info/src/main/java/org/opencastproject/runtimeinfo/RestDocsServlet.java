@@ -157,7 +157,15 @@ public class RestDocsServlet extends HttpServlet {
               }
             }
             String template = DocUtil.loadTemplate("/ui/restdocs/template.xhtml");
-            docs.append(DocUtil.generate(data, template));
+            try {
+              docs.append(DocUtil.generate(data, template));
+            } catch (RuntimeException e) {
+              // The failure is already logged with the template and data model. Degrade to an error message
+              // instead of failing the whole docs page
+              logger.error("Failed to generate the REST documentation for '{}'", docPath, e);
+              docs.append("Failed to generate the REST documentation for this service. "
+                      + "See the Opencast log for details.");
+            }
           },
           () -> docs.append("No documentation has been found for ").append(restService.getClass().getSimpleName())
       );
