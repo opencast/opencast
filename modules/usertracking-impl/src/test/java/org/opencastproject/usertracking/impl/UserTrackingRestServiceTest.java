@@ -92,7 +92,6 @@ public class UserTrackingRestServiceTest {
     EasyMock.expect(session.getId()).andReturn(MOCK_SESSION_ID).anyTimes();
     HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession()).andReturn(session).anyTimes();
-    EasyMock.expect(request.getHeader("X-FORWARDED-FOR")).andReturn(null).anyTimes();
     EasyMock.expect(request.getRemoteAddr()).andReturn(REMOTE_IP).anyTimes();
     EasyMock.replay(session, request);
     return request;

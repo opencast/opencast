@@ -52,7 +52,7 @@ public interface PlaylistDatabaseService {
   Playlist getPlaylist(String playlistId, String orgId) throws NotFoundException, PlaylistDatabaseException;
 
   /**
-   * Get several playlists based on their order in the database
+   * Get several playlists of the current organization based on their order in the database
    * @param limit Maximum amount of playlists to return
    * @param offset The index of the first result to return
    * @return a list of {@link Playlist}s
