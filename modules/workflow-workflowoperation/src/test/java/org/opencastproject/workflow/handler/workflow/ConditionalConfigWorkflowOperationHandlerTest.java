@@ -32,10 +32,10 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
   private WorkflowOperationInstance operation;
   private static final String CONFIGURATION_VAR = "config";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Operation handler to be tested
     operationHandler = new ConditionalConfigWorkflowOperationHandler();
@@ -74,7 +74,7 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
     workflowInstance.setOperations(operationsList);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -83,9 +83,9 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
     workflowInstance = replaceVars(workflowInstance, "step", "1");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertEquals("value 1", result.getProperties().get(CONFIGURATION_VAR));
+    Assertions.assertEquals("value 1", result.getProperties().get(CONFIGURATION_VAR));
   }
 
   @Test
@@ -93,9 +93,9 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
     workflowInstance = replaceVars(workflowInstance, "step", "3");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertEquals("value 3", result.getProperties().get(CONFIGURATION_VAR));
+    Assertions.assertEquals("value 3", result.getProperties().get(CONFIGURATION_VAR));
   }
 
   @Test
@@ -103,9 +103,9 @@ public class ConditionalConfigWorkflowOperationHandlerTest {
     workflowInstance = replaceVars(workflowInstance, "step", "99");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertEquals("value no-match", result.getProperties().get(CONFIGURATION_VAR));
+    Assertions.assertEquals("value no-match", result.getProperties().get(CONFIGURATION_VAR));
   }
 
   private WorkflowInstance replaceVars(WorkflowInstance wf, String key, String value) throws WorkflowParsingException {

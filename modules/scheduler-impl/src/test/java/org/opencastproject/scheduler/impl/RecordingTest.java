@@ -24,23 +24,23 @@ import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.RecordingState;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RecordingTest {
   private Recording recording = null;
   private Long time = 0L;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     recording = new RecordingImpl("test", RecordingState.CAPTURING);
-    Assert.assertNotNull(recording);
+    Assertions.assertNotNull(recording);
     time = recording.getLastCheckinTime();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     recording = null;
     time = 0L;
@@ -48,24 +48,24 @@ public class RecordingTest {
 
   @Test
   public void correctInformation() {
-    Assert.assertEquals("test", recording.getID());
-    Assert.assertEquals(RecordingState.CAPTURING, recording.getState());
+    Assertions.assertEquals("test", recording.getID());
+    Assertions.assertEquals(RecordingState.CAPTURING, recording.getState());
   }
 
   @Test
   public void changedInformation() throws InterruptedException {
-    Assert.assertEquals("test", recording.getID());
-    Assert.assertEquals(RecordingState.CAPTURING, recording.getState());
-    Assert.assertEquals(time, recording.getLastCheckinTime());
+    Assertions.assertEquals("test", recording.getID());
+    Assertions.assertEquals(RecordingState.CAPTURING, recording.getState());
+    Assertions.assertEquals(time, recording.getLastCheckinTime());
 
     Thread.sleep(1);
     recording.setState(RecordingState.UPLOADING);
 
-    Assert.assertEquals("test", recording.getID());
-    Assert.assertEquals(RecordingState.UPLOADING, recording.getState());
+    Assertions.assertEquals("test", recording.getID());
+    Assertions.assertEquals(RecordingState.UPLOADING, recording.getState());
     Thread.sleep(1);
     if (recording.getLastCheckinTime() <= time || recording.getLastCheckinTime() >= System.currentTimeMillis()) {
-      Assert.fail("Invalid checkin time");
+      Assertions.fail("Invalid checkin time");
     }
   }
 }

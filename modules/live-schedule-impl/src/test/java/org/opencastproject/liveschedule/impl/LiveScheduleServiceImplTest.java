@@ -67,9 +67,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -122,7 +122,7 @@ public class LiveScheduleServiceImplTest {
   private DublinCoreCatalog episodeDC;
   private DublinCoreCatalog seriesDC;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     mimeType = MimeTypes.parseMimeType(MIME_TYPE);
     URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
@@ -194,7 +194,7 @@ public class LiveScheduleServiceImplTest {
   private void assertExpectedLiveTracks(Track[] liveTracks, long duration, String caName, String suffix,
           boolean hasPresentation) {
     int tracksExpected = hasPresentation ? 4 : 2;
-    Assert.assertEquals(tracksExpected, liveTracks.length);
+    Assertions.assertEquals(tracksExpected, liveTracks.length);
 
     boolean[] presenterFound = new boolean[2];
     boolean[] presentationFound = new boolean[2];
@@ -202,13 +202,13 @@ public class LiveScheduleServiceImplTest {
     for (Track track : liveTracks) {
       if (track.getURI().toString().contains("presenter")) {
         if (((VideoStream) track.getStreams()[0]).getFrameHeight() == 270) {
-          Assert.assertEquals(
+          Assertions.assertEquals(
                   STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presenter-delivery-stream-960x270" + suffix,
                   track.getURI().toString());
           assertLiveTrack(track, duration, 270, 960);
           presenterFound[0] = true;
         } else {
-          Assert.assertEquals(
+          Assertions.assertEquals(
                   STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presenter-delivery-stream-1920x540" + suffix,
                   track.getURI().toString());
           assertLiveTrack(track, duration, 540, 1920);
@@ -216,13 +216,13 @@ public class LiveScheduleServiceImplTest {
         }
       } else {
         if (((VideoStream) track.getStreams()[0]).getFrameHeight() == 270) {
-          Assert.assertEquals(
+          Assertions.assertEquals(
                   STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presentation-delivery-stream-960x270" + suffix,
                   track.getURI().toString());
           assertLiveTrack(track, duration, 270, 960);
           presentationFound[0] = true;
         } else {
-          Assert.assertEquals(
+          Assertions.assertEquals(
                   STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presentation-delivery-stream-1920x540" + suffix,
                   track.getURI().toString());
           assertLiveTrack(track, duration, 540, 1920);
@@ -233,17 +233,17 @@ public class LiveScheduleServiceImplTest {
     // Check if got all expected
     if (!presenterFound[0] || !presenterFound[1]
             || (hasPresentation && (!presentationFound[0] || !presentationFound[1]))) {
-      Assert.fail("Didn't get the expected presenter/presentation live tracks");
+      Assertions.fail("Didn't get the expected presenter/presentation live tracks");
     }
   }
 
   private void assertLiveTrack(Track liveTrack, long duration, int height, int width) {
-    Assert.assertEquals(Long.valueOf(duration), liveTrack.getDuration());
-    Assert.assertEquals(mimeType, liveTrack.getMimeType());
-    Assert.assertEquals(true, liveTrack.isLive());
-    Assert.assertEquals(1, liveTrack.getStreams().length);
-    Assert.assertEquals(height, ((VideoStream) liveTrack.getStreams()[0]).getFrameHeight().intValue());
-    Assert.assertEquals(width, ((VideoStream) liveTrack.getStreams()[0]).getFrameWidth().intValue());
+    Assertions.assertEquals(Long.valueOf(duration), liveTrack.getDuration());
+    Assertions.assertEquals(mimeType, liveTrack.getMimeType());
+    Assertions.assertEquals(true, liveTrack.isLive());
+    Assertions.assertEquals(1, liveTrack.getStreams().length);
+    Assertions.assertEquals(height, ((VideoStream) liveTrack.getStreams()[0]).getFrameHeight().intValue());
+    Assertions.assertEquals(width, ((VideoStream) liveTrack.getStreams()[0]).getFrameWidth().intValue());
   }
 
   private Job createJob(long id, String elementId, String payload) {
@@ -272,7 +272,7 @@ public class LiveScheduleServiceImplTest {
     String expectedStreamName = MP_ID + "-" + CAPTURE_AGENT_NAME + "-presenter-delivery-stream-3840x1080_suffix";
     String actualStreamName = service.replaceVariables(MP_ID, CAPTURE_AGENT_NAME, STREAM_NAME, flavor, "3840x1080");
 
-    Assert.assertEquals(expectedStreamName, actualStreamName);
+    Assertions.assertEquals(expectedStreamName, actualStreamName);
   }
 
   @Test
@@ -355,25 +355,26 @@ public class LiveScheduleServiceImplTest {
     MediaPackage mp1 = service.distributeAclsAndCatalogs(s);
 
     Catalog[] catalogs = mp1.getCatalogs(MediaPackageElements.EPISODE);
-    Assert.assertNotNull(catalogs);
-    Assert.assertEquals(1, catalogs.length);
+    Assertions.assertNotNull(catalogs);
+    Assertions.assertEquals(1, catalogs.length);
     Catalog catalog = catalogs[0];
-    Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/episode.xml",
+    Assertions.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/episode.xml",
             catalog.getURI().toString());
-    Assert.assertEquals("dublincore/episode", catalog.getFlavor().toString());
+    Assertions.assertEquals("dublincore/episode", catalog.getFlavor().toString());
     catalogs = mp1.getCatalogs(MediaPackageElements.SERIES);
-    Assert.assertNotNull(catalogs);
-    Assert.assertEquals(1, catalogs.length);
+    Assertions.assertNotNull(catalogs);
+    Assertions.assertEquals(1, catalogs.length);
     catalog = catalogs[0];
-    Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/series.xml", catalog.getURI().toString());
-    Assert.assertEquals("dublincore/series", catalog.getFlavor().toString());
+    Assertions.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/series.xml",
+        catalog.getURI().toString());
+    Assertions.assertEquals("dublincore/series", catalog.getFlavor().toString());
     Attachment[] atts = mp1.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-    Assert.assertNotNull(atts);
-    Assert.assertEquals(1, atts.length);
+    Assertions.assertNotNull(atts);
+    Assertions.assertEquals(1, atts.length);
     Attachment att = atts[0];
-    Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml",
+    Assertions.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml",
             att.getURI().toString());
-    Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
+    Assertions.assertEquals("security/xacml+episode", att.getFlavor().toString());
     EasyMock.verify(downloadDistributionService);
   }
 
@@ -399,11 +400,11 @@ public class LiveScheduleServiceImplTest {
     MediaPackage mp1 = service.replaceAndDistributeAcl(mp, acl);
 
     Attachment[] atts = mp1.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-    Assert.assertNotNull(atts);
-    Assert.assertEquals(1, atts.length);
+    Assertions.assertNotNull(atts);
+    Assertions.assertEquals(1, atts.length);
     Attachment att = atts[0];
-    Assert.assertEquals("http://host/security-policy-episode.xml", att.getURI().toString());
-    Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
+    Assertions.assertEquals("http://host/security-policy-episode.xml", att.getURI().toString());
+    Assertions.assertEquals("security/xacml+episode", att.getFlavor().toString());
     EasyMock.verify(downloadDistributionService);
   }
 
@@ -428,14 +429,14 @@ public class LiveScheduleServiceImplTest {
 
     Snapshot s = service.getSnapshotFromArchive(MP_ID);
 
-    Assert.assertNotNull(s);
+    Assertions.assertNotNull(s);
     MediaPackage mp1 = s.getMediaPackage();
-    Assert.assertNotNull(mp1);
-    Assert.assertEquals(MP_ID, mp1.getIdentifier().toString());
-    Assert.assertEquals("Live Test", mp1.getTitle());
-    Assert.assertEquals("2017-10-12T18:10:59Z", DateTimeSupport.toUTC(mp1.getDate().getTime()));
-    Assert.assertEquals("20170119999", mp1.getSeries());
-    Assert.assertEquals("Test Fall 2017", mp1.getSeriesTitle());
+    Assertions.assertNotNull(mp1);
+    Assertions.assertEquals(MP_ID, mp1.getIdentifier().toString());
+    Assertions.assertEquals("Live Test", mp1.getTitle());
+    Assertions.assertEquals("2017-10-12T18:10:59Z", DateTimeSupport.toUTC(mp1.getDate().getTime()));
+    Assertions.assertEquals("20170119999", mp1.getSeries());
+    Assertions.assertEquals("Test Fall 2017", mp1.getSeriesTitle());
   }
 
   @Test
@@ -446,8 +447,8 @@ public class LiveScheduleServiceImplTest {
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
-    Assert.assertNotNull(mp);
-    Assert.assertEquals(MP_ID, mp.getIdentifier().toString());
+    Assertions.assertNotNull(mp);
+    Assertions.assertEquals(MP_ID, mp.getIdentifier().toString());
   }
 
   @Test
@@ -456,7 +457,7 @@ public class LiveScheduleServiceImplTest {
     replayServices();
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
-    Assert.assertNull(mp);
+    Assertions.assertNull(mp);
   }
 
   @Test
@@ -474,7 +475,7 @@ public class LiveScheduleServiceImplTest {
     mp2.setDuration(DURATION);
     service.addLiveTracksToMediaPackage(mp2, episodeDC);
 
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertTrue(service.isSameMediaPackage(mp1, mp2));
   }
 
   @Test
@@ -496,32 +497,32 @@ public class LiveScheduleServiceImplTest {
     Track track = mp2.getTracks()[0];
     URI previousURI = track.getURI();
     track.setURI(new URI("http://new.url.com"));
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertFalse(service.isSameMediaPackage(mp1, mp2));
     track.setURI(previousURI);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertTrue(service.isSameMediaPackage(mp1, mp2));
 
     // Change number of tracks
     track = (Track) mp2.getTracks()[0].clone();
     mp2.remove(track);
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertFalse(service.isSameMediaPackage(mp1, mp2));
     mp2.add(track);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertTrue(service.isSameMediaPackage(mp1, mp2));
 
     // Change catalog checksum
     Catalog catalog = mp2.getCatalogs()[0];
     Checksum previousChecksum = catalog.getChecksum();
     catalog.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, "123456abcd"));
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertFalse(service.isSameMediaPackage(mp1, mp2));
     catalog.setChecksum(previousChecksum);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertTrue(service.isSameMediaPackage(mp1, mp2));
 
     // Change attachment flavor
     Attachment attachment = mp2.getAttachments()[0];
     MediaPackageElementFlavor previousFlavor = attachment.getFlavor();
     attachment.setFlavor(MediaPackageElementFlavor.parseFlavor("test/test"));
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertFalse(service.isSameMediaPackage(mp1, mp2));
     attachment.setFlavor(previousFlavor);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+    Assertions.assertTrue(service.isSameMediaPackage(mp1, mp2));
   }
 
   @Test
@@ -536,7 +537,7 @@ public class LiveScheduleServiceImplTest {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.setIdentifier(new IdImpl(MP_ID));
     service.publishToSearch(mp);
-    Assert.assertEquals(MP_ID, capturedMp.getValue().getIdentifier().toString());
+    Assertions.assertEquals(MP_ID, capturedMp.getValue().getIdentifier().toString());
   }
 
   @Test
@@ -554,10 +555,10 @@ public class LiveScheduleServiceImplTest {
 
     service.addLivePublicationToMediaPackage(snapshot, new HashMap<>());
     Publication[] publications = mp.getPublications();
-    Assert.assertEquals(1, publications.length);
-    Assert.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
-    Assert.assertEquals("text/html", publications[0].getMimeType().toString());
-    Assert.assertEquals(ENGAGE_URL + "/play/" + MP_ID, publications[0].getURI().toString());
+    Assertions.assertEquals(1, publications.length);
+    Assertions.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
+    Assertions.assertEquals("text/html", publications[0].getMimeType().toString());
+    Assertions.assertEquals(ENGAGE_URL + "/play/" + MP_ID, publications[0].getURI().toString());
   }
 
   @Test
@@ -571,7 +572,7 @@ public class LiveScheduleServiceImplTest {
     service.removeLivePublicationChannel(mp);
 
     Publication[] publications = mp.getPublications();
-    Assert.assertEquals(0, publications.length);
+    Assertions.assertEquals(0, publications.length);
   }
 
   @Test
@@ -593,7 +594,7 @@ public class LiveScheduleServiceImplTest {
     service.setDownloadDistributionService(downloadDistributionService);
 
     service.retract(mp);
-    Assert.assertEquals(MP_ID, capturedMpId.getValue());
+    Assertions.assertEquals(MP_ID, capturedMpId.getValue());
 
     EasyMock.verify(searchService, downloadDistributionService);
   }
@@ -620,8 +621,8 @@ public class LiveScheduleServiceImplTest {
 
     service.retractPreviousElements(previousMp, newMp);
     Set<String> ids = capturedElementId.getValue();
-    Assert.assertEquals(1, ids.size());
-    Assert.assertEquals("episode-dc-published", ids.iterator().next());
+    Assertions.assertEquals(1, ids.size());
+    Assertions.assertEquals("episode-dc-published", ids.iterator().next());
 
     EasyMock.verify(downloadDistributionService);
   }
@@ -674,18 +675,18 @@ public class LiveScheduleServiceImplTest {
 
     // Check published live media package
     MediaPackage searchMp = capturedMp.getValue();
-    Assert.assertEquals(MP_ID, searchMp.getIdentifier().toString());
-    Assert.assertEquals(DURATION, searchMp.getDuration().longValue());
-    Assert.assertEquals(2, searchMp.getCatalogs().length);
+    Assertions.assertEquals(MP_ID, searchMp.getIdentifier().toString());
+    Assertions.assertEquals(DURATION, searchMp.getDuration().longValue());
+    Assertions.assertEquals(2, searchMp.getCatalogs().length);
     assertExpectedLiveTracks(searchMp.getTracks(), DURATION, CAPTURE_AGENT_NAME, "_suffix", false);
 
     // Check archived media package
     MediaPackage archivedMp = capturedSnapshotMp.getValue();
-    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
-    Assert.assertEquals(1, archivedMp.getPublications().length);
-    Assert.assertEquals(LiveScheduleService.CHANNEL_ID, archivedMp.getPublications()[0].getChannel());
+    Assertions.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
+    Assertions.assertEquals(1, archivedMp.getPublications().length);
+    Assertions.assertEquals(LiveScheduleService.CHANNEL_ID, archivedMp.getPublications()[0].getChannel());
     // Check that version got into local cache
-    Assert.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID));
+    Assertions.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID));
   }
 
   @Test
@@ -703,7 +704,7 @@ public class LiveScheduleServiceImplTest {
 
     service.getSnapshotVersionCache().put(MP_ID, version);
 
-    Assert.assertFalse(service.updateLiveEvent(previousMp, episodeDC));
+    Assertions.assertFalse(service.updateLiveEvent(previousMp, episodeDC));
   }
 
   @Test
@@ -711,7 +712,7 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
     replayServices();
 
-    Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
+    Assertions.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
   }
 
   @Test
@@ -720,7 +721,7 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
     replayServices();
 
-    Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
+    Assertions.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
   }
 
   @Test
@@ -782,15 +783,15 @@ public class LiveScheduleServiceImplTest {
     episodeDC.set(DublinCore.PROPERTY_TEMPORAL,
             DublinCoreValue.mk("start=2017-10-12T19:00:00Z;end=2017-10-12T19:02:00Z; scheme=W3C-DTF;"));
 
-    Assert.assertTrue(service.updateLiveEvent(previousMp, episodeDC));
+    Assertions.assertTrue(service.updateLiveEvent(previousMp, episodeDC));
 
     // Check published live media package
     MediaPackage searchMp = capturedMp.getValue();
-    Assert.assertEquals(MP_ID, searchMp.getIdentifier().toString());
-    Assert.assertEquals(120000L, searchMp.getDuration().longValue());
-    Assert.assertEquals(2, searchMp.getCatalogs().length);
+    Assertions.assertEquals(MP_ID, searchMp.getIdentifier().toString());
+    Assertions.assertEquals(120000L, searchMp.getDuration().longValue());
+    Assertions.assertEquals(2, searchMp.getCatalogs().length);
     assertExpectedLiveTracks(searchMp.getTracks(), 120000L, "another_ca", "_suffix", false);
-    Assert.assertEquals(0, searchMp.getPublications().length);
+    Assertions.assertEquals(0, searchMp.getPublications().length);
   }
 
   @Test
@@ -826,8 +827,8 @@ public class LiveScheduleServiceImplTest {
 
     // Check archived media package
     MediaPackage archivedMp = capturedSnapshotMp.getValue();
-    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
-    Assert.assertEquals(0, archivedMp.getPublications().length);
+    Assertions.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
+    Assertions.assertEquals(0, archivedMp.getPublications().length);
 
     EasyMock.verify(searchService, downloadDistributionService);
   }

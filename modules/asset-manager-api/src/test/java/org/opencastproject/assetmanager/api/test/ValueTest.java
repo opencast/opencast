@@ -22,15 +22,16 @@
 package org.opencastproject.assetmanager.api.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.function.Function;
@@ -44,14 +45,15 @@ import java.util.function.Function;
 public class ValueTest {
   @Test
   public void testGet() throws Exception {
-    Assert.assertEquals("a value", Value.mk("a value").get(Value.STRING));
+    Assertions.assertEquals("a value", Value.mk("a value").get(Value.STRING));
     assertThat(Value.mk(1511L).get(Value.LONG), Matchers.instanceOf(Long.class));
     assertEquals(Value.mk(10L).get(), Long.valueOf(10L));
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetTypesDoNotMatch() throws Exception {
-    Value.mk(1511L).get(Value.STRING);
+    assertThrows(java.lang.RuntimeException.class, () ->
+        Value.mk(1511L).get(Value.STRING));
   }
 
   @Test
@@ -102,14 +104,15 @@ public class ValueTest {
     assertEquals("1511", valueAsString);
   }
 
-  @Test(expected = java.lang.Error.class)
+  @Test
   public void testDecomposeNoMatch() {
-    Value.mk(new Date()).decompose(
-            Value.doNotMatch(),
-            Value.doNotMatch(),
-            Value.doNotMatch(),
-            Value.doNotMatch(),
-            Value.doNotMatch());
+    assertThrows(java.lang.Error.class, () ->
+        Value.mk(new Date()).decompose(
+          Value.doNotMatch(),
+          Value.doNotMatch(),
+          Value.doNotMatch(),
+          Value.doNotMatch(),
+          Value.doNotMatch()));
   }
 
   @Test

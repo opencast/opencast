@@ -22,9 +22,9 @@
 package org.opencastproject.job.api;
 
 import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -37,15 +37,15 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class AbstractJobProducerTest extends EasyMockSupport {
 
   private JobProducerTest jobProducer;
   private ServiceRegistry serviceRegistry;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     serviceRegistry = createNiceMock(ServiceRegistry.class);
     expect(serviceRegistry.count(JobProducerTest.JOB_TYPE, Status.DISPATCHING)).andReturn(2L).anyTimes();
@@ -120,14 +120,14 @@ public class AbstractJobProducerTest extends EasyMockSupport {
 
     // Job load lower than max load and enough free load available
     job.setJobLoad(1.0f);
-    assertTrue("Job load + current load < max load, so accept job", jobProducer.isReadyToAccept(job));
+    assertTrue(jobProducer.isReadyToAccept(job), "Job load + current load < max load, so accept job");
 
     job.setJobLoad(1.0f);
-    assertFalse("Job load + current load >= max load, so reject job", jobProducer.isReadyToAccept(job));
+    assertFalse(jobProducer.isReadyToAccept(job), "Job load + current load >= max load, so reject job");
 
     // Job load higher than max load but some load on host
     job.setJobLoad(10.0f);
-    assertFalse("Job load >= max load, so reject job", jobProducer.isReadyToAccept(job));
+    assertFalse(jobProducer.isReadyToAccept(job), "Job load >= max load, so reject job");
   }
 
   @Test
@@ -151,15 +151,15 @@ public class AbstractJobProducerTest extends EasyMockSupport {
 
     // Job load lower than max load and enough free load available
     job.setJobLoad(1.0f);
-    assertTrue("Job load + current load < max load, so accept job", jobProducer.isReadyToAccept(job));
+    assertTrue(jobProducer.isReadyToAccept(job), "Job load + current load < max load, so accept job");
 
     job.setJobLoad(1.0f);
-    assertFalse("Job load + current load >= max load, so accept job", jobProducer.isReadyToAccept(job));
+    assertFalse(jobProducer.isReadyToAccept(job), "Job load + current load >= max load, so accept job");
 
     // Job load higher than max load but some load on host
     job.setJobLoad(10.0f);
-    assertTrue("Job load >= max load, but accepting oversize jobs is true so accept job",
-        jobProducer.isReadyToAccept(job));
+    assertTrue(jobProducer.isReadyToAccept(job),
+        "Job load >= max load, but accepting oversize jobs is true so accept job");
   }
 
   private class JobProducerTest extends AbstractJobProducer {

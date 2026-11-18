@@ -22,8 +22,8 @@ package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -33,9 +33,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /** Unit tests for {@link BaseEndpoint} */
 public class BaseEndpointTest {
@@ -44,12 +44,12 @@ public class BaseEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestBaseEndpoint.class);
 
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     env.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     env.tearDownServer();
   }
@@ -84,9 +84,9 @@ public class BaseEndpointTest {
             .asString();
 
     JsonArray json = JsonParser.parseString(response).getAsJsonArray();
-    assertTrue("User does not have role 'ROLE_USER_92623987_OPENCAST_ORG'",
-            json.contains(new JsonPrimitive("ROLE_USER_92623987_OPENCAST_ORG")));
-    assertTrue("User does not have role 'ROLE_STUDENT'", json.contains(new JsonPrimitive("ROLE_STUDENT")));
+    assertTrue(json.contains(new JsonPrimitive("ROLE_USER_92623987_OPENCAST_ORG")),
+            "User does not have role 'ROLE_USER_92623987_OPENCAST_ORG'");
+    assertTrue(json.contains(new JsonPrimitive("ROLE_STUDENT")), "User does not have role 'ROLE_STUDENT'");
     assertEquals(2, json.size());
   }
 

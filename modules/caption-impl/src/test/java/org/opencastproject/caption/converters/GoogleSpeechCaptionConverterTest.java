@@ -23,10 +23,10 @@ package org.opencastproject.caption.converters;
 import org.opencastproject.caption.api.Caption;
 import org.opencastproject.caption.api.Time;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.List;
@@ -40,12 +40,12 @@ public class GoogleSpeechCaptionConverterTest {
   private GoogleSpeechCaptionConverter converter;
   private InputStream inputStream;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     converter = new GoogleSpeechCaptionConverter();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -57,54 +57,54 @@ public class GoogleSpeechCaptionConverterTest {
 
   private void importCaption() throws Exception {
     List<Caption> captionList = converter.importCaption(inputStream, "80");
-    Assert.assertEquals(3, captionList.size());
+    Assertions.assertEquals(3, captionList.size());
     Caption caption = captionList.get(0);
     String[] text = caption.getCaption();
-    Assert.assertEquals(1, text.length);
-    Assert.assertEquals("what we need to see TV device that requires that already has been practising talking ",
+    Assertions.assertEquals(1, text.length);
+    Assertions.assertEquals("what we need to see TV device that requires that already has been practising talking ",
             text[0]);
     Time time = caption.getStartTime();
-    Assert.assertEquals(0, time.getHours());
-    Assert.assertEquals(0, time.getMinutes());
-    Assert.assertEquals(0, time.getSeconds());
-    Assert.assertEquals(0, time.getMilliseconds());
+    Assertions.assertEquals(0, time.getHours());
+    Assertions.assertEquals(0, time.getMinutes());
+    Assertions.assertEquals(0, time.getSeconds());
+    Assertions.assertEquals(0, time.getMilliseconds());
 
     time = caption.getStopTime();
-    Assert.assertEquals(0, time.getHours());
-    Assert.assertEquals(0, time.getMinutes());
-    Assert.assertEquals(37, time.getSeconds());
-    Assert.assertEquals(0, time.getMilliseconds());
+    Assertions.assertEquals(0, time.getHours());
+    Assertions.assertEquals(0, time.getMinutes());
+    Assertions.assertEquals(37, time.getSeconds());
+    Assertions.assertEquals(0, time.getMilliseconds());
 
     caption = captionList.get(1);
     text = caption.getCaption();
-    Assert.assertEquals(1, text.length);
-    Assert.assertEquals("about safeguarding. ", text[0]);
+    Assertions.assertEquals(1, text.length);
+    Assertions.assertEquals("about safeguarding. ", text[0]);
     time = caption.getStartTime();
-    Assert.assertEquals(0, time.getHours());
-    Assert.assertEquals(0, time.getMinutes());
-    Assert.assertEquals(37, time.getSeconds());
-    Assert.assertEquals(0, time.getMilliseconds());
+    Assertions.assertEquals(0, time.getHours());
+    Assertions.assertEquals(0, time.getMinutes());
+    Assertions.assertEquals(37, time.getSeconds());
+    Assertions.assertEquals(0, time.getMilliseconds());
 
     time = caption.getStopTime();
-    Assert.assertEquals(0, time.getHours());
-    Assert.assertEquals(0, time.getMinutes());
-    Assert.assertEquals(38, time.getSeconds());
-    Assert.assertEquals(700, time.getMilliseconds());
+    Assertions.assertEquals(0, time.getHours());
+    Assertions.assertEquals(0, time.getMinutes());
+    Assertions.assertEquals(38, time.getSeconds());
+    Assertions.assertEquals(700, time.getMilliseconds());
 
     caption = captionList.get(2);
     text = caption.getCaption();
-    Assert.assertEquals(1, text.length);
-    Assert.assertEquals("I'm going on social work so I'm going to get through ", text[0]);
+    Assertions.assertEquals(1, text.length);
+    Assertions.assertEquals("I'm going on social work so I'm going to get through ", text[0]);
     time = caption.getStartTime();
-    Assert.assertEquals(0, time.getHours());
-    Assert.assertEquals(1, time.getMinutes());
-    Assert.assertEquals(32, time.getSeconds());
-    Assert.assertEquals(400, time.getMilliseconds());
+    Assertions.assertEquals(0, time.getHours());
+    Assertions.assertEquals(1, time.getMinutes());
+    Assertions.assertEquals(32, time.getSeconds());
+    Assertions.assertEquals(400, time.getMilliseconds());
 
     time = caption.getStopTime();
-    Assert.assertEquals(0, time.getHours());
-    Assert.assertEquals(2, time.getMinutes());
-    Assert.assertEquals(24, time.getSeconds());
-    Assert.assertEquals(600, time.getMilliseconds());
+    Assertions.assertEquals(0, time.getHours());
+    Assertions.assertEquals(2, time.getMinutes());
+    Assertions.assertEquals(24, time.getSeconds());
+    Assertions.assertEquals(600, time.getMilliseconds());
   }
 }

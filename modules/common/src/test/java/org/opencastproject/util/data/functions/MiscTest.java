@@ -21,7 +21,7 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MiscTest {
   @Test

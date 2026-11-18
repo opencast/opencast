@@ -20,9 +20,10 @@
  */
 package org.opencastproject.external.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ApiMediaTypeTest {
 
@@ -122,8 +123,9 @@ public class ApiMediaTypeTest {
     assertEquals("application/v1.13.0+json", type.toExternalForm());
   }
 
-  @Test(expected = ApiMediaTypeException.class)
+  @Test
   public void testParseJsonWithInvalidVersion() throws Exception {
-    ApiMediaType.parse("application/v0.0.0+json");
+    assertThrows(ApiMediaTypeException.class, () ->
+        ApiMediaType.parse("application/v0.0.0+json"));
   }
 }

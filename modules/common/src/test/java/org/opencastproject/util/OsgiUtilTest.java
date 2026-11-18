@@ -20,10 +20,10 @@
  */
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -67,18 +67,18 @@ public class OsgiUtilTest {
 
     try {
       OsgiUtil.getCfgAsInt(h, "a");
-      Assert.fail();
+      Assertions.fail();
     } catch (org.osgi.service.cm.ConfigurationException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
 
     assertEquals(2, OsgiUtil.getCfgAsInt(h, "b"));
 
     try {
       OsgiUtil.getCfgAsInt(h, "c");
-      Assert.fail();
+      Assertions.fail();
     } catch (org.osgi.service.cm.ConfigurationException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
   }
 
@@ -91,18 +91,18 @@ public class OsgiUtilTest {
 
     try {
       OsgiUtil.getCfgAsInt(m, "a");
-      Assert.fail();
+      Assertions.fail();
     } catch (org.osgi.service.cm.ConfigurationException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
 
     assertEquals(2, OsgiUtil.getCfgAsInt(m, "b"));
 
     try {
       OsgiUtil.getCfgAsInt(m, "c");
-      Assert.fail();
+      Assertions.fail();
     } catch (org.osgi.service.cm.ConfigurationException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
   }
 

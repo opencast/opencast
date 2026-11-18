@@ -22,23 +22,24 @@
 package org.opencastproject.metadata.dublincore;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.IoSupport;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +57,8 @@ public class DublinCoreCatalogTest {
   private static final EName PROPERTY_FOO_EMPTY = new EName("http://foo.org/metadata", "empty");
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogTest.class);
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   @Test
   public void testLoadFromFile() throws Exception {
@@ -71,14 +72,15 @@ public class DublinCoreCatalogTest {
     assertEquals(asList("Loriot", "Harald Juhnke"),
             dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_UNDEFINED));
     assertEquals(
-            "The modified property should be of type W3CDTF.",
-            Optional.of(DublinCore.ENC_SCHEME_W3CDTF), dc.get(DublinCore.PROPERTY_MODIFIED).get(0).getEncodingScheme());
+            Optional.of(DublinCore.ENC_SCHEME_W3CDTF),
+            dc.get(DublinCore.PROPERTY_MODIFIED).get(0).getEncodingScheme(),
+            "The modified property should be of type W3CDTF.");
     assertEquals(1, dc.get(PROPERTY_FOO_ID).size());
     assertEquals(Optional.<EName>empty(), dc.get(PROPERTY_FOO_ID).get(0).getEncodingScheme());
     assertTrue(
-            "Property foo:id should be in the list of known properties.",
-            dc.getProperties().contains(PROPERTY_FOO_ID));
-    assertNull("The DublinCore reader cannot detect the flavor", dc.getFlavor());
+            dc.getProperties().contains(PROPERTY_FOO_ID),
+            "Property foo:id should be in the list of known properties.");
+    assertNull(dc.getFlavor(), "The DublinCore reader cannot detect the flavor");
   }
 
   @Test
@@ -96,8 +98,8 @@ public class DublinCoreCatalogTest {
       logger.debug(entry.getEName().toString() + " " + entry.getValue());
     }
 
-    assertTrue("Property foo:id should be in the list of known properties.",
-            dc.getProperties().contains(PROPERTY_FOO_ID));
+    assertTrue(dc.getProperties().contains(PROPERTY_FOO_ID),
+            "Property foo:id should be in the list of known properties.");
     assertEquals(fooId, dc.getFirstVal(PROPERTY_FOO_ID).getValue());
   }
 
@@ -122,16 +124,16 @@ public class DublinCoreCatalogTest {
       logger.debug(entry.getEName().toString() + " " + entry.getValue());
     }
 
-    assertTrue("Property foo:id should be in the list of known properties.",
-            dc.getProperties().contains(PROPERTY_FOO_ID));
+    assertTrue(dc.getProperties().contains(PROPERTY_FOO_ID),
+            "Property foo:id should be in the list of known properties.");
     assertEquals(fooId, dc.getFirstVal(PROPERTY_FOO_ID).getValue());
     //  verify that catalog only instantiates properties from catalog
     // and that it instantiates properties with passed in empty values.
     // Passing empty values is how existing values are deleted during metadata update
-    assertFalse("Non-passed property dc:temporal should *not* be instantiated.",
-            dc.getProperties().contains(DublinCore.PROPERTY_TEMPORAL));
-    assertTrue("Property foo:empty should be in the list of known properties.",
-            dc.getProperties().contains(PROPERTY_FOO_EMPTY));
+    assertFalse(dc.getProperties().contains(DublinCore.PROPERTY_TEMPORAL),
+            "Non-passed property dc:temporal should *not* be instantiated.");
+    assertTrue(dc.getProperties().contains(PROPERTY_FOO_EMPTY),
+            "Property foo:empty should be in the list of known properties.");
     assertEquals("", dc.getFirstVal(PROPERTY_FOO_EMPTY).getValue());
   }
 
@@ -150,36 +152,38 @@ public class DublinCoreCatalogTest {
     for (DublinCoreValue value: dc2.getValuesFlat()) {
       logger.debug("DublinCorevalue 2 " + value.getValue());
     }
-    assertEquals("Original value count", 9, dcOrig.getValuesFlat().size());
-    assertEquals("Merge catalog value count", 6, dc2.getValuesFlat().size());
+    assertEquals(9, dcOrig.getValuesFlat().size(), "Original value count");
+    assertEquals(6, dc2.getValuesFlat().size(), "Merge catalog value count");
 
     DublinCoreCatalog dc3 = DublinCoreXmlFormat.merge(dc2, dcOrig);
-    assertEquals("Merge count (removed 2 values added 1 value)", 8, dc3.getValuesFlat().size());
-    assertEquals("Only one title now exists", 1, dc3.get(DublinCore.PROPERTY_TITLE).size());
-    assertTrue("A changed Modify value", "2018-01-05".equals(dc3.get(DublinCore.PROPERTY_MODIFIED).get(0).getValue()));
+    assertEquals(8, dc3.getValuesFlat().size(), "Merge count (removed 2 values added 1 value)");
+    assertEquals(1, dc3.get(DublinCore.PROPERTY_TITLE).size(), "Only one title now exists");
+    assertTrue("2018-01-05".equals(dc3.get(DublinCore.PROPERTY_MODIFIED).get(0).getValue()), "A changed Modify value");
     assertEquals("Not Empty!", dc3.getFirstVal(PROPERTY_FOO_EMPTY).getValue());
-    assertEquals("German title was removed", 0, dc3.get(DublinCore.PROPERTY_TITLE, "de").size());
+    assertEquals(0, dc3.get(DublinCore.PROPERTY_TITLE, "de").size(), "German title was removed");
   }
 
   @Test
   public void testLoadAndSave() throws Exception {
     final DublinCoreCatalog dc = read("/dublincore-extended.xml");
-    final File out = testFolder.newFile("dublincore.xml");
+    final File out = newFile(testFolder, "dublincore.xml");
     try (FileOutputStream fos = new FileOutputStream(out)) {
       dc.toXml(fos, false);
     }
     final DublinCoreCatalog reloaded = DublinCoreXmlFormat.read(out);
     assertEquals(
-            "The reloaded catalog should have the same amount of properties than the original one.",
-            dc.getValues().size(), reloaded.getValues().size());
+            dc.getValues().size(),
+            reloaded.getValues().size(),
+            "The reloaded catalog should have the same amount of properties than the original one.");
   }
 
   @Test
   public void testLoadDublinCoreNoDefaultNs() throws Exception {
     final DublinCoreCatalog dc = read("/dublincore-no-default-ns.xml");
     assertEquals(
-            "The catalog should contain 4 properties because empty property are not considered.",
-            4, dc.getValuesFlat().size());
+            4,
+            dc.getValuesFlat().size(),
+            "The catalog should contain 4 properties because empty property are not considered.");
     assertEquals("Cutting Test 1", dc.getFirst(DublinCore.PROPERTY_TITLE));
   }
 
@@ -192,7 +196,7 @@ public class DublinCoreCatalogTest {
     List<Map<EName, String>> attributes = dc1.getEntriesSorted().stream()
         .map(CatalogEntry::getAttributes)
         .collect(Collectors.toList());
-    assertEquals("Attribute order", attributes, List.of(
+    assertEquals(attributes, List.of(
         Map.of(),
         Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"),
         Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de",
@@ -202,7 +206,7 @@ public class DublinCoreCatalogTest {
         Map.of(),
         Map.of(),
         Map.of(),
-        Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de")));
+        Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de")), "Attribute order");
     assertEquals(dc1.toXmlString(), dc2.toXmlString());
   }
 
@@ -235,7 +239,7 @@ public class DublinCoreCatalogTest {
             DublinCoreCatalog cat = DublinCoreXmlFormat.read(catString);
             map.put(Integer.valueOf(index), cat);
           } catch (Exception e) {
-            org.junit.Assert.fail("Should not have failed reading the catalog!");
+            Assertions.fail("Should not have failed reading the catalog!");
           }
         }
       }));
@@ -268,5 +272,11 @@ public class DublinCoreCatalogTest {
    */
   private DublinCoreCatalog read(String dcFile, boolean includeEmptiedElements) throws Exception {
     return DublinCoreXmlFormat.read(IoSupport.classPathResourceAsFile(dcFile).get(), includeEmptiedElements);
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 }

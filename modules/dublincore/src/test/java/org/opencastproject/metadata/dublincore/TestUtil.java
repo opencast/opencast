@@ -24,7 +24,7 @@ package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.util.IoSupport;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +33,7 @@ import java.util.TimeZone;
 /**
  * Some useful test utilities.
  */
-@Ignore("Contains no tests, only helper functions")
+@Disabled("Contains no tests, only helper functions")
 public final class TestUtil {
 
   private TestUtil() {

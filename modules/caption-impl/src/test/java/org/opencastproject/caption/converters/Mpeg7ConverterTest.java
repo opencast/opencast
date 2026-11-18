@@ -29,10 +29,10 @@ import org.opencastproject.caption.api.Time;
 import org.opencastproject.caption.impl.TimeImpl;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -61,7 +61,7 @@ public class Mpeg7ConverterTest {
   // Sample file
   private static final String FILE = "/sample.mpeg7.xml";
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException, IllegalTimeFormatException {
     converter = new Mpeg7CaptionConverter();
     inputStream = Mpeg7ConverterTest.class.getResourceAsStream(FILE);
@@ -85,7 +85,7 @@ public class Mpeg7ConverterTest {
 
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
@@ -98,23 +98,23 @@ public class Mpeg7ConverterTest {
       int nbCaption = collection.size();
 
       // Check size
-      Assert.assertEquals(25, nbCaption);
+      Assertions.assertEquals(25, nbCaption);
 
       // Check the last caption value
-      Assert.assertEquals(EXPECTED_LAST_CAPTION, collection.get(nbCaption - 1).getCaption()[0]);
+      Assertions.assertEquals(EXPECTED_LAST_CAPTION, collection.get(nbCaption - 1).getCaption()[0]);
 
       // Check start time from second segment
-      Assert.assertEquals(0, collection.get(1).getStartTime().compareTo(time));
+      Assertions.assertEquals(0, collection.get(1).getStartTime().compareTo(time));
 
     } catch (CaptionConverterException e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     return collection;
   }
 
-  @After
+  @AfterEach
   public void tear() throws IOException {
     IOUtils.closeQuietly(inputStream);
     IOUtils.closeQuietly(outputStream);

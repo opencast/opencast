@@ -21,13 +21,13 @@
 
 package org.opencastproject.job.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Incident.Severity;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,12 +46,12 @@ public class JaxbIncidentTreeTest {
     final IncidentTree tree = dto.toIncidentTree();
     run(IncidentTree.class, new IncidentTree() {
       @Override public List<Incident> getIncidents() {
-        assertEquals("incidents transferred", incidents, tree.getIncidents());
+        assertEquals(incidents, tree.getIncidents(), "incidents transferred");
         return null;
       }
 
       @Override public List<IncidentTree> getDescendants() {
-        assertEquals("childIncidents transferred", subTrees, tree.getDescendants());
+        assertEquals(subTrees, tree.getDescendants(), "childIncidents transferred");
         return null;
       }
     });

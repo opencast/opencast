@@ -20,8 +20,8 @@
  */
 package org.opencastproject.security.urlsigning.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.provider.UrlSigningProvider;
@@ -29,7 +29,7 @@ import org.opencastproject.urlsigning.common.Policy;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class UrlSigningProviderImplTest {

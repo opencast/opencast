@@ -24,8 +24,8 @@ package org.opencastproject.adminui.endpoint;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -38,9 +38,9 @@ import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -74,14 +74,14 @@ public class CaptureAgentsEndpointTest {
   private void checkCaptureAgentResults(String expected, String actual, boolean checkInputs) {
     JsonObject expectedJson = JsonParser.parseString(expected).getAsJsonObject();
     JsonObject resultJson = JsonParser.parseString(actual).getAsJsonObject();
-    assertEquals("The expected total should match the result total", expectedJson.get("total"),
-        resultJson.get("total"));
-    assertEquals("The expected offset should match the result offset", expectedJson.get("offset"),
-        resultJson.get("offset"));
-    assertEquals("The expected count should match the result count", expectedJson.get("count"),
-        resultJson.get("count"));
-    assertEquals("The expected limit should match the result limit", expectedJson.get("limit"),
-        resultJson.get("limit"));
+    assertEquals(expectedJson.get("total"), resultJson.get("total"),
+        "The expected total should match the result total");
+    assertEquals(expectedJson.get("offset"), resultJson.get("offset"),
+        "The expected offset should match the result offset");
+    assertEquals(expectedJson.get("count"), resultJson.get("count"),
+        "The expected count should match the result count");
+    assertEquals(expectedJson.get("limit"), resultJson.get("limit"),
+        "The expected limit should match the result limit");
     checkCaptureAgentResults(expectedJson.getAsJsonArray("results"), resultJson.getAsJsonArray("results"),
         checkInputs);
   }
@@ -190,12 +190,12 @@ public class CaptureAgentsEndpointTest {
             .when().get(rt.host("/agents.json"));
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }

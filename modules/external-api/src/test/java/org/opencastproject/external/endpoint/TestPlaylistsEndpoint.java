@@ -39,7 +39,7 @@ import org.opencastproject.util.requests.SortCriterion;
 import com.google.common.collect.Lists;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 @Path("")
-@Ignore
+@Disabled
 public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
 
   public TestPlaylistsEndpoint() throws Exception {

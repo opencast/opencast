@@ -21,7 +21,7 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.composer.layout.AnchorOffset.anchorOffset;
 import static org.opencastproject.composer.layout.Dimension.dimension;
 import static org.opencastproject.composer.layout.LayoutManager.aspectRatio;
@@ -33,7 +33,7 @@ import org.opencastproject.util.data.Tuple;
 
 import com.google.gson.JsonParser;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -97,10 +97,10 @@ public class LayoutManagerTest {
         new TwoShapeLayouts.TwoShapeLayoutSpec(
             new HorizontalCoverageLayoutSpec(anchorOffset(Anchors.TOP_LEFT, Anchors.TOP_LEFT, -20, -20), 0.2),
             new HorizontalCoverageLayoutSpec(anchorOffset(Anchors.BOTTOM_RIGHT, Anchors.BOTTOM_RIGHT, -20, -20), 0.8)));
-    assertEquals("Media must not exceed canvas", dimension(384, 288), layout.getUpper().getDimension());
-    assertEquals("Media must not exceed canvas", offset(0, 0), layout.getUpper().getOffset());
-    assertEquals("Media must not exceed canvas", dimension(1440, 1080), layout.getLower().getDimension());
-    assertEquals("Media must not exceed canvas", offset(460, 0), layout.getLower().getOffset());
+    assertEquals(dimension(384, 288), layout.getUpper().getDimension(), "Media must not exceed canvas");
+    assertEquals(offset(0, 0), layout.getUpper().getOffset(), "Media must not exceed canvas");
+    assertEquals(dimension(1440, 1080), layout.getLower().getDimension(), "Media must not exceed canvas");
+    assertEquals(offset(460, 0), layout.getLower().getOffset(), "Media must not exceed canvas");
   }
 
   @Test

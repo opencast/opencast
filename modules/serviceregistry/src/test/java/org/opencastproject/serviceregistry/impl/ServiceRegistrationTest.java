@@ -44,10 +44,10 @@ import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.util.UrlSupport;
 
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class ServiceRegistrationTest {
   private ServiceRegistrationJpaImpl regType1Remotehost1 = null;
   private ServiceRegistrationJpaImpl regType1Remotehost2 = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     serviceRegistry = new ServiceRegistryJpaImpl();
     serviceRegistry.setEntityManagerFactory(newEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT));
@@ -108,7 +108,7 @@ public class ServiceRegistrationTest {
             .registerService(JOB_TYPE_1, REMOTEHOST_2, PATH_2);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     serviceRegistry.unRegisterService(JOB_TYPE_1, LOCALHOST);
     serviceRegistry.unRegisterService(JOB_TYPE_1, REMOTEHOST_1);
@@ -125,7 +125,7 @@ public class ServiceRegistrationTest {
             hosts, hostLoads);
 
     // Make sure all hosts are available for processing
-    Assert.assertEquals(3, availableServices.size());
+    Assertions.assertEquals(3, availableServices.size());
 
     // Create a job and mark it as running.
     Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(),
@@ -138,14 +138,14 @@ public class ServiceRegistrationTest {
     availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since the host load is not taken into account, still all tree services should show up
-    Assert.assertEquals(3, availableServices.size());
+    Assertions.assertEquals(3, availableServices.size());
 
     // Recalculate the number of available services after ignoring a host
     hosts.remove(regType1Remotehost1.getHostRegistration());
     availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since host 1 is now ignored, only two more services should show up
-    Assert.assertEquals(2, availableServices.size());
+    Assertions.assertEquals(2, availableServices.size());
   }
 
   @Test
@@ -157,7 +157,7 @@ public class ServiceRegistrationTest {
             services, hosts, hostLoads);
 
     // Make sure all hosts are available for processing
-    Assert.assertEquals(3, availableServices.size());
+    Assertions.assertEquals(3, availableServices.size());
 
     // Create a job and mark it as running.
     Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(),
@@ -170,14 +170,14 @@ public class ServiceRegistrationTest {
     availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since host 1 is now maxed out, only two more services should show up
-    Assert.assertEquals(2, availableServices.size());
+    Assertions.assertEquals(2, availableServices.size());
 
     // Recalculate the number of available services after ignoring a host
     hosts.remove(regType1Remotehost1.getHostRegistration());
     availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since remote host 1 is now ignored, only one more service should show up
-    Assert.assertEquals(1, availableServices.size());
+    Assertions.assertEquals(1, availableServices.size());
   }
 
   @Test
@@ -196,8 +196,8 @@ public class ServiceRegistrationTest {
     jobTry1.setProcessingHost(regType1Localhost.getHost());
     jobTry1 = serviceRegistry.updateJob(jobTry1);
     updatedService = getUpdatedService(regType1Localhost);
-    Assert.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
-    Assert.assertEquals(0, updatedService.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
+    Assertions.assertEquals(0, updatedService.getErrorStateTrigger());
 
     // 2nd try, failed on localhost
     jobTry2.setStatus(Status.FAILED);
@@ -205,8 +205,8 @@ public class ServiceRegistrationTest {
     jobTry2.setProcessingHost(regType1Localhost.getHost());
     jobTry2 = serviceRegistry.updateJob(jobTry2);
     updatedService = getUpdatedService(regType1Localhost);
-    Assert.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
-    Assert.assertEquals(0, updatedService.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
+    Assertions.assertEquals(0, updatedService.getErrorStateTrigger());
 
     // 3rd try, finished on localhost
     jobTry3.setStatus(Status.FINISHED);
@@ -214,8 +214,8 @@ public class ServiceRegistrationTest {
     jobTry3.setProcessingHost(regType1Localhost.getHost());
     jobTry3 = serviceRegistry.updateJob(jobTry3);
     updatedService = getUpdatedService(regType1Localhost);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService.getServiceState());
-    Assert.assertEquals(0, updatedService.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService.getServiceState());
+    Assertions.assertEquals(0, updatedService.getErrorStateTrigger());
   }
 
   @Test
@@ -251,10 +251,10 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService1.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService1.getErrorStateTrigger());
 
     // 1st try for job 2, failed on localhost
     job2Try1.setStatus(Status.FAILED);
@@ -264,9 +264,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
 
     // 2nd try for job 1, failed on remotehost1
     job1Try2.setStatus(Status.FAILED);
@@ -276,11 +276,11 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
     updatedService2.getWarningStateTrigger();
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 2nd try for job 2, failed on remotehost1
     job2Try2.setStatus(Status.FINISHED);
@@ -290,10 +290,10 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 3rd try for job 1, failed on remotehost2
     job1Try3.setStatus(Status.FINISHED);
@@ -303,11 +303,11 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService3.getWarningStateTrigger());
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.ERROR, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService3.getWarningStateTrigger());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 3rd try for job2, failed on remotehost2
     job2Try3.setStatus(Status.FAILED);
@@ -317,9 +317,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
 
     // 4rd try for job1, failed on remotehost2
     job1Try4.setStatus(Status.FAILED);
@@ -329,9 +329,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.ERROR, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.ERROR, updatedService3.getServiceState());
 
   }
 
@@ -369,10 +369,10 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService1.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService1.getErrorStateTrigger());
 
     // 1st try for job 2, failed on localhost
     job2Try1.setStatus(Status.FAILED);
@@ -382,9 +382,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
 
     // 2nd try for job 1, failed on remotehost1
     job1Try2.setStatus(Status.FAILED);
@@ -394,11 +394,11 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
     updatedService2.getWarningStateTrigger();
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 2nd try for job 2, failed on remotehost1
     job2Try2.setStatus(Status.FINISHED);
@@ -408,10 +408,10 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 3rd try for job 1, failed on remotehost2
     job1Try3.setStatus(Status.FINISHED);
@@ -421,11 +421,11 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService3.getWarningStateTrigger());
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService3.getWarningStateTrigger());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 3rd try for job2, failed on remotehost2
     job2Try3.setStatus(Status.FAILED);
@@ -435,9 +435,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
 
     // 4rd try for job1, failed on remotehost2
     job1Try4.setStatus(Status.FAILED);
@@ -447,9 +447,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
 
   }
 
@@ -474,8 +474,8 @@ public class ServiceRegistrationTest {
     jobTry1 = serviceRegistry.updateJob(jobTry1);
     updatedService1 = (ServiceRegistrationJpaImpl) serviceRegistry.getServiceRegistration(JOB_TYPE_1,
             regType1Localhost.getHost());
-    Assert.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
-    Assert.assertEquals(0, updatedService1.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
+    Assertions.assertEquals(0, updatedService1.getErrorStateTrigger());
 
     // 2nd try, failed on remotehost1
     jobTry2.setStatus(Status.FAILED);
@@ -484,10 +484,10 @@ public class ServiceRegistrationTest {
     jobTry2 = serviceRegistry.updateJob(jobTry2);
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService2.getServiceState());
-    Assert.assertNotEquals(0, updatedService2.getWarningStateTrigger());
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService2.getServiceState());
+    Assertions.assertNotEquals(0, updatedService2.getWarningStateTrigger());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 3rd try, failed on remotehost2
     jobTry3.setStatus(Status.FAILED);
@@ -497,10 +497,10 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
-    Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
+    Assertions.assertEquals(0, updatedService2.getErrorStateTrigger());
 
     // 4th try, finished on localhost
     jobTry4.setStatus(Status.FINISHED);
@@ -510,9 +510,9 @@ public class ServiceRegistrationTest {
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
-    Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
-    Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
   }
 
   /**

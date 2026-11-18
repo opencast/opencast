@@ -40,12 +40,11 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,6 +53,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javax.servlet.http.HttpServletResponse;
@@ -66,8 +66,8 @@ public class WorkspaceImplTest {
           + "junit-workspace-rootdir";
   private static final String repoRoot = "." + File.separator + "target" + File.separator + "junit-repo-rootdir";
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   private static final String STREAM_SECURITY_QUERY = "?policy=eyJTdGF0ZW1lbnQiOnt9fQ&keyId=mh_default_org"
           + "&signature=abc";
@@ -76,13 +76,13 @@ public class WorkspaceImplTest {
   private interface PathMappableRepository extends WorkingFileRepository, PathMappable {
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     workspace = new WorkspaceImpl(workspaceRoot, false);
     workspace.activate(null);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     workspace.deactivate();
     FileUtils.deleteDirectory(new File(workspaceRoot));
@@ -119,9 +119,9 @@ public class WorkspaceImplTest {
     EasyMock.expect(httpClient.execute(EasyMock.anyObject(ClassicHttpRequest.class))).andReturn(response);
     EasyMock.replay(httpClient);
     workspace.setTrustedHttpClient(httpClient);
-    Assert.assertTrue(urlToSource.toString().length() > 255);
+    Assertions.assertTrue(urlToSource.toString().length() > 255);
     try {
-      Assert.assertNotNull(workspace.get(urlToSource.toURI()));
+      Assertions.assertNotNull(workspace.get(urlToSource.toURI()));
     } catch (NotFoundException e) {
       // This happens on some machines, so we catch and handle it.
     }
@@ -133,7 +133,7 @@ public class WorkspaceImplTest {
   }
 
   private void setUpWorkingFileRepositoryWithFile(String path, String content, String urlPrefix) throws Exception {
-    File repoDirectory = testFolder.newFolder();
+    File repoDirectory = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
     File file = new File(repoDirectory, path);
     FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
 
@@ -171,7 +171,7 @@ public class WorkspaceImplTest {
 
     for (String uri : withQueryAndFragment(url)) {
       File file = workspace.get(new URI(uri));
-      Assert.assertEquals(uri, "<policy/>", FileUtils.readFileToString(file, StandardCharsets.UTF_8));
+      Assertions.assertEquals("<policy/>", FileUtils.readFileToString(file, StandardCharsets.UTF_8), uri);
     }
   }
 
@@ -182,7 +182,7 @@ public class WorkspaceImplTest {
 
     for (String uri : withQueryAndFragment(url)) {
       try (InputStream in = workspace.read(new URI(uri))) {
-        Assert.assertEquals(uri, "<policy/>", IOUtils.toString(in, StandardCharsets.UTF_8));
+        Assertions.assertEquals("<policy/>", IOUtils.toString(in, StandardCharsets.UTF_8), uri);
       }
     }
   }
@@ -208,11 +208,11 @@ public class WorkspaceImplTest {
 
     try {
       workspace.get(new URI(uri));
-      Assert.fail("The file is not available, so the download should fail");
+      Assertions.fail("The file is not available, so the download should fail");
     } catch (NotFoundException e) {
       // expected
     }
-    Assert.assertEquals(uri, request.getValue().getUri().toString());
+    Assertions.assertEquals(uri, request.getValue().getUri().toString());
   }
 
   @Test
@@ -223,11 +223,11 @@ public class WorkspaceImplTest {
 
     try {
       workspace.read(new URI(uri));
-      Assert.fail("The file is not available, so the download should fail");
+      Assertions.fail("The file is not available, so the download should fail");
     } catch (NotFoundException e) {
       // expected
     }
-    Assert.assertEquals(uri, request.getValue().getUri().toString());
+    Assertions.assertEquals(uri, request.getValue().getUri().toString());
   }
 
   // If the working file repository has no URL prefix, its files cannot be found on the file system. Files have to be
@@ -240,11 +240,11 @@ public class WorkspaceImplTest {
 
     try {
       workspace.read(new URI(uri));
-      Assert.fail("The file is not available, so the download should fail");
+      Assertions.fail("The file is not available, so the download should fail");
     } catch (NotFoundException e) {
       // expected
     }
-    Assert.assertEquals(uri, request.getValue().getUri().toString());
+    Assertions.assertEquals(uri, request.getValue().getUri().toString());
   }
 
   // Calls to put() should put the file into the working file repository, but not in the local cache if there's a valid
@@ -269,7 +269,7 @@ public class WorkspaceImplTest {
 
     // Put a stream into the workspace (and hence, the repository)
     try (InputStream in = getClass().getResourceAsStream("/opencast_header.gif")) {
-      Assert.assertNotNull(in);
+      Assertions.assertNotNull(in);
       workspace.put("foo", "bar", "header.gif", in);
     }
 
@@ -278,7 +278,7 @@ public class WorkspaceImplTest {
 
     // Ensure that the file was not cached in the workspace (since there is a configured filesystem mapping)
     File file = new File(workspaceRoot, "http___localhost_8080_files_foo_bar_header.gif");
-    Assert.assertFalse(file.exists());
+    Assertions.assertFalse(file.exists());
   }
 
   // Calls to put() should put the file into the working file repository and the local cache if there is no valid
@@ -305,7 +305,7 @@ public class WorkspaceImplTest {
 
     // Put a stream into the workspace (and hence, the repository)
     try (InputStream in = getClass().getResourceAsStream("/opencast_header.gif")) {
-      Assert.assertNotNull(in);
+      Assertions.assertNotNull(in);
       workspace.put("foo", "bar", "header.gif", in);
     }
 
@@ -315,7 +315,7 @@ public class WorkspaceImplTest {
     // Ensure that the file was cached in the workspace (since there is no configured filesystem mapping)
     File file = Paths.get(
         workspaceRoot, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, "foo", "bar", "header.gif").toFile();
-    Assert.assertTrue(file.exists());
+    Assertions.assertTrue(file.exists());
   }
 
   @Test
@@ -329,15 +329,15 @@ public class WorkspaceImplTest {
 
     File workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com/myaccount/videos/bar.mov"));
     File expected = Paths.get(workspaceRoot, "http_foo.com", "myaccount", "videos", "bar.mov").toFile();
-    Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
+    Assertions.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com:8080/myaccount/videos/bar.mov"));
     expected = Paths.get(workspaceRoot, "http_foo.com_8080", "myaccount", "videos", "bar.mov").toFile();
-    Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
+    Assertions.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://localhost/files/collection/c1/bar.mov"));
     expected = Paths.get(workspaceRoot, "collection", "c1", "bar.mov").toFile();
-    Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
+    Assertions.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
   }
 
@@ -352,15 +352,15 @@ public class WorkspaceImplTest {
 
     File workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com/myaccount/videos/bar.mov"));
     File expected = Paths.get(workspaceRoot, "http_foo.com", "myaccount", "videos", "bar.mov").toFile();
-    Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
+    Assertions.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://foo.com:8080/myaccount/videos/bar.mov"));
     expected = Paths.get(workspaceRoot, "http_foo.com_8080", "myaccount", "videos", "bar.mov").toFile();
-    Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
+    Assertions.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
     workspaceFile = workspace.toWorkspaceFile(new URI("http://localhost:8080/files/collection/c1/bar.mov"));
     expected = Paths.get(workspaceRoot, "collection", "c1", "bar.mov").toFile();
-    Assert.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
+    Assertions.assertEquals(expected.getAbsolutePath(), workspaceFile.getAbsolutePath());
 
   }
 
@@ -393,7 +393,7 @@ public class WorkspaceImplTest {
     workspace.setTrustedHttpClient(trustedHttpClient);
 
     File resultingFile = workspace.get(URI.create("http://foo.com/myaccount/videos/"));
-    Assert.assertEquals(expectedFile, resultingFile);
+    Assertions.assertEquals(expectedFile, resultingFile);
   }
 
   /**
@@ -405,7 +405,7 @@ public class WorkspaceImplTest {
   public void testDeleteWithUnsafeMediaPackageIdThrowsIllegalStateException() throws Exception {
     try {
       workspace.delete("..", "../evil");
-      Assert.fail("Expected unsafe identifiers to be rejected");
+      Assertions.fail("Expected unsafe identifiers to be rejected");
     } catch (IllegalStateException e) {
       // intended
     }
@@ -423,7 +423,7 @@ public class WorkspaceImplTest {
 
     try {
       workspace.get(URI.create("http://foo.com/../../../evil/file.bin"));
-      Assert.fail("Expected a URI with traversal segments to be rejected");
+      Assertions.fail("Expected a URI with traversal segments to be rejected");
     } catch (IllegalStateException e) {
       // intended
     }
@@ -432,29 +432,29 @@ public class WorkspaceImplTest {
   @Test
   public void testCleanup() throws Exception {
     workspace.cleanup(-1);
-    Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
+    Assertions.assertEquals(0L, workspace.getUsedSpace().get().longValue());
 
     File file = Paths.get(workspaceRoot, "test", "c1", "bar.mov").toFile();
     FileUtils.write(file, "asdf", StandardCharsets.UTF_8);
     file.deleteOnExit();
 
-    Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
+    Assertions.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
     workspace.cleanup(0);
-    Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
+    Assertions.assertEquals(0L, workspace.getUsedSpace().get().longValue());
 
     FileUtils.write(file, "asdf", StandardCharsets.UTF_8);
-    Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
+    Assertions.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
     workspace.cleanup(100);
-    Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
+    Assertions.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
     Thread.sleep(1100L);
 
-    Assert.assertTrue(Paths.get(workspaceRoot, "test", "c1").toFile().exists());
+    Assertions.assertTrue(Paths.get(workspaceRoot, "test", "c1").toFile().exists());
     workspace.cleanup(1);
-    Assert.assertEquals(0L, workspace.getUsedSpace().get().longValue());
-    Assert.assertFalse(Paths.get(workspaceRoot, "test").toFile().exists());
+    Assertions.assertEquals(0L, workspace.getUsedSpace().get().longValue());
+    Assertions.assertFalse(Paths.get(workspaceRoot, "test").toFile().exists());
   }
 
 }

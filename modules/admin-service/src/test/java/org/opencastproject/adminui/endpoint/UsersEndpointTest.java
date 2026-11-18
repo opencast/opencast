@@ -34,11 +34,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,22 +102,22 @@ public class UsersEndpointTest {
     JsonObject user2 = users.get(1).getAsJsonObject();
     JsonObject user3 = users.get(2).getAsJsonObject();
     JsonObject user4 = users.get(3).getAsJsonObject();
-    Assert.assertEquals("User1", user1.get("name").getAsString());
-    Assert.assertEquals("user2", user2.get("name").getAsString());
-    Assert.assertEquals("User3", user3.get("name").getAsString());
-    Assert.assertEquals("user4", user4.get("name").getAsString());
+    Assertions.assertEquals("User1", user1.get("name").getAsString());
+    Assertions.assertEquals("user2", user2.get("name").getAsString());
+    Assertions.assertEquals("User3", user3.get("name").getAsString());
+    Assertions.assertEquals("user4", user4.get("name").getAsString());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }

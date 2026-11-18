@@ -40,9 +40,9 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -54,7 +54,7 @@ public class WaveformWorkflowOperationHandlerTest {
   private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     handler = new WaveformWorkflowOperationHandler() {
@@ -106,14 +106,14 @@ public class WaveformWorkflowOperationHandlerTest {
   public void testStart() throws Exception {
     EasyMock.expect(instance.getConfiguration("source-flavor")).andReturn("*/source").anyTimes();
     EasyMock.replay(instance);
-    Assert.assertTrue(handler.start(workflow, null).allowsContinue());
+    Assertions.assertTrue(handler.start(workflow, null).allowsContinue());
   }
 
   @Test
   public void testNoTracks() throws Exception {
     EasyMock.expect(instance.getConfiguration("source-flavor")).andReturn("*/nothing").anyTimes();
     EasyMock.replay(instance);
-    Assert.assertTrue(handler.start(workflow, null).allowsContinue());
+    Assertions.assertTrue(handler.start(workflow, null).allowsContinue());
   }
 
   @Test
@@ -121,7 +121,7 @@ public class WaveformWorkflowOperationHandlerTest {
     track.setAudio(new LinkedList<>());
     EasyMock.expect(instance.getConfiguration("source-flavor")).andReturn("*/source").anyTimes();
     EasyMock.replay(instance);
-    Assert.assertTrue(handler.start(workflow, null).allowsContinue());
+    Assertions.assertTrue(handler.start(workflow, null).allowsContinue());
   }
 
   @Test
@@ -129,9 +129,9 @@ public class WaveformWorkflowOperationHandlerTest {
     EasyMock.replay(instance);
     try {
       handler.start(workflow, null);
-      Assert.fail();
+      Assertions.fail();
     } catch (WorkflowOperationException e) {
-      Assert.assertTrue(e.getMessage().startsWith("Required property "));
+      Assertions.assertTrue(e.getMessage().startsWith("Required property "));
     }
   }
 

@@ -21,15 +21,16 @@
 
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
 import java.util.List;
@@ -69,9 +70,10 @@ public class GsonUtilTest {
   }
 
   /** Input the JSON specification does not allow must be rejected, as the previous parser rejected it. */
-  @Test(expected = JsonSyntaxException.class)
+  @Test
   public void testLenientInputIsRejected() {
-    GsonUtil.gson().fromJson("{key: value}", JsonObject.class);
+    assertThrows(JsonSyntaxException.class, () ->
+        GsonUtil.gson().fromJson("{key: value}", JsonObject.class));
   }
 
   /** Decimals must still come back as Double. */
@@ -120,15 +122,17 @@ public class GsonUtilTest {
   }
 
   /** Unlike JsonParser, parsing into a tree has to be as strict as the Gson instance. */
-  @Test(expected = JsonSyntaxException.class)
+  @Test
   public void testParseRejectsLenientInput() {
-    GsonUtil.parse("{key: value}");
+    assertThrows(JsonSyntaxException.class, () ->
+        GsonUtil.parse("{key: value}"));
   }
 
   /** Same for readers. */
-  @Test(expected = JsonSyntaxException.class)
+  @Test
   public void testParseReaderRejectsLenientInput() {
-    GsonUtil.parse(new StringReader("{key: value}"));
+    assertThrows(JsonSyntaxException.class, () ->
+        GsonUtil.parse(new StringReader("{key: value}")));
   }
 
   /** An empty document parses to JSON null, as it does with JsonParser. */

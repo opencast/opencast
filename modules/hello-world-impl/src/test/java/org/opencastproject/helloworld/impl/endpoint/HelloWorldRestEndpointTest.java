@@ -24,9 +24,9 @@ package org.opencastproject.helloworld.impl.endpoint;
 import org.opencastproject.helloworld.api.HelloWorldService;
 import org.opencastproject.helloworld.impl.HelloWorldServiceImpl;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Response;
 
@@ -40,7 +40,7 @@ public class HelloWorldRestEndpointTest {
   /**
    * Setup for the Hello World Rest Service
    */
-  @Before
+  @BeforeEach
   public void setUp() {
     HelloWorldService service = new HelloWorldServiceImpl();
     rest = new HelloWorldRestEndpoint();
@@ -50,28 +50,28 @@ public class HelloWorldRestEndpointTest {
   @Test
   public void testHelloWorld() throws Exception {
     Response response = rest.helloWorld();
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals("Hello World", response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals("Hello World", response.getEntity());
   }
 
   @Test
   public void testHelloNameEmpty() throws Exception {
     Response response = rest.helloName("");
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals("Hello!", response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals("Hello!", response.getEntity());
   }
 
   @Test
   public void testHelloNameMissing() {
     Response response = rest.helloName(null);
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals("Hello!", response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals("Hello!", response.getEntity());
   }
 
   @Test
   public void testHelloName() throws Exception {
     Response response = rest.helloName("Peter");
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals("Hello Peter!", response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals("Hello Peter!", response.getEntity());
   }
 }

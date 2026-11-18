@@ -31,12 +31,12 @@ import org.opencastproject.security.api.User;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestUserSettingsEndpoint extends UserSettingsEndpoint {
   public static final String EXAMPLE_EMAIL = "example@fake.com";
   public static final String EXAMPLE_KEY = "example_key";

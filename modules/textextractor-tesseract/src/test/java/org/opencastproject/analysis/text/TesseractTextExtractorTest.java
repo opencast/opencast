@@ -21,18 +21,17 @@
 
 package org.opencastproject.analysis.text;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.opencastproject.textextractor.tesseract.TesseractTextExtractor;
 import org.opencastproject.util.IoSupport;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +65,10 @@ public class TesseractTextExtractorTest {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TesseractTextExtractorTest.class);
 
-  @ClassRule
-  public static TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private static File testFolder;
 
-  @BeforeClass
+  @BeforeAll
   public static void testTesseract() {
     final String[] command = { tesseractBinary, "-v"};
     Process p = null;
@@ -91,10 +90,10 @@ public class TesseractTextExtractorTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     final URL imageUrl = this.getClass().getResource(testPath);
-    testFile = testFolder.newFile();
+    testFile = File.createTempFile("junit", null, testFolder);
     FileUtils.copyURLToFile(imageUrl, testFile);
     analyzer = new TesseractTextExtractor(tesseractBinary);
     analyzer.setAdditionalOptions(additionalOptions);

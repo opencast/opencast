@@ -21,10 +21,10 @@
 
 package org.opencastproject.security.api;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class AccessControlParserTest {
   /**  The acl to test */
   private AccessControlList acl = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Construct an ACL with 100 entries
     acl = new AccessControlList();
@@ -49,7 +49,7 @@ public class AccessControlParserTest {
     }
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     acl = null;
   }
@@ -65,7 +65,7 @@ public class AccessControlParserTest {
       int role = Integer.parseInt(entry.getRole());
       int action = Integer.parseInt(entry.getAction());
       boolean allowed = entry.isAllow();
-      Assert.assertEquals(allowed, role + action % 2 == 0);
+      Assertions.assertEquals(allowed, role + action % 2 == 0);
     }
   }
 
@@ -81,7 +81,7 @@ public class AccessControlParserTest {
       int role = Integer.parseInt(entry.getRole());
       int action = Integer.parseInt(entry.getAction());
       boolean allowed = entry.isAllow();
-      Assert.assertEquals(allowed, role + action % 2 == 0);
+      Assertions.assertEquals(allowed, role + action % 2 == 0);
     }
   }
 
@@ -93,15 +93,15 @@ public class AccessControlParserTest {
     acl.merge(deny);
 
     //Ensure that after the merge the deny rule is still present
-    Assert.assertTrue(acl.getEntries().contains(denyRule));
+    Assertions.assertTrue(acl.getEntries().contains(denyRule));
 
     String json = AccessControlParser.toJson(acl);
     AccessControlList jsonAfter =  AccessControlParser.parseAcl(json);
-    Assert.assertFalse(jsonAfter.getEntries().stream().anyMatch(e -> e.getAction().equals("DENY")));
+    Assertions.assertFalse(jsonAfter.getEntries().stream().anyMatch(e -> e.getAction().equals("DENY")));
 
     String xml = AccessControlParser.toXml(acl);
     AccessControlList xmlAfter =  AccessControlParser.parseAcl(json);
-    Assert.assertFalse(xmlAfter.getEntries().stream().anyMatch(e -> e.getAction().equals("DENY")));
+    Assertions.assertFalse(xmlAfter.getEntries().stream().anyMatch(e -> e.getAction().equals("DENY")));
   }
 
 }

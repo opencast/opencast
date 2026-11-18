@@ -21,9 +21,9 @@
 
 package org.opencastproject.list.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
@@ -32,8 +32,8 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class ListProvidersScannerTest {
     return new File(ListProvidersScannerTest.class.getResource(resourcePath).toURI());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     listName = "TEST.LIST.NAME";
     defaultOrg = EasyMock.createNiceMock(Organization.class);
@@ -88,7 +88,7 @@ public class ListProvidersScannerTest {
 
     EasyMock.replay(securityService, defaultOrg);
 
-    assertTrue("Provider has not been registered", listProvidersService.hasProvider(listName));
+    assertTrue(listProvidersService.hasProvider(listName), "Provider has not been registered");
     assertEquals(1, listProvidersService.getAvailableProviders().size());
     assertEquals(3, listProvidersService
             .getList(listName, null, false).size()
@@ -115,7 +115,7 @@ public class ListProvidersScannerTest {
   public void testDefaultUninstall() throws Exception {
     File file = getResourceFile("/ListProvidersScannerTest-GoodProperties.properties");
     listProvidersScanner.uninstall(file);
-    assertFalse("Provider was not removed", listProvidersService.hasProvider(listName));
+    assertFalse(listProvidersService.hasProvider(listName), "Provider was not removed");
   }
 
   @Test
@@ -129,7 +129,7 @@ public class ListProvidersScannerTest {
 
     EasyMock.replay();
 
-    assertTrue("Provider has not been registered", listProvidersService.hasProvider(listName, "org1"));
+    assertTrue(listProvidersService.hasProvider(listName, "org1"), "Provider has not been registered");
   }
 
   @Test
@@ -142,7 +142,7 @@ public class ListProvidersScannerTest {
 
     EasyMock.replay();
 
-    assertFalse("Provider was not removed", listProvidersService.hasProvider(listName, "org1"));
+    assertFalse(listProvidersService.hasProvider(listName, "org1"), "Provider was not removed");
   }
 
   @Test
@@ -155,7 +155,7 @@ public class ListProvidersScannerTest {
 
     EasyMock.replay(securityService, specificOrg);
 
-    assertTrue("Translatable property not read correctly", listProvidersService.isTranslatable(listName));
+    assertTrue(listProvidersService.isTranslatable(listName), "Translatable property not read correctly");
   }
 
   @Test
@@ -187,7 +187,7 @@ public class ListProvidersScannerTest {
     File file = getResourceFile("/ListProvidersScannerTest-MissingListName.properties");
     listProvidersScanner.install(file);
 
-    assertFalse("Provider should not be added without a name", listProvidersService.hasProvider(listName));
+    assertFalse(listProvidersService.hasProvider(listName), "Provider should not be added without a name");
   }
 
   @Test
@@ -195,7 +195,7 @@ public class ListProvidersScannerTest {
     File file = getResourceFile("/ListProvidersScannerTest-EmptyListName.properties");
     listProvidersScanner.install(file);
 
-    assertFalse("Provider should not be added without a name", listProvidersService.hasProvider(listName));
+    assertFalse(listProvidersService.hasProvider(listName), "Provider should not be added without a name");
   }
 
   @Test
@@ -219,7 +219,7 @@ public class ListProvidersScannerTest {
     assertEquals(1, listProvidersService.getAvailableProviders().size());
     assertEquals(listName, listProvidersService.getAvailableProviders().get(0));
     assertEquals("org1", org1.getId());
-    assertTrue("Provider is not registered", listProvidersService.hasProvider(listName, org1.getId()));
+    assertTrue(listProvidersService.hasProvider(listName, org1.getId()), "Provider is not registered");
     Map<String, String> dictionary = listProvidersService.getList(listName, query, false);
 
     assertEquals(3, dictionary.size());

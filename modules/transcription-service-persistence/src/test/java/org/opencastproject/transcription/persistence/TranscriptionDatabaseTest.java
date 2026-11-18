@@ -23,10 +23,10 @@ package org.opencastproject.transcription.persistence;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -52,7 +52,7 @@ public class TranscriptionDatabaseTest {
   private static final Date DATE_EXPECTED = null;
   private static final long PROVIDER_ID = 1;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     database = new TranscriptionDatabaseImpl() {
       @Override
@@ -65,7 +65,7 @@ public class TranscriptionDatabaseTest {
     database.activate(null);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws SQLException {
   }
 
@@ -76,13 +76,13 @@ public class TranscriptionDatabaseTest {
     long dt2 = System.currentTimeMillis();
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(STATUS, j.getStatus());
-    Assert.assertEquals(TRACK_DURATION, j.getTrackDuration());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(STATUS, j.getStatus());
+    Assertions.assertEquals(TRACK_DURATION, j.getTrackDuration());
     long created = j.getDateCreated().getTime();
-    Assert.assertTrue(dt1 <= created && created <= dt2);
+    Assertions.assertTrue(dt1 <= created && created <= dt2);
   }
 
   @Test
@@ -92,12 +92,12 @@ public class TranscriptionDatabaseTest {
     long dt2 = System.currentTimeMillis();
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(STATUS, j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(STATUS, j.getStatus());
     long created = j.getDateCreated().getTime();
-    Assert.assertTrue(dt1 <= created && created <= dt2);
+    Assertions.assertTrue(dt1 <= created && created <= dt2);
   }
 
   @Test
@@ -107,9 +107,9 @@ public class TranscriptionDatabaseTest {
     database.storeJobControl("another_mp_id", "track3", "job3", STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     List<TranscriptionJobControl> list = database.findByMediaPackage(MP_ID);
-    Assert.assertEquals(2, list.size());
-    Assert.assertTrue(TRACK_ID.equals(list.get(0).getTrackId()) || TRACK_ID.equals(list.get(1).getTrackId()));
-    Assert.assertTrue(TRACK_ID2.equals(list.get(0).getTrackId()) || TRACK_ID2.equals(list.get(1).getTrackId()));
+    Assertions.assertEquals(2, list.size());
+    Assertions.assertTrue(TRACK_ID.equals(list.get(0).getTrackId()) || TRACK_ID.equals(list.get(1).getTrackId()));
+    Assertions.assertTrue(TRACK_ID2.equals(list.get(0).getTrackId()) || TRACK_ID2.equals(list.get(1).getTrackId()));
   }
 
   @Test
@@ -119,9 +119,11 @@ public class TranscriptionDatabaseTest {
     database.storeJobControl(MP_ID3, TRACK_ID3, JOB_ID3, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     List<TranscriptionJobControl> list = database.findByStatus(STATUS);
-    Assert.assertEquals(2, list.size());
-    Assert.assertTrue(MP_ID.equals(list.get(0).getMediaPackageId()) || MP_ID.equals(list.get(1).getMediaPackageId()));
-    Assert.assertTrue(MP_ID3.equals(list.get(0).getMediaPackageId()) || MP_ID3.equals(list.get(1).getMediaPackageId()));
+    Assertions.assertEquals(2, list.size());
+    Assertions.assertTrue(
+        MP_ID.equals(list.get(0).getMediaPackageId()) || MP_ID.equals(list.get(1).getMediaPackageId()));
+    Assertions.assertTrue(
+        MP_ID3.equals(list.get(0).getMediaPackageId()) || MP_ID3.equals(list.get(1).getMediaPackageId()));
   }
 
   @Test
@@ -131,7 +133,7 @@ public class TranscriptionDatabaseTest {
     database.storeJobControl(MP_ID3, TRACK_ID3, JOB_ID3, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     List<TranscriptionJobControl> list = database.findByStatus(STATUS, STATUS2);
-    Assert.assertEquals(3, list.size());
+    Assertions.assertEquals(3, list.size());
   }
 
   @Test
@@ -143,7 +145,7 @@ public class TranscriptionDatabaseTest {
     database.storeJobControl(MP_ID3, TRACK_ID3, JOB_ID3, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     List<TranscriptionJobControl> list = database.findByMediaPackageTrackAndStatus(MP_ID, TRACK_ID, STATUS);
-    Assert.assertEquals(2, list.size());
+    Assertions.assertEquals(2, list.size());
   }
 
   @Test
@@ -153,15 +155,15 @@ public class TranscriptionDatabaseTest {
     long dt2 = System.currentTimeMillis();
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(STATUS, j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(STATUS, j.getStatus());
     long created = j.getDateCreated().getTime();
-    Assert.assertTrue(dt1 <= created && created <= dt2);
+    Assertions.assertTrue(dt1 <= created && created <= dt2);
 
     database.deleteJobControl(JOB_ID);
-    Assert.assertNull(database.findByJob(JOB_ID));
+    Assertions.assertNull(database.findByJob(JOB_ID));
   }
 
   @Test
@@ -171,20 +173,20 @@ public class TranscriptionDatabaseTest {
     long dt2 = System.currentTimeMillis();
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(STATUS, j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(STATUS, j.getStatus());
     long created = j.getDateCreated().getTime();
-    Assert.assertTrue(dt1 <= created && created <= dt2);
+    Assertions.assertTrue(dt1 <= created && created <= dt2);
 
     database.updateJobControl(JOB_ID, STATUS2);
 
     j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(STATUS2, j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(STATUS2, j.getStatus());
   }
 
   @Test
@@ -192,23 +194,23 @@ public class TranscriptionDatabaseTest {
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(STATUS, j.getStatus());
-    Assert.assertNull(j.getDateCompleted());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(STATUS, j.getStatus());
+    Assertions.assertNull(j.getDateCompleted());
 
     long dt1 = System.currentTimeMillis();
     database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
     long dt2 = System.currentTimeMillis();
 
     j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), j.getStatus());
     long completed = j.getDateCompleted().getTime();
-    Assert.assertTrue(dt1 <= completed && completed <= dt2);
+    Assertions.assertTrue(dt1 <= completed && completed <= dt2);
   }
 
 }

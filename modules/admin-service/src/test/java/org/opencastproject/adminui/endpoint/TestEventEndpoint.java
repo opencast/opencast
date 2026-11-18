@@ -113,7 +113,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.joda.time.DateTime;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.io.File;
@@ -139,7 +139,7 @@ import java.util.TimeZone;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestEventEndpoint extends AbstractEventEndpoint {
   private final TestEnv env;
 

@@ -21,18 +21,18 @@
 
 package org.opencastproject.kernel.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.util.Hashtable;
@@ -46,7 +46,7 @@ public class OrganizationDirectoryServiceTest {
 
   private OrganizationDirectoryServiceImpl orgDirectoryService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     OrganizationDatabase organizationDatabase = new OrganizationDatabase() {
 

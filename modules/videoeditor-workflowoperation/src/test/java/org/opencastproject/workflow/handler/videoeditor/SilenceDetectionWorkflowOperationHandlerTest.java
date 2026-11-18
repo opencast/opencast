@@ -44,9 +44,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -76,7 +76,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
   private MediaPackage mp;
   private URI smilURI;
 
-  @Before
+  @BeforeEach
   public void setUp() throws URISyntaxException, MediaPackageException, MalformedURLException, IOException,
           SmilException, JAXBException, SAXException {
 
@@ -153,8 +153,8 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     EasyMock.replay(job, serviceRegistry, silenceDetectionServiceMock, workspaceMock);
     WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration());
     WorkflowOperationResult result = silenceDetectionOperationHandler.start(workflowInstance, null);
-    Assert.assertNotNull("SilenceDetectionWorkflowOperationHandler workflow operation returns null "
-            + "but should be an instantiated WorkflowOperationResult", result);
+    Assertions.assertNotNull(result, "SilenceDetectionWorkflowOperationHandler workflow operation returns null "
+            + "but should be an instantiated WorkflowOperationResult");
     EasyMock.verify(silenceDetectionServiceMock, workspaceMock);
 
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -163,7 +163,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     // test media package contains new smil catalog
     MediaPackageElementFlavor smilPartialFlavor = new MediaPackageElementFlavor("*", smilFlavorSubtypeProperty);
     Catalog[] smilCatalogs = result.getMediaPackage().getCatalogs(smilPartialFlavor);
-    Assert.assertTrue("Media package should contain a smil catalog",
-            smilCatalogs != null && smilCatalogs.length > 0);
+    Assertions.assertTrue(smilCatalogs != null && smilCatalogs.length > 0,
+            "Media package should contain a smil catalog");
   }
 }

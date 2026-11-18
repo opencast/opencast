@@ -39,9 +39,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -68,7 +68,7 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
   private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     handler = new CutMarksToSmilWorkflowOperationHandler();
 
@@ -167,11 +167,11 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     specificSetUp(jsonPaths, trackFlavors);
 
     WorkflowOperationResult result = handler.start(workflow, null);
-    Assert.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
 
     MediaPackage mpNew = result.getMediaPackage();
     Catalog[] catalogs = mpNew.getCatalogs(MediaPackageElementFlavor.parseFlavor(TARGET_SMIL_FLAVOR_KEY));
-    Assert.assertEquals(1, catalogs.length);
+    Assertions.assertEquals(1, catalogs.length);
   }
 
   @Test
@@ -181,7 +181,7 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     specificSetUp(jsonPaths, trackFlavors);
 
     WorkflowOperationResult result = handler.start(workflow, null);
-    Assert.assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
+    Assertions.assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
   }
 
   @Test
@@ -190,9 +190,8 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     String[] trackFlavors = new String[] {SOURCE_MEDIA_FLAVORS_KEY};
     specificSetUp(jsonPaths, trackFlavors);
 
-    Assert.assertThrows(Exception.class, () -> {
-      handler.start(workflow, null);
-    });
+    Assertions.assertThrows(Exception.class, () ->
+        handler.start(workflow, null));
   }
 
   @Test
@@ -201,9 +200,8 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     String[] trackFlavors = new String[] {SOURCE_MEDIA_FLAVORS_KEY};
     specificSetUp(jsonPaths, trackFlavors);
 
-    Assert.assertThrows(Exception.class, () -> {
-      handler.start(workflow, null);
-    });
+    Assertions.assertThrows(Exception.class, () ->
+        handler.start(workflow, null));
   }
 
   @Test
@@ -213,6 +211,6 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     specificSetUp(jsonPaths, trackFlavors);
 
     WorkflowOperationResult result = handler.start(workflow, null);
-    Assert.assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
+    Assertions.assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
   }
 }

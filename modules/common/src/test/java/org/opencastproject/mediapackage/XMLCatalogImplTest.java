@@ -20,12 +20,12 @@
  */
 package org.opencastproject.mediapackage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import java.io.IOException;

@@ -21,8 +21,8 @@
 
 package org.opencastproject.serviceregistry.api;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
@@ -30,7 +30,7 @@ import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;

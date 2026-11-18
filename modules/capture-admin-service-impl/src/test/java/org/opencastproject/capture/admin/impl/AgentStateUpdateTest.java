@@ -27,26 +27,26 @@ import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentStateUpdate;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class AgentStateUpdateTest {
 
   private Agent agent = null;
   private AgentStateUpdate asu = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws InterruptedException {
     agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "", null);
-    Assert.assertNotNull(agent);
+    Assertions.assertNotNull(agent);
     Thread.sleep(5);
     asu = new AgentStateUpdate(agent);
-    Assert.assertNotNull(asu);
+    Assertions.assertNotNull(asu);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     agent = null;
     asu = null;
@@ -54,10 +54,10 @@ public class AgentStateUpdateTest {
 
   @Test
   public void correctInformation() {
-    Assert.assertEquals("test", asu.getName());
-    Assert.assertEquals(IDLE, asu.getState());
+    Assertions.assertEquals("test", asu.getName());
+    Assertions.assertEquals(IDLE, asu.getState());
     if (asu.getTimeSinceLastUpdate() <= 1) {
-      Assert.fail("Invalid update time in agent state update");
+      Assertions.fail("Invalid update time in agent state update");
     }
   }
 
@@ -65,10 +65,10 @@ public class AgentStateUpdateTest {
   // This is a stupid test, but it gets us up to 100%...
   public void blank() {
     asu = new AgentStateUpdate();
-    Assert.assertNotNull(asu);
-    Assert.assertNull(asu.getName());
-    Assert.assertNull(asu.getState());
-    Assert.assertNull(asu.getTimeSinceLastUpdate());
+    Assertions.assertNotNull(asu);
+    Assertions.assertNull(asu.getName());
+    Assertions.assertNull(asu.getState());
+    Assertions.assertNull(asu.getTimeSinceLastUpdate());
   }
 
 }

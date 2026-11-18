@@ -21,11 +21,11 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.util.MimeType.mimeType;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -40,9 +40,9 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class MediaInspectionServiceImplTest {
   /** True to run the tests */
   private static Optional<String> ffprobePath;
 
-  @BeforeClass
+  @BeforeAll
   public static void setupClass() {
     try {
       Process p = new ProcessBuilder(FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT, "-version").start();
@@ -72,7 +72,7 @@ public class MediaInspectionServiceImplTest {
   }
 
   /** Setup test. */
-  @Ignore
+  @Disabled
   private Optional<MediaInspector> init(URI resource) throws Exception {
     if (ffprobePath.isPresent()) {
       final File f = new File(resource);

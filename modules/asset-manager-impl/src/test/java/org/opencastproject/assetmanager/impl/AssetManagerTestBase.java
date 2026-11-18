@@ -20,7 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.Property;
@@ -60,9 +60,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,15 +91,15 @@ public abstract class AssetManagerTestBase {
   public static final String REMOTE_STORE_1_ID = "remote-1-test";
   public static final String REMOTE_STORE_2_ID = "remote-2-test";
 
-  @Rule
-  public TemporaryFolder tempFolder = new TemporaryFolder();
+  @TempDir
+  private File tempFolder;
 
   /** The asset manager under test. */
   protected AssetManagerImpl am;
   protected Props p;
   protected Props p2;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.am = makeAssetManager();
     p = new Props("org.opencastproject.service");
@@ -133,7 +132,7 @@ public abstract class AssetManagerTestBase {
     EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
             .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tempFolder.newFile();
+      File tmp = File.createTempFile("junit", null, tempFolder);
       FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
       return tmp;
     }).anyTimes();
@@ -488,7 +487,7 @@ public abstract class AssetManagerTestBase {
   }
 
   void assertStoreSize(long size) {
-    assertEquals("Assets in store", size, (long) am.getLocalAssetStore().getUsedSpace().get());
+    assertEquals(size, (long) am.getLocalAssetStore().getUsedSpace().get(), "Assets in store");
   }
 
   String getStoreType() {

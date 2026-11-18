@@ -21,9 +21,10 @@
 
 package org.opencastproject.index.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
@@ -98,9 +99,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,7 @@ public class IndexServiceImplTest {
 
   private UserDirectoryService noUsersUserDirectoryService;
 
-  @Before
+  @BeforeEach
   public void before() {
     noUsersUserDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(noUsersUserDirectoryService.loadUser(EasyMock.anyString())).andStubReturn(null);
@@ -267,35 +268,39 @@ public class IndexServiceImplTest {
    *
    */
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateSeriesWithoutMetadataExpectsIllegalArgumentException() throws Exception {
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
-    indexServiceImpl.addCatalogUIAdapter(setupCommonSeriesCatalogUIAdapter());
+    assertThrows(IllegalArgumentException.class, () -> {
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+      indexServiceImpl.addCatalogUIAdapter(setupCommonSeriesCatalogUIAdapter());
 
-    // No metadata for the required title field was submitted at all (e.g. the "dublincore/series" catalog was
-    // omitted from the request), so this must be rejected instead of silently creating a series without a title.
-    indexServiceImpl.createSeries(new MetadataList(), new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+      // No metadata for the required title field was submitted at all (e.g. the "dublincore/series" catalog was
+      // omitted from the request), so this must be rejected instead of silently creating a series without a title.
+      indexServiceImpl.createSeries(new MetadataList(), new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+    });
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateSeriesWithBlankTitleExpectsIllegalArgumentException() throws Exception {
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
-    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = setupCommonSeriesCatalogUIAdapter();
-    indexServiceImpl.addCatalogUIAdapter(commonSeriesCatalogUIAdapter);
+    assertThrows(IllegalArgumentException.class, () -> {
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+      CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = setupCommonSeriesCatalogUIAdapter();
+      indexServiceImpl.addCatalogUIAdapter(commonSeriesCatalogUIAdapter);
 
-    DublinCoreMetadataCollection seriesMetadata = commonSeriesCatalogUIAdapter.getRawFields();
-    MetadataField title = seriesMetadata.getOutputFields().get("title");
-    seriesMetadata.removeField(title);
-    MetadataField newTitle = new MetadataField(title);
-    newTitle.setValue("");
-    seriesMetadata.addField(newTitle);
+      DublinCoreMetadataCollection seriesMetadata = commonSeriesCatalogUIAdapter.getRawFields();
+      MetadataField title = seriesMetadata.getOutputFields().get("title");
+      seriesMetadata.removeField(title);
+      MetadataField newTitle = new MetadataField(title);
+      newTitle.setValue("");
+      seriesMetadata.addField(newTitle);
 
-    MetadataList metadataList = new MetadataList();
-    metadataList.add(commonSeriesCatalogUIAdapter, seriesMetadata);
+      MetadataList metadataList = new MetadataList();
+      metadataList.add(commonSeriesCatalogUIAdapter, seriesMetadata);
 
-    indexServiceImpl.createSeries(metadataList, new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+      indexServiceImpl.createSeries(metadataList, new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+    });
   }
 
   /**
@@ -306,66 +311,76 @@ public class IndexServiceImplTest {
    *
    */
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testCreateEventInputNullMetadataExpectsIllegalArgumentException() throws IllegalArgumentException,
+  @Test
+  public void testCreateEventInputNullMetadataExpectsIllegalArgumentException() throws
           ConfigurationException, MediaPackageException, IOException, IngestException, ParseException,
           NotFoundException, SchedulerException, UnauthorizedException {
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
-    indexServiceImpl.createEvent(null, null);
+    assertThrows(IllegalArgumentException.class, () -> {
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
+      indexServiceImpl.createEvent(null, null);
+    });
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateEventInputEmptyJsonExpectsIllegalArgumentException()
-          throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
+          throws ConfigurationException, MediaPackageException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
-    JsonObject metadataJson = JsonParser.parseString("{}").getAsJsonObject();
+    assertThrows(IllegalArgumentException.class, () -> {
+      JsonObject metadataJson = JsonParser.parseString("{}").getAsJsonObject();
 
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
-    indexServiceImpl.createEvent(metadataJson, null);
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
+      indexServiceImpl.createEvent(metadataJson, null);
+    });
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateEventInputNoSourceExpectsIllegalArgumentException()
-          throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
+          throws ConfigurationException, MediaPackageException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
-    String testResourceLocation = "/events/create-event-no-source.json";
-    JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
-            StandardCharsets.UTF_8)).getAsJsonObject();
+    assertThrows(IllegalArgumentException.class, () -> {
+      String testResourceLocation = "/events/create-event-no-source.json";
+      JsonObject metadataJson = JsonParser.parseString(
+          IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+              StandardCharsets.UTF_8)).getAsJsonObject();
 
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
-    indexServiceImpl.createEvent(metadataJson, null);
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
+      indexServiceImpl.createEvent(metadataJson, null);
+    });
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateEventInputNoProcessingExpectsIllegalArgumentException()
-          throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
+          throws ConfigurationException, MediaPackageException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
-    String testResourceLocation = "/events/create-event-no-processing.json";
-    JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
-            StandardCharsets.UTF_8)).getAsJsonObject();
+    assertThrows(IllegalArgumentException.class, () -> {
+      String testResourceLocation = "/events/create-event-no-processing.json";
+      JsonObject metadataJson = JsonParser.parseString(
+          IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+              StandardCharsets.UTF_8)).getAsJsonObject();
 
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
-    indexServiceImpl.createEvent(metadataJson, null);
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
+      indexServiceImpl.createEvent(metadataJson, null);
+    });
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testCreateEventInputNoMetadataExpectsIllegalArgumentException()
-          throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
+          throws ConfigurationException, MediaPackageException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
-    String testResourceLocation = "/events/create-event-no-metadata.json";
-    JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
-            StandardCharsets.UTF_8)).getAsJsonObject();
+    assertThrows(IllegalArgumentException.class, () -> {
+      String testResourceLocation = "/events/create-event-no-metadata.json";
+      JsonObject metadataJson = JsonParser.parseString(
+          IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+              StandardCharsets.UTF_8)).getAsJsonObject();
 
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
-    indexServiceImpl.createEvent(metadataJson, null);
+      IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+      indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
+      indexServiceImpl.createEvent(metadataJson, null);
+    });
   }
 
   @Test
@@ -437,15 +452,15 @@ public class IndexServiceImplTest {
     indexServiceImpl.setAssetManager(assetManager);
     indexServiceImpl.createEvent(metadataJson, mediapackage);
 
-    assertTrue("The catalog must be added to the mediapackage", result.hasCaptured());
-    assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
-            mediapackageIdResult.getValue());
-    assertTrue("The catalog should have a new id", catalogIdResult.hasCaptured());
-    assertTrue("The catalog should have a new filename", filenameResult.hasCaptured());
-    assertTrue("The catalog should have been added to the input stream", catalogResult.hasCaptured());
-    assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
-    assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
-    assertTrue("The catalog should have been created", catalogResult.hasCaptured());
+    assertTrue(result.hasCaptured(), "The catalog must be added to the mediapackage");
+    assertEquals(mpId.toString(), mediapackageIdResult.getValue(),
+            "The catalog should have been added to the correct mediapackage");
+    assertTrue(catalogIdResult.hasCaptured(), "The catalog should have a new id");
+    assertTrue(filenameResult.hasCaptured(), "The catalog should have a new filename");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been added to the input stream");
+    assertTrue(catalogResult.hasCaptured(), "The mediapackage should have had its title updated");
+    assertEquals(expectedTitle, mediapackageTitleResult.getValue(), "The mediapackage title should have been updated.");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been created");
   }
 
   @Test
@@ -524,15 +539,15 @@ public class IndexServiceImplTest {
     indexServiceImpl.setAssetManager(assetManager);
     indexServiceImpl.createEvent(metadataJson, mediapackage);
 
-    assertTrue("The catalog must be added to the mediapackage", result.hasCaptured());
-    assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
-            mediapackageIdResult.getValue());
-    assertTrue("The catalog should have a new id", catalogIdResult.hasCaptured());
-    assertTrue("The catalog should have a new filename", filenameResult.hasCaptured());
-    assertTrue("The catalog should have been added to the input stream", catalogResult.hasCaptured());
-    assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
-    assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
-    assertTrue("The catalog should have been created", catalogResult.hasCaptured());
+    assertTrue(result.hasCaptured(), "The catalog must be added to the mediapackage");
+    assertEquals(mpId.toString(), mediapackageIdResult.getValue(),
+            "The catalog should have been added to the correct mediapackage");
+    assertTrue(catalogIdResult.hasCaptured(), "The catalog should have a new id");
+    assertTrue(filenameResult.hasCaptured(), "The catalog should have a new filename");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been added to the input stream");
+    assertTrue(catalogResult.hasCaptured(), "The mediapackage should have had its title updated");
+    assertEquals(expectedTitle, mediapackageTitleResult.getValue(), "The mediapackage title should have been updated.");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been created");
   }
 
   @Test
@@ -617,21 +632,21 @@ public class IndexServiceImplTest {
     indexServiceImpl.setCaptureAgentStateService(captureAgentStateService);
     indexServiceImpl.setSchedulerService(schedulerService);
     String scheduledEvent = indexServiceImpl.createEvent(metadataJson, mediapackage);
-    Assert.assertEquals(mediapackage.getIdentifier().toString(), scheduledEvent);
+    Assertions.assertEquals(mediapackage.getIdentifier().toString(), scheduledEvent);
 
-    assertTrue("The catalog must be added to the mediapackage", result.hasCaptured());
-    assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
-            mediapackageIdResult.getValue());
-    assertTrue("The catalog should have a new id", catalogIdResult.hasCaptured());
-    assertTrue("The catalog should have a new filename", filenameResult.hasCaptured());
-    assertTrue("The catalog should have been added to the input stream", catalogResult.hasCaptured());
-    assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
-    assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
-    assertTrue("The catalog should have been created", catalogResult.hasCaptured());
+    assertTrue(result.hasCaptured(), "The catalog must be added to the mediapackage");
+    assertEquals(mpId.toString(), mediapackageIdResult.getValue(),
+            "The catalog should have been added to the correct mediapackage");
+    assertTrue(catalogIdResult.hasCaptured(), "The catalog should have a new id");
+    assertTrue(filenameResult.hasCaptured(), "The catalog should have a new filename");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been added to the input stream");
+    assertTrue(catalogResult.hasCaptured(), "The mediapackage should have had its title updated");
+    assertEquals(expectedTitle, mediapackageTitleResult.getValue(), "The mediapackage title should have been updated.");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been created");
     assertTrue(captureStart.hasCaptured());
     assertTrue(captureEnd.hasCaptured());
-    Assert.assertEquals(new Date(DateTimeSupport.fromUTC("2008-03-16T14:00:00Z")), captureStart.getValue());
-    Assert.assertEquals(new Date(DateTimeSupport.fromUTC("2008-03-16T14:01:00Z")), captureEnd.getValue());
+    Assertions.assertEquals(new Date(DateTimeSupport.fromUTC("2008-03-16T14:00:00Z")), captureStart.getValue());
+    Assertions.assertEquals(new Date(DateTimeSupport.fromUTC("2008-03-16T14:01:00Z")), captureEnd.getValue());
   }
 
   private AuthorizationService setupAuthorizationService(MediaPackage mediapackage) {
@@ -674,8 +689,8 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestService(mediapackage, Capture.<InputStream> newInstance()));
     mediapackage = indexServiceImpl.updateMpAssetFlavor(assetList, mediapackage, assetMetadata);
-    assertTrue("The mediapackage attachment has the updated flavor",
-        mediapackage.getAttachments(newElemflavor).length == 1);
+    assertTrue(mediapackage.getAttachments(newElemflavor).length == 1,
+        "The mediapackage attachment has the updated flavor");
   }
 
   @Test
@@ -779,17 +794,17 @@ public class IndexServiceImplTest {
     String scheduledEvents = indexServiceImpl.createEvent(metadataJson, mediapackage);
     String[] ids = StringUtils.split(scheduledEvents, ",");
     //We should have as many scheduled events as we do periods
-    Assert.assertTrue(ids.length == calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(),
-        (Long) schedDuration.getValue(), schedTz.getValue()).size());
+    Assertions.assertTrue(ids.length == calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
+        schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue()).size());
 
-    assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
-            mediapackageIdResult.getValue());
-    assertTrue("The catalog should have a new id", catalogIdResult.hasCaptured());
-    assertTrue("The catalog should have a new filename", filenameResult.hasCaptured());
-    assertTrue("The catalog should have been added to the input stream", catalogResult.hasCaptured());
-    assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
-    assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
-    assertTrue("The catalog should have been created", catalogResult.hasCaptured());
+    assertEquals(mpId.toString(), mediapackageIdResult.getValue(),
+            "The catalog should have been added to the correct mediapackage");
+    assertTrue(catalogIdResult.hasCaptured(), "The catalog should have a new id");
+    assertTrue(filenameResult.hasCaptured(), "The catalog should have a new filename");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been added to the input stream");
+    assertTrue(catalogResult.hasCaptured(), "The mediapackage should have had its title updated");
+    assertEquals(expectedTitle, mediapackageTitleResult.getValue(), "The mediapackage title should have been updated.");
+    assertTrue(catalogResult.hasCaptured(), "The catalog should have been created");
     //Assert that the scheduling call has its necessary data
     assertTrue(schedStart.hasCaptured());
     assertTrue(schedEnd.hasCaptured());
@@ -805,33 +820,35 @@ public class IndexServiceImplTest {
    *
    */
 
-  @Test(expected = NotFoundException.class)
+  @Test
   public void testUpdateEventInputNoEventExpectsNotFound()
-          throws IOException, IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException,
+          throws IOException, IllegalArgumentException, IndexServiceException, UnauthorizedException,
           SearchIndexException, WorkflowDatabaseException {
-    String username = "username";
-    String org = "org1";
-    String testResourceLocation = "/events/update-event.json";
-    String eventId = "event-1";
-    String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
-        StandardCharsets.UTF_8);
+    assertThrows(NotFoundException.class, () -> {
+      String username = "username";
+      String org = "org1";
+      String testResourceLocation = "/events/update-event.json";
+      String eventId = "event-1";
+      String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+          StandardCharsets.UTF_8);
 
-    SearchQuery query = EasyMock.createMock(SearchQuery.class);
-    EasyMock.expect(query.getLimit()).andReturn(100);
-    EasyMock.expect(query.getOffset()).andReturn(0);
-    EasyMock.replay(query);
+      SearchQuery query = EasyMock.createMock(SearchQuery.class);
+      EasyMock.expect(query.getLimit()).andReturn(100);
+      EasyMock.expect(query.getOffset()).andReturn(0);
+      EasyMock.replay(query);
 
-    SearchResult<Event> result = new SearchResultImpl<>(query, 0, 0);
+      SearchResult<Event> result = new SearchResultImpl<>(query, 0, 0);
 
-    OpenSearchIndex abstractIndex = EasyMock.createMock(OpenSearchIndex.class);
-    EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
-    EasyMock.replay(abstractIndex);
+      OpenSearchIndex abstractIndex = EasyMock.createMock(OpenSearchIndex.class);
+      EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
+      EasyMock.replay(abstractIndex);
 
-    SecurityService securityService = setupSecurityService(username, org);
+      SecurityService securityService = setupSecurityService(username, org);
 
-    IndexServiceImpl indexService = new IndexServiceImpl();
-    indexService.setSecurityService(securityService);
-    indexService.updateAllEventMetadata(eventId, metadataJson, abstractIndex);
+      IndexServiceImpl indexService = new IndexServiceImpl();
+      indexService.setSecurityService(securityService);
+      indexService.updateAllEventMetadata(eventId, metadataJson, abstractIndex);
+    });
   }
 
   @Test
@@ -941,9 +958,9 @@ public class IndexServiceImplTest {
     indexService.setWorkspace(workspace);
     MetadataList updateEventMetadata = indexService.updateEventMetadata(org, metadataList, index);
 
-    Assert.assertTrue(mpCapture.hasCaptured());
-    Assert.assertEquals("series-1", mp.getSeries());
-    Assert.assertEquals(1, mp.getCatalogs(MediaPackageElements.SERIES).length);
+    Assertions.assertTrue(mpCapture.hasCaptured());
+    Assertions.assertEquals("series-1", mp.getSeries());
+    Assertions.assertEquals(1, mp.getCatalogs(MediaPackageElements.SERIES).length);
   }
 
   @Test
@@ -1153,54 +1170,54 @@ public class IndexServiceImplTest {
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(emptyUpdatedPresenter);
     Tuple<List<String>, Set<String>> updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertTrue("The presenters dublincore metadata should be empty", updatedPresenters.getA().isEmpty());
-    assertTrue("The technical presenters should be empty", updatedPresenters.getB().isEmpty());
+    assertTrue(updatedPresenters.getA().isEmpty(), "The presenters dublincore metadata should be empty");
+    assertTrue(updatedPresenters.getB().isEmpty(), "The technical presenters should be empty");
 
     // Non-user presenter
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(nonUserUpdatedPresenter);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertTrue("There should be one presenter", updatedPresenters.getA().size() == 1);
-    assertTrue("There should be no technical presenters", updatedPresenters.getB().isEmpty());
+    assertTrue(updatedPresenters.getA().size() == 1, "There should be one presenter");
+    assertTrue(updatedPresenters.getB().isEmpty(), "There should be no technical presenters");
 
     // Multi non-user presenter
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(multiNonUserUpdatedPresenter);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertTrue("There should be three presenters", updatedPresenters.getA().size() == 3);
-    assertTrue("The value for technical presenters should be empty", updatedPresenters.getB().isEmpty());
+    assertTrue(updatedPresenters.getA().size() == 3, "There should be three presenters");
+    assertTrue(updatedPresenters.getB().isEmpty(), "The value for technical presenters should be empty");
 
     // User presenter
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(userUpdatedPresenter);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertTrue("There should be one presenter", updatedPresenters.getA().size() == 1);
-    assertEquals("The one presenter should have the user's full name", "User 1", updatedPresenters.getA().get(0));
-    assertTrue("The one technical presenter", updatedPresenters.getB().size() == 1);
-    assertEquals("The one technical presenter has the correct username", "user1",
-            updatedPresenters.getB().iterator().next());
+    assertTrue(updatedPresenters.getA().size() == 1, "There should be one presenter");
+    assertEquals("User 1", updatedPresenters.getA().get(0), "The one presenter should have the user's full name");
+    assertTrue(updatedPresenters.getB().size() == 1, "The one technical presenter");
+    assertEquals("user1", updatedPresenters.getB().iterator().next(),
+            "The one technical presenter has the correct username");
 
     // Multi user presenter
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(multiUserUpdatedPresenter);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertEquals("There should be three presenters", 3, updatedPresenters.getA().size());
-    assertEquals("There should be three technical presenters", 3, updatedPresenters.getB().size());
-    assertTrue("The list of technical presenters should contain all of the user names",
-            updatedPresenters.getB().containsAll(multiUserList));
+    assertEquals(3, updatedPresenters.getA().size(), "There should be three presenters");
+    assertEquals(3, updatedPresenters.getB().size(), "There should be three technical presenters");
+    assertTrue(updatedPresenters.getB().containsAll(multiUserList),
+            "The list of technical presenters should contain all of the user names");
 
     // Mixed non-user and user presenters
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(mixedPresenters);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertEquals("There should be six presenters", 6, updatedPresenters.getA().size());
-    assertEquals("There should be three technical presenters", 3, updatedPresenters.getB().size());
-    assertTrue("The list of presenters should contain all of the non-user names",
-            updatedPresenters.getA().containsAll(multiNonUserList));
-    assertTrue("The list of presenters should contain all of the user full names",
-            updatedPresenters.getA().containsAll(userFullNames));
-    assertTrue("The list of technical presenters should contain all of the usernames",
-            updatedPresenters.getB().containsAll(multiUserList));
+    assertEquals(6, updatedPresenters.getA().size(), "There should be six presenters");
+    assertEquals(3, updatedPresenters.getB().size(), "There should be three technical presenters");
+    assertTrue(updatedPresenters.getA().containsAll(multiNonUserList),
+            "The list of presenters should contain all of the non-user names");
+    assertTrue(updatedPresenters.getA().containsAll(userFullNames),
+            "The list of presenters should contain all of the user full names");
+    assertTrue(updatedPresenters.getB().containsAll(multiUserList),
+            "The list of technical presenters should contain all of the usernames");
   }
 
   private List<Period<ZonedDateTime>> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days,

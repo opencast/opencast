@@ -24,15 +24,15 @@ package org.opencastproject.userdirectory;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 
 import org.apache.commons.collections4.IteratorUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -43,7 +43,7 @@ public class CustomRoleProviderTest {
   private BundleContext bundleContextMock;
   private SecurityService securityService;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     // Set up bundle context with role list and pattern

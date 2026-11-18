@@ -48,9 +48,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -87,7 +87,7 @@ public class InspectWorkflowOperationHandlerTest {
   private static final String TITLE = "title";
   private static final String NEW_DC_URL = "http://www.url.org";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -179,10 +179,10 @@ public class InspectWorkflowOperationHandlerTest {
     Track trackNew = result.getMediaPackage().getTracks()[0];
 
     // check track metadata
-    Assert.assertNotNull(trackNew.getChecksum());
-    Assert.assertNotNull(trackNew.getMimeType());
-    Assert.assertNotNull(trackNew.getDuration());
-    Assert.assertNotNull(trackNew.getStreams());
+    Assertions.assertNotNull(trackNew.getChecksum());
+    Assertions.assertNotNull(trackNew.getMimeType());
+    Assertions.assertNotNull(trackNew.getDuration());
+    Assertions.assertNotNull(trackNew.getStreams());
   }
 
   @Test
@@ -190,7 +190,7 @@ public class InspectWorkflowOperationHandlerTest {
     WorkflowOperationResult result = getWorkflowOperationResult(mp);
     Catalog cat = result.getMediaPackage().getCatalogs()[0];
     // dublincore check: also checked with strict mock calls
-    Assert.assertEquals(NEW_DC_URL, cat.getURI().toString());
+    Assertions.assertEquals(NEW_DC_URL, cat.getURI().toString());
   }
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp) throws WorkflowOperationException {

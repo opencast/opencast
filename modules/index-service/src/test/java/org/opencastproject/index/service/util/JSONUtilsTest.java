@@ -22,7 +22,8 @@
 package org.opencastproject.index.service.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProvidersService;
@@ -38,7 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.easymock.EasyMock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -84,12 +85,14 @@ public class JSONUtilsTest {
   /**
    * Test method for {@link JSONUtils#fromMap(Map)}
    */
-  @Test(expected = JSONException.class)
+  @Test
   public void testFromMapWithNullKey() throws Exception {
-    Map<String, String> map = new HashMap<String, String>();
-    map.put(null, "value");
+    assertThrows(JSONException.class, () -> {
+      Map<String, String> map = new HashMap<String, String>();
+      map.put(null, "value");
 
-    JSONUtils.fromMap(map);
+      JSONUtils.fromMap(map);
+    });
   }
 
   /**

@@ -20,10 +20,10 @@
  */
 package org.opencastproject.assetmanager.storage.impl.fs;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -37,17 +37,17 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,26 +79,26 @@ public class AbstractFileSystemAssetStoreTest {
 
   private File sampleElemDir;
 
-  @Rule
-  public TemporaryFolder tmpFolder = new TemporaryFolder();
+  @TempDir
+  private File tmpFolder;
 
-  @Rule
-  public TemporaryFolder tmpFolder2 = new TemporaryFolder();
+  @TempDir
+  private File tmpFolder2;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     final File asset = IoSupport.classPathResourceAsFile("/" + FILE_NAME).get();
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(asset);
     EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andAnswer(() -> {
-      File tmp = tmpFolder.newFile();
+      File tmp = File.createTempFile("junit", null, tmpFolder);
       FileUtils.copyFile(asset, tmp);
       return tmp;
     }).anyTimes();
     EasyMock.replay(workspace);
 
-    tmpRoot = tmpFolder.newFolder();
-    tmpRoot2 = tmpFolder2.newFolder();
+    tmpRoot = Files.createTempDirectory(tmpFolder.toPath(), "junit").toFile();
+    tmpRoot2 = Files.createTempDirectory(tmpFolder2.toPath(), "junit").toFile();
 
     repo = new OsgiFileSystemAssetStore() {
       @Override protected Workspace getWorkspace() {
@@ -127,7 +127,7 @@ public class AbstractFileSystemAssetStoreTest {
     return Paths.get(tmpRoot2.toString(), ORG_ID, AssetStoreDirectory.prefix(mpId, PREFIX_LENGTH), mpId).toFile();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.forceDelete(tmpRoot);
   }
@@ -143,7 +143,7 @@ public class AbstractFileSystemAssetStoreTest {
 
     File versionDir = new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_1.toString());
     assertEquals("pr", prefixedMpDir(PREFIXED_MP_ID).getParentFile().getName());
-    assertTrue(versionDir + " should be a directory", versionDir.isDirectory());
+    assertTrue(versionDir.isDirectory(), versionDir + " should be a directory");
     assertEquals(1, versionDir.listFiles().length);
     assertTrue(repo.contains(storagePath));
     assertTrue(repo.get(storagePath).isPresent());
@@ -188,7 +188,7 @@ public class AbstractFileSystemAssetStoreTest {
     repo.put(storagePath, Source.mk(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
 
     File file = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID, VERSION_1.toString()).toFile();
-    assertTrue(file + " should be a directory", file.isDirectory());
+    assertTrue(file.isDirectory(), file + " should be a directory");
     assertTrue(file.listFiles().length == 1);
 
     InputStream original = null;
@@ -227,7 +227,7 @@ public class AbstractFileSystemAssetStoreTest {
       copyIn = new FileInputStream(copyFile);
       byte[] bytesOriginal = IOUtils.toByteArray(srcIn);
       byte[] bytesCopy = IOUtils.toByteArray(copyIn);
-      Assert.assertEquals(bytesCopy.length, bytesOriginal.length);
+      Assertions.assertEquals(bytesCopy.length, bytesOriginal.length);
     } finally {
       IOUtils.closeQuietly(srcIn);
       IOUtils.closeQuietly(copyIn);
@@ -344,12 +344,12 @@ public class AbstractFileSystemAssetStoreTest {
     for (String badId : new String[] { "", ".", ".." }) {
       try {
         repo.delete(DeletionSelector.delete(ORG_ID, badId, VERSION_2));
-        Assert.fail("Expected the media package ID '" + badId + "' to be rejected");
+        Assertions.fail("Expected the media package ID '" + badId + "' to be rejected");
       } catch (AssetStoreException e) {
         // intended
       }
     }
-    assertTrue("The stored data must be intact", sampleElemDir.exists());
+    assertTrue(sampleElemDir.exists(), "The stored data must be intact");
     assertEquals(1, sampleElemDir.listFiles().length);
   }
 
@@ -363,12 +363,12 @@ public class AbstractFileSystemAssetStoreTest {
     for (String badId : new String[] { MP_ID + "/" + VERSION_2, MP_ID + "\\" + VERSION_2, "x/../" + MP_ID }) {
       try {
         repo.delete(DeletionSelector.deleteAll(ORG_ID, badId));
-        Assert.fail("Expected the media package ID '" + badId + "' to be rejected");
+        Assertions.fail("Expected the media package ID '" + badId + "' to be rejected");
       } catch (AssetStoreException e) {
         // intended
       }
     }
-    assertTrue("The stored data must be intact", sampleElemDir.exists());
+    assertTrue(sampleElemDir.exists(), "The stored data must be intact");
     assertEquals(1, sampleElemDir.listFiles().length);
   }
 
@@ -388,19 +388,19 @@ public class AbstractFileSystemAssetStoreTest {
       for (StoragePath path : paths) {
         try {
           repo.put(path, source);
-          Assert.fail("Expected put to reject the storage path " + path);
+          Assertions.fail("Expected put to reject the storage path " + path);
         } catch (AssetStoreException e) {
           // intended
         }
         try {
           repo.get(path);
-          Assert.fail("Expected get to reject the storage path " + path);
+          Assertions.fail("Expected get to reject the storage path " + path);
         } catch (AssetStoreException e) {
           // intended
         }
       }
     }
-    assertEquals("Nothing must have been written next to the sample element", 1, sampleElemDir.listFiles().length);
-    assertEquals("Nothing must have been written to the store root", 1, tmpRoot.listFiles().length);
+    assertEquals(1, sampleElemDir.listFiles().length, "Nothing must have been written next to the sample element");
+    assertEquals(1, tmpRoot.listFiles().length, "Nothing must have been written to the store root");
   }
 }

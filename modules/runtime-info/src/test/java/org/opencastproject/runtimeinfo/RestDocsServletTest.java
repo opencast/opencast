@@ -24,8 +24,8 @@ import org.opencastproject.rest.RestConstants;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
@@ -69,9 +69,9 @@ public class RestDocsServletTest {
 
     EasyMock.verify(bundleContext, req, resp);
 
-    Assert.assertEquals("REST docs unavailable for " + StringEscapeUtils.escapeHtml4(payload),
+    Assertions.assertEquals("REST docs unavailable for " + StringEscapeUtils.escapeHtml4(payload),
         body.toString());
-    Assert.assertFalse("The payload must not be reflected without HTML encoding",
-        body.toString().contains(payload));
+    Assertions.assertFalse(body.toString().contains(payload),
+        "The payload must not be reflected without HTML encoding");
   }
 }

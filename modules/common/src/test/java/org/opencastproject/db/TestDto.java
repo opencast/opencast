@@ -23,7 +23,7 @@ package org.opencastproject.db;
 
 import static org.opencastproject.db.Queries.namedQuery;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.List;
 import java.util.function.Function;
@@ -40,7 +40,7 @@ import javax.persistence.Table;
 @Entity(name = "Test")
 @Table(name = "test")
 @NamedQueries(@NamedQuery(name = "Test.findAll", query = "select a from Test a"))
-@Ignore
+@Disabled
 public class TestDto {
   @Id
   @GeneratedValue

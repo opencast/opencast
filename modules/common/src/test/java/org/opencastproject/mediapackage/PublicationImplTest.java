@@ -21,7 +21,7 @@
 package org.opencastproject.mediapackage;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
@@ -30,8 +30,8 @@ import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.util.MimeType;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -44,7 +44,7 @@ public class PublicationImplTest {
   private Attachment attachment1;
   private Catalog catalog1;
 
-  @Before
+  @BeforeEach
   public void setUpTests() throws Exception {
     pub = PublicationImpl.publication("p-1", "test", new URI(
             "http://publications.com/videos/1/index.html"), MimeType.mimeType("text", "html"));

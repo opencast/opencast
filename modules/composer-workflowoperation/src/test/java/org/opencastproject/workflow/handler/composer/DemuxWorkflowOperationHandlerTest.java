@@ -41,9 +41,9 @@ import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationH
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public class DemuxWorkflowOperationHandlerTest {
   private static final String ENCODED_TRACK_ID = "demux-workflow-operation-test-encode-track-id";
   private static final String ENCODED_TRACK_ID2 = "demux-workflow-operation-test-encode-track-id2";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -146,13 +146,13 @@ public class DemuxWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertEquals("presenter/work", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals("presenter/work", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+    Assertions.assertEquals(SOURCE_TRACK_ID, trackEncoded.getReference().getIdentifier());
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID2);
-    Assert.assertEquals("presentation/work", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals("presentation/work", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+    Assertions.assertEquals(SOURCE_TRACK_ID, trackEncoded.getReference().getIdentifier());
   }
 
   @Test
@@ -177,7 +177,7 @@ public class DemuxWorkflowOperationHandlerTest {
       // no encoding profile
       configurations.put("source-flavors", "multitrack/source");
       getWorkflowOperationResult(mp, configurations);
-      Assert.fail("Since encoding profile is not specified exception should be thrown");
+      Assertions.fail("Since encoding profile is not specified exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
     }

@@ -30,9 +30,9 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class TagWorkflowOperationHandlerTest {
   private TagWorkflowOperationHandler operationHandler;
   private MediaPackage mp;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(this.getClass().getResourceAsStream("/archive_mediapackage.xml"));
@@ -72,9 +72,9 @@ public class TagWorkflowOperationHandlerTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     Track track = resultingMediapackage.getTrack("track-2");
-    Assert.assertEquals("presenter/test", track.getFlavor().toString());
-    Assert.assertEquals("tag1", track.getTags()[0]);
-    Assert.assertEquals("tag2", track.getTags()[1]);
+    Assertions.assertEquals("presenter/test", track.getFlavor().toString());
+    Assertions.assertEquals("tag1", track.getTags()[0]);
+    Assertions.assertEquals("tag2", track.getTags()[1]);
 
     instance = new WorkflowInstance();
     ops = new ArrayList<WorkflowOperationInstance>();
@@ -92,9 +92,9 @@ public class TagWorkflowOperationHandlerTest {
     resultingMediapackage = result.getMediaPackage();
 
     track = resultingMediapackage.getTrack("track-2");
-    Assert.assertEquals("presenter/source", track.getFlavor().toString());
-    Assert.assertEquals("tag2", track.getTags()[0]);
-    Assert.assertEquals("tag3", track.getTags()[1]);
+    Assertions.assertEquals("presenter/source", track.getFlavor().toString());
+    Assertions.assertEquals("tag2", track.getTags()[0]);
+    Assertions.assertEquals("tag3", track.getTags()[1]);
   }
 
   @Test
@@ -115,8 +115,8 @@ public class TagWorkflowOperationHandlerTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
     Track track1 = resultingMediapackage.getTrack("track-1");
     Track track2 = resultingMediapackage.getTrack("track-2");
-    Assert.assertEquals("presentation/wildcard_test", track1.getFlavor().toString());
-    Assert.assertEquals("presenter/wildcard_test", track2.getFlavor().toString());
+    Assertions.assertEquals("presentation/wildcard_test", track1.getFlavor().toString());
+    Assertions.assertEquals("presenter/wildcard_test", track2.getFlavor().toString());
   }
 
   @Test
@@ -137,8 +137,8 @@ public class TagWorkflowOperationHandlerTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
     Track track1 = resultingMediapackage.getTrack("track-1");
     Track track2 = resultingMediapackage.getTrack("track-2");
-    Assert.assertEquals("wildcard_test/source", track1.getFlavor().toString());
-    Assert.assertEquals("wildcard_test/source", track2.getFlavor().toString());
+    Assertions.assertEquals("wildcard_test/source", track1.getFlavor().toString());
+    Assertions.assertEquals("wildcard_test/source", track2.getFlavor().toString());
   }
 
   @Test
@@ -159,8 +159,8 @@ public class TagWorkflowOperationHandlerTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
     Track track1 = resultingMediapackage.getTrack("track-1");
     Track track2 = resultingMediapackage.getTrack("track-2");
-    Assert.assertEquals("presentation/source", track1.getFlavor().toString());
-    Assert.assertEquals("presenter/source", track2.getFlavor().toString());
+    Assertions.assertEquals("presentation/source", track1.getFlavor().toString());
+    Assertions.assertEquals("presenter/source", track2.getFlavor().toString());
   }
 
 }

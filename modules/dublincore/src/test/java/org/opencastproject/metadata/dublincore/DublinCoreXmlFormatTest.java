@@ -20,10 +20,10 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -34,7 +34,7 @@ import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.Xpath;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -140,8 +140,8 @@ public class DublinCoreXmlFormatTest {
     assertEquals("lab2", mergedToMergeNoEmpty.getFirst(DublinCore.PROPERTY_SPATIAL));
     assertNull(mergedToMergeNoEmpty.getAsText(DublinCore.PROPERTY_TITLE, irishLang, delimiter));
     assertNotNull(mergedToMergeNoEmpty.getAsText(DublinCore.PROPERTY_TITLE, germanLang, delimiter));
-    assertTrue("Property foo:id should be in the list of known properties.",
-            mergedToMergeNoEmpty.getProperties().contains(eNamepropertyFooId));
+    assertTrue(mergedToMergeNoEmpty.getProperties().contains(eNamepropertyFooId),
+            "Property foo:id should be in the list of known properties.");
     assertEquals(fooId, mergedToMergeNoEmpty.getFirstVal(eNamepropertyFooId).getValue());
   }
 }

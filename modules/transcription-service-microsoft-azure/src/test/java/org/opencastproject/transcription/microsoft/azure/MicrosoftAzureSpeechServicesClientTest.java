@@ -24,9 +24,9 @@ package org.opencastproject.transcription.microsoft.azure;
 import org.opencastproject.transcription.microsoft.azure.model.MicrosoftAzureSpeechTranscription;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class MicrosoftAzureSpeechServicesClientTest {
   private MicrosoftAzureSpeechServicesClient azureSpeechClient;
 
 
-  @Before
+  @BeforeEach
   public void setUp() {
     azureSpeechServicesEndpoint = System.getenv().getOrDefault("AZURE_SPEECH_SERVICES_ENDPOINT", "");
     azureCognitiveServicesSubscriptionKey = System.getenv().getOrDefault("AZURE_SPEECH_SERVICES_SUBSCRIPTION_KEY", "");
@@ -74,7 +74,7 @@ public class MicrosoftAzureSpeechServicesClientTest {
       return;
     }
     List<MicrosoftAzureSpeechTranscription> transcriptions = azureSpeechClient.getTranscriptions(0, 0, null);
-    Assert.assertNotNull(transcriptions);
+    Assertions.assertNotNull(transcriptions);
   }
 
   @Test
@@ -87,8 +87,8 @@ public class MicrosoftAzureSpeechServicesClientTest {
     String transcriptionId = "09c3892c-4819-46b3-9161-9716679bdf01";
     MicrosoftAzureSpeechTranscription transcription = azureSpeechClient.getTranscriptionById(
         transcriptionId);
-    Assert.assertNotNull(transcription);
-    Assert.assertTrue(transcription.self.contains(transcriptionId));
+    Assertions.assertNotNull(transcription);
+    Assertions.assertTrue(transcription.self.contains(transcriptionId));
   }
 
   @Test
@@ -108,6 +108,6 @@ public class MicrosoftAzureSpeechServicesClientTest {
 
     MicrosoftAzureSpeechTranscription transcription = azureSpeechClient.createTranscription(Arrays.asList(contentUrl),
         destContainerUrl + "?" + sasToken, "Test createTranscription", "de-DE", null, "PT1H", null);
-    Assert.assertNotNull(transcription);
+    Assertions.assertNotNull(transcription);
   }
 }

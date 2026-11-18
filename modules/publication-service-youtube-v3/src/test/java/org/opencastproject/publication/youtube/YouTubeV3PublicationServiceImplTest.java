@@ -44,10 +44,9 @@ import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.Video;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +67,10 @@ public class YouTubeV3PublicationServiceImplTest {
   private UserDirectoryService userDirectoryService;
   private Workspace workspace;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void before() throws Exception {
     youTubeService = createMock(YouTubeAPIVersion3Service.class);
     youTubeService.initialize(anyObject(ClientCredentials.class));
@@ -120,7 +119,7 @@ public class YouTubeV3PublicationServiceImplTest {
     final Properties p = new Properties();
     YouTubeUtils.put(p, YouTubeKey.credentialDatastore, "credentialDatastore");
     final String absolutePath = UnitTestUtils.getMockClientSecretsFile("clientId",
-        testFolder.newFile("client-secrets-youtube-v3.json")).getAbsolutePath();
+        newFile(testFolder, "client-secrets-youtube-v3.json")).getAbsolutePath();
     YouTubeUtils.put(p, YouTubeKey.clientSecretsV3, absolutePath);
     YouTubeUtils.put(p, YouTubeKey.dataStore, "dataStore");
     YouTubeUtils.put(p, YouTubeKey.keywords, "foo");
@@ -130,6 +129,12 @@ public class YouTubeV3PublicationServiceImplTest {
     final Map<String, Object> properties = new HashMap<>();
     p.forEach((key, value) -> properties.put((String) key, value));
     return properties;
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 
 }

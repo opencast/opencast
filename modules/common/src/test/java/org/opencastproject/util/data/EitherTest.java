@@ -22,12 +22,13 @@
 
 package org.opencastproject.util.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EitherTest {
 
@@ -41,14 +42,16 @@ public class EitherTest {
     assertEquals(Integer.valueOf(1), b.right().value());
   }
 
-  @Test(expected = java.lang.Error.class)
+  @Test
   public void testProjection1() {
-    left("a").right().value();
+    assertThrows(java.lang.Error.class, () ->
+        left("a").right().value());
   }
 
-  @Test(expected = java.lang.Error.class)
+  @Test
   public void testProjection2() {
-    right("a").left().value();
+    assertThrows(java.lang.Error.class, () ->
+        right("a").left().value());
   }
 
   @Test

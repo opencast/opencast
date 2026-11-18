@@ -48,9 +48,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.CaptureType;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -70,7 +70,7 @@ public class SeriesWorkflowOperationHandlerTest {
   private MediaPackage mp;
   private Capture<InputStream> capturedStream;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(getClass().getResourceAsStream("/series_mediapackage.xml"));
@@ -143,7 +143,7 @@ public class SeriesWorkflowOperationHandlerTest {
     operation.setConfiguration(SeriesWorkflowOperationHandler.APPLY_ACL_PROPERTY, "true");
 
     WorkflowOperationResult result = operationHandler.start(instance, null);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   @Test
@@ -160,7 +160,7 @@ public class SeriesWorkflowOperationHandlerTest {
     operation.setConfiguration(SeriesWorkflowOperationHandler.APPLY_ACL_PROPERTY, "true");
 
     WorkflowOperationResult result = operationHandler.start(instance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
   }
 
   @Test
@@ -178,11 +178,11 @@ public class SeriesWorkflowOperationHandlerTest {
     operation.setConfiguration(SeriesWorkflowOperationHandler.APPLY_ACL_PROPERTY, "false");
 
     WorkflowOperationResult result = operationHandler.start(instance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackage resultingMediapackage = result.getMediaPackage();
-    Assert.assertEquals("series1", resultingMediapackage.getSeries());
-    Assert.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
-    Assert.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
+    Assertions.assertEquals("series1", resultingMediapackage.getSeries());
+    Assertions.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
+    Assertions.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
   }
 
   @Test
@@ -200,11 +200,11 @@ public class SeriesWorkflowOperationHandlerTest {
     operation.setConfiguration(SeriesWorkflowOperationHandler.APPLY_ACL_PROPERTY, "false");
 
     WorkflowOperationResult result = operationHandler.start(instance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackage resultingMediapackage = result.getMediaPackage();
-    Assert.assertEquals("series1", resultingMediapackage.getSeries());
-    Assert.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
-    Assert.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
+    Assertions.assertEquals("series1", resultingMediapackage.getSeries());
+    Assertions.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
+    Assertions.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
   }
 
   @Test
@@ -245,26 +245,26 @@ public class SeriesWorkflowOperationHandlerTest {
             StringUtils.join(extraMetadata, ", "));
 
     WorkflowOperationResult result = operationHandler.start(instance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     // Get episode DublinCore
     DublinCoreCatalog episodeCatalog = DublinCores.read(capturedStream.getValue());
 
-    Assert.assertEquals("series1", resultingMediapackage.getSeries());
-    Assert.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
-    Assert.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
+    Assertions.assertEquals("series1", resultingMediapackage.getSeries());
+    Assertions.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
+    Assertions.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
 
     // Check the extra metadata were copied into the dublincore (only those present in the series catalog)
-    Assert.assertTrue(episodeCatalog.hasValue(DublinCore.PROPERTY_CONTRIBUTOR));
-    Assert.assertEquals(seriesCatalog.get(DublinCore.PROPERTY_CONTRIBUTOR),
+    Assertions.assertTrue(episodeCatalog.hasValue(DublinCore.PROPERTY_CONTRIBUTOR));
+    Assertions.assertEquals(seriesCatalog.get(DublinCore.PROPERTY_CONTRIBUTOR),
             episodeCatalog.get(DublinCore.PROPERTY_CONTRIBUTOR));
-    Assert.assertTrue(episodeCatalog.hasValue(DublinCore.PROPERTY_LANGUAGE));
-    Assert.assertEquals(seriesCatalog.get(DublinCore.PROPERTY_LANGUAGE),
+    Assertions.assertTrue(episodeCatalog.hasValue(DublinCore.PROPERTY_LANGUAGE));
+    Assertions.assertEquals(seriesCatalog.get(DublinCore.PROPERTY_LANGUAGE),
             episodeCatalog.get(DublinCore.PROPERTY_LANGUAGE));
-    Assert.assertTrue(episodeCatalog.hasValue(otherProperty));
-    Assert.assertEquals(seriesCatalog.get(otherProperty), episodeCatalog.get(otherProperty));
-    Assert.assertFalse(episodeCatalog.hasValue(new EName(DublinCore.TERMS_NS_URI, "does-not-exist")));
+    Assertions.assertTrue(episodeCatalog.hasValue(otherProperty));
+    Assertions.assertEquals(seriesCatalog.get(otherProperty), episodeCatalog.get(otherProperty));
+    Assertions.assertFalse(episodeCatalog.hasValue(new EName(DublinCore.TERMS_NS_URI, "does-not-exist")));
   }
 
   @Test
@@ -305,20 +305,20 @@ public class SeriesWorkflowOperationHandlerTest {
     operation.setConfiguration(SeriesWorkflowOperationHandler.DEFAULT_NS_PROPERTY, DublinCores.OC_PROPERTY_NS_URI);
 
     WorkflowOperationResult result = operationHandler.start(instance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackage resultingMediapackage = result.getMediaPackage();
-    Assert.assertEquals("series1", resultingMediapackage.getSeries());
-    Assert.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
-    Assert.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
+    Assertions.assertEquals("series1", resultingMediapackage.getSeries());
+    Assertions.assertEquals("Series 1", resultingMediapackage.getSeriesTitle());
+    Assertions.assertEquals(clone.getElements().length + 1, resultingMediapackage.getElements().length);
 
     // Get episode DublinCore
     DublinCoreCatalog episodeCatalog = DublinCores.read(capturedStream.getValue());
 
     // Only the later metadatum should have been resolved. The other had a different namespace.
-    Assert.assertFalse(episodeCatalog.hasValue(DublinCore.PROPERTY_CONTRIBUTOR));
-    Assert.assertFalse(episodeCatalog.hasValue(DublinCore.PROPERTY_LANGUAGE));
-    Assert.assertTrue(episodeCatalog.hasValue(customProperty));
-    Assert.assertEquals(seriesCatalog.get(customProperty),
+    Assertions.assertFalse(episodeCatalog.hasValue(DublinCore.PROPERTY_CONTRIBUTOR));
+    Assertions.assertFalse(episodeCatalog.hasValue(DublinCore.PROPERTY_LANGUAGE));
+    Assertions.assertTrue(episodeCatalog.hasValue(customProperty));
+    Assertions.assertEquals(seriesCatalog.get(customProperty),
             episodeCatalog.get(customProperty));
   }
 

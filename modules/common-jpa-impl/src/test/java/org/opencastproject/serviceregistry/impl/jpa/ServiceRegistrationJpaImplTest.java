@@ -20,7 +20,7 @@
  */
 package org.opencastproject.serviceregistry.impl.jpa;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.job.api.Job.Status.DISPATCHING;
@@ -35,9 +35,9 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ public class ServiceRegistrationJpaImplTest {
   private JpaOrganization org;
   private JpaUser user;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     db = newDBSession("org.opencastproject.common");
     setUpOrganizationAndUsers();
@@ -66,7 +66,7 @@ public class ServiceRegistrationJpaImplTest {
     user = db.execTx(namedQuery.persistOrUpdate(user));
   }
 
-  @After
+  @AfterEach
   public void cleanUp() {
     db.close();
   }

@@ -21,8 +21,8 @@
 
 package org.opencastproject.mediapackage.attachment;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageBuilderTest;
@@ -31,8 +31,8 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.UnsupportedElementException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
@@ -49,7 +49,7 @@ public class AttachmentTest {
    *
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     coverFile = new File(MediaPackageBuilderTest.class.getResource("/cover.png").toURI());
     assertTrue(coverFile.exists() && coverFile.canRead());
@@ -83,7 +83,7 @@ public class AttachmentTest {
     }
 
     // Type test
-    assertTrue("Type mismatch", packageElement instanceof Attachment);
+    assertTrue(packageElement instanceof Attachment, "Type mismatch");
 
   }
 

@@ -21,8 +21,8 @@
 package org.opencastproject.userdirectory.ldap;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
@@ -32,8 +32,8 @@ import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.DirContextOperations;
@@ -223,7 +223,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   };
   private final JpaGroupRoleProvider[] groupRoleProviderTests = new JpaGroupRoleProvider[] { null, groupRoleProvider };
 
-  @Before
+  @BeforeEach
   public void setUp() {
 
     mappings = new HashMap<>();
@@ -707,11 +707,11 @@ public class OpencastLdapAuthoritiesPopulatorTest {
           Collection<? extends GrantedAuthority> expected) {
 
     for (GrantedAuthority auth : actual) {
-      assertTrue(format("Authorities populator returned unexpected authority: %s", auth), expected.contains(auth));
+      assertTrue(expected.contains(auth), format("Authorities populator returned unexpected authority: %s", auth));
     }
 
     for (GrantedAuthority auth : expected) {
-      assertTrue(format("Authorities populator did not return expected authority: %s", auth), actual.contains(auth));
+      assertTrue(actual.contains(auth), format("Authorities populator did not return expected authority: %s", auth));
     }
   }
 }

@@ -21,14 +21,14 @@
 
 package org.opencastproject.util.data;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Arrays.singleton;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ArraysTest {
   @Test

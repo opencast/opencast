@@ -22,13 +22,13 @@
 package org.opencastproject.util;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -131,11 +131,11 @@ public class XmlNamespaceContextTest {
   public void testAddOverwrite() {
     final XmlNamespaceContext ctx = XmlNamespaceContext.mk("gnu", "http://gnu.org");
     final XmlNamespaceContext added = ctx.add(new XmlNamespaceBinding("gnu", "http://gnoo.org"));
-    assertNull("Existing binding should not be overwritten.", added.getPrefix("http://gnoo.org"));
+    assertNull(added.getPrefix("http://gnoo.org"), "Existing binding should not be overwritten.");
     assertEquals("gnu", added.getPrefix("http://gnu.org"));
     // test other add method
     final XmlNamespaceContext added2 = ctx.add(XmlNamespaceContext.mk("gnu", "http://gnoo.org"));
-    assertNull("Existing binding should not be overwritten.", added2.getPrefix("http://gnoo.org"));
+    assertNull(added2.getPrefix("http://gnoo.org"), "Existing binding should not be overwritten.");
     assertEquals("gnu", added2.getPrefix("http://gnu.org"));
   }
 }

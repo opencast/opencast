@@ -25,36 +25,38 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.publication.youtube.UnitTestUtils;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.util.store.DataStore;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 
 public class GoogleAPICredentialRequestorTest {
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidArgs() throws IOException {
-    GoogleAPICredentialRequestor.main(new String[0]);
+    assertThrows(IllegalArgumentException.class, () ->
+        GoogleAPICredentialRequestor.main(new String[0]));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testFileDoesNotExist() throws IOException {
-    GoogleAPICredentialRequestor.main(new String[] {
-        "/this/path/does/exist",
-        "credentialDataStore",
-        "dataStoreDirectory"
-    });
+    assertThrows(IllegalArgumentException.class, () ->
+        GoogleAPICredentialRequestor.main(new String[]{
+            "/this/path/does/exist",
+            "credentialDataStore",
+            "dataStoreDirectory"
+        }));
   }
 
   @Test
@@ -63,7 +65,7 @@ public class GoogleAPICredentialRequestorTest {
     final String credentialDataStore = "credentialDataStore";
     final String dataStoreDirectory = "dataStoreDirectory";
     final File clientSecrets = UnitTestUtils.getMockClientSecretsFile(clientId,
-        testFolder.newFile("client-secrets-youtube-v3.json"));
+        newFile(testFolder, "client-secrets-youtube-v3.json"));
     try {
       final OAuth2CredentialFactory credentialFactory = createMock(OAuth2CredentialFactory.class);
       expect(credentialFactory.getDataStore(credentialDataStore, dataStoreDirectory))
@@ -79,5 +81,11 @@ public class GoogleAPICredentialRequestorTest {
         clientSecrets.delete();
       }
     }
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 }

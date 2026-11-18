@@ -44,15 +44,15 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
@@ -84,10 +84,10 @@ public class CropServiceTest {
   /** Temporary media file */
   protected File tempFile = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(DefaultOrganization
@@ -117,7 +117,7 @@ public class CropServiceTest {
     cropService.setUserDirectoryService(userDirectoryService);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(tempFile);
     ((ServiceRegistryInMemoryImpl) serviceRegistry).dispose();
@@ -128,11 +128,11 @@ public class CropServiceTest {
     Track track = createTrack(MEDIA_RESOURCE, MEDIA_DURATION);
     cropService.setWorkspace(createWorkspace(track));
     Job receipt = cropService.crop(track);
-    Assert.assertNotNull(receipt);
+    Assertions.assertNotNull(receipt);
 
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     JobBarrier.Result result = jobBarrier.waitForJobs();
-    Assert.assertTrue(result.isSuccess());
+    Assertions.assertTrue(result.isSuccess());
   }
 
   @Test
@@ -140,11 +140,11 @@ public class CropServiceTest {
     Track track = createTrack(MEDIA_RESOURCE_VERT_BARS, MEDIA_DURATION_VERT_BARS);
     cropService.setWorkspace(createWorkspace(track));
     Job receipt = cropService.crop(track);
-    Assert.assertNotNull(receipt);
+    Assertions.assertNotNull(receipt);
 
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     JobBarrier.Result result = jobBarrier.waitForJobs();
-    Assert.assertTrue(result.isSuccess());
+    Assertions.assertTrue(result.isSuccess());
   }
 
   @Test
@@ -152,11 +152,11 @@ public class CropServiceTest {
     Track track = createTrack(MEDIA_RESOURCE_BLACK, MEDIA_DURATION_BLACK);
     cropService.setWorkspace(createWorkspace(track));
     Job receipt = cropService.crop(track);
-    Assert.assertNotNull(receipt);
+    Assertions.assertNotNull(receipt);
 
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     JobBarrier.Result result = jobBarrier.waitForJobs();
-    Assert.assertTrue(result.isSuccess());
+    Assertions.assertTrue(result.isSuccess());
   }
 
   @Test
@@ -167,11 +167,11 @@ public class CropServiceTest {
     properties.put(CropServiceImpl.CROP_FFMPEG_REGEX, "");
     cropService.updated(properties);
     Job receipt = cropService.crop(track);
-    Assert.assertNotNull(receipt);
+    Assertions.assertNotNull(receipt);
 
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     JobBarrier.Result result = jobBarrier.waitForJobs();
-    Assert.assertFalse(result.isSuccess());
+    Assertions.assertFalse(result.isSuccess());
   }
 
 
@@ -195,7 +195,7 @@ public class CropServiceTest {
   protected Workspace createWorkspace(Track track) throws Exception {
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(new File(track.getURI()));
-    tempFile = testFolder.newFile(getClass().getName() + ".xml");
+    tempFile = newFile(testFolder, getClass().getName() + ".xml");
 
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(),
             EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
@@ -206,5 +206,11 @@ public class CropServiceTest {
     EasyMock.replay(workspace);
 
     return workspace;
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 }

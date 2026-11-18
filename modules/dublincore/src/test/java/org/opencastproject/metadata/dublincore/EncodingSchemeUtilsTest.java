@@ -22,10 +22,10 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.decodeDate;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.decodeDuration;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.decodePeriod;
@@ -37,7 +37,7 @@ import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
 import static org.opencastproject.metadata.dublincore.TestUtil.precisionDay;
 import static org.opencastproject.metadata.dublincore.TestUtil.precisionSecond;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

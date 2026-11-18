@@ -33,7 +33,7 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.SmartIterator;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestUsersEndpoint extends UsersEndpoint {
 
   private UserDirectoryService userDirectoryService;

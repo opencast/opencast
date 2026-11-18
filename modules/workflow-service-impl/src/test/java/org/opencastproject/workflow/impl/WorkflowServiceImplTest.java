@@ -25,7 +25,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
@@ -79,10 +79,10 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -118,7 +118,7 @@ public class WorkflowServiceImplTest {
 
   private AccessControlList acl = new AccessControlList();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -131,8 +131,8 @@ public class WorkflowServiceImplTest {
       mediapackage2 = mediaPackageBuilder.loadFromXml(in);
     }
 
-    Assert.assertNotNull(mediapackage1.getIdentifier());
-    Assert.assertNotNull(mediapackage2.getIdentifier());
+    Assertions.assertNotNull(mediapackage1.getIdentifier());
+    Assertions.assertNotNull(mediapackage2.getIdentifier());
     // create operation handlers for our workflows
     succeedingOperationHandler = new SucceedingWorkflowOperationHandler();
     failingOperationHandler = new FailingWorkflowOperationHandler();
@@ -261,7 +261,7 @@ public class WorkflowServiceImplTest {
       IOUtils.closeQuietly(is);
 
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);
@@ -275,7 +275,7 @@ public class WorkflowServiceImplTest {
     service.setIndex(index);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     serviceRegistry.deactivate();
     serviceRegistry.unRegisterService(REMOTE_SERVICE, REMOTE_HOST);
@@ -289,11 +289,11 @@ public class WorkflowServiceImplTest {
 
     // verify that we can retrieve the workflow instance from the service by its ID
     WorkflowInstance instanceFromDb = service.getWorkflowById(instance.getId());
-    Assert.assertNotNull(instanceFromDb);
+    Assertions.assertNotNull(instanceFromDb);
     MediaPackage mediapackageFromDb = instanceFromDb.getMediaPackage();
-    Assert.assertNotNull(mediapackageFromDb);
-    Assert.assertEquals(mediapackage1.getIdentifier().toString(), mediapackageFromDb.getIdentifier().toString());
-    Assert.assertEquals(2, service.countWorkflowInstances());
+    Assertions.assertNotNull(mediapackageFromDb);
+    Assertions.assertEquals(mediapackage1.getIdentifier().toString(), mediapackageFromDb.getIdentifier().toString());
+    Assertions.assertEquals(2, service.countWorkflowInstances());
   }
 
   @Test
@@ -301,23 +301,23 @@ public class WorkflowServiceImplTest {
     // A workflow which ran to completion must keep its SUCCEEDED state when stop() is called on it, so that the
     // record of how it actually ended is not lost.
     WorkflowInstance succeeded = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
-    Assert.assertEquals(WorkflowState.SUCCEEDED, service.stop(succeeded.getId()).getState());
-    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(succeeded.getId()).getState());
+    Assertions.assertEquals(WorkflowState.SUCCEEDED, service.stop(succeeded.getId()).getState());
+    Assertions.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(succeeded.getId()).getState());
 
     // Failed workflows are terminated as well and must be left alone likewise.
     WorkflowInstance failed = startAndWait(failingDefinitionWithoutErrorHandler, mediapackage2, WorkflowState.FAILED);
-    Assert.assertEquals(WorkflowState.FAILED, service.stop(failed.getId()).getState());
-    Assert.assertEquals(WorkflowState.FAILED, service.getWorkflowById(failed.getId()).getState());
+    Assertions.assertEquals(WorkflowState.FAILED, service.stop(failed.getId()).getState());
+    Assertions.assertEquals(WorkflowState.FAILED, service.getWorkflowById(failed.getId()).getState());
   }
 
   @Test
   public void testGetWorkflowByMediaPackageId() throws Exception {
     // Ensure that the database doesn't have a workflow instance with this media package
-    Assert.assertEquals(0, service.countWorkflowInstances());
-    Assert.assertEquals(
+    Assertions.assertEquals(0, service.countWorkflowInstances());
+    Assertions.assertEquals(
             0,
             service.getWorkflowInstancesByMediaPackage(mediapackage1.getIdentifier().toString()).size());
-    Assert.assertEquals(
+    Assertions.assertEquals(
             0,
             service.getWorkflowInstancesByMediaPackage(mediapackage2.getIdentifier().toString()).size());
 
@@ -325,20 +325,20 @@ public class WorkflowServiceImplTest {
     WorkflowInstance instance2 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
     WorkflowInstance instance3 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
 
-    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(instance.getId()).getState());
-    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(instance2.getId()).getState());
-    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(instance3.getId()).getState());
+    Assertions.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(instance.getId()).getState());
+    Assertions.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(instance2.getId()).getState());
+    Assertions.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(instance3.getId()).getState());
 
-    Assert.assertEquals(mediapackage1.getIdentifier().toString(), service.getWorkflowById(instance.getId())
+    Assertions.assertEquals(mediapackage1.getIdentifier().toString(), service.getWorkflowById(instance.getId())
             .getMediaPackage().getIdentifier().toString());
-    Assert.assertEquals(mediapackage2.getIdentifier().toString(), service.getWorkflowById(instance2.getId())
+    Assertions.assertEquals(mediapackage2.getIdentifier().toString(), service.getWorkflowById(instance2.getId())
             .getMediaPackage().getIdentifier().toString());
-    Assert.assertEquals(mediapackage2.getIdentifier().toString(), service.getWorkflowById(instance3.getId())
+    Assertions.assertEquals(mediapackage2.getIdentifier().toString(), service.getWorkflowById(instance3.getId())
             .getMediaPackage().getIdentifier().toString());
 
     List<WorkflowInstance> workflowsInDb = service.getWorkflowInstancesByMediaPackage(
             mediapackage1.getIdentifier().toString());
-    Assert.assertEquals(1, workflowsInDb.size());
+    Assertions.assertEquals(1, workflowsInDb.size());
   }
 
   @Test
@@ -350,7 +350,7 @@ public class WorkflowServiceImplTest {
     // Create a child workflow with a wrong parent id
     try {
       service.start(workingDefinition, mediapackage1, 1876234678L, Collections.emptyMap());
-      Assert.fail("Workflows should not be started with bad parent IDs");
+      Assertions.fail("Workflows should not be started with bad parent IDs");
     } catch (NotFoundException e) {
     } // the exception is expected
   }
@@ -358,13 +358,13 @@ public class WorkflowServiceImplTest {
   @Test
   public void testGetWorkflowByEpisodeId() throws Exception {
     // Ensure that the database doesn't have a workflow instance with this episode
-    Assert.assertEquals(0, service.countWorkflowInstances());
+    Assertions.assertEquals(0, service.countWorkflowInstances());
 
     startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
 
     List<WorkflowInstance> workflowsInDb = service.getWorkflowInstancesByMediaPackage(
         mediapackage1.getIdentifier().toString());
-    Assert.assertEquals(1, workflowsInDb.size());
+    Assertions.assertEquals(1, workflowsInDb.size());
   }
 
   protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, WorkflowState stateToWaitFor)
@@ -406,27 +406,27 @@ public class WorkflowServiceImplTest {
   public void testFailingOperationWithErrorHandler() throws Exception {
     WorkflowInstance instance = startAndWait(failingDefinitionWithErrorHandler, mediapackage1, WorkflowState.FAILED);
 
-    Assert.assertEquals(WorkflowState.FAILED, service.getWorkflowById(instance.getId()).getState());
+    Assertions.assertEquals(WorkflowState.FAILED, service.getWorkflowById(instance.getId()).getState());
 
     // The second operation should have failed
-    Assert.assertEquals(OperationState.FAILED, service.getWorkflowById(instance.getId()).getOperations().get(1)
+    Assertions.assertEquals(OperationState.FAILED, service.getWorkflowById(instance.getId()).getOperations().get(1)
             .getState());
 
     // Load a fresh copy
     WorkflowInstance storedInstance = service.getWorkflowById(instance.getId());
 
     // Make sure the error handler has been added
-    Assert.assertEquals(4, storedInstance.getOperations().size());
-    Assert.assertEquals("op1", storedInstance.getOperations().get(0).getTemplate());
-    Assert.assertEquals("op3", storedInstance.getOperations().get(1).getTemplate());
-    Assert.assertEquals("op1", storedInstance.getOperations().get(2).getTemplate());
-    Assert.assertEquals("op2", storedInstance.getOperations().get(3).getTemplate());
+    Assertions.assertEquals(4, storedInstance.getOperations().size());
+    Assertions.assertEquals("op1", storedInstance.getOperations().get(0).getTemplate());
+    Assertions.assertEquals("op3", storedInstance.getOperations().get(1).getTemplate());
+    Assertions.assertEquals("op1", storedInstance.getOperations().get(2).getTemplate());
+    Assertions.assertEquals("op2", storedInstance.getOperations().get(3).getTemplate());
   }
 
   @Test
   public void testFailingOperationWithoutErrorHandler() throws Exception {
     WorkflowInstance instance = startAndWait(failingDefinitionWithoutErrorHandler, mediapackage1, WorkflowState.FAILED);
-    Assert.assertEquals(WorkflowState.FAILED, service.getWorkflowById(instance.getId()).getState());
+    Assertions.assertEquals(WorkflowState.FAILED, service.getWorkflowById(instance.getId()).getState());
   }
 
   @Test
@@ -444,11 +444,11 @@ public class WorkflowServiceImplTest {
 
     WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.FAILED);
 
-    Assert.assertTrue(
+    Assertions.assertTrue(
         service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.FAILED);
-    Assert.assertTrue(
+    Assertions.assertTrue(
         service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 1);
-    Assert.assertTrue(
+    Assertions.assertTrue(
         service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
   }
 
@@ -468,11 +468,11 @@ public class WorkflowServiceImplTest {
 
     WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.SUCCEEDED);
 
-    Assert.assertTrue(
+    Assertions.assertTrue(
         service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.SUCCEEDED);
-    Assert.assertTrue(
+    Assertions.assertTrue(
         service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 2);
-    Assert.assertTrue(
+    Assertions.assertTrue(
         service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
   }
 
@@ -497,13 +497,13 @@ public class WorkflowServiceImplTest {
             .get(0);
     WorkflowOperationInstance failOneTimeOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
 
-    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
-    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
-    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+    Assertions.assertEquals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID, errorResolutionOperation.getTemplate());
+    Assertions.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assertions.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
 
-    Assert.assertTrue(failOneTimeOperation.getState() == OperationState.RETRY);
-    Assert.assertTrue(failOneTimeOperation.getMaxAttempts() == 2);
-    Assert.assertTrue(failOneTimeOperation.getFailedAttempts() == 1);
+    Assertions.assertTrue(failOneTimeOperation.getState() == OperationState.RETRY);
+    Assertions.assertTrue(failOneTimeOperation.getMaxAttempts() == 2);
+    Assertions.assertTrue(failOneTimeOperation.getFailedAttempts() == 1);
   }
 
   @Test
@@ -527,14 +527,14 @@ public class WorkflowServiceImplTest {
             .get(0);
     WorkflowOperationInstance failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
 
-    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
-    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
-    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+    Assertions.assertEquals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID, errorResolutionOperation.getTemplate());
+    Assertions.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assertions.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
 
-    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
-    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
-    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
-    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 1);
+    Assertions.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assertions.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assertions.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assertions.assertTrue(failTwiceOperation.getFailedAttempts() == 1);
 
     // Try operation a second time, simulate user selecting RETRY
     retryAndWait(service.getWorkflowById(workflow.getId()), "RETRY", WorkflowState.PAUSED);
@@ -542,24 +542,24 @@ public class WorkflowServiceImplTest {
     errorResolutionOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
     failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
 
-    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
-    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
-    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+    Assertions.assertEquals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID, errorResolutionOperation.getTemplate());
+    Assertions.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assertions.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
 
-    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
-    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
-    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
-    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+    Assertions.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assertions.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assertions.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assertions.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
 
     // Try operation a third time, it should succeed, simulate user selecting RETRY
     retryAndWait(service.getWorkflowById(workflow.getId()), "RETRY", WorkflowState.SUCCEEDED);
 
     failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
 
-    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
-    Assert.assertTrue(failTwiceOperation.getState() == OperationState.SUCCEEDED);
-    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
-    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+    Assertions.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assertions.assertTrue(failTwiceOperation.getState() == OperationState.SUCCEEDED);
+    Assertions.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assertions.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
   }
 
   @Test
@@ -584,14 +584,14 @@ public class WorkflowServiceImplTest {
             .get(0);
     WorkflowOperationInstance failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
 
-    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
-    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
-    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+    Assertions.assertEquals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID, errorResolutionOperation.getTemplate());
+    Assertions.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assertions.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
 
-    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
-    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
-    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
-    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 1);
+    Assertions.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assertions.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assertions.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assertions.assertTrue(failTwiceOperation.getFailedAttempts() == 1);
 
     // Try operation a second time, simulate user selecting RETRY
     retryAndWait(service.getWorkflowById(workflow.getId()), "RETRY", WorkflowState.PAUSED);
@@ -599,24 +599,24 @@ public class WorkflowServiceImplTest {
     errorResolutionOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
     failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
 
-    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
-    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
-    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+    Assertions.assertEquals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID, errorResolutionOperation.getTemplate());
+    Assertions.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assertions.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
 
-    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
-    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
-    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
-    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+    Assertions.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assertions.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assertions.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assertions.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
 
     // Simulate user selecting 'fail'
     retryAndWait(service.getWorkflowById(workflow.getId()), "NONE", WorkflowState.FAILED);
 
     failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
 
-    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
-    Assert.assertTrue(failTwiceOperation.getState() == OperationState.FAILED);
-    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
-    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+    Assertions.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assertions.assertTrue(failTwiceOperation.getState() == OperationState.FAILED);
+    Assertions.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assertions.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
   }
 
   /**
@@ -627,7 +627,7 @@ public class WorkflowServiceImplTest {
   @Test
   public void testManyConcurrentWorkflows() throws Exception {
     int count = 10;
-    Assert.assertEquals(0, service.countWorkflowInstances());
+    Assertions.assertEquals(0, service.countWorkflowInstances());
     List<WorkflowInstance> instances = new ArrayList<WorkflowInstance>();
 
     WorkflowStateListener stateListener = new WorkflowStateListener(WorkflowState.SUCCEEDED, WorkflowState.FAILED);
@@ -641,8 +641,8 @@ public class WorkflowServiceImplTest {
 
     WorkflowTestSupport.poll(stateListener, count);
 
-    Assert.assertEquals(count, service.countWorkflowInstances());
-    Assert.assertEquals(count, stateListener.countStateChanges(WorkflowState.SUCCEEDED));
+    Assertions.assertEquals(count, service.countWorkflowInstances());
+    Assertions.assertEquals(count, stateListener.countStateChanges(WorkflowState.SUCCEEDED));
   }
 
   /**
@@ -672,7 +672,7 @@ public class WorkflowServiceImplTest {
 
     try {
       service.remove(wi3.getId(), false);
-      Assert.fail("A paused workflow shouldn't be removed without using force");
+      Assertions.fail("A paused workflow shouldn't be removed without using force");
     } catch (WorkflowStateException e) {
       assertEquals(1, service.countWorkflowInstances());
     }
@@ -681,7 +681,7 @@ public class WorkflowServiceImplTest {
       service.remove(wi3.getId(), true);
       assertEquals(0, service.countWorkflowInstances());
     } catch (WorkflowStateException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

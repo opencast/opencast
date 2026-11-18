@@ -24,7 +24,7 @@ package org.opencastproject.authorization.xacml.manager.impl;
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -46,8 +46,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class AclScannerTest {
   private OrganizationDirectoryService orgService;
   private AclScanner aclScanner;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     Organization org1 = new JpaOrganization("org1", "org1", new HashMap<String, Integer>(), "ADMIN", "ANONYMOUS",
         new HashMap<>());

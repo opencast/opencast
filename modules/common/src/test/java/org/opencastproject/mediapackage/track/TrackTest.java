@@ -21,8 +21,8 @@
 
 package org.opencastproject.mediapackage.track;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -35,9 +35,9 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
 import java.io.InputStream;
@@ -67,7 +67,7 @@ public class TrackTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     httpUrl = new URI("http://downloads.opencastproject.org/media/movie.m4v");
     rtmpUrl = new URI("rtmp://downloads.opencastproject.org/media/movie.m4v");
@@ -125,7 +125,7 @@ public class TrackTest {
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
       TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
@@ -137,15 +137,15 @@ public class TrackTest {
     inputStream = IOUtils.toInputStream(xml, StandardCharsets.UTF_8);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
-      Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+      Assertions.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
 
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(track);
-    Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
+    Assertions.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -153,8 +153,9 @@ public class TrackTest {
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t3.getURI().toURL().toExternalForm());
+    Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
+    Assertions.assertEquals("http://downloads.opencastproject.org/media/movie.m4v",
+        t3.getURI().toURL().toExternalForm());
   }
 
   @Test
@@ -171,8 +172,8 @@ public class TrackTest {
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
       TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
-      Assert.assertEquals(true, t1.isLive());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+      Assertions.assertEquals(true, t1.isLive());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
@@ -184,17 +185,17 @@ public class TrackTest {
     inputStream = IOUtils.toInputStream(xml, StandardCharsets.UTF_8);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
-      Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
-      Assert.assertEquals(true, t2.isLive());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+      Assertions.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t2.getURI().toString());
+      Assertions.assertEquals(true, t2.isLive());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
 
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(track);
-    Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
-    Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
+    Assertions.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
+    Assertions.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -202,9 +203,10 @@ public class TrackTest {
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t3.getURI().toURL().toExternalForm());
-    Assert.assertEquals(true, t3.isLive());
+    Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
+    Assertions.assertEquals("http://downloads.opencastproject.org/media/movie.m4v",
+        t3.getURI().toURL().toExternalForm());
+    Assertions.assertEquals(true, t3.isLive());
   }
 
 }

@@ -23,10 +23,10 @@ package org.opencastproject.videoeditor.ffmpeg;
 
 import org.opencastproject.videoeditor.impl.VideoClip;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class FFmpegTest {
     outputFilePath = new File("target/testoutput/mux.mp4").getAbsolutePath();
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void testForFFmpeg() {
     try {
       Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
@@ -64,7 +64,7 @@ public class FFmpegTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     if (new File(outputFilePath).exists())  {
       new File(outputFilePath).delete();
@@ -91,7 +91,7 @@ public class FFmpegTest {
     input.add(inputFilePath);
     FFmpegEdit fmp = new FFmpegEdit();
     fmp.processEdits(input, outputFilePath, null, clips);
-    Assert.assertTrue("Edited File is nonzero",new File(outputFilePath).length() > 0);
+    Assertions.assertTrue(new File(outputFilePath).length() > 0,"Edited File is nonzero");
     logger.info("Ffmpeg concat 2 clips from 1 file OK!");
 
   }
@@ -115,7 +115,7 @@ public class FFmpegTest {
     input.add(inputFilePath);
     FFmpegEdit fmp = new FFmpegEdit();
     fmp.processEdits(input, outputFilePath, "320x180", clips);    // Both clips are scaled to 320x180
-    Assert.assertTrue("Edited File is nonzero",new File(outputFilePath).length() > 0);
+    Assertions.assertTrue(new File(outputFilePath).length() > 0,"Edited File is nonzero");
     logger.info("Ffmpeg concat 2 clips from 2 files OK!");
   }
 }

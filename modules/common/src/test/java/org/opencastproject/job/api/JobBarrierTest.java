@@ -22,12 +22,12 @@
 package org.opencastproject.job.api;
 
 import static org.easymock.EasyMock.createNiceMock;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.easymock.EasyMock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public class JobBarrierTest {
     // check if there are still running jobs
     final boolean noRunningJobs = jobs.values().stream()
         .allMatch(job -> hasJobTerminated(job.getLastReportedStatus()));
-    assertTrue("There are still some jobs running", noRunningJobs);
+    assertTrue(noRunningJobs, "There are still some jobs running");
   }
 
   private static boolean hasJobTerminated(Job.Status status) {

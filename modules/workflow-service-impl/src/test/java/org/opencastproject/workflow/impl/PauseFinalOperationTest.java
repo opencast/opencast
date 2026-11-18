@@ -58,9 +58,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -84,7 +84,7 @@ public class PauseFinalOperationTest {
 
   private AccessControlList acl = new AccessControlList();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
@@ -181,7 +181,7 @@ public class PauseFinalOperationTest {
     service.setIndex(index);
   }
 
-  @Test()
+  @Test
   public void testHoldAndResumeFinalOperation() throws Exception {
     // Start a new workflow, and wait for it to pause
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
@@ -191,11 +191,11 @@ public class PauseFinalOperationTest {
     service.removeWorkflowListener(pauseListener);
 
     // Ensure that "start" was called on the first operation handler, but not resume
-    Assert.assertTrue(handler.isStarted());
-    Assert.assertTrue(!handler.isResumed());
+    Assertions.assertTrue(handler.isStarted());
+    Assertions.assertTrue(!handler.isResumed());
 
     // The workflow should be in the paused state
-    Assert.assertEquals(WorkflowState.PAUSED, service.getWorkflowById(workflow.getId()).getState());
+    Assertions.assertEquals(WorkflowState.PAUSED, service.getWorkflowById(workflow.getId()).getState());
 
     // Resume the workflow
     WorkflowStateListener succeedListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
@@ -204,7 +204,7 @@ public class PauseFinalOperationTest {
     WorkflowTestSupport.poll(succeedListener, 1);
     service.removeWorkflowListener(succeedListener);
 
-    Assert.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(workflow.getId()).getState());
+    Assertions.assertEquals(WorkflowState.SUCCEEDED, service.getWorkflowById(workflow.getId()).getState());
   }
 
 }

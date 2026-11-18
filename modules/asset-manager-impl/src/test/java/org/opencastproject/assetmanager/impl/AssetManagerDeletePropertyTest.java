@@ -20,12 +20,12 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.fn.Properties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
 
@@ -37,15 +37,15 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[2], "agent-5"));
     assertTotals(6, 6, 3);
     assertEquals(
-        "One property should be deleted",
         1,
-        am.deleteProperties(mp[0])
+        am.deleteProperties(mp[0]),
+        "One property should be deleted"
     );
     assertTotals(6, 6, 2);
     assertEquals(
-        "One property should be deleted",
         1,
-        am.deleteProperties(mp[1])
+        am.deleteProperties(mp[1]),
+        "One property should be deleted"
     );
     assertTotals(6, 6, 1);
     assertEquals(Value.mk("agent-5"),
@@ -61,15 +61,15 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
     am.setProperty(p.agent(mp[2], "agent-5"));
     assertTotals(6, 6, 4);
     assertEquals(
-        "One property should be deleted",
         1,
-        am.deleteProperties(mp[0], p.getNamespace())
+        am.deleteProperties(mp[0], p.getNamespace()),
+        "One property should be deleted"
     );
     assertTotals(6, 6, 3);
     assertEquals(
-        "One property should be deleted",
         1,
-        am.deleteProperties(mp[1], p.getNamespace())
+        am.deleteProperties(mp[1], p.getNamespace()),
+        "One property should be deleted"
     );
     assertTotals(6, 6, 2);
     assertEquals(Value.mk("agent-12"),

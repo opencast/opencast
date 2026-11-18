@@ -20,6 +20,8 @@
  */
 package org.opencastproject.workflow.handler.notification;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.email.template.api.EmailTemplateService;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -37,9 +39,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class EmailWorkflowOperationHandlerTest {
   private Capture<String> capturedBodyText;
   private Capture<String> capturedBodyHTML;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -146,12 +148,12 @@ public class EmailWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("Test Media Package (3e7bb56d-2fcc-4efe-9f0e-d6e56422f557)", capturedBodyText.getValue());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("Test Media Package (3e7bb56d-2fcc-4efe-9f0e-d6e56422f557)", capturedBodyText.getValue());
   }
 
   @Test
@@ -167,13 +169,14 @@ public class EmailWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
-    Assert.assertEquals("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>",
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557",
+        capturedBodyText.getValue());
+    Assertions.assertEquals("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>",
         capturedBodyHTML.getValue());
   }
 
@@ -188,13 +191,14 @@ public class EmailWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
-    Assert.assertEquals("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>",
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557",
+        capturedBodyText.getValue());
+    Assertions.assertEquals("<h1>This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557</h1>",
         capturedBodyHTML.getValue());
   }
 
@@ -208,11 +212,11 @@ public class EmailWorkflowOperationHandlerTest {
 
     operationHandler.start(workflowInstance, null);
 
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("TEMPLATE NOT FOUND!", capturedBodyText.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_CC}, capturedCC.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_BCC}, capturedBCC.getValue());
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("TEMPLATE NOT FOUND!", capturedBodyText.getValue());
   }
 
   @Test
@@ -226,12 +230,13 @@ public class EmailWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedCC.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedCC.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedBCC.getValue());
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557",
+        capturedBodyText.getValue());
   }
 
   @Test
@@ -246,12 +251,13 @@ public class EmailWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO, DEFAULT_BCC, DEFAULT_CC}, capturedTo.getValue());
-    Assert.assertEquals(0, capturedCC.getValue().length);
-    Assert.assertEquals(0, capturedBCC.getValue().length);
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO, DEFAULT_BCC, DEFAULT_CC}, capturedTo.getValue());
+    Assertions.assertEquals(0, capturedCC.getValue().length);
+    Assertions.assertEquals(0, capturedBCC.getValue().length);
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557",
+        capturedBodyText.getValue());
   }
 
   @Test
@@ -265,31 +271,35 @@ public class EmailWorkflowOperationHandlerTest {
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedCC.getValue());
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO}, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedCC.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO}, capturedBCC.getValue());
+    Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+    Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557",
+        capturedBodyText.getValue());
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testUserNoEmail() throws Exception {
-    operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, USER_NAME_NO_EMAIL);
-    operation.setConfiguration(EmailWorkflowOperationHandler.CC_PROPERTY, USER_NAME_NO_EMAIL);
-    operation.setConfiguration(EmailWorkflowOperationHandler.BCC_PROPERTY, USER_NAME_NO_EMAIL);
-    operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, DEFAULT_SUBJECT);
-    operation.setConfiguration(EmailWorkflowOperationHandler.BODY_PROPERTY,
-            "This is the media package: ${mediaPackage.identifier}");
+    assertThrows(WorkflowOperationException.class, () -> {
+      operation.setConfiguration(EmailWorkflowOperationHandler.TO_PROPERTY, USER_NAME_NO_EMAIL);
+      operation.setConfiguration(EmailWorkflowOperationHandler.CC_PROPERTY, USER_NAME_NO_EMAIL);
+      operation.setConfiguration(EmailWorkflowOperationHandler.BCC_PROPERTY, USER_NAME_NO_EMAIL);
+      operation.setConfiguration(EmailWorkflowOperationHandler.SUBJECT_PROPERTY, DEFAULT_SUBJECT);
+      operation.setConfiguration(EmailWorkflowOperationHandler.BODY_PROPERTY,
+          "This is the media package: ${mediaPackage.identifier}");
 
-    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+      WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertEquals(DEFAULT_TO, capturedTo.getValue());
-    Assert.assertEquals(DEFAULT_TO, capturedCC.getValue());
-    Assert.assertEquals(DEFAULT_TO, capturedBCC.getValue());
-    Assert.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", capturedBodyText.getValue());
+      Assertions.assertEquals(Action.CONTINUE, result.getAction());
+      Assertions.assertEquals(DEFAULT_TO, capturedTo.getValue());
+      Assertions.assertEquals(DEFAULT_TO, capturedCC.getValue());
+      Assertions.assertEquals(DEFAULT_TO, capturedBCC.getValue());
+      Assertions.assertEquals(DEFAULT_SUBJECT, capturedSubject.getValue());
+      Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557",
+          capturedBodyText.getValue());
+    });
   }
 
   @Test
@@ -300,7 +310,7 @@ public class EmailWorkflowOperationHandlerTest {
     operation.setConfiguration(EmailWorkflowOperationHandler.ADDRESS_SEPARATOR_PROPERTY, separator);
 
     operationHandler.start(workflowInstance, null);
-    Assert.assertArrayEquals(new String[] {DEFAULT_TO, DEFAULT_TO}, capturedTo.getValue());
+    Assertions.assertArrayEquals(new String[] {DEFAULT_TO, DEFAULT_TO}, capturedTo.getValue());
   }
 
   @Test
@@ -308,7 +318,7 @@ public class EmailWorkflowOperationHandlerTest {
     operation.setConfiguration(EmailWorkflowOperationHandler.SKIP_INVALID_ADDRESS_PROPERTY, "true");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   @Test
@@ -331,10 +341,10 @@ public class EmailWorkflowOperationHandlerTest {
 
     try {
       handler.start(workflowInstance, null);
-      Assert.fail("Expected a WorkflowOperationException");
+      Assertions.fail("Expected a WorkflowOperationException");
     } catch (WorkflowOperationException e) {
       // The exception names the configuration key that failed to render
-      Assert.assertTrue(e.getMessage().contains(EmailWorkflowOperationHandler.SUBJECT_PROPERTY));
+      Assertions.assertTrue(e.getMessage().contains(EmailWorkflowOperationHandler.SUBJECT_PROPERTY));
     }
   }
 

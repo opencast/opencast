@@ -21,7 +21,7 @@
 package org.opencastproject.assetmanager.impl;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.db.Queries.nativeQuery;
 
 import org.opencastproject.assetmanager.impl.persistence.Database;
@@ -50,21 +50,21 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase {
   }
 
   void assertPropertiesTotal(long count) {
-    assertEquals(format("There should be %d properties total", count),
-                 count,
-                 am.countProperties());
+    assertEquals(count,
+                 am.countProperties(),
+                 format("There should be %d properties total", count));
   }
 
   void assertAssetsTotal(long count) {
-    assertEquals(format("There should be %d assets total", count),
-                 count,
-                 am.countAssets());
+    assertEquals(count,
+                 am.countAssets(),
+                 format("There should be %d assets total", count));
   }
 
   void assertSnapshotsTotal(long count) {
-    assertEquals(format("There should be %d snapshots total", count),
-                 count,
-                 am.countSnapshots(null));
+    assertEquals(count,
+                 am.countSnapshots(null),
+                 format("There should be %d snapshots total", count));
   }
 
   void assertTotals(long snapshots, long assets, long properties) {

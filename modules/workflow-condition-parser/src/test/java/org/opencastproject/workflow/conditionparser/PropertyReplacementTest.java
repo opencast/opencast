@@ -21,9 +21,9 @@
 
 package org.opencastproject.workflow.conditionparser;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +41,10 @@ public class PropertyReplacementTest {
                   + "<config key=\"bar\">${bar}</config>"
                   + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, false);
-    assertEquals("Variable replacement failed",
-            "<config key=\"foo\">propertyForFoo</config>"
+    assertEquals("<config key=\"foo\">propertyForFoo</config>"
                     + "<config key=\"bar\">propertyForBar</config>"
-                    + "<config key=\"baz\">${baz}</config>", result);
+                    + "<config key=\"baz\">${baz}</config>",
+            result, "Variable replacement failed");
   }
 
   @Test
@@ -56,10 +56,10 @@ public class PropertyReplacementTest {
                   + "<config key=\"bar\">${bar}</config>"
                   + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, true);
-    assertEquals("Variable replacement failed",
-            "<config key=\"foo\">'propertyForFoo'</config>"
+    assertEquals("<config key=\"foo\">'propertyForFoo'</config>"
                     + "<config key=\"bar\">'propertyForBar'</config>"
-                    + "<config key=\"baz\">${baz}</config>", result);
+                    + "<config key=\"baz\">${baz}</config>",
+            result, "Variable replacement failed");
   }
 
   @Test
@@ -71,10 +71,10 @@ public class PropertyReplacementTest {
                   + "<config key=\"bar\">${bar}</config>"
                   + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, true);
-    assertEquals("Variable replacement failed",
-            "<config key=\"foo\">1</config>"
+    assertEquals("<config key=\"foo\">1</config>"
                     + "<config key=\"bar\">'propertyForBar'</config>"
-                    + "<config key=\"baz\">${baz}</config>", result);
+                    + "<config key=\"baz\">${baz}</config>",
+            result, "Variable replacement failed");
   }
 
   @Test
@@ -86,9 +86,9 @@ public class PropertyReplacementTest {
                   + "<config key=\"bar\">${bar}</config>"
                   + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, true);
-    assertEquals("Variable replacement failed",
-            "<config key=\"foo\">true</config>"
+    assertEquals("<config key=\"foo\">true</config>"
                     + "<config key=\"bar\">'propertyForBar'</config>"
-                    + "<config key=\"baz\">${baz}</config>", result);
+                    + "<config key=\"baz\">${baz}</config>",
+            result, "Variable replacement failed");
   }
 }

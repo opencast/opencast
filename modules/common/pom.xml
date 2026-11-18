@@ -133,8 +133,8 @@
     </dependency>
     <!-- Testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- JAXB implementation for unit tests; provided by the Karaf runtime in production -->
@@ -153,10 +153,6 @@
       <artifactId>Saxon-HE</artifactId>
       <version>9.6.0-4</version>
     </dependency>
-    <!--
-    - Parameterized tests for JUnit
-    - https://github.com/Pragmatists/JUnitParams
-    -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-reload4j</artifactId>

@@ -21,9 +21,9 @@
 
 package org.opencastproject.userdirectory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
@@ -37,9 +37,9 @@ import org.opencastproject.security.api.UserProvider;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,7 +64,7 @@ public class UserAndRoleDirectoryServiceImplTest {
   private JaxbRole role2;
   private JaxbRole role3;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     org = new DefaultOrganization();
     userName = "sampleUser";
@@ -206,44 +206,44 @@ public class UserAndRoleDirectoryServiceImplTest {
   @SuppressWarnings("unchecked")
   public void testGetRoles() {
     List<Role> roles = directory.findRoles("%", Role.Target.ALL, 0, 0);
-    Assert.assertEquals(4, roles.size());
+    Assertions.assertEquals(4, roles.size());
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testGetUsers() {
     List<User> users = directory.getUsers();
-    Assert.assertEquals(2, users.size());
+    Assertions.assertEquals(2, users.size());
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testFindUsers() {
     List<User> users = IteratorUtils.toList(directory.findUsers("%mple%", 0, 0));
-    Assert.assertEquals(2, users.size());
-    Assert.assertTrue(userName.equals(users.get(0).getUsername()) || userName.equals(users.get(1).getUsername()));
-    Assert.assertTrue("userSample".equals(users.get(0).getUsername())
+    Assertions.assertEquals(2, users.size());
+    Assertions.assertTrue(userName.equals(users.get(0).getUsername()) || userName.equals(users.get(1).getUsername()));
+    Assertions.assertTrue("userSample".equals(users.get(0).getUsername())
             || "userSample".equals(users.get(1).getUsername()));
 
     // Test limit and offset
     users = IteratorUtils.toList(directory.findUsers("%mple%", 1, 1));
-    Assert.assertEquals(1, users.size());
+    Assertions.assertEquals(1, users.size());
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testFindRoles() {
     List<Role> roles = directory.findRoles("%2012%", Role.Target.ALL, 0, 0);
-    Assert.assertEquals(2, roles.size());
-    Assert.assertTrue("ROLE_MATH_2012".equals(roles.get(0).getName())
+    Assertions.assertEquals(2, roles.size());
+    Assertions.assertTrue("ROLE_MATH_2012".equals(roles.get(0).getName())
             || "ROLE_MATH_2012".equals(roles.get(1).getName()));
-    Assert.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
+    Assertions.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
             || "ROLE_ASTRO_2012".equals(roles.get(1).getName()));
 
     // Test limit and offset
     roles = directory.findRoles("%2012%", Role.Target.ALL, 1, 1);
-    Assert.assertEquals(1, roles.size());
-    Assert.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
+    Assertions.assertEquals(1, roles.size());
+    Assertions.assertTrue("ROLE_ASTRO_2012".equals(roles.get(0).getName())
             || "ROLE_MATH_2012".equals(roles.get(0).getName()));
   }
 
@@ -287,21 +287,21 @@ public class UserAndRoleDirectoryServiceImplTest {
 
     // No filter: current behaviour is preserved
     List<Role> unfiltered = hasUserDirectory.findRoles("%", Role.Target.ALL, 0, 0, null);
-    Assert.assertEquals(3, unfiltered.size());
+    Assertions.assertEquals(3, unfiltered.size());
 
     // Only roles with a user account
     List<Role> withUser = hasUserDirectory.findRoles("%", Role.Target.ALL, 0, 0, true);
-    Assert.assertEquals(1, withUser.size());
-    Assert.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "linked", withUser.get(0).getName());
+    Assertions.assertEquals(1, withUser.size());
+    Assertions.assertEquals(UserIdRoleProvider.getUserRolePrefix() + "linked", withUser.get(0).getName());
 
     // Only roles without a user account
     List<Role> withoutUser = hasUserDirectory.findRoles("%", Role.Target.ALL, 0, 0, false);
-    Assert.assertEquals(2, withoutUser.size());
+    Assertions.assertEquals(2, withoutUser.size());
 
     // Filtering must happen before offset/limit are applied: a limit of 1 on the 2 "no user" roles must return
     // exactly 1 result, not come back short because filtering happened after pagination.
     List<Role> pagedWithoutUser = hasUserDirectory.findRoles("%", Role.Target.ALL, 0, 1, false);
-    Assert.assertEquals(1, pagedWithoutUser.size());
+    Assertions.assertEquals(1, pagedWithoutUser.size());
   }
 
   @Test
@@ -329,11 +329,11 @@ public class UserAndRoleDirectoryServiceImplTest {
 
     // Not "ROLE_Anna, ROLE_Leon, ROLE_anna, ROLE_b", which is what ordering by character code would give
     List<Role> found = sortDirectory.findRoles("%", Role.Target.ALL, 0, 0, null);
-    Assert.assertEquals(4, found.size());
-    Assert.assertEquals("ROLE_Anna", found.get(0).getName());
-    Assert.assertEquals("ROLE_anna", found.get(1).getName());
-    Assert.assertEquals("ROLE_b", found.get(2).getName());
-    Assert.assertEquals("ROLE_Leon", found.get(3).getName());
+    Assertions.assertEquals(4, found.size());
+    Assertions.assertEquals("ROLE_Anna", found.get(0).getName());
+    Assertions.assertEquals("ROLE_anna", found.get(1).getName());
+    Assertions.assertEquals("ROLE_b", found.get(2).getName());
+    Assertions.assertEquals("ROLE_Leon", found.get(3).getName());
   }
 
 }

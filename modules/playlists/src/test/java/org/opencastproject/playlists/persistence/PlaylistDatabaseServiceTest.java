@@ -20,8 +20,8 @@
  */
 package org.opencastproject.playlists.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -38,8 +38,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +52,7 @@ public class PlaylistDatabaseServiceTest {
 
   private Playlist testPlaylist;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Init default playlist
     PlaylistEntry playlistEntry = new PlaylistEntry("1234", PlaylistEntryType.EVENT);
@@ -110,10 +110,10 @@ public class PlaylistDatabaseServiceTest {
     playlistDatabaseService.updatePlaylist(testPlaylist, securityService.getOrganization().getId());
 
     List playlists = playlistDatabaseService.getPlaylists(100, 0, new SortCriterion("", SortCriterion.Order.None));
-    assertTrue("Exactly one playlists should be returned", playlists.size() == 1);
+    assertTrue(playlists.size() == 1, "Exactly one playlists should be returned");
     playlistDatabaseService.deletePlaylist(testPlaylist, securityService.getOrganization().getId());
     playlists = playlistDatabaseService.getPlaylists(100, 0, new SortCriterion("", SortCriterion.Order.None));
-    assertTrue("Exactly zero playlists should be returned", playlists.isEmpty());
+    assertTrue(playlists.isEmpty(), "Exactly zero playlists should be returned");
   }
 
   @Test

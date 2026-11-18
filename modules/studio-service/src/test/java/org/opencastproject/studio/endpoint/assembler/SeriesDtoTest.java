@@ -21,15 +21,18 @@
 
 package org.opencastproject.studio.endpoint.assembler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.studio.endpoint.dto.SeriesDto;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.UUID;
 
-import junit.framework.TestCase;
+public class SeriesDtoTest {
 
-public class SeriesDtoTest extends TestCase {
-
+  @Test
   public void testToDto() {
     Series series = new Series(UUID.randomUUID().toString(), "mh_default_org");
     series.setTitle("Series Test 1");

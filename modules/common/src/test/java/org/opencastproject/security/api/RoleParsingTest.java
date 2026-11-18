@@ -21,14 +21,14 @@
 
 package org.opencastproject.security.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.Diff;
@@ -50,7 +50,7 @@ public class RoleParsingTest {
 
   private JAXBContext jaxbContext;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     jaxbContext = JAXBContext.newInstance(JaxbRole.class);
   }
@@ -70,7 +70,7 @@ public class RoleParsingTest {
         .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
         .checkForSimilar()
         .build();
-    assertFalse(diff.toString(), diff.hasDifferences());
+    assertFalse(diff.hasDifferences(), diff.toString());
   }
 
   @Test

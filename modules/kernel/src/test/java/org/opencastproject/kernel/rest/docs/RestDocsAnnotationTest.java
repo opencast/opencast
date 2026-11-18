@@ -27,8 +27,8 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
@@ -44,31 +44,31 @@ public class RestDocsAnnotationTest {
       if (testMethod != null) {
         RestQuery annotation = (RestQuery) testMethod.getAnnotation(RestQuery.class);
 
-        Assert.assertEquals("Starts a capture using the default devices as appropriate.", annotation.description());
-        Assert.assertEquals("A list of capture agent things", annotation.returnDescription());
+        Assertions.assertEquals("Starts a capture using the default devices as appropriate.", annotation.description());
+        Assertions.assertEquals("A list of capture agent things", annotation.returnDescription());
 
-        Assert.assertTrue(annotation.pathParameters().length == 1);
-        Assert.assertEquals("location", annotation.pathParameters()[0].name());
-        Assert.assertEquals("The room of the capture agent", annotation.pathParameters()[0].description());
-        Assert.assertFalse(annotation.pathParameters()[0].isRequired());
+        Assertions.assertTrue(annotation.pathParameters().length == 1);
+        Assertions.assertEquals("location", annotation.pathParameters()[0].name());
+        Assertions.assertEquals("The room of the capture agent", annotation.pathParameters()[0].description());
+        Assertions.assertFalse(annotation.pathParameters()[0].isRequired());
 
-        Assert.assertTrue(annotation.restParameters().length == 1);
-        Assert.assertEquals("id", annotation.restParameters()[0].name());
-        Assert.assertEquals("The ID of the capture to start", annotation.restParameters()[0].description());
-        Assert.assertTrue(annotation.restParameters()[0].isRequired());
+        Assertions.assertTrue(annotation.restParameters().length == 1);
+        Assertions.assertEquals("id", annotation.restParameters()[0].name());
+        Assertions.assertEquals("The ID of the capture to start", annotation.restParameters()[0].description());
+        Assertions.assertTrue(annotation.restParameters()[0].isRequired());
 
-        Assert.assertTrue(annotation.responses().length == 2);
+        Assertions.assertTrue(annotation.responses().length == 2);
 
-        Assert.assertEquals(200, annotation.responses()[0].responseCode());
-        Assert.assertEquals("When the capture started correctly", annotation.responses()[0].description());
+        Assertions.assertEquals(200, annotation.responses()[0].responseCode());
+        Assertions.assertEquals("When the capture started correctly", annotation.responses()[0].description());
 
-        Assert.assertEquals(400, annotation.responses()[1].responseCode());
-        Assert.assertEquals("When there are no media devices", annotation.responses()[1].description());
+        Assertions.assertEquals(400, annotation.responses()[1].responseCode());
+        Assertions.assertEquals("When there are no media devices", annotation.responses()[1].description());
       }
     } catch (SecurityException e) {
-      Assert.fail();
+      Assertions.fail();
     } catch (NoSuchMethodException e) {
-      Assert.fail();
+      Assertions.fail();
     }
   }
 
