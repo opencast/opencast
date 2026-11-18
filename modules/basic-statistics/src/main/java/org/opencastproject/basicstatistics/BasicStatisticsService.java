@@ -113,6 +113,22 @@ public class BasicStatisticsService implements FileFetchListener {
 
   private final AtomicLong droppedFileFetches = new AtomicLong();
 
+  /**
+   * How long a run of fetches for the same (session, item, element) may go without a new, connecting byte range
+   * before it is persisted as-is. Chosen to match {@code ViewCorrelator}'s own fetch/play matching tolerance, so it
+   * is generous enough to bridge ordinary gaps between adaptive-streaming segment requests without inventing a
+   * second magic number.
+   */
+  private static final long FETCH_MERGE_IDLE_SECONDS = 30;
+
+  /**
+   * Combines fetches of the same file element, by the same session, into a single raw event as long as their byte
+   * ranges connect, instead of storing one event per HTTP (range) request. This is what keeps adaptive streaming
+   * (which fetches one file in many small byte-range requests, one per segment) from storing one row per segment.
+   * See {@link #flushMergedFetch} for how a merged run becomes a {@link RawEvent}.
+   */
+  private FetchRangeMerger fetchRangeMerger;
+
   /** Callback to set the basic statistics database */
   @Reference(name = "basicstatistics-persistence")
   public void setPersistence(BasicStatisticsDatabaseService persistence) {
@@ -150,6 +166,8 @@ public class BasicStatisticsService implements FileFetchListener {
             logger.warn("File fetch events are not processed fast enough, dropped {} so far", dropped);
           }
         });
+
+    fetchRangeMerger = new FetchRangeMerger(fileFetchExecutor, this::flushMergedFetch, FETCH_MERGE_IDLE_SECONDS);
   }
 
   @Modified
@@ -160,6 +178,9 @@ public class BasicStatisticsService implements FileFetchListener {
 
   @Deactivate
   void deactivate() {
+    // Flush whatever is still merged in memory before shutting down; stop() queues that onto fileFetchExecutor
+    // ahead of the shutdown() below, so it still runs during the graceful drain.
+    fetchRangeMerger.stop();
     fileFetchExecutor.shutdown();
     try {
       // Give the pending events a few seconds to be processed
@@ -313,13 +334,6 @@ public class BasicStatisticsService implements FileFetchListener {
     String mediaPackageId = parts[3];
     String elementId = parts[4];
 
-    RawEvent event = new RawEvent();
-    event.setTimestamp(timestamp);
-    event.setItemType(ItemType.VIDEO);
-    event.setItemId(mediaPackageId);
-    event.setEventType(EventType.FETCH_FILE);
-    event.setEventPayload(RawEvent.serializePayload(new EventPayload.FetchFile(elementId, from, to)));
-
     InetAddress ip;
     String ipString;
     if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {
@@ -341,17 +355,35 @@ public class BasicStatisticsService implements FileFetchListener {
     Organization organization = securityService.getOrganization();
     User user = securityService.getUser();
     fileFetchExecutor.execute(() -> SecurityUtil.runAs(securityService, organization, user,
-        () -> recordFileFetch(event, ip, userAgent)));
+        () -> recordFileFetch(mediaPackageId, elementId, timestamp, from, to, ip, userAgent, organization, user)));
   }
 
-  /** Runs in the background, see {@link #fileFetched} */
-  private void recordFileFetch(RawEvent event, InetAddress ip, String userAgent) {
+  /** Runs in the background, see {@link #fileFetched}. Hands the fetch to {@link #fetchRangeMerger}. */
+  private void recordFileFetch(String itemId, String elementId, Instant timestamp, long from, Long to,
+          InetAddress ip, String userAgent, Organization organization, User user) {
     try {
-      event.setSession(generateSessionHash(secretService.getCurrentSecret(), event.getItemId(), ip, userAgent));
-      create(List.of(event));
+      long session = generateSessionHash(secretService.getCurrentSecret(), itemId, ip, userAgent);
+      FetchRangeMerger.Key key = new FetchRangeMerger.Key(session, itemId, elementId);
+      fetchRangeMerger.record(key, timestamp, from, to, organization, user);
     } catch (BasicStatisticsSecretServiceException | RuntimeException | InternalError e) {
       logger.warn("Could not record file fetch event", e);
     }
+  }
+
+  /**
+   * Turns one merged run of fetches (see {@link #fetchRangeMerger}) into a {@link RawEvent} and persists it.
+   * Only ever called on {@link #fileFetchExecutor}.
+   */
+  private void flushMergedFetch(FetchRangeMerger.Key key, Instant timestamp, long from, Long to,
+          Organization organization, User user) {
+    RawEvent event = new RawEvent();
+    event.setTimestamp(timestamp);
+    event.setSession(key.session());
+    event.setItemType(ItemType.VIDEO);
+    event.setItemId(key.itemId());
+    event.setEventType(EventType.FETCH_FILE);
+    event.setEventPayload(RawEvent.serializePayload(new EventPayload.FetchFile(key.elementId(), from, to)));
+    SecurityUtil.runAs(securityService, organization, user, () -> create(List.of(event)));
   }
 
   /**

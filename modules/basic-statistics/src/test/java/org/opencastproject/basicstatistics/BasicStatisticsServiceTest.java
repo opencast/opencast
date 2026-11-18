@@ -57,6 +57,9 @@ public class BasicStatisticsServiceTest {
   /** Path of a file of the media package "mp" and element "element", as the file server sees it */
   private static final String PATH = "/mh_default_org/engage-player/mp/element/video.mp4";
 
+  /** Same media package, but a different element, so it cannot be merged with fetches of {@link #PATH}. */
+  private static final String PATH2 = "/mh_default_org/engage-player/mp/other-element/video.mp4";
+
   private BasicStatisticsService service;
   private InetAddress ip;
 
@@ -136,9 +139,10 @@ public class BasicStatisticsServiceTest {
     recording.activate(Map.of());
     Instant timestamp = Instant.parse("2026-10-20T10:00:00Z");
 
+    // Two different elements, so that merging connecting byte ranges (tested separately) does not collapse them.
     // these calls return although nothing could be processed yet
     recording.fileFetched(PATH, "video/mp4", timestamp, 0, null, request);
-    recording.fileFetched(PATH, "video/mp4", timestamp, 0, null, request);
+    recording.fileFetched(PATH2, "video/mp4", timestamp, 0, null, request);
     assertEquals(0, stored.size());
 
     release.countDown();
