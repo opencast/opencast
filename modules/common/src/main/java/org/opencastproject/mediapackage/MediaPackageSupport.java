@@ -220,12 +220,99 @@ public final class MediaPackageSupport {
   public static Optional<List<String>> sanityCheck(MediaPackage mp) {
     List<String> errors = java.util.stream.Stream.of(
             mp.getIdentifier() == null ? "no ID" : null,
-            (mp.getIdentifier() != null && isNotBlank(mp.getIdentifier().toString())) ? null : "blank ID"
+            (mp.getIdentifier() != null && isNotBlank(mp.getIdentifier().toString())) ? null : "blank ID",
+            (mp.getIdentifier() != null && containsPathTraversal(mp.getIdentifier().toString()))
+                    ? "ID must not be empty, must not be '.' or '..' and must not contain path separators"
+                    : null
         )
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
 
+    for (MediaPackageElement e : mp.getElements()) {
+      forEachElement(e, element -> {
+        if (element.getIdentifier() != null && containsPathTraversal(element.getIdentifier())) {
+          errors.add("Element ID '" + element.getIdentifier()
+                  + "' must not be empty, must not be '.' or '..' and must not contain path separators");
+        }
+      });
+    }
+
     return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
+  }
+
+  /**
+   * Determines whether the given identifier is unsafe when joined into a file system path.
+   * Identifiers are joined into paths by the working file repository, the asset store and the
+   * distribution services, so path separators are rejected outright, as are the current and
+   * parent directory references ({@code .} and {@code ..}) and the empty identifier: a
+   * component of {@code .} or {@code ..} collapses a path level, so the identifier would
+   * refer to a different (parent) directory than the one it names, and an empty component has
+   * the same effect. A {@code ..} sequence *inside* a component (e.g. {@code track..1}) is a
+   * harmless literal file system name and stays legal.
+   *
+   * @param id an identifier
+   * @return whether the identifier contains a path separator or is empty, {@code .} or
+   *         {@code ..}
+   */
+  public static boolean containsPathTraversal(String id) {
+    return id == null
+            ? false
+            : id.isEmpty() || id.indexOf('/') >= 0 || id.indexOf('\\') >= 0 || ".".equals(id) || "..".equals(id);
+  }
+
+  /**
+   * Validates that the media package identifier and the identifiers of all of its elements do
+   * not contain path separators and are not empty, the current directory reference {@code .}
+   * or the parent directory reference {@code ..}. These identifiers are joined into file
+   * system paths by the working file repository, the asset store and the distribution
+   * services, so such identifiers would allow writing, reading or deleting files outside the
+   * configured storage roots (or, in the case of {@code .} and the empty identifier, the
+   * entire parent directory instead of the named one).
+   *
+   * <p>
+   * Elements nested inside a publication are checked as well: they are bound directly by JAXB
+   * (bypassing the element-level setters) and, when a publication is distributed or
+   * retracted, they are promoted to top-level elements and joined into file system paths.
+   *
+   * @param mp the media package to validate
+   * @throws IllegalArgumentException if an identifier is unsafe
+   */
+  public static void checkPathSafety(MediaPackage mp) {
+    if (mp.getIdentifier() != null && containsPathTraversal(mp.getIdentifier().toString())) {
+      throw new IllegalArgumentException("Media package ID must not be empty, must not be '.' or '..' "
+              + "and must not contain path separators: " + mp.getIdentifier());
+    }
+    for (MediaPackageElement element : mp.getElements()) {
+      forEachElement(element, e -> {
+        if (containsPathTraversal(e.getIdentifier())) {
+          throw new IllegalArgumentException("Element ID must not be empty, must not be '.' or '..' "
+                  + "and must not contain path separators: " + e.getIdentifier());
+        }
+      });
+    }
+  }
+
+  /**
+   * Invokes the given consumer for the given element and, if the element is a publication,
+   * also for the tracks, attachments and catalogs nested inside it.
+   *
+   * @param element the element to start with
+   * @param consumer the consumer to invoke for the element and its nested elements
+   */
+  private static void forEachElement(MediaPackageElement element, Consumer<MediaPackageElement> consumer) {
+    consumer.accept(element);
+    if (element instanceof Publication) {
+      Publication publication = (Publication) element;
+      for (Track track : publication.getTracks()) {
+        forEachElement(track, consumer);
+      }
+      for (Attachment attachment : publication.getAttachments()) {
+        forEachElement(attachment, consumer);
+      }
+      for (Catalog catalog : publication.getCatalogs()) {
+        forEachElement(catalog, consumer);
+      }
+    }
   }
 
   /** To be used in unit tests. */

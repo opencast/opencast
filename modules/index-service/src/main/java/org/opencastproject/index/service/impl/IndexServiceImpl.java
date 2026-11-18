@@ -1629,6 +1629,13 @@ public class IndexServiceImpl implements IndexService {
         // so the number of deleted snapshots is what tells us whether the deletion actually happened.
         removedArchive = assetManager.deleteSnapshots(id) > 0;
         unauthorizedArchive = !removedArchive;
+      } else if (assetManager.snapshotExists(id, securityService.getOrganization().getId())) {
+        // The event has snapshots, but none of them could be loaded (e.g. because the stored
+        // media package can no longer be parsed). Deleting works by identifier and does not
+        // need to load them. Reporting such an event as not found would remove it from the
+        // index while leaving its snapshots and files in the archive.
+        removedArchive = assetManager.deleteSnapshots(id) > 0;
+        unauthorizedArchive = !removedArchive;
       } else {
         notFoundArchive = true;
       }

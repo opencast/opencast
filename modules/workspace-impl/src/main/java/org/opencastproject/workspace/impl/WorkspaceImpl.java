@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
+import org.opencastproject.assetmanager.util.AssetStoreDirectory;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
 import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.mediapackage.identifier.Id;
@@ -145,7 +146,7 @@ public final class WorkspaceImpl implements Workspace {
   private boolean waitForResourceFlag = false;
 
   /** the asset manager directory if locally available */
-  private List<String> assetManagerPaths = null;
+  private List<AssetStoreDirectory> assetManagerPaths = null;
 
   /** the download url and directory if locally available */
   private String downloadUrl = null;
@@ -803,6 +804,7 @@ public final class WorkspaceImpl implements Workspace {
     }
     String wsDirectoryPath = Paths.get(wsRoot, serverPath).toString();
     File wsDirectory = new File(wsDirectoryPath);
+    FileSupport.requireWithinRoot(wsDirectory, new File(wsRoot));
     wsDirectory.mkdirs();
 
     String safeFileName = toSafeName(FilenameUtils.getName(uriString));
@@ -812,9 +814,16 @@ public final class WorkspaceImpl implements Workspace {
     return new File(wsDirectory, safeFileName);
   }
 
-  /** Return a file object pointing into the workspace. */
+  /**
+   * Return a file object pointing into the workspace. The path components (media package and
+   * element identifiers) are checked to stay within the workspace root (see
+   * {@link FileSupport#requireWithinRoot(File, File)}).
+   *
+   * @throws IllegalStateException
+   *         if the file is outside the workspace root
+   */
   private File workspaceFile(String... path) {
-    return Paths.get(wsRoot, path).toFile();
+    return FileSupport.requireWithinRoot(Paths.get(wsRoot, path).toFile(), new File(wsRoot));
   }
 
   /**
@@ -827,9 +836,16 @@ public final class WorkspaceImpl implements Workspace {
         && StringUtils.isNotBlank(pathMappable.getUrlPrefix());
   }
 
-  /** Return a file object pointing into the working file repository. */
+  /**
+   * Return a file object pointing into the working file repository.
+   *
+   * @throws IllegalStateException
+   *         if the file is outside the working file repository root
+   */
   private File workingFileRepositoryFile(String... path) {
-    return Paths.get(pathMappable.getPathPrefix(), path).toFile();
+    return FileSupport.requireWithinRoot(
+            Paths.get(pathMappable.getPathPrefix(), path).toFile(),
+            new File(pathMappable.getPathPrefix()));
   }
 
   /**
