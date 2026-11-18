@@ -87,6 +87,7 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
@@ -504,6 +505,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Event event = createEvent("asdasd", "title", Source.SCHEDULE);
     Event event2 = createEvent("archivedid", "title 2", Source.ARCHIVE);
     Event event3 = createEvent("workflowid", "title 3", Source.WORKFLOW);
+    Event deletableEvent = createEvent("deletableid", "deletable", Source.ARCHIVE);
+    Event undeletableEvent = createEvent("undeletableid", "undeletable", Source.ARCHIVE);
 
     SearchResultItem[] list = new SearchResultItem[3];
     list[0] = new SearchResultItemImpl<>(1, event);
@@ -535,6 +538,16 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
     EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
     EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Optional.of(event3)).anyTimes();
+    // Deleting an event: the write-access check lives in the index service, so the endpoint is expected to simply
+    // pass an UnauthorizedException on to the caller as a 401.
+    EasyMock.expect(indexService.getEvent("deletableid", searchIndex)).andReturn(Optional.of(deletableEvent))
+            .anyTimes();
+    EasyMock.expect(indexService.removeEvent(EasyMock.eq(deletableEvent), EasyMock.anyString()))
+            .andReturn(IndexService.EventRemovalResult.SUCCESS).anyTimes();
+    EasyMock.expect(indexService.getEvent("undeletableid", searchIndex)).andReturn(Optional.of(undeletableEvent))
+            .anyTimes();
+    EasyMock.expect(indexService.removeEvent(EasyMock.eq(undeletableEvent), EasyMock.anyString()))
+            .andThrow(new UnauthorizedException("Not authorized to remove event")).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
     EasyMock.expect(indexService.getExtendedEventCatalogUIAdapters()).andReturn(Collections.emptyList()).anyTimes();
