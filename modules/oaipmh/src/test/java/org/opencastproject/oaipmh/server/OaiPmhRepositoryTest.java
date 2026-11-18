@@ -56,10 +56,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
@@ -276,7 +276,7 @@ public class OaiPmhRepositoryTest {
     logger.info("--- REQUEST ---");
     logger.info(xml);
     try {
-      final HttpResponse res = client.execute(post);
+      final ClassicHttpResponse res = client.execute(post);
       final String json = withResource(res.getEntity().getContent(), IoSupport.readToString);
       logger.info("--- RESPONSE ---");
       logger.info(json);

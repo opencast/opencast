@@ -48,9 +48,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -295,16 +295,16 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
       return;
     }
     HttpDelete delete = new HttpDelete(deleteUri);
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = client.execute(delete);
-      int statusCode = response.getStatusLine().getStatusCode();
+      int statusCode = response.getCode();
       if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
-        logger.info("Successfully deleted external URI {}", delete.getURI());
+        logger.info("Successfully deleted external URI {}", delete.getRequestUri());
       } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-        logger.info("External URI {} has already been deleted", delete.getURI());
+        logger.info("External URI {} has already been deleted", delete.getRequestUri());
       } else {
-        logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getURI(), statusCode);
+        logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getRequestUri(), statusCode);
       }
     } finally {
       try {

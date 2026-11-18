@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Test;
 
 import javax.ws.rs.core.Response;

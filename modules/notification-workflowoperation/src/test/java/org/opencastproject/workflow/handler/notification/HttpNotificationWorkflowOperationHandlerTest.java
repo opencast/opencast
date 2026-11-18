@@ -32,13 +32,11 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,9 +74,8 @@ public class HttpNotificationWorkflowOperationHandlerTest {
 
     // set up mock trusted http client
     client = EasyMock.createNiceMock(TrustedHttpClient.class);
-    HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-            HttpStatus.SC_ACCEPTED, ""));
-    EasyMock.expect(client.execute((HttpUriRequest) EasyMock.anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
+    ClassicHttpResponse response = new BasicClassicHttpResponse(HttpStatus.SC_ACCEPTED, "");
+    EasyMock.expect(client.execute((ClassicHttpRequest) EasyMock.anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
             .andReturn(response);
     EasyMock.replay(client);
 
@@ -89,8 +86,7 @@ public class HttpNotificationWorkflowOperationHandlerTest {
   @Test
   public void testNotificationFailedAfterOneTry() throws Exception {
     client = EasyMock.createNiceMock(TrustedHttpClient.class);
-    HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1),
-            HttpStatus.SC_NOT_FOUND, ""));
+    ClassicHttpResponse response = new BasicClassicHttpResponse(HttpStatus.SC_NOT_FOUND, "");
     EasyMock.expect(client.execute((HttpPut) EasyMock.anyObject(), EasyMock.anyInt(), EasyMock.anyInt())).andReturn(
             response);
     EasyMock.replay(client);

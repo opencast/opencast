@@ -601,7 +601,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return tagsAndFlavors;
   }
 
-  private ConfiguredTagsAndFlavors.TargetTags parseTargetTagsByType(List<String> tags) {
+  /**
+   * Classifies a list of target tags into override tags (no prefix) and tag changes (`+` prefix: add, `-` prefix:
+   * remove).
+   *
+   * @param tags
+   *          the configured target tags
+   * @return the tags classified by type
+   */
+  protected ConfiguredTagsAndFlavors.TargetTags parseTargetTagsByType(List<String> tags) {
     final String plus = "+";
     final String minus = "-";
     List<String> overrideTags = new ArrayList();

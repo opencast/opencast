@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
+import org.opencastproject.assetmanager.util.AssetStoreDirectory;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
 import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.mediapackage.identifier.Id;
@@ -54,9 +55,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -145,7 +146,7 @@ public final class WorkspaceImpl implements Workspace {
   private boolean waitForResourceFlag = false;
 
   /** the asset manager directory if locally available */
-  private List<String> assetManagerPaths = null;
+  private List<AssetStoreDirectory> assetManagerPaths = null;
 
   /** the download url and directory if locally available */
   private String downloadUrl = null;
@@ -443,10 +444,10 @@ public final class WorkspaceImpl implements Workspace {
    * @throws IOException
    *           in case of any IO related issues
    */
-  private Either<String, Optional<File>> handleDownloadResponse(HttpResponse response, URI src, File dst)
+  private Either<String, Optional<File>> handleDownloadResponse(ClassicHttpResponse response, URI src, File dst)
           throws IOException {
     final String url = src.toString();
-    final int status = response.getStatusLine().getStatusCode();
+    final int status = response.getCode();
     switch (status) {
       case HttpServletResponse.SC_NOT_FOUND:
         return right(Optional.empty());
@@ -495,7 +496,7 @@ public final class WorkspaceImpl implements Workspace {
     while (true) {
       // run the http request and handle its response
       try {
-        HttpResponse response = null;
+        ClassicHttpResponse response = null;
         final Either<String, Optional<File>> result;
         try {
           response = trustedHttpClient.execute(get);
@@ -544,7 +545,7 @@ public final class WorkspaceImpl implements Workspace {
    *
    * @return the destination file
    */
-  private static File downloadTo(final HttpResponse response, final File dst) throws IOException {
+  private static File downloadTo(final ClassicHttpResponse response, final File dst) throws IOException {
     // ignore return value
     dst.createNewFile();
     try (InputStream in = response.getEntity().getContent()) {
@@ -803,6 +804,7 @@ public final class WorkspaceImpl implements Workspace {
     }
     String wsDirectoryPath = Paths.get(wsRoot, serverPath).toString();
     File wsDirectory = new File(wsDirectoryPath);
+    FileSupport.requireWithinRoot(wsDirectory, new File(wsRoot));
     wsDirectory.mkdirs();
 
     String safeFileName = toSafeName(FilenameUtils.getName(uriString));
@@ -812,9 +814,16 @@ public final class WorkspaceImpl implements Workspace {
     return new File(wsDirectory, safeFileName);
   }
 
-  /** Return a file object pointing into the workspace. */
+  /**
+   * Return a file object pointing into the workspace. The path components (media package and
+   * element identifiers) are checked to stay within the workspace root (see
+   * {@link FileSupport#requireWithinRoot(File, File)}).
+   *
+   * @throws IllegalStateException
+   *         if the file is outside the workspace root
+   */
   private File workspaceFile(String... path) {
-    return Paths.get(wsRoot, path).toFile();
+    return FileSupport.requireWithinRoot(Paths.get(wsRoot, path).toFile(), new File(wsRoot));
   }
 
   /**
@@ -827,9 +836,16 @@ public final class WorkspaceImpl implements Workspace {
         && StringUtils.isNotBlank(pathMappable.getUrlPrefix());
   }
 
-  /** Return a file object pointing into the working file repository. */
+  /**
+   * Return a file object pointing into the working file repository.
+   *
+   * @throws IllegalStateException
+   *         if the file is outside the working file repository root
+   */
   private File workingFileRepositoryFile(String... path) {
-    return Paths.get(pathMappable.getPathPrefix(), path).toFile();
+    return FileSupport.requireWithinRoot(
+            Paths.get(pathMappable.getPathPrefix(), path).toFile(),
+            new File(pathMappable.getPathPrefix()));
   }
 
   /**

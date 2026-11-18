@@ -22,12 +22,12 @@ package org.opencastproject.transcription.googlespeech;
 
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -36,7 +36,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 
 public class GoogleSpeechTranscriptionServiceStorageTest {
 
@@ -67,38 +66,36 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
   }
 
   @Test
-  public void startUploadTest() throws IOException {
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
-    EasyMock.replay(response, status);
+  public void startUploadTest() throws Exception {
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     // Check if correct url was invoked
     service.startUpload(httpClient, bucket, mpId, fileExtension, file, size, contentType, token);
     Assert.assertEquals("https://www.googleapis.com/upload/storage/v1/b/bucket/o?uploadType=resumable&name=mpId.flac",
-            capturedPost.getValue().getURI().toString());
+            capturedPost.getValue().getUri().toString());
   }
 
   @Test
-  public void deleteGoogleStorageFileTest() throws IOException {
-    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
-    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
-    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_NO_CONTENT).anyTimes();
-    EasyMock.replay(response, status);
+  public void deleteGoogleStorageFileTest() throws Exception {
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_NO_CONTENT).anyTimes();
+    EasyMock.replay(response);
 
     Capture<HttpDelete> capturedDel = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedDel))).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedDel)))
+        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.deleteGoogleStorageFile(httpClient, bucket, fileName, token);
     Assert.assertEquals("https://www.googleapis.com/storage/v1/b/bucket/o/myFile",
-            capturedDel.getValue().getURI().toString());
+            capturedDel.getValue().getUri().toString());
   }
 
 }

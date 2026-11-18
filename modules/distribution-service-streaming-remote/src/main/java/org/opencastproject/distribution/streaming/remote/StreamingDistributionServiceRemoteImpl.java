@@ -40,9 +40,9 @@ import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -110,7 +110,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   @Override
   public boolean publishToStreaming() {
     HttpGet get = new HttpGet("/publishToStreaming");
-    HttpResponse response = getResponse(get);
+    ClassicHttpResponse response = getResponse(get);
 
     if (response != null) {
       String content = null;

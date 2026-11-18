@@ -39,6 +39,7 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.doc.DocUtil;
+import org.opencastproject.util.doc.OrganizationTemplateData;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
@@ -94,8 +95,6 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   protected static final String SERIES_ID_TEMPLATE_KEY = "series_id";
   /** The configuration property value for the player location. */
   protected static final String PLAYER_PROPERTY = "player";
-  /** The template key name prefix for organization keys */
-  protected static final String ORG_TEMPLATE_KEY_PREFIX = "org_";
 
   // service references
   private DownloadDistributionService downloadDistributionService;
@@ -158,11 +157,18 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return streamingDistributionService;
   }
 
+  @Override
+  public Set<String> getTemplatedConfigurationKeys() {
+    return Set.of(URL_PATTERN);
+  }
+
   /**
    * Replace possible variables in the url-pattern configuration for this workflow operation handler.
    *
    * @param urlPattern
    *          The operation's template for replacing the variables.
+   * @param workflowInstance
+   *          The workflow instance; its properties are available as template data.
    * @param mp
    *          The {@link MediaPackage} used to get the event / mediapackage id.
    * @param pubUUID
@@ -171,23 +177,25 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
    * @throws WorkflowOperationException
    *           Thrown if the URI is malformed after replacing the variables.
    */
-  public URI populateUrlWithVariables(String urlPattern, MediaPackage mp, String pubUUID)
-          throws WorkflowOperationException {
+  public URI populateUrlWithVariables(String urlPattern, WorkflowInstance workflowInstance, MediaPackage mp,
+          String pubUUID) throws WorkflowOperationException {
     Map<String, Object> values = new HashMap<>();
-    values.put(EVENT_ID_TEMPLATE_KEY, mp.getIdentifier().toString());
-    values.put(PUBLICATION_ID_TEMPLATE_KEY, pubUUID);
-    String playerPath = securityService.getOrganization().getProperties().get(PLAYER_PROPERTY);
-    values.put(PLAYER_PATH_TEMPLATE_KEY, playerPath);
-    values.put(SERIES_ID_TEMPLATE_KEY, StringUtils.trimToEmpty(mp.getSeries()));
-    Map<String, String> orgProperties = securityService.getOrganization().getProperties();
+    // Organization properties first, so that the workflow properties and the canonical values below take
+    // precedence over an organization property with the same name, matching the workflow service's
+    // variable resolution
+    // Work on a copy: getProperties() can return the organization's own map, and the synthetic keys below must
+    // not be added to it
+    Map<String, String> orgProperties = new HashMap<>(securityService.getOrganization().getProperties());
     orgProperties.put("id", securityService.getOrganization().getId());
     orgProperties.put("name", securityService.getOrganization().getName());
     orgProperties.put("admin_role", securityService.getOrganization().getAdminRole());
     orgProperties.put("anonymous_role", securityService.getOrganization().getAnonymousRole());
-    for (Map.Entry<String, String> orgProperty : orgProperties.entrySet()) {
-      values.put(ORG_TEMPLATE_KEY_PREFIX + orgProperty.getKey().replace('.', '_').toLowerCase(),
-              orgProperty.getValue());
-    }
+    OrganizationTemplateData.addOrganizationProperties(values, orgProperties);
+    workflowInstance.getConfigurations().forEach(values::put);
+    values.put(EVENT_ID_TEMPLATE_KEY, mp.getIdentifier().toString());
+    values.put(PUBLICATION_ID_TEMPLATE_KEY, pubUUID);
+    values.put(PLAYER_PATH_TEMPLATE_KEY, orgProperties.get(PLAYER_PROPERTY));
+    values.put(SERIES_ID_TEMPLATE_KEY, StringUtils.trimToEmpty(mp.getSeries()));
     String uriWithVariables = DocUtil.processTextTemplate("Replacing Variables in Publish URL", urlPattern, values);
     URI publicationURI;
     try {
@@ -313,7 +321,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     }
 
     if (!"".equals(urlPattern)) {
-      publication.setURI(populateUrlWithVariables(urlPattern, mp, publicationUUID));
+      publication.setURI(populateUrlWithVariables(urlPattern, workflowInstance, mp, publicationUUID));
     }
     if (mimetype != null) {
       publication.setMimeType(mimetype);

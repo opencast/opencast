@@ -21,9 +21,9 @@
 
 package org.opencastproject.workflow.remote;
 
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.hc.core5.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,10 +31,9 @@ import static org.junit.Assert.fail;
 
 import org.opencastproject.security.api.UnauthorizedException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -52,14 +51,14 @@ public class WorkflowServiceRemoteImplTest {
     private int responseStatus = SC_NO_CONTENT;
 
     @Override
-    protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
-      requestUri = httpRequest.getURI().toString();
+    protected ClassicHttpResponse getResponse(ClassicHttpRequest httpRequest, Integer... expectedHttpStatus) {
+      requestUri = httpRequest.getRequestUri();
       expectedStatuses = Arrays.asList(expectedHttpStatus);
-      return new BasicHttpResponse(HttpVersion.HTTP_1_1, responseStatus, "");
+      return new BasicClassicHttpResponse(responseStatus);
     }
 
     @Override
-    protected void closeConnection(HttpResponse response) {
+    protected void closeConnection(ClassicHttpResponse response) {
     }
   }
 

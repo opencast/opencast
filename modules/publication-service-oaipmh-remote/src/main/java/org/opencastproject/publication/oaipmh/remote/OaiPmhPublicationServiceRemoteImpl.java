@@ -40,10 +40,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -89,8 +89,8 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
     params.add(new BasicNameValuePair("downloadElementIds", StringUtils.join(downloadIds, SEPARATOR)));
     params.add(new BasicNameValuePair("streamingElementIds", StringUtils.join(streamingIds, SEPARATOR)));
     params.add(new BasicNameValuePair("checkAvailability", Boolean.toString(checkAvailability)));
-    final HttpPost post = new HttpPost();
-    HttpResponse response = null;
+    final HttpPost post = new HttpPost("");
+    ClassicHttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
       response = getResponse(post);
@@ -125,7 +125,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
       Set<? extends Publication> publications,
       boolean checkAvailability
   ) throws PublicationException {
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       final String mediapackageXml = MediaPackageParser.getAsXml(mediaPackage);
       final String downloadElementsXml = MediaPackageElementParser.getArrayAsXml(downloadElements);
@@ -172,7 +172,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
       Set<? extends Publication> publications,
       boolean checkAvailability
   ) throws PublicationException {
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       final String mediapackageXml = MediaPackageParser.getAsXml(mediaPackage);
       final String downloadElementsXml = MediaPackageElementParser.getArrayAsXml(downloadElements);
@@ -216,7 +216,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
     params.add(new BasicNameValuePair("mediapackage", mediapackageXml));
     params.add(new BasicNameValuePair("channel", repository));
     HttpPost post = new HttpPost("/retract");
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
     try {
       response = getResponse(post);
@@ -257,7 +257,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
     params.add(new BasicNameValuePair("tags", StringUtils.join(tags, SEPARATOR)));
     params.add(new BasicNameValuePair("checkAvailability", Boolean.toString(checkAvailability)));
     final HttpPost post = new HttpPost("/updateMetadata");
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
       response = getResponse(post);

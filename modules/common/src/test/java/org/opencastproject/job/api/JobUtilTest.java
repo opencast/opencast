@@ -47,11 +47,9 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -178,8 +176,7 @@ public class JobUtilTest {
 
   @Test
   public void testJobFromHttpResponse() throws Exception {
-    BasicHttpResponse response = new BasicHttpResponse(
-            new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
+    BasicClassicHttpResponse response = new BasicClassicHttpResponse(HttpStatus.SC_NO_CONTENT, "No message");
     Optional<Job> job = JobUtil.jobFromHttpResponse(response);
     assertFalse(job.isPresent());
 

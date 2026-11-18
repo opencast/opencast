@@ -28,10 +28,9 @@ import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.joda.time.DateTimeConstants;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -43,6 +42,7 @@ import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -105,8 +105,9 @@ public class RemoteBase {
     this.remoteServiceManager = remoteServiceManager;
   }
 
-  protected <A> Optional<A> runRequest(HttpRequestBase req, java.util.function.Function<HttpResponse, Optional<A>> f) {
-    HttpResponse res = null;
+  protected <A> Optional<A> runRequest(ClassicHttpRequest req,
+          java.util.function.Function<ClassicHttpResponse, Optional<A>> f) {
+    ClassicHttpResponse res = null;
     try {
       res = getResponse(req);
       return res != null ? f.apply(res) : Optional.empty();
@@ -115,7 +116,7 @@ public class RemoteBase {
     }
   }
 
-  public static Optional<List<MediaPackageElement>> elementsFromHttpResponse(HttpResponse response) {
+  public static Optional<List<MediaPackageElement>> elementsFromHttpResponse(ClassicHttpResponse response) {
     try {
       String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
       List<MediaPackageElement> result = new ArrayList<>(MediaPackageElementParser.getArrayFromXml(xml));
@@ -136,7 +137,7 @@ public class RemoteBase {
    *          "/extra/path/info.xml".
    * @return the response object, or null if we can not connect to any services
    */
-  protected HttpResponse getResponse(HttpRequestBase httpRequest) {
+  protected ClassicHttpResponse getResponse(ClassicHttpRequest httpRequest) {
     return getResponse(httpRequest, HttpStatus.SC_OK);
   }
 
@@ -152,7 +153,7 @@ public class RemoteBase {
    *          any expected status codes to include in the return.
    * @return the response object, or null if we can not connect to any services
    */
-  protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
+  protected ClassicHttpResponse getResponse(ClassicHttpRequest httpRequest, Integer... expectedHttpStatus) {
 
     final long maxWaitTimeMillis = System.currentTimeMillis() + DateTimeConstants.MILLIS_PER_DAY;
     boolean warnedUnavailability = false;
@@ -188,16 +189,29 @@ public class RemoteBase {
         }
       }
 
-      URI originalUri = httpRequest.getURI();
+      final URI originalUri;
+      try {
+        originalUri = httpRequest.getUri();
+      } catch (URISyntaxException e) {
+        logger.error("Invalid request URI for remote service of type '{}'", serviceType, e);
+        return null;
+      }
       String uriSuffix = null;
-      if (originalUri != null && StringUtils.isNotBlank(originalUri.toString())) {
+      if (httpRequest.getAuthority() == null) {
+        // Relative request: only the path (and query) beyond the service endpoint is given.
+        // A request created without a URI is normalized to "/" which means "no suffix".
+        final String path = httpRequest.getRequestUri();
+        if (StringUtils.isNotBlank(path) && !"/".equals(path)) {
+          uriSuffix = path;
+        }
+      } else if (StringUtils.isNotBlank(originalUri.toString())) {
         uriSuffix = originalUri.toString();
       }
 
       // Try each available service
       String fullUrl = null;
       for (ServiceRegistration remoteService : remoteServices) {
-        HttpResponse response = null;
+        ClassicHttpResponse response = null;
         try {
           if (uriSuffix == null) {
             fullUrl = UrlSupport.concat(remoteService.getHost(), remoteService.getPath());
@@ -208,22 +222,21 @@ public class RemoteBase {
           logger.debug("Connecting to remote service of type '{}' at {}", serviceType, fullUrl);
 
           URI uri = new URI(fullUrl);
-          httpRequest.setURI(uri);
+          httpRequest.setUri(uri);
           response = client.execute(httpRequest);
-          StatusLine status = response.getStatusLine();
-          if (Arrays.asList(expectedHttpStatus).contains(status.getStatusCode())) {
+          final int status = response.getCode();
+          if (Arrays.asList(expectedHttpStatus).contains(status)) {
             if (servicesInWarningState.contains(fullUrl) || servicesInKnownState.contains(fullUrl)) {
-              logger.warn("Service at {} is back to normal with expected status code {}", fullUrl,
-                      status.getStatusCode());
+              logger.warn("Service at {} is back to normal with expected status code {}", fullUrl, status);
             }
             return response;
           } else {
-            if (!knownHttpStatuses.contains(status.getStatusCode()) && !servicesInWarningState.contains(fullUrl)) {
-              logger.warn("Service at {} returned unexpected response code {}", fullUrl, status.getStatusCode());
+            if (!knownHttpStatuses.contains(status) && !servicesInWarningState.contains(fullUrl)) {
+              logger.warn("Service at {} returned unexpected response code {}", fullUrl, status);
               servicesInWarningState.add(fullUrl);
               servicesInKnownState.remove(fullUrl);
-            } else if (knownHttpStatuses.contains(status.getStatusCode()) && !servicesInKnownState.contains(fullUrl)) {
-              logger.info("Service at {} returned known response code {}", fullUrl, status.getStatusCode());
+            } else if (knownHttpStatuses.contains(status) && !servicesInKnownState.contains(fullUrl)) {
+              logger.info("Service at {} returned known response code {}", fullUrl, status);
               servicesInKnownState.add(fullUrl);
               servicesInWarningState.remove(fullUrl);
             }
@@ -247,7 +260,7 @@ public class RemoteBase {
       }
 
       // Reset Original URI
-      httpRequest.setURI(originalUri);
+      httpRequest.setUri(originalUri);
 
       // If none of them accepted the request, let's wait and retry
       if (!warnedUnavailability) {
@@ -276,7 +289,7 @@ public class RemoteBase {
   /**
    * Closes any http connections kept open by this http response.
    */
-  protected void closeConnection(HttpResponse response) {
+  protected void closeConnection(ClassicHttpResponse response) {
     if (response != null) {
       try {
         client.close(response);
@@ -296,7 +309,7 @@ public class RemoteBase {
     protected InputStream delegateStream = null;
 
     /** The http response to close when the stream is closed */
-    protected HttpResponse httpResponse = null;
+    protected ClassicHttpResponse httpResponse = null;
 
     /**
      * Constructs an HttpClientClosingInputStream from a source stream and an http response.
@@ -304,7 +317,7 @@ public class RemoteBase {
      * @throws IOException
      * @throws IllegalStateException
      */
-    public HttpClientClosingInputStream(HttpResponse resp) throws IllegalStateException, IOException {
+    public HttpClientClosingInputStream(ClassicHttpResponse resp) throws IllegalStateException, IOException {
       this.delegateStream = resp.getEntity().getContent();
       this.httpResponse = resp;
     }

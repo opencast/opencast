@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.api;
 
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
 
@@ -127,10 +128,16 @@ public final class XmlWorkflowParser {
   public static WorkflowInstance parseWorkflowInstance(InputStream in) throws WorkflowParsingException {
     try {
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller
+      WorkflowInstance instance = unmarshaller
           .unmarshal(XmlSafeParser.parse(in), JaxbWorkflowInstance.class)
           .getValue()
           .toWorkflowInstance();
+      // The (nested) media package is unmarshalled directly by JAXB, bypassing the
+      // MediaPackageImpl.valueOf validation, so the path-safety check is repeated here.
+      if (instance.getMediaPackage() != null) {
+        MediaPackageSupport.checkPathSafety(instance.getMediaPackage());
+      }
+      return instance;
     } catch (Exception e) {
       throw new WorkflowParsingException(e);
     } finally {

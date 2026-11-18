@@ -166,6 +166,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
     if (elementType == null) {
       throw new IllegalArgumentException("Argument 'elementType' is null");
     }
+    checkPathSafe(id);
     this.id = id;
     this.elementType = elementType;
     this.flavor = flavor;
@@ -181,7 +182,22 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    */
   @Override
   public void setIdentifier(String id) {
+    checkPathSafe(id);
     this.id = id;
+  }
+
+  /**
+   * Element identifiers are joined into file system paths by the working file repository,
+   * the asset store and the distribution services. Rejects identifiers that are unsafe in
+   * such paths (see {@link MediaPackageSupport#containsPathTraversal(String)}).
+   */
+  protected static void checkPathSafe(String id) {
+    if (id == null) {
+      return;
+    }
+    if (MediaPackageSupport.containsPathTraversal(id)) {
+      throw new IllegalArgumentException("Invalid element identifier: " + id);
+    }
   }
 
   @Override

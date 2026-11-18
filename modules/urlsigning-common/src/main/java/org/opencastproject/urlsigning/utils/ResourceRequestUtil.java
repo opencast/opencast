@@ -26,9 +26,9 @@ import org.opencastproject.urlsigning.common.ResourceRequest.Status;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -66,7 +66,7 @@ public final class ResourceRequestUtil {
     if (StringUtils.isBlank(queryString)) {
       return new ArrayList<NameValuePair>();
     }
-    return URLEncodedUtils.parse(queryString.replaceFirst("\\?", ""), StandardCharsets.UTF_8);
+    return WWWFormCodec.parse(queryString.replaceFirst("\\?", ""), StandardCharsets.UTF_8);
   }
 
   /**
@@ -195,7 +195,7 @@ public final class ResourceRequestUtil {
     queryStringParameters.add(new BasicNameValuePair(ResourceRequest.ENCRYPTION_ID_KEY, resourceRequest
             .getEncryptionKeyId()));
     queryStringParameters.add(new BasicNameValuePair(ResourceRequest.SIGNATURE_KEY, resourceRequest.getSignature()));
-    return URLEncodedUtils.format(queryStringParameters, StandardCharsets.UTF_8);
+    return WWWFormCodec.format(queryStringParameters, StandardCharsets.UTF_8);
   }
 
   /**
@@ -339,7 +339,7 @@ public final class ResourceRequestUtil {
    * @return True if signed, false if not.
    */
   public static boolean isSigned(URI uri) {
-    List<NameValuePair> queryStringParameters = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8);
+    List<NameValuePair> queryStringParameters = parseQueryString(uri.getRawQuery());
     boolean hasKeyId = false;
     boolean hasPolicy = false;
     boolean hasSignature = false;

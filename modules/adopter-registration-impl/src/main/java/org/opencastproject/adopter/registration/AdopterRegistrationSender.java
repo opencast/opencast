@@ -21,12 +21,12 @@
 
 package org.opencastproject.adopter.registration;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,9 +147,9 @@ public class AdopterRegistrationSender {
       } catch (IllegalArgumentException e) {
         throw new MalformedURLException(baseUrl + urlSuffix + " is not a valid URL");
       }
-      HttpEntityEnclosingRequestBase request = null;
+      HttpUriRequestBase request;
       if ("DELETE".equals(method)) {
-        request = new HttpDeleteWithEntity(url);
+        request = new HttpDelete(url);
       } else {
         request = new HttpPost(url);
       }
@@ -157,38 +157,24 @@ public class AdopterRegistrationSender {
       request.addHeader("Accept", "application/json");
       request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
 
-      HttpResponse resp = client.execute(request);
-      int httpStatus = resp.getStatusLine().getStatusCode();
-      boolean errorOccurred = httpStatus < 200 || httpStatus > 299;
-      InputStream responseStream = resp.getEntity().getContent();
+      client.execute(request, resp -> {
+        int httpStatus = resp.getCode();
+        boolean errorOccurred = httpStatus < 200 || httpStatus > 299;
+        InputStream responseStream = resp.getEntity().getContent();
 
-      try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
-        StringBuilder response = new StringBuilder();
-        String responseLine;
-        while ((responseLine = br.readLine()) != null) {
-          response.append(responseLine.trim());
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
+          StringBuilder response = new StringBuilder();
+          String responseLine;
+          while ((responseLine = br.readLine()) != null) {
+            response.append(responseLine.trim());
+          }
+          if (errorOccurred) {
+            String errorMessage = String.format("HttpStatus: %s, HttpResponse: %s", httpStatus, response);
+            throw new RuntimeException(errorMessage);
+          }
         }
-        if (errorOccurred) {
-          String errorMessage = String.format("HttpStatus: %s, HttpResponse: %s", httpStatus, response);
-          throw new RuntimeException(errorMessage);
-        }
-      }
-    }
-  }
-
-  //This custom class is here because HttpDelete doesn't accept entities, which is needed by the server
-  static class HttpDeleteWithEntity extends HttpEntityEnclosingRequestBase {
-
-    public static final String METHOD_NAME = "DELETE";
-
-    HttpDeleteWithEntity(final String uri) {
-      super();
-      setURI(URI.create(uri));
-    }
-
-    @Override
-    public String getMethod() {
-      return METHOD_NAME;
+        return null;
+      });
     }
   }
 

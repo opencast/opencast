@@ -1,0 +1,34 @@
+Some workflow operations now render their configuration values as FreeMarker templates using the
+workflow properties as template data, instead of the workflow service substituting the properties
+into the values before the operation runs. The affected operations and configuration keys are:
+
+- `publish-configure`: the `url-pattern` key
+- `send-email`: the `to`, `cc`, `bcc`, `subject`, `body` and `body-html` keys
+- `azure-attach-transcription`: the `target-flavor`, `target-tags` and `target-tag` keys
+
+In these values, workflow properties are available under their property name (e.g. `${series_id}`)
+and organization properties with the `org_` prefix, both in the dotted form documented in the
+workflow configuration guide (e.g. `${org_org.opencastproject.admin.ui.url}`) and in a flattened
+form with underscores instead of dots (e.g. `${org_org_opencastproject_admin_ui_url}`). If one
+property name is a dot prefix of another property's name (e.g. `player` and `player.mobile`, or
+`a.b` and `a.b.c`), only one of the two has a dotted form; use the flattened form for both, which
+always works. A workflow
+property takes precedence over an organization property with the same name, and template keys that
+have a fixed meaning (e.g. `event_id` or `publication_id` in `url-pattern`) take precedence over
+workflow properties with the same name. In `azure-attach-transcription`, the values are rendered
+before they are parsed as a flavor and as a tag list, so a property can hold a complete flavor or
+a complete tag list.
+
+Differences to the previous behavior:
+
+- The values are now FreeMarker templates, so variables must use FreeMarker name syntax (letters,
+  digits and underscores). The `${name:default}` form of the previous substitution is not
+  recognized anymore; use `${name}` or `${name!'default'}` instead. Organization properties whose
+  key contains other special characters (e.g. the `org.opencastproject.host.*` server mappings) can
+  no longer be referenced in these values.
+- A property value that itself contains template syntax (e.g. `${...}`) is no longer evaluated as
+  template code.
+- When a variable in one of these values is missing or the rendering fails, the workflow operation
+  now fails; the failure is logged with details to `data/log/opencast.log`.
+
+There are no database schema or search index changes.

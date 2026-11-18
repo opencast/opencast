@@ -61,7 +61,6 @@ import org.opencastproject.util.UrlSupport;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.client.utils.URIUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -846,9 +845,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   protected Publication createPublicationElement(String mpId, String repository) throws PublicationException {
     Optional<String> hostUrl = OaiPmhServerInfoUtil.oaiPmhServerUrlOfCurrentOrganization(securityService);
     if (hostUrl.isPresent()) {
-      final URI engageUri = URIUtils.resolve(
-          URI.create(UrlSupport.concat(hostUrl.get(), oaiPmhServerInfo.getMountPoint(), repository)),
-          "?verb=ListMetadataFormats&identifier=" + mpId);
+      final URI engageUri = URI.create(UrlSupport.concat(hostUrl.get(), oaiPmhServerInfo.getMountPoint(), repository)
+          + "?verb=ListMetadataFormats&identifier=" + mpId);
       return PublicationImpl.publication(UUID.randomUUID().toString(), getPublicationChannelName(repository), engageUri,
               MimeTypes.parseMimeType(MimeTypes.XML.toString()));
     }

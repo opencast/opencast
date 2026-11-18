@@ -33,6 +33,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -48,10 +49,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;
@@ -61,6 +62,7 @@ import org.osgi.service.component.ComponentException;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -136,16 +138,12 @@ public class WowzaStreamingDistributionServiceTest {
     orgDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     streamingService.setOrganizationDirectoryService(orgDirectoryService);
 
-    StatusLine statusLine = EasyMock.createNiceMock(StatusLine.class);
-    EasyMock.expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
-    EasyMock.replay(statusLine);
-
-    HttpResponse response = EasyMock.createNiceMock(HttpResponse.class);
-    EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
+    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+    EasyMock.expect(response.getCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
     EasyMock.replay(response);
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(httpClient.execute((ClassicHttpRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
     streamingService.setTrustedHttpClient(httpClient);
 
@@ -346,5 +344,186 @@ public class WowzaStreamingDistributionServiceTest {
     Job job = streamingService.distribute("channel", mp, "blah");
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job);
     jobBarrier.waitForJobs();
+  }
+
+  /**
+   * A streaming element's URI is below the streaming URL, so its retraction target used to be
+   * derived from the URI. The target must be the SMIL file the service derives from the
+   * channel, the media package and the flavor instead, so that a crafted URI cannot steer the
+   * deletion to another file.
+   */
+  @Test
+  public void testRetractStreamingElementTargetsSmilFile() throws Exception {
+    File distRoot = new File("target/wowza-retract-test/streams");
+    FileUtils.deleteQuietly(distRoot.getParentFile());
+    activateStreamingService(distRoot);
+
+    // A streaming element whose URI references a SMIL name that does not belong to this
+    // channel and media package
+    MediaPackage mp = MediaPackageParser.getFromXml(
+            "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" id=\"mp-1\">"
+                    + "<media><track id=\"track-1\" type=\"presenter/source\">"
+                    + "<url>http://wowza.example/live/smil:other.smil/playlist.m3u8</url>"
+                    + "</track></media></mediapackage>");
+
+    File orgDir = new File(distRoot, tenant1);
+    File smilFile = new File(orgDir, "channel1_mp-1_presenter.smil");
+    File referencedFile = new File(orgDir, "channel1/mp-1/track-1/file.mp4");
+    File foreignSmil = new File(orgDir, "other.smil");
+    FileUtils.forceMkdir(referencedFile.getParentFile());
+    Files.writeString(referencedFile.toPath(), "video");
+    Files.writeString(smilFile.toPath(), smilXml("channel1/mp-1/track-1/file.mp4"));
+    Files.writeString(foreignSmil.toPath(), "must not be deleted");
+
+    streamingService.retractSync("channel1", mp, "track-1");
+
+    assertTrue("The SMIL file must be deleted", !smilFile.exists());
+    assertTrue("The file referenced by the SMIL file must be deleted", !referencedFile.exists());
+    assertTrue("A SMIL file named by the element URI must not be deleted", foreignSmil.exists());
+  }
+
+  /**
+   * Even when the element URI is below the streaming URL, percent-encoded traversal segments
+   * must not be resolved into a path outside the distribution directory.
+   */
+  @Test
+  public void testRetractStreamingElementWithTraversalUriStaysContained() throws Exception {
+    File distRoot = new File("target/wowza-traversal-test/streams");
+    FileUtils.deleteQuietly(distRoot.getParentFile());
+    activateStreamingService(distRoot);
+
+    MediaPackage mp = MediaPackageParser.getFromXml(
+            "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" id=\"mp-1\">"
+                    + "<media><track id=\"track-1\" type=\"presenter/source\">"
+                    + "<url>http://wowza.example/live/x/%2e%2e/%2e%2e/%2e%2e/evil.smil/playlist</url>"
+                    + "</track></media></mediapackage>");
+
+    File orgDir = new File(distRoot, tenant1);
+    File smilFile = new File(orgDir, "channel1_mp-1_presenter.smil");
+    File referencedFile = new File(orgDir, "channel1/mp-1/track-1/file.mp4");
+    File escapee = new File(distRoot.getParentFile(), "evil.smil");
+    FileUtils.forceMkdir(referencedFile.getParentFile());
+    Files.writeString(referencedFile.toPath(), "video");
+    Files.writeString(smilFile.toPath(), smilXml("channel1/mp-1/track-1/file.mp4"));
+    Files.writeString(escapee.toPath(), "must not be deleted");
+
+    streamingService.retractSync("channel1", mp, "track-1");
+
+    assertTrue("The SMIL file must be deleted", !smilFile.exists());
+    assertTrue("A file outside the distribution directory must not be deleted", escapee.exists());
+  }
+
+  /**
+   * The media package identifier is joined into the distribution path. A programmatic media
+   * package carrying an unsafe identifier must fail with an IllegalStateException, not with a
+   * bare IllegalArgumentException.
+   */
+  @Test
+  public void testRetractWithUnsafeMediaPackageIdentifierThrowsIllegalStateException() throws Exception {
+    File distRoot = new File("target/wowza-unsafe-id-test/streams");
+    FileUtils.deleteQuietly(distRoot.getParentFile());
+    activateStreamingService(distRoot);
+
+    MediaPackage mp = MediaPackageParser.getFromXml(
+            "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" id=\"mp-1\">"
+                    + "<media><track id=\"track-1\" type=\"presenter/source\">"
+                    + "<url>http://wfr.example/mediapackage/mp-1/track-1.mp4</url>"
+                    + "</track></media></mediapackage>");
+    // '..' collapses the media package level out of the channel subtree, so the containment
+    // check must reject it
+    mp.setIdentifier(new IdImpl() {
+      {
+        this.id = "..";
+      }
+    });
+
+    try {
+      streamingService.retractSync("channel1", mp, "track-1");
+      fail("Expected an unsafe media package identifier to be rejected");
+    } catch (IllegalStateException e) {
+      // expected
+    }
+  }
+
+  /**
+   * The channel identifier is joined into the distribution path and determines the directory
+   * the containment check is anchored at, so a traversal channel identifier would move that
+   * directory along with the path. It must be rejected before any file is touched.
+   */
+  @Test
+  public void testRetractWithUnsafeChannelIdIsRejected() throws Exception {
+    File distRoot = new File("target/wowza-unsafe-channel-test/a/b/streams");
+    FileUtils.deleteQuietly(new File("target/wowza-unsafe-channel-test"));
+    activateStreamingService(distRoot);
+
+    MediaPackage mp = MediaPackageParser.getFromXml(
+            "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" id=\"mp-1\">"
+                    + "<media><track id=\"track-1\" type=\"presenter/source\">"
+                    + "<url>http://wfr.example/mediapackage/mp-1/track-1/file.mp4</url>"
+                    + "</track></media></mediapackage>");
+
+    // <distRoot>/<org>/../../../mp-1/track-1/file.mp4 is a file outside the distribution directory
+    File escapee = new File(distRoot.getParentFile().getParentFile(), "mp-1/track-1/file.mp4");
+    FileUtils.forceMkdir(escapee.getParentFile());
+    Files.writeString(escapee.toPath(), "must not be deleted");
+
+    for (String channelId : new String[] { "../../..", "..", ".", "", "a/b", "a\\b" }) {
+      try {
+        streamingService.retractSync(channelId, mp, "track-1");
+        fail("Expected the channel identifier '" + channelId + "' to be rejected");
+      } catch (IllegalStateException e) {
+        // expected
+      }
+    }
+    assertTrue("A file outside the distribution directory must not be deleted", escapee.exists());
+  }
+
+  /**
+   * An element whose URI is below the streaming URL is a streaming manifest. Its distribution
+   * file is the SMIL file, which must not be replaced with the content of the element when
+   * such an element is distributed.
+   */
+  @Test
+  public void testDistributeStreamingElementKeepsSmilFile() throws Exception {
+    File distRoot = new File("target/wowza-distribute-manifest-test/streams");
+    FileUtils.deleteQuietly(distRoot.getParentFile());
+    activateStreamingService(distRoot);
+
+    // The workspace mock resolves the last URI segment against the test resources
+    MediaPackage mp = MediaPackageParser.getFromXml(
+            "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" id=\"mp-1\">"
+                    + "<media><track id=\"track-1\" type=\"presenter/source\">"
+                    + "<mimetype>video/mp4</mimetype>"
+                    + "<url>http://wowza.example/live/smil:other.smil/mediapackage.xml</url>"
+                    + "</track></media></mediapackage>");
+
+    File smilFile = new File(new File(distRoot, tenant1), "channel1_mp-1_presenter.smil");
+    FileUtils.forceMkdir(smilFile.getParentFile());
+    String smil = smilXml("channel1/mp-1/track-1/file.mp4");
+    Files.writeString(smilFile.toPath(), smil);
+
+    assertTrue(streamingService.distributeSync("channel1", mp, "track-1").isEmpty());
+    assertEquals("The SMIL file must not be overwritten", smil, Files.readString(smilFile.toPath()));
+  }
+
+  private void activateStreamingService(File distRoot) throws Exception {
+    setUpMultiTenant();
+    expect(securityService.getOrganization()).andReturn(org1).anyTimes();
+    replay(securityService);
+
+    map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, distRoot.getAbsolutePath());
+    map.put(property1, "http://wowza.example/live/");
+    streamingService.activate(bundleContext, map);
+  }
+
+  private static String smilXml(String src) {
+    return "<smil>\n"
+            + "  <head/>\n"
+            + "  <body>\n"
+            + "    <switch>\n"
+            + "      <video src=\"" + src + "\" bitrate=\"1000\"/>\n"
+            + "    </switch>\n"
+            + "  </body>\n"
+            + "</smil>\n";
   }
 }

@@ -125,14 +125,14 @@ Overview of configuration files for services that are able to automatically sign
 |Video player content     | org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.cfg |
 |Admin UI links           | org.opencastproject.adminui.endpoint.OsgiEventEndpoint.cfg                |
 
-The URLs will be signed by the first signing provider that will accept the URL’s path based upon the signing provider’s
-configuration. This makes it flexible to support many different scenarios. For example, we could configure the signing
-provider to have one key for any URL that begins with one scheme, such as http, which would cover all of the URLs to be
-signed with a single key. Or it could be configured so that each different scheme and hostname pair would have a
-different keys protecting each host’s URLs separately etc. Having the timing configurations separate from the key
-configuration allows the different types of URLs to be signed differently depending on the needs of the users without
-needing to configure this timing for all of the different keys.
-<!-- _Very wordy.If this paragraph of examples is necessary, consider making it a list instead (and not full complete sentences) -->
+The URLs will be signed by the first signing provider that accepts the URL’s path, based on the signing provider’s
+configuration. This supports many different scenarios, for example:
+
+* One key for all URLs starting with a scheme such as `http`, so that a single key signs all URLs.
+* A separate key for each pair of scheme and host name, so that each host’s URLs are protected by their own key.
+
+Since the timing configuration is separate from the key configuration, different types of URLs can be signed with
+different timing without configuring it for every key.
 
 ### Signing for Opencast-internal access
 
@@ -331,9 +331,5 @@ Inspecting and modifying the policy is useful for advanced testing, such as:
 * URLs where the policy was modified and resigned with a different key
 
 ## Further information
-
-For an overview of Stream Security: <!-- _This info is already given at the very beginning of the page! -->
-
-* [Stream Security Overview](stream-security-overview.md)
 
 For further developer information, please have a look at the stream security section in the developer guide.

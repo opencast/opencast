@@ -19,16 +19,16 @@
  *
  */
 
+
 package org.opencastproject.kernel.security;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.job.api.Job;
@@ -44,21 +44,18 @@ import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.HostRegistrationInMemory;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
-import org.easymock.Capture;
-import org.easymock.CaptureType;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,24 +63,78 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class TrustedHttpClientImplTest {
 
+  private static final String DIGEST_CHALLENGE = "Digest realm=\"testrealm@host.com\","
+      + "qop=\"auth,auth-int\","
+      + "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\","
+      + "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
+
   private TrustedHttpClientImpl client;
   private ComponentContext componentContextMock;
   private BundleContext bundleContextMock;
-  private CloseableHttpResponse okResponse;
-  private CloseableHttpResponse digestResponse;
-  private CloseableHttpResponse nonceResponse;
   private ServiceRegistry serviceRegistry;
   private SecurityService securityService;
   private OrganizationDirectoryService organizationDirectoryService;
+
+  /**
+   * A trusted http client which does not send anything but answers with canned responses and records the requests it
+   * would have sent.
+   */
+  private static final class CannedResponseClient extends TrustedHttpClientImpl {
+    private final Deque<ClassicHttpResponse> responses = new ArrayDeque<>();
+    private final List<ClassicHttpRequest> requests = new ArrayList<>();
+
+    CannedResponseClient(ClassicHttpResponse... cannedResponses) {
+      super("u", "p");
+      responses.addAll(Arrays.asList(cannedResponses));
+    }
+
+    @Override
+    protected ClassicHttpResponse send(ClassicHttpRequest request, HttpClientContext context) {
+      requests.add(request);
+      if (responses.isEmpty()) {
+        throw new IllegalStateException("No more canned responses");
+      }
+      return responses.pop();
+    }
+
+    List<ClassicHttpRequest> getRequests() {
+      return requests;
+    }
+
+    int remainingResponses() {
+      return responses.size();
+    }
+  }
+
+  private static ClassicHttpResponse okResponse() {
+    return new BasicClassicHttpResponse(200, "Good to go");
+  }
+
+  private static ClassicHttpResponse digestResponse() {
+    final BasicClassicHttpResponse response = new BasicClassicHttpResponse(401, "Unauthorized");
+    response.addHeader(HttpHeaders.WWW_AUTHENTICATE, DIGEST_CHALLENGE);
+    return response;
+  }
+
+  private static ClassicHttpResponse staleNonceResponse() {
+    final BasicClassicHttpResponse response = new BasicClassicHttpResponse(401, "Unauthorized");
+    response.addHeader(HttpHeaders.WWW_AUTHENTICATE, DIGEST_CHALLENGE + ",stale=\"true\"");
+    return response;
+  }
 
   @Before
   public void setUp() throws Exception {
@@ -136,31 +187,30 @@ public class TrustedHttpClientImplTest {
     client.setSecurityService(securityService);
     client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
-    // Setup responses.
-    final String digestValue = "Digest realm=\"testrealm@host.com\","
-        + "qop=\"auth,auth-int\","
-        + "nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\","
-        + "opaque=\"5ccc069c403ebaf9f0171e9517f40e41\"";
-    okResponse = EasyMock.createMock(CloseableHttpResponse.class);
-    expect(okResponse.getStatusLine())
-        .andReturn(new BasicStatusLine(new ProtocolVersion("Http", 1, 1), 200, "Good to go"))
-        .anyTimes();
-    expect(okResponse.getHeaders("WWW-Authenticate")).andReturn(new Header[] {}).anyTimes();
-    BasicHttpResponse basicResponse = new BasicHttpResponse(new ProtocolVersion("Http", 1, 1), 401, "Unauthorized");
-    basicResponse.addHeader("WWW-Authenticate", digestValue);
-    digestResponse = EasyMock.createMock(CloseableHttpResponse.class);
-    expect(digestResponse.getStatusLine())
-        .andReturn(new BasicStatusLine(new ProtocolVersion("Http", 1, 1), 401, "Unauthorized"))
-        .anyTimes();
-    expect(digestResponse.getHeaders("WWW-Authenticate"))
-        .andReturn(basicResponse.getHeaders("WWW-Authenticate"))
-        .anyTimes();
-    nonceResponse = EasyMock.createMock(CloseableHttpResponse.class);
-    expect(nonceResponse.getStatusLine())
-        .andReturn(new BasicStatusLine(new ProtocolVersion("Http", 1, 1), 401, "Nonce has expired/timed out"))
-        .anyTimes();
-    expect(nonceResponse.getHeaders("WWW-Authenticate")).andReturn(new Header[] {}).anyTimes();
-    replay(okResponse, digestResponse, nonceResponse);
+  }
+
+  /** Wires the mocked services into a canned client and activates it with the given nonce retry configuration. */
+  private CannedResponseClient cannedClient(int nonceRetries, ClassicHttpResponse... responses) {
+    bundleContextMock = createNiceMock(BundleContext.class);
+    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
+    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
+    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_KEY))
+        .andReturn(Integer.toString(nonceRetries));
+    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_BASE_TIME_KEY)).andReturn("0");
+    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY))
+            .andReturn("0");
+    replay(bundleContextMock);
+
+    componentContextMock = createNiceMock(ComponentContext.class);
+    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
+    replay(componentContextMock);
+
+    final CannedResponseClient canned = new CannedResponseClient(responses);
+    canned.setServiceRegistry(serviceRegistry);
+    canned.setSecurityService(securityService);
+    canned.setOrganizationDirectoryService(organizationDirectoryService);
+    canned.activate(componentContextMock);
+    return canned;
   }
 
   @Test
@@ -173,7 +223,6 @@ public class TrustedHttpClientImplTest {
 
     }
   }
-
   @Test
   public void nonceTimeoutRetryPropertySetsOkay() {
     // Test Default value
@@ -338,249 +387,106 @@ public class TrustedHttpClientImplTest {
   }
 
   @Test
-  public void failsIfNonceReturnAndNoRetries() throws ClientProtocolException, IOException {
-    // Setup bundle context for TrustedHttpClientImpl
-    bundleContextMock = createNiceMock(BundleContext.class);
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_KEY)).andReturn("0");
-    replay(bundleContextMock);
+  public void failsIfStaleNonceAndNoRetries() throws Exception {
+    final CannedResponseClient canned = cannedClient(0, digestResponse(), staleNonceResponse());
 
-    componentContextMock = createNiceMock(ComponentContext.class);
-    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
-    replay(componentContextMock);
-
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-
-    client.setServiceRegistry(serviceRegistry);
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.activate(componentContextMock);
-
-    HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
-
-    HttpResponse response = client.execute(httpPost);
-    Assert.assertEquals(401, response.getStatusLine().getStatusCode());
-
-    verify(httpClient);
+    final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
+    Assert.assertEquals(401, response.getCode());
+    Assert.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
-  public void failsIfNonceReturnAndOneRetries() throws ClientProtocolException, IOException {
-    // Setup bundle context for TrustedHttpClientImpl
-    bundleContextMock = createNiceMock(BundleContext.class);
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_KEY)).andReturn("1");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_BASE_TIME_KEY)).andReturn("0");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY))
-            .andReturn("0");
-    replay(bundleContextMock);
+  public void failsIfStaleNonceAndOneRetry() throws Exception {
+    final CannedResponseClient canned = cannedClient(1,
+        digestResponse(), staleNonceResponse(), digestResponse(), staleNonceResponse());
 
-    componentContextMock = createNiceMock(ComponentContext.class);
-    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
-    replay(componentContextMock);
-
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    // First request
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    // Second Security Handshake
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // Retry request and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setServiceRegistry(serviceRegistry);
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.activate(componentContextMock);
-
-    HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
-
-    HttpResponse response = client.execute(httpPost);
-    Assert.assertEquals(401, response.getStatusLine().getStatusCode());
+    final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
+    Assert.assertEquals(401, response.getCode());
+    Assert.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
-  public void successIfNonceReturnOnceAndOneRetries() throws ClientProtocolException, IOException {
-    // Setup bundle context for TrustedHttpClientImpl
-    bundleContextMock = createNiceMock(BundleContext.class);
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_KEY)).andReturn("1");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_BASE_TIME_KEY)).andReturn("0");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY))
-            .andReturn("0");
-    replay(bundleContextMock);
+  public void successIfStaleNonceOnceAndOneRetry() throws Exception {
+    final CannedResponseClient canned = cannedClient(1,
+        digestResponse(), staleNonceResponse(), digestResponse(), okResponse());
 
-    componentContextMock = createNiceMock(ComponentContext.class);
-    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
-    replay(componentContextMock);
-
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // First request
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    // Nonce retry
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // Final request with success.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(okResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setServiceRegistry(serviceRegistry);
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.activate(componentContextMock);
-
-    HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
-
-    HttpResponse response = client.execute(httpPost);
-    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+    final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
+    Assert.assertEquals(200, response.getCode());
+    Assert.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
-  public void successIfNonceReturnOnceAndThreeRetries() throws ClientProtocolException, IOException {
-    // Setup bundle context for TrustedHttpClientImpl
-    bundleContextMock = createNiceMock(BundleContext.class);
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_KEY)).andReturn("3");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_BASE_TIME_KEY)).andReturn("0");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY))
-            .andReturn("0");
-    replay(bundleContextMock);
+  public void successIfStaleNonceThreeTimesAndThreeRetries() throws Exception {
+    final CannedResponseClient canned = cannedClient(3,
+        digestResponse(), staleNonceResponse(),
+        digestResponse(), staleNonceResponse(),
+        digestResponse(), staleNonceResponse(),
+        digestResponse(), okResponse());
 
-    componentContextMock = createNiceMock(ComponentContext.class);
-    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
-    replay(componentContextMock);
-
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    // First Digest handshake and close
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // First request and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    // Second Digest handshake and close
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // First request retry.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(okResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setServiceRegistry(serviceRegistry);
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.activate(componentContextMock);
-
-    HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
-    HttpResponse response = client.execute(httpPost);
-    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+    final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
+    Assert.assertEquals(200, response.getCode());
+    Assert.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
-  public void successIfNonceReturnThreeAndThreeRetries() throws ClientProtocolException, IOException {
-    // Setup bundle context for TrustedHttpClientImpl
-    bundleContextMock = createNiceMock(BundleContext.class);
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_KEY)).andReturn("3");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_BASE_TIME_KEY)).andReturn("0");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY))
-            .andReturn("0");
-    replay(bundleContextMock);
+  public void plainUnauthorizedIsNotRetried() throws Exception {
+    final CannedResponseClient canned = cannedClient(3, digestResponse(), digestResponse());
 
-    componentContextMock = createNiceMock(ComponentContext.class);
-    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
-    replay(componentContextMock);
-
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    // First Digest handshake and close
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // First request with a nonce timeout and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    // First retry getting nonce and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // First retry request and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    // Second retry getting nonce and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // Second retry request and close
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(nonceResponse);
-    // Third retry getting nonce and close.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(digestResponse);
-    // Third retry with successful request.
-    expect(httpClient.execute(isA(HttpUriRequest.class))).andReturn(okResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setServiceRegistry(serviceRegistry);
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.activate(componentContextMock);
-
-    HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
-    HttpResponse response = client.execute(httpPost);
-    Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+    final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
+    Assert.assertEquals(401, response.getCode());
+    Assert.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
-  public void testNotAcceptsUrlSigningService() throws IOException {
-    bundleContextMock = createNiceMock(BundleContext.class);
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_USER_KEY)).andReturn("u");
-    expect(bundleContextMock.getProperty(TrustedHttpClientImpl.DIGEST_AUTH_PASS_KEY)).andReturn("p");
-    replay(bundleContextMock);
+  public void nonRepeatableRequestIsNotRetried() throws Exception {
+    final CannedResponseClient canned = cannedClient(3,
+        digestResponse(), staleNonceResponse(), digestResponse(), okResponse());
 
-    componentContextMock = createNiceMock(ComponentContext.class);
-    expect(componentContextMock.getBundleContext()).andReturn(bundleContextMock).anyTimes();
-    replay(componentContextMock);
+    final HttpPost post = new HttpPost("http://localhost:8080/fake");
+    post.setEntity(new InputStreamEntity(new ByteArrayInputStream(new byte[] { 1, 2, 3 }),
+        ContentType.APPLICATION_OCTET_STREAM));
+    final ClassicHttpResponse response = canned.execute(post);
+    Assert.assertEquals(401, response.getCode());
+    Assert.assertEquals(2, canned.remainingResponses());
+  }
 
-    String notAcceptsUrl = "http://notaccepts.com";
+  @Test
+  public void digestAuthorizationIsComputedFromChallenge() throws Exception {
+    final CannedResponseClient canned = cannedClient(0, digestResponse(), okResponse());
+
+    final HttpPost post = new HttpPost("http://localhost:8080/fake?a=b");
+    post.setEntity(new StringEntity("data", ContentType.TEXT_PLAIN));
+    final ClassicHttpResponse response = canned.execute(post);
+    Assert.assertEquals(200, response.getCode());
+
+    final List<ClassicHttpRequest> requests = canned.getRequests();
+    Assert.assertEquals(2, requests.size());
+    // The probe carries no body but asks for digest authentication
+    final ClassicHttpRequest probe = requests.get(0);
+    Assert.assertEquals("POST", probe.getMethod());
+    Assert.assertEquals(post.getUri(), probe.getUri());
+    Assert.assertNull(probe.getEntity());
+    Assert.assertEquals(DelegatingAuthenticationEntryPoint.DIGEST_AUTH,
+        probe.getFirstHeader(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER).getValue());
+    // The actual request carries the authorization computed from the challenge
+    final Header authorization = requests.get(1).getFirstHeader(HttpHeaders.AUTHORIZATION);
+    assertNotNull(authorization);
+    final String value = authorization.getValue();
+    assertTrue(value, value.startsWith("Digest "));
+    assertTrue(value, value.contains("username=\"u\""));
+    assertTrue(value, value.contains("realm=\"testrealm@host.com\""));
+    assertTrue(value, value.contains("nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\""));
+    assertTrue(value, value.contains("uri=\"/fake?a=b\""));
+    assertTrue(value, value.contains("qop=auth"));
+    assertTrue(value, value.contains("nc=00000001"));
+    assertTrue(value, value.contains("cnonce="));
+    assertTrue(value, value.contains("opaque=\"5ccc069c403ebaf9f0171e9517f40e41\""));
+    assertTrue(value, value.contains("response=\""));
+  }
+
+  @Test
+  public void testNotAcceptsUrlSigningService() throws Exception {
+    String notAcceptsUrl = "http://notaccepts.com/";
     HttpGet get = new HttpGet(notAcceptsUrl);
 
     // Setup signing service
@@ -588,37 +494,17 @@ public class TrustedHttpClientImplTest {
     EasyMock.expect(urlSigningService.accepts(notAcceptsUrl)).andReturn(false);
     EasyMock.replay(urlSigningService);
 
-    // Capture request
-    Capture<HttpUriRequest> request = EasyMock.newCapture();
+    final CannedResponseClient canned = cannedClient(0, okResponse());
+    canned.setUrlSigningService(urlSigningService);
 
-    // Setup Http Client
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    expect(httpClient.execute(EasyMock.capture(request))).andReturn(okResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.setServiceRegistry(serviceRegistry);
-    client.setUrlSigningService(urlSigningService);
-    client.activate(componentContextMock);
-
-    client.execute(get);
-    assertTrue(request.hasCaptured());
-    assertEquals(get.getURI().toString(), request.getValue().getURI().toString());
+    canned.execute(get);
+    assertEquals(1, canned.getRequests().size());
+    assertEquals(get.getUri().toString(), canned.getRequests().get(0).getUri().toString());
   }
 
   @Test
-  public void testAlreadySignedUrlIgnoredByUrlSigningService() throws IOException, UrlSigningException {
-    String acceptsUrl = "http://alreadysigned.com?signature=thesig&policy=thepolicy&keyId=thekey";
+  public void testAlreadySignedUrlIgnoredByUrlSigningService() throws Exception {
+    String acceptsUrl = "http://alreadysigned.com/?signature=thesig&policy=thepolicy&keyId=thekey";
     HttpHead headRequest = new HttpHead(acceptsUrl);
 
     // Setup signing service
@@ -626,49 +512,32 @@ public class TrustedHttpClientImplTest {
     EasyMock.expect(urlSigningService.accepts(acceptsUrl)).andReturn(true);
     EasyMock.replay(urlSigningService);
 
-    Capture<HttpUriRequest> request = EasyMock.newCapture();
+    final CannedResponseClient canned = cannedClient(0, okResponse());
+    canned.setUrlSigningService(urlSigningService);
 
-    // Setup Http Client
-    CloseableHttpClient httpClient = createMock(CloseableHttpClient.class);
-    expect(httpClient.execute(EasyMock.capture(request))).andReturn(okResponse);
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-    replay(httpClientBuilder, httpClient);
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setSecurityService(securityService);
-    client.setOrganizationDirectoryService(organizationDirectoryService);
-    client.setServiceRegistry(serviceRegistry);
-    client.setUrlSigningService(urlSigningService);
-
-    client.execute(headRequest);
-    assertTrue(request.hasCaptured());
-    assertEquals(acceptsUrl, request.getValue().getURI().toString());
+    canned.execute(headRequest);
+    assertEquals(1, canned.getRequests().size());
+    assertEquals(acceptsUrl, canned.getRequests().get(0).getUri().toString());
   }
 
   @Test
-  public void testGetSignedUrl() throws IOException, UrlSigningException {
-    HttpGet notAccepted = new HttpGet("http://notAccepted.com");
+  public void testGetSignedUrl() throws IOException, UrlSigningException, URISyntaxException {
+    HttpGet notAccepted = new HttpGet("http://notAccepted.com/");
     HttpGet alreadySigned =
-        new HttpGet("http://alreadySigned.com?signature=thesignature&keyId=theKeyId&policy=thePolicy");
-    HttpPost notGetOrHead = new HttpPost("http://notGetOrHead.com");
-    HttpGet ok = new HttpGet("http://ok.com");
-    String signedOk = "http://ok.com?signature=thesignature&keyId=theKeyId&policy=thePolicy";
+        new HttpGet("http://alreadySigned.com/?signature=thesignature&keyId=theKeyId&policy=thePolicy");
+    HttpPost notGetOrHead = new HttpPost("http://notGetOrHead.com/");
+    HttpGet ok = new HttpGet("http://ok.com/");
+    ok.addHeader("X-Test", "copied");
+    String signedOk = "http://ok.com/?signature=thesignature&keyId=theKeyId&policy=thePolicy";
 
     // Setup signing service
     UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
-    EasyMock.expect(urlSigningService.accepts(notAccepted.getURI().toString())).andReturn(false);
-    EasyMock.expect(urlSigningService.accepts(alreadySigned.getURI().toString())).andReturn(true);
-    EasyMock.expect(urlSigningService.accepts(notGetOrHead.getURI().toString())).andReturn(true);
-    EasyMock.expect(urlSigningService.accepts(ok.getURI().toString())).andReturn(true);
+    EasyMock.expect(urlSigningService.accepts(notAccepted.getUri().toString())).andReturn(false);
+    EasyMock.expect(urlSigningService.accepts(alreadySigned.getUri().toString())).andReturn(true);
+    EasyMock.expect(urlSigningService.accepts(notGetOrHead.getUri().toString())).andReturn(true);
+    EasyMock.expect(urlSigningService.accepts(ok.getUri().toString())).andReturn(true);
     EasyMock.expect(
-            urlSigningService.sign(ok.getURI().toString(), TrustedHttpClientImpl.DEFAULT_URL_SIGNING_EXPIRES_DURATION,
+            urlSigningService.sign(ok.getUri().toString(), TrustedHttpClientImpl.DEFAULT_URL_SIGNING_EXPIRES_DURATION,
                     null, null)).andReturn(signedOk);
     EasyMock.replay(urlSigningService);
 
@@ -676,11 +545,13 @@ public class TrustedHttpClientImplTest {
     client.setUrlSigningService(urlSigningService);
     assertEquals(client.getSignedUrl(notAccepted), notAccepted);
     assertEquals(client.getSignedUrl(notGetOrHead), notGetOrHead);
-    assertEquals(client.getSignedUrl(ok).getURI().toString(), signedOk);
+    final ClassicHttpRequest signed = client.getSignedUrl(ok);
+    assertEquals(signed.getUri().toString(), signedOk);
+    assertEquals("copied", signed.getFirstHeader("X-Test").getValue());
   }
 
   @Test
-  public void testClusterDetection() throws IOException {
+  public void testClusterDetection() throws Exception {
 
     Map<String, Integer> servers = new HashMap<>();
     servers.put("tenant-admin.example.org", 8080);
@@ -702,67 +573,43 @@ public class TrustedHttpClientImplTest {
     EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(false).anyTimes();
     EasyMock.replay(urlSigningService);
 
-    Capture<HttpUriRequest> request = EasyMock.newCapture(CaptureType.ALL);
-
-    // Setup Http Client
-    CloseableHttpClient httpClient = createNiceMock(CloseableHttpClient.class);
-    expect(httpClient.execute(EasyMock.capture(request))).andReturn(okResponse).anyTimes();
-    httpClient.close();
-    EasyMock.expectLastCall().anyTimes();
-
-    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
-    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
-
-    replay(httpClientBuilder, httpClient);
-
-    client = new TrustedHttpClientImpl("u", "p") {
-      @Override
-      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
-        return httpClientBuilder;
-      }
-    };
-    client.setSecurityService(secSvc);
-    client.setServiceRegistry(serviceRegistry);
-    client.setOrganizationDirectoryService(orgDirSvc);
-    client.setUrlSigningService(urlSigningService);
+    final CannedResponseClient canned = cannedClient(0,
+        okResponse(), okResponse(), okResponse(), okResponse(), okResponse(), okResponse());
+    canned.setSecurityService(secSvc);
+    canned.setOrganizationDirectoryService(orgDirSvc);
+    canned.setUrlSigningService(urlSigningService);
 
     //Reminder: the valid nodes for the current org are:
     // - http://localhost:80
     // - http://admin:8080
-    //Note that we are *not* checking that the auth credentials are correct.  That's a final method, which won't mock.
+    //Note that we are *not* checking that the auth credentials are correct.
     //Instead we check if the desire to use Digest auth is present.  That's close enough.
-    client.execute(new HttpGet("http://localhost:8080/info/me.json"));
+    canned.execute(new HttpGet("http://localhost:8080/info/me.json"));
     //This isn't part of the cluster at all, don't send auth
-    client.execute(new HttpGet("http://www.example.org"));
+    canned.execute(new HttpGet("http://www.example.org"));
     //This is the admin node, but https rather than http as defined in the org.  Safe to send credentials, *but*
     // the host cache in TrustedHttpClientImpl uses Organization::getServers, which returns a string like http://admin
     // then compares the URI passed in to that string.  Thus, while we *could* send the auth, we don't since http!=https
-    client.execute(new HttpGet("https://admin.example.org"));
+    canned.execute(new HttpGet("https://admin.example.org"));
     //This is the admin node, but on the wrong port (80 vs 8080).  Still safe to send credentials.
     //The behaviour here is different than the above because same cache as above discards the port defined by the server
     //This makes sense when you think of it - the *host* is the important part, not the port or protocol.
-    client.execute(new HttpGet("http://admin.example.org"));
+    canned.execute(new HttpGet("http://admin.example.org"));
     //Similar to the admin node, but *not*.  Don't send credentials.
-    client.execute(new HttpGet("http://tenant-admin.example.org"));
-    client.execute(new HttpGet("https://tenant-pres.example.org"));
+    canned.execute(new HttpGet("http://tenant-admin.example.org"));
+    canned.execute(new HttpGet("https://tenant-pres.example.org"));
 
-    assertTrue(
-        Arrays.stream(request.getValues().get(0).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
-        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertFalse(
-        Arrays.stream(request.getValues().get(1).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
-        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(
-        Arrays.stream(request.getValues().get(2).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
-        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(
-        Arrays.stream(request.getValues().get(3).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
-        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(
-        Arrays.stream(request.getValues().get(4).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
-        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(
-        Arrays.stream(request.getValues().get(5).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
-        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
+    final List<ClassicHttpRequest> requests = canned.getRequests();
+    assertTrue(requestsDigest(requests.get(0)));
+    assertFalse(requestsDigest(requests.get(1)));
+    assertTrue(requestsDigest(requests.get(2)));
+    assertTrue(requestsDigest(requests.get(3)));
+    assertTrue(requestsDigest(requests.get(4)));
+    assertTrue(requestsDigest(requests.get(5)));
+  }
+
+  private static boolean requestsDigest(ClassicHttpRequest request) {
+    return Arrays.stream(request.getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue()));
   }
 }

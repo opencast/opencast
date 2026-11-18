@@ -25,10 +25,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.assetmanager.util.AssetStoreDirectory;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -57,6 +59,10 @@ public class AbstractFileSystemAssetStoreTest {
   private static final String ORG_ID = "sampleOrgId";
 
   private static final String MP_ID = "sampleMediaPackageId";
+
+  private static final String PREFIXED_MP_ID = "prefixedMediaPackageId";
+
+  private static final int PREFIX_LENGTH = 2;
 
   private static final String MP_ELEM_ID = "sampleMediaPackageElementId";
 
@@ -99,10 +105,9 @@ public class AbstractFileSystemAssetStoreTest {
         return workspace;
       }
     };
-    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
-    rootDirectories.setAccessible(true);
-    rootDirectories.set(repo, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
-    repo.setupCache();
+    // The first root uses the flat layout, the second one prefix directories
+    setRootDirectories(new AssetStoreDirectory(tmpRoot.getAbsolutePath(), 0),
+        new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH));
 
     sampleElemDir = Paths.get(tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString()).toFile();
     FileUtils.forceMkdir(sampleElemDir);
@@ -110,9 +115,71 @@ public class AbstractFileSystemAssetStoreTest {
     FileUtils.copyFile(asset, new File(sampleElemDir, MP_ELEM_ID + XML_EXTENSTION));
   }
 
+  private void setRootDirectories(AssetStoreDirectory... directories) throws Exception {
+    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
+    rootDirectories.setAccessible(true);
+    rootDirectories.set(repo, new ArrayList<>(Arrays.asList(directories)));
+    repo.setupCache();
+  }
+
+  /** The directory of a media package in the prefixed root */
+  private File prefixedMpDir(String mpId) {
+    return Paths.get(tmpRoot2.toString(), ORG_ID, AssetStoreDirectory.prefix(mpId, PREFIX_LENGTH), mpId).toFile();
+  }
+
   @After
   public void tearDown() throws Exception {
     FileUtils.forceDelete(tmpRoot);
+  }
+
+  @Test
+  public void testPutIntoPrefixedRoot() throws Exception {
+    // New media packages go to the root with the most usable space. With only the prefixed root configured, the
+    // choice does not depend on the free space of the temporary folders.
+    setRootDirectories(new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH));
+
+    StoragePath storagePath = new StoragePath(ORG_ID, PREFIXED_MP_ID, VERSION_1, MP_ELEM_ID);
+    repo.put(storagePath, Source.mk(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
+
+    File versionDir = new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_1.toString());
+    assertEquals("pr", prefixedMpDir(PREFIXED_MP_ID).getParentFile().getName());
+    assertTrue(versionDir + " should be a directory", versionDir.isDirectory());
+    assertEquals(1, versionDir.listFiles().length);
+    assertTrue(repo.contains(storagePath));
+    assertTrue(repo.get(storagePath).isPresent());
+
+    // Further versions are stored in the same root even if a flat root is searched first
+    setRootDirectories(new AssetStoreDirectory(tmpRoot.getAbsolutePath(), 0),
+        new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH));
+    StoragePath version2 = new StoragePath(ORG_ID, PREFIXED_MP_ID, VERSION_2, MP_ELEM_ID);
+    assertTrue(repo.copy(storagePath, version2));
+    assertTrue(new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_2.toString()).isDirectory());
+    assertFalse(Paths.get(tmpRoot.toString(), ORG_ID, PREFIXED_MP_ID).toFile().exists());
+  }
+
+  @Test
+  public void testDeleteFromPrefixedRoot() throws Exception {
+    File versionDir = new File(prefixedMpDir(PREFIXED_MP_ID), VERSION_1.toString());
+    FileUtils.forceMkdir(versionDir);
+    FileUtils.copyFile(IoSupport.classPathResourceAsFile("/" + FILE_NAME).get(),
+        new File(versionDir, MP_ELEM_ID + XML_EXTENSTION));
+    StoragePath storagePath = new StoragePath(ORG_ID, PREFIXED_MP_ID, VERSION_1, MP_ELEM_ID);
+    assertTrue(repo.contains(storagePath));
+
+    assertTrue(repo.delete(DeletionSelector.delete(ORG_ID, PREFIXED_MP_ID, VERSION_1)));
+    assertFalse(repo.contains(storagePath));
+    assertFalse(prefixedMpDir(PREFIXED_MP_ID).exists());
+    // The prefix directory is kept
+    assertTrue(prefixedMpDir(PREFIXED_MP_ID).getParentFile().isDirectory());
+  }
+
+  @Test
+  public void testUnknownMediaPackage() throws Exception {
+    StoragePath storagePath = new StoragePath(ORG_ID, "unknown", VERSION_1, MP_ELEM_ID);
+    assertFalse(repo.contains(storagePath));
+    assertFalse(repo.get(storagePath).isPresent());
+    assertFalse(repo.copy(storagePath, new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID)));
+    assertFalse(repo.delete(DeletionSelector.deleteAll(ORG_ID, "unknown")));
   }
 
   @Test
@@ -238,8 +305,8 @@ public class AbstractFileSystemAssetStoreTest {
         return null;
       }
 
-      @Override protected String getRootDirectory(String orgId, String mpId) {
-        final String rootDirectory = super.getRootDirectory(orgId, mpId);
+      @Override protected AssetStoreDirectory getRootDirectory(String orgId, String mpId) {
+        final AssetStoreDirectory rootDirectory = super.getRootDirectory(orgId, mpId);
         // drop the cached entry so that every further lookup is resolved from disk again, just like it would be
         // after the cache entry expired
         onDeleteMediaPackage(orgId, mpId);
@@ -248,7 +315,9 @@ public class AbstractFileSystemAssetStoreTest {
     };
     Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
     rootDirectories.setAccessible(true);
-    rootDirectories.set(store, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
+    rootDirectories.set(store, new ArrayList<>(Arrays.asList(
+        new AssetStoreDirectory(tmpRoot.getAbsolutePath(), 0),
+        new AssetStoreDirectory(tmpRoot2.getAbsolutePath(), PREFIX_LENGTH))));
     store.setupCache();
 
     assertTrue(store.delete(DeletionSelector.deleteAll(ORG_ID, MP_ID)));
@@ -263,5 +332,75 @@ public class AbstractFileSystemAssetStoreTest {
     DeletionSelector versionSelector = DeletionSelector.delete(ORG_ID, MP_ID, VERSION_1);
     repo.delete(versionSelector);
     assertTrue(sampleElemDir.exists());
+  }
+
+  /**
+   * A media package identifier that is the current or parent directory reference or the empty
+   * string resolves the root directory lookup successfully (it collapses into an existing
+   * parent directory). The deletion must still be rejected before any file is touched.
+   */
+  @Test
+  public void testDeleteWithUnsafeMediaPackageIdIsRejected() throws Exception {
+    for (String badId : new String[] { "", ".", ".." }) {
+      try {
+        repo.delete(DeletionSelector.delete(ORG_ID, badId, VERSION_2));
+        Assert.fail("Expected the media package ID '" + badId + "' to be rejected");
+      } catch (AssetStoreException e) {
+        // intended
+      }
+    }
+    assertTrue("The stored data must be intact", sampleElemDir.exists());
+    assertEquals(1, sampleElemDir.listFiles().length);
+  }
+
+  /**
+   * A media package identifier containing a path separator can address an existing directory
+   * of another media package (here: version 2 of the sample media package, as if it was a
+   * media package of its own). The deletion must be rejected.
+   */
+  @Test
+  public void testDeleteWithSeparatorInMediaPackageIdIsRejected() throws Exception {
+    for (String badId : new String[] { MP_ID + "/" + VERSION_2, MP_ID + "\\" + VERSION_2, "x/../" + MP_ID }) {
+      try {
+        repo.delete(DeletionSelector.deleteAll(ORG_ID, badId));
+        Assert.fail("Expected the media package ID '" + badId + "' to be rejected");
+      } catch (AssetStoreException e) {
+        // intended
+      }
+    }
+    assertTrue("The stored data must be intact", sampleElemDir.exists());
+    assertEquals(1, sampleElemDir.listFiles().length);
+  }
+
+  /**
+   * Organization, media package and element identifiers are joined into the storage path, so
+   * each of them must be rejected if it is unsafe as a path component, both for writing and
+   * for reading.
+   */
+  @Test
+  public void testUnsafeStoragePathComponentsAreRejected() throws Exception {
+    final Source source = Source.mk(getClass().getClassLoader().getResource(FILE_NAME).toURI());
+    for (String bad : new String[] { "", ".", "..", "a/b", "a\\b", "../" + MP_ID }) {
+      final StoragePath[] paths = {
+          new StoragePath(bad, MP_ID, VERSION_2, MP_ELEM_ID),
+          new StoragePath(ORG_ID, bad, VERSION_2, MP_ELEM_ID),
+          new StoragePath(ORG_ID, MP_ID, VERSION_2, bad) };
+      for (StoragePath path : paths) {
+        try {
+          repo.put(path, source);
+          Assert.fail("Expected put to reject the storage path " + path);
+        } catch (AssetStoreException e) {
+          // intended
+        }
+        try {
+          repo.get(path);
+          Assert.fail("Expected get to reject the storage path " + path);
+        } catch (AssetStoreException e) {
+          // intended
+        }
+      }
+    }
+    assertEquals("Nothing must have been written next to the sample element", 1, sampleElemDir.listFiles().length);
+    assertEquals("Nothing must have been written to the store root", 1, tmpRoot.listFiles().length);
   }
 }

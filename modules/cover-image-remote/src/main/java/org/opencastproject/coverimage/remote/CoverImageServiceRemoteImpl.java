@@ -29,16 +29,17 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,11 +77,11 @@ public class CoverImageServiceRemoteImpl extends RemoteBase implements CoverImag
       params.add(new BasicNameValuePair("height", height));
       params.add(new BasicNameValuePair("posterimage", posterImageUri));
       params.add(new BasicNameValuePair("targetflavor", targetFlavor));
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new CoverImageException("Unable to assemble a remote cover image request", e);
     }
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = getResponse(post);
       if (response != null) {

@@ -47,6 +47,8 @@ Variable Substitution
 
 The template will have access to the media package, workflow instance (including its configuration properties and last
 failed operation), catalogs, and any incidents. Fields should be tested for null/empty values before being used.
+Workflow properties are also available under their property name. The `${name:default}` form is not supported; use
+`${name!'default'}` instead. If a variable is missing, the operation fails.
 
 ### Media Package Information
 
@@ -135,7 +137,10 @@ catalogs. This syntax is still accepted but deprecation. Future versions might r
 
 ### Organization properties
 
-Use `${organization['PROPERTY']}`
+Use `${organization['PROPERTY']}`, or the `org_` prefix followed by the property name. Organization properties
+whose name contains a `.` (period) can be referenced with the dot, eg.
+`${org_org.opencastproject.engage.ui.url}`, or in a flattened form with underscores instead of dots, eg.
+`${org_org_opencastproject_engage_ui_url}`.
 
 #### Examples
 

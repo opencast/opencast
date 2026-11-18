@@ -45,6 +45,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -994,6 +995,20 @@ public class SchedulerRestService {
     if (StringUtils.isBlank(agentId)) {
       logger.debug("Cannot add event without agent identifier");
       return RestUtil.R.badRequest("Cannot add event without agent identifier");
+    }
+
+    if (templateMp == null) {
+      logger.debug("Cannot add event without a template media package");
+      return RestUtil.R.badRequest("Cannot add event without a template media package");
+    }
+    // The template media package form parameter is converted by JAX-RS through
+    // MediaPackageImpl.valueOf(String), which already validates the identifiers; repeat the
+    // check here so the endpoint stays safe even if the conversion path ever changes.
+    try {
+      MediaPackageSupport.checkPathSafety(templateMp);
+    } catch (IllegalArgumentException e) {
+      logger.info("Cannot schedule events from a template media package with invalid identifiers");
+      return RestUtil.R.badRequest("The template media package contains invalid identifiers");
     }
 
     Map<String, String> caProperties = new HashMap<>();

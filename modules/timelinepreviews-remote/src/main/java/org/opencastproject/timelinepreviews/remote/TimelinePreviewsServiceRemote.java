@@ -31,15 +31,16 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.timelinepreviews.api.TimelinePreviewsException;
 import org.opencastproject.timelinepreviews.api.TimelinePreviewsService;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,11 +81,11 @@ public class TimelinePreviewsServiceRemote extends RemoteBase implements Timelin
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("imageCount", Integer.toString(imageCount)));
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new TimelinePreviewsException(e);
     }
-    HttpResponse response = null;
+    ClassicHttpResponse response = null;
     try {
       response = getResponse(post);
       if (response != null) {

@@ -38,7 +38,7 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
