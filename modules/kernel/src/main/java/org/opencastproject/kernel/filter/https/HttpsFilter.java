@@ -21,6 +21,8 @@
 
 package org.opencastproject.kernel.filter.https;
 
+import org.opencastproject.kernel.filter.proxy.TransparentProxyFilter;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.component.propertytypes.ServiceRanking;
@@ -42,6 +44,9 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * This filter is wrapping <code>HttpServletRequest</code>s in such a way that they feature the https scheme.
+ * <p>
+ * The headers it acts on are only believed if the request reached us through a trusted reverse proxy, which
+ * {@link TransparentProxyFilter} has determined before this filter runs.
  */
 @Component(
     service = Filter.class,
@@ -77,17 +82,23 @@ public class HttpsFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
           ServletException {
-    HttpServletRequest httpReqquest = (HttpServletRequest) request;
+    HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+    // Anyone can send these headers, so they only mean something if a proxy we trust is the one who sent them
+    if (!Boolean.TRUE.equals(httpRequest.getAttribute(TransparentProxyFilter.FORWARDED_HEADERS_TRUSTED))) {
+      chain.doFilter(httpRequest, response);
+      return;
+    }
 
     // Check if the forwarded SSL header is set
-    if (X_FORWARDED_SSL_VALUE.equalsIgnoreCase(httpReqquest.getHeader(X_FORWARDED_SSL))) {
+    if (X_FORWARDED_SSL_VALUE.equalsIgnoreCase(httpRequest.getHeader(X_FORWARDED_SSL))) {
       logger.debug("Found forwarded SSL header");
-      httpReqquest = new HttpsRequestWrapper(httpReqquest);
-    } else if (X_FORWARDED_PROTO_VALUE.equalsIgnoreCase(httpReqquest.getHeader(X_FORWARDED_PROTO))) {
+      httpRequest = new HttpsRequestWrapper(httpRequest);
+    } else if (X_FORWARDED_PROTO_VALUE.equalsIgnoreCase(httpRequest.getHeader(X_FORWARDED_PROTO))) {
       logger.debug("Found forwarded proto HTTPS header");
-      httpReqquest = new HttpsRequestWrapper(httpReqquest);
+      httpRequest = new HttpsRequestWrapper(httpRequest);
     }
-    chain.doFilter(httpReqquest, response);
+    chain.doFilter(httpRequest, response);
   }
 
   @Override

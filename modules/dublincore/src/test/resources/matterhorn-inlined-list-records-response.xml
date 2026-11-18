@@ -20,7 +20,7 @@
         <inlined xmlns="http://www.opencastproject.org/oai/matterhorn-inlined">
           <mediapackage xmlns="http://mediapackage.opencastproject.org"
             duration="1004400000"
-            id="10.0000/5820"
+            id="10.0000-5820"
             start="2007-12-05T13:40:00">
             <metadata>
               <catalog id="catalog-1" type="dublincore/episode">
@@ -46,7 +46,7 @@
               xmlns:oc="http://www.opencastproject.org/matterhorn/"
               xmlns:dcterms="http://purl.org/dc/terms/">
               <dcterms:identifier>
-                10.0000/5820
+                10.0000-5820
               </dcterms:identifier>
               <dcterms:isPartOf>10.0000/1</dcterms:isPartOf>
               <dcterms:title xml:lang="en">

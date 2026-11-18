@@ -24,7 +24,6 @@ import static java.lang.String.format;
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.HttpUtil.waitForResource;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
@@ -39,6 +38,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -667,6 +667,18 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
         return element;
       }
 
+      // The parent directory of the element file is deleted below, so the element file must
+      // be a regular file. A publication URI in the legacy layout without channel level
+      // ({orgId}/{mediaPackageId}/{elementId}/{fileName}) can otherwise address the element
+      // directory of another media package if the identifier of the media package of this
+      // job equals the name of a channel directory: the "file" is that element directory,
+      // and its parent is the other media package's publication directory.
+      if (!elementFile.isFile()) {
+        throw new DistributionException("Element " + elementId + " of media package " + mediapackageId
+                + " cannot be retracted from publication channel " + channelId + ": " + elementFile
+                + " is not a regular file");
+      }
+
       logger.debug("Retracting element {} ({})", element, elementFile);
 
       // Try to remove the file and its parent folder representing the mediapackage element id
@@ -829,21 +841,33 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
+    checkChannelId(channelId);
     final String uriString = element.getURI().toString().split("\\?")[0];
     final String directoryName = distributionDirectory.getAbsolutePath();
     final String orgId = securityService.getOrganization().getId();
     if (uriString.startsWith(serviceUrl)) {
       String[] splitUrl = uriString.substring(serviceUrl.length() + 1).split("/");
+      checkSafePathSegments(splitUrl);
+      final String mediaPackageId = mp.getIdentifier().toString();
       if (splitUrl.length < 5) {
         logger.warn("Malformed URI {}. Format must be .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
                         + " Trying URI without channelId", uriString);
-        return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]));
+        // Legacy layout without channel level: <distributionDirectory>/<orgId>/<mpId>/<elementId>/<fileName>
+        checkUriBelongsToJob(uriString, splitUrl, null, mediaPackageId);
+        return FileSupport.requireWithinRoot(
+                Paths.get(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]).toFile(),
+                new File(distributionDirectory, orgId));
       } else {
-        return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]));
+        checkUriBelongsToJob(uriString, splitUrl, channelId, mediaPackageId);
+        return FileSupport.requireWithinRoot(
+                Paths.get(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]).toFile(),
+                new File(distributionDirectory, Paths.get(orgId, channelId).toString()));
       }
     }
-    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
-            FilenameUtils.getName(uriString)));
+    return FileSupport.requireWithinRoot(
+            Paths.get(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
+                    FilenameUtils.getName(uriString)).toFile(),
+            new File(distributionDirectory, Paths.get(orgId, channelId).toString()));
   }
 
   /**
@@ -852,8 +876,97 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    * @return the filesystem directory
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
+    checkChannelId(channelId);
     final String orgId = securityService.getOrganization().getId();
-    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().toString()));
+    return FileSupport.requireWithinRoot(
+            new File(distributionDirectory, Paths.get(orgId, channelId, mp.getIdentifier().toString()).toString()),
+            new File(distributionDirectory, Paths.get(orgId, channelId).toString()));
+  }
+
+  /**
+   * Rejects channel identifiers that are unsafe as a file system path component. The channel
+   * identifier is joined into the distribution paths and also determines the directory the
+   * containment checks are anchored at, so a channel like {@code ../..} would move that
+   * directory along with the path and the containment check could never fail.
+   *
+   * @throws IllegalStateException
+   *         if the channel identifier is empty, {@code .} or {@code ..} or contains a path
+   *         separator
+   */
+  private static void checkChannelId(String channelId) {
+    if (MediaPackageSupport.containsPathTraversal(channelId)) {
+      throw new IllegalStateException("Channel ID must not be empty, must not be '.' or '..' "
+              + "and must not contain path separators: " + channelId);
+    }
+  }
+
+  /**
+   * Rejects unsafe segments in the segments of a publication URI. Such segments are joined
+   * into file system paths below the distribution directory; empty segments, the current and
+   * parent directory references and path separators are all rejected.
+   *
+   * @param segments
+   *          the URL segments to check
+   * @throws IllegalStateException
+   *         if a segment is unsafe
+   */
+  private static void checkSafePathSegments(String... segments) {
+    for (String segment : segments) {
+      if (segment.isEmpty() || "..".equals(segment) || ".".equals(segment)) {
+        throw new IllegalStateException("Unsafe path segments are not allowed in distribution URIs: '"
+                + segment + "'");
+      }
+    }
+  }
+
+  /**
+   * Verifies that the segments of a publication URI refer to the channel and media package of
+   * the job the caller is currently processing. The segments are joined into file system
+   * paths below the distribution directory (see {@link #getDistributionFile(String,
+   * MediaPackage, MediaPackageElement)}), and an element that carried a publication URI of
+   * another channel or media package would otherwise cause the files of that channel or
+   * media package to be overwritten (on distribution) or deleted (on retraction).
+   *
+   * The element segment is deliberately not compared: the element being processed does not
+   * necessarily carry the identifier that the file system path was created with. A
+   * distributed element is a copy of the original element whose publication URI references
+   * the original element's identifier, and adding such a copy to a media package that still
+   * contains the original element generates a new identifier for the copy due to the
+   * identifier conflict. Retracting a distributed element by its new identifier must still
+   * find the file, so the element segment of the URI cannot be required to match the
+   * element's current identifier.
+   *
+   * The organization segment is also not compared: the path is built from the organization
+   * of the current context, not from the URI.
+   *
+   * @param uriString
+   *          the full publication URI (for error messages only)
+   * @param splitUrl
+   *          the segments of the URI below the service URL
+   * @param channelId
+   *          the channel of the current job; {@code null} for the legacy layout without
+   *          channel level
+   * @param mediaPackageId
+   *          the media package identifier of the current job
+   * @throws IllegalStateException
+   *         if the URI does not refer to the current job's channel and media package
+   */
+  private static void checkUriBelongsToJob(String uriString, String[] splitUrl, String channelId,
+          String mediaPackageId) {
+    if (splitUrl.length < 5) {
+      // Legacy layout without channel level: {orgId}/{mediaPackageId}/{elementId}/{fileName}
+      if (splitUrl.length < 4) {
+        throw new IllegalStateException("Malformed distribution URI: " + uriString);
+      }
+      if (!mediaPackageId.equals(splitUrl[1])) {
+        throw new IllegalStateException("Element URI " + uriString
+                + " does not refer to the media package of the current job (" + mediaPackageId + ")");
+      }
+    } else if (!channelId.equals(splitUrl[1]) || !mediaPackageId.equals(splitUrl[2])) {
+      throw new IllegalStateException("Element URI " + uriString
+              + " does not refer to the channel and media package of the current job ("
+              + channelId + "/" + mediaPackageId + ")");
+    }
   }
 
   /**

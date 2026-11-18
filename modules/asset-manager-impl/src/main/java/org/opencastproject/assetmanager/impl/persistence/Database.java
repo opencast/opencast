@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -622,10 +623,26 @@ public class Database {
     }
   }
 
+  /**
+   * Converts the snapshot DTOs of a query result to snapshots. A single broken or invalid
+   * snapshot (e.g. one persisted with an unsafe media package identifier by an older version)
+   * must not make the whole result unavailable, so such a snapshot is skipped and an error is
+   * logged.
+   */
   private List<Snapshot> snapshotDtoToSnapshot(List<SnapshotDto> snapshotDtos) {
     return snapshotDtos.stream()
-        .map(s -> s.toSnapshot())
-        .map(s -> httpAssetProvider.prepareForDelivery(s))
+        .map(dto -> {
+          try {
+            return httpAssetProvider.prepareForDelivery(dto.toSnapshot());
+          } catch (Exception e) {
+            logger.error("Could not parse snapshot {} of media package {}, skipping: {}",
+                dto.getVersion(),
+                dto.getMediaPackageId(),
+                e.getMessage());
+            return null;
+          }
+        })
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 }

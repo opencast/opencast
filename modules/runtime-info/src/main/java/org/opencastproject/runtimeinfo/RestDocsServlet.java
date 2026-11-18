@@ -30,6 +30,7 @@ import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -126,7 +127,7 @@ public class RestDocsServlet extends HttpServlet {
 
     if (reference == null) {
       docs.append("REST docs unavailable for ");
-      docs.append(docPath);
+      docs.append(StringEscapeUtils.escapeHtml4(docPath));
     } else {
       final Object restService = bundleContext.getService(reference);
       findRestAnnotation(restService.getClass()).ifPresentOrElse(

@@ -23,6 +23,7 @@ package org.opencastproject.distribution.download;
 
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 
+import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -67,6 +68,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -366,5 +368,151 @@ public class DownloadDistributionServiceImplTest {
     hasRelativeLink = Files.lines(playlist.toPath()).filter(s -> s.contains("../segments/file_0.mp4"))
             .findFirst();
     Assert.assertTrue(hasRelativeLink.isPresent());
+  }
+
+  /**
+   * An element whose publication URI refers to the channel and media package of the current
+   * job resolves to the file in that channel's subtree
+   */
+  @Test
+  public void testGetDistributionFileOfCurrentJob() throws Exception {
+    String orgId = defaultOrganization.getId();
+    String mpId = mp.getIdentifier().toString();
+
+    // Five-segment layout: .../{orgId}/{channelId}/{mpId}/{elementId}/{fileName}
+    MediaPackageElement element = trackElement("track-1",
+            UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "engage-player", mpId, "track-1", "media.mov"));
+    File file = service.getDistributionFile("engage-player", mp, element);
+    File expected = new File(distributionRoot,
+            Paths.get(orgId, "engage-player", mpId, "track-1", "media.mov").toString());
+    Assert.assertEquals(expected, file);
+
+    // The element segment of the URI is not compared against the element identifier: a
+    // distributed element is a copy of the original element whose publication URI references
+    // the original element's identifier, and adding the copy to a media package that still
+    // contains the original element generates a new identifier for the copy. Retracting such
+    // a renamed element must still find its file.
+    MediaPackageElement renamedElement = trackElement("renamed-id",
+            UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "engage-player", mpId, "track-1", "media.mov"));
+    Assert.assertEquals(expected, service.getDistributionFile("engage-player", mp, renamedElement));
+
+    // Legacy layout without channel level: .../{orgId}/{mpId}/{elementId}/{fileName}
+    MediaPackageElement legacyElement = trackElement("track-1",
+            UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, mpId, "track-1", "media.mov"));
+    File legacyFile = service.getDistributionFile("engage-player", mp, legacyElement);
+    File legacyExpected = new File(distributionRoot,
+            Paths.get(orgId, mpId, "track-1", "media.mov").toString());
+    Assert.assertEquals(legacyExpected, legacyFile);
+  }
+
+  /**
+   * An element whose publication URI refers to another channel or media package must not be
+   * able to address that channel's or media package's files, nor may the URI use unsafe path
+   * segments. A URI that stays within the channel and media package of the current job but
+   * names a different element is deliberately accepted (see
+   * {@link #testGetDistributionFileOfCurrentJob()})
+   */
+  @Test
+  public void testGetDistributionFileRejectsForeignUri() throws Exception {
+    String orgId = defaultOrganization.getId();
+    String mpId = mp.getIdentifier().toString();
+
+    // Five-segment layout with a foreign channel or media package
+    assertIllegalState(
+            () -> service.getDistributionFile("engage-player", mp,
+                    trackElement("track-1", UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "oai-pmh", mpId,
+                            "track-1", "media.mov"))),
+            "URI of another channel");
+    assertIllegalState(
+            () -> service.getDistributionFile("engage-player", mp,
+                    trackElement("track-1", UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId,
+                            "engage-player", "other-mp", "track-1", "media.mov"))),
+            "URI of another media package");
+
+    // Legacy layout with a foreign media package
+    assertIllegalState(
+            () -> service.getDistributionFile("engage-player", mp,
+                    trackElement("track-1",
+                            UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "other-mp", "track-1",
+                                    "media.mov"))),
+            "legacy URI of another media package");
+
+    // Unsafe path segments
+    assertIllegalState(
+            () -> service.getDistributionFile("engage-player", mp,
+                    trackElement("track-1", UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId,
+                            "engage-player", mpId, "..", "media.mov"))),
+            "traversal segment in URI");
+    assertIllegalState(
+            () -> service.getDistributionFile("engage-player", mp,
+                    trackElement("track-1", UrlSupport.DEFAULT_BASE_URL + "/" + orgId + "//engage-player/" + mpId
+                            + "/track-1/media.mov")),
+            "empty segment in URI");
+  }
+
+  /**
+   * The channel identifier is joined into the distribution path and determines the directory
+   * the containment check is anchored at, so a traversal channel identifier would move that
+   * directory along with the path. It must be rejected outright.
+   */
+  @Test
+  public void testUnsafeChannelIdIsRejected() throws Exception {
+    final MediaPackageElement element = trackElement("track-1", "http://wfr.example/mediapackage/mp/track-1/media.mov");
+    for (String channelId : new String[] { "", ".", "..", "../..", "../../../..", "a/b", "a\\b" }) {
+      assertIllegalState(() -> service.getDistributionFile(channelId, mp, element),
+              "distribution file for channel '" + channelId + "'");
+      assertIllegalState(() -> service.getMediaPackageDirectory(channelId, mp),
+              "media package directory for channel '" + channelId + "'");
+    }
+  }
+
+  /**
+   * A publication URI in the legacy layout without channel level is only compared with the
+   * media package of the job. If that media package is named like a channel directory, such
+   * a URI can address the element directory of another media package in that channel. A
+   * retraction must not delete it (nor its parent, the other media package's directory).
+   */
+  @Test
+  public void testRetractLegacyUriDoesNotDeleteForeignElementDirectory() throws Exception {
+    String orgId = defaultOrganization.getId();
+    File victimFile = new File(distributionRoot,
+            Paths.get(orgId, "engage-player", "victim-mp", "victim-element", "media.mov").toString());
+    FileUtils.forceMkdir(victimFile.getParentFile());
+    FileUtils.writeStringToFile(victimFile, "must not be deleted", "UTF-8");
+
+    MediaPackage channelNamedMp = MediaPackageParser.getFromXml(
+            "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" id=\"engage-player\"/>");
+    MediaPackageElement element = trackElement("track-1",
+            UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "engage-player", "victim-mp", "victim-element"));
+    try {
+      service.retractElement("internal", channelNamedMp, element);
+      Assert.fail("Expected the retraction of a directory to be rejected");
+    } catch (DistributionException e) {
+      // intended
+      Assert.assertTrue("The element of another media package must not be deleted", victimFile.isFile());
+    } finally {
+      FileUtils.deleteQuietly(victimFile.getParentFile().getParentFile());
+    }
+  }
+
+  private static MediaPackageElement trackElement(String id, String url) throws Exception {
+    String xml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"" + id
+            + "\" type=\"presenter/source\"><url>" + url + "</url></track>";
+    return MediaPackageElementParser.getFromXml(xml);
+  }
+
+  private static void assertIllegalState(ThrowingRunnable runnable, String description) {
+    try {
+      runnable.run();
+      Assert.fail(description + " must be rejected");
+    } catch (IllegalStateException e) {
+      // intended
+    } catch (Exception e) {
+      Assert.fail(description + " was rejected with " + e + " instead of IllegalStateException");
+    }
+  }
+
+  private interface ThrowingRunnable {
+    void run() throws Exception;
   }
 }
