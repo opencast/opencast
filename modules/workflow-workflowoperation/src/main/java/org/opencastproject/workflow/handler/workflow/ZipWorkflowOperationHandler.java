@@ -302,8 +302,16 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       throw new WorkflowOperationException("Invalid mediapackage");
     }
 
-    // Create the temp directory
+    // The media package identifier is joined into a path below the temp storage directory,
+    // so it is checked to stay within it (see FileSupport#ensureWithinRoot(File, File)) —
+    // otherwise a traversal identifier would let forceMkdir and forceDelete operate on
+    // arbitrary directories
     File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().toString());
+    try {
+      FileSupport.ensureWithinRoot(mediaPackageDir, tempStorageDir);
+    } catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException("Invalid media package identifier", e);
+    }
     FileUtils.forceMkdir(mediaPackageDir);
 
     // Link or copy each matching element's file from the workspace to the temp directory
@@ -323,6 +331,11 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
         continue;
       }
       File elementDir = new File(mediaPackageDir, element.getIdentifier());
+      try {
+        FileSupport.ensureWithinRoot(elementDir, tempStorageDir);
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException("Invalid element identifier", e);
+      }
       FileUtils.forceMkdir(elementDir);
       File workspaceFile = workspace.get(element.getURI());
       File linkedFile = FileSupport.link(workspaceFile, new File(elementDir, workspaceFile.getName()), true);

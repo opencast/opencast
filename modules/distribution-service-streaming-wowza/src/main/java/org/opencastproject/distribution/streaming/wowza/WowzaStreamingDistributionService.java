@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
@@ -78,7 +79,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -512,6 +512,15 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
       return Collections.emptyList();
     }
 
+    // An element whose URI already points to the streaming server is a streaming manifest
+    // derived from a SMIL file, not a file that could be distributed. Its distribution file
+    // is the SMIL file itself, which must not be replaced with the content of the element.
+    if (isStreamingManifest(element, streamingURL)) {
+      logger.warn("Skipping distribution of element {}: its URI {} already points to the streaming server",
+              element.getIdentifier(), element.getURI());
+      return Collections.emptyList();
+    }
+
     try {
       File source;
       try {
@@ -572,11 +581,19 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     }
   }
 
+  /**
+   * The media package and element identifiers are part of the file name, so the result is
+   * checked to stay within the organization's distribution directory (see
+   * {@link FileSupport#requireWithinRoot(File, File)}).
+   */
   private File getSmilFile(MediaPackageElement element, MediaPackage mediapackage, String channelId) {
+    checkChannelId(channelId);
     String orgId = securityService.getOrganization().getId();
     String smilFileName = channelId + "_" + mediapackage.getIdentifier() + "_" + element.getFlavor().getType()
             + ".smil";
-    return distributionDirectory.toPath().resolve(Paths.get(orgId, smilFileName)).toFile();
+    return FileSupport.requireWithinRoot(
+            distributionDirectory.toPath().resolve(Paths.get(orgId, smilFileName)).toFile(),
+            new File(distributionDirectory, orgId));
   }
 
   private URI getSmilUri(File smilFile, URI streamingURL) {
@@ -948,7 +965,12 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
             smilPathStr += ".mp4";
           }
 
-          deleteElementFile(smilFile.toPath().resolveSibling(smilPathStr).toFile());
+          // The src attribute is written by the service from validated identifiers, but it
+          // is resolved against the SMIL file's parent directory, so the result is checked
+          // to stay within the organization's distribution subtree
+          File referencedFile = FileSupport.requireWithinRoot(
+                  smilFile.toPath().resolveSibling(smilPathStr).toFile(), smilFile.getParentFile());
+          deleteElementFile(referencedFile);
         }
       }
 
@@ -1017,54 +1039,88 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   }
 
   /**
-   * Gets the destination file to copy the contents of a media package element.
+   * Gets the destination file to copy the contents of a media package element to.
+   *
+   * <p>
+   * If the element URI is below the streaming URL, the element is a streaming manifest
+   * derived from the SMIL file, and the SMIL file's location is returned. That location is
+   * derived from the channel, the media package and the element flavor — the URI is only
+   * used to detect the case, never joined into a path, so it cannot steer the destination
+   * outside the organization's distribution subtree.
    *
    * @return The file to copy the content to
+   * @throws IllegalStateException
+   *         if the file name of the element URI is unsafe
    */
   private File getDistributionFile(String channelId, MediaPackage mediapackage, MediaPackageElement element,
           URI streamingURL) {
 
-    final String orgId = securityService.getOrganization().getId();
-    final Path distributionPath = distributionDirectory.toPath().resolve(orgId);
     final URI elementUri = element.getURI();
-    URI relativeUri = streamingURL.relativize(elementUri);
-    if (relativeUri != elementUri) {
-      // SMIL file
-
-      // Get the relative URL path
-      String uriPath = relativeUri.getPath();
-      // Remove the last part (corresponds to the part of the "virtual" manifests)
-      uriPath = uriPath.substring(0, uriPath.lastIndexOf('/'));
-      // Remove the "smil:" tags, if any, and set the right extension if needed
-      uriPath = uriPath.replace("smil:", "");
-      if (!uriPath.endsWith(".smil")) {
-        uriPath += ".smil";
-      }
-
-      String[] uriPathParts = uriPath.split("/");
-
-      if (uriPathParts.length > 1) {
-        logger.warn(
-            "Malformed URI path \"{}\". The SMIL files must be at the streaming application's root. Trying anyway...",
-            uriPath);
-      }
-      return distributionPath.resolve(uriPath).toFile();
+    if (isStreamingManifest(element, streamingURL)) {
+      return getSmilFile(element, mediapackage, channelId);
     }
 
-    // We have an ordinary file (not yet distributed)
-    return new File(getElementDirectory(channelId, mediapackage, element.getIdentifier()),
-            FilenameUtils.getName(elementUri.getPath()));
+    // We have an ordinary file (not yet distributed). The file name is the last segment of
+    // the element URI, which is percent-decoded, so it is checked before it is joined into
+    // the distribution path.
+    final String fileName;
+    try {
+      fileName = FilenameUtils.getName(elementUri.getPath());
+    } catch (IllegalArgumentException e) {
+      // e.g. a percent-encoded NUL character in the path
+      throw new IllegalStateException("The file name of the element URI " + elementUri
+              + " is unsafe and must not be used in a distribution path", e);
+    }
+    if (fileName.isEmpty() || ".".equals(fileName) || "..".equals(fileName)) {
+      throw new IllegalStateException("The file name of the element URI " + elementUri
+              + " is unsafe and must not be used in a distribution path");
+    }
+    return new File(getElementDirectory(channelId, mediapackage, element.getIdentifier()), fileName);
   }
 
   /**
-   * Gets the directory containing the distributed files for this mediapackage.
+   * Whether the element is a streaming manifest derived from a SMIL file, which is the case if
+   * its URI is below the streaming URL.
+   */
+  private static boolean isStreamingManifest(MediaPackageElement element, URI streamingURL) {
+    final URI elementUri = element.getURI();
+    return streamingURL.relativize(elementUri) != elementUri;
+  }
+
+  /**
+   * Rejects channel identifiers that are unsafe as a file system path component. The channel
+   * identifier is joined into the distribution paths and also determines the directory the
+   * containment checks are anchored at, so a channel like {@code ../..} would move that
+   * directory along with the path and the containment check could never fail.
+   *
+   * @throws IllegalStateException
+   *         if the channel identifier is empty, {@code .} or {@code ..} or contains a path
+   *         separator
+   */
+  private static void checkChannelId(String channelId) {
+    if (MediaPackageSupport.containsPathTraversal(channelId)) {
+      throw new IllegalStateException("Channel ID must not be empty, must not be '.' or '..' "
+              + "and must not contain path separators: " + channelId);
+    }
+  }
+
+  /**
+   * Gets the directory containing the distributed files for this mediapackage. The channel
+   * and media package identifiers are joined into the path, so the channel identifier is
+   * validated and the result is checked to stay within the channel's distribution directory (see
+   * {@link FileSupport#requireWithinRoot(File, File)}).
    *
    * @return the filesystem directory
+   * @throws IllegalStateException
+   *         if the directory is outside the channel's distribution directory
    */
   private File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
+    checkChannelId(channelId);
     final String orgId = securityService.getOrganization().getId();
-    return distributionDirectory.toPath().resolve(Paths.get(orgId, channelId, mediaPackage.getIdentifier().toString()))
-            .toFile();
+    return FileSupport.requireWithinRoot(
+            distributionDirectory.toPath()
+                    .resolve(Paths.get(orgId, channelId, mediaPackage.getIdentifier().toString())).toFile(),
+            new File(distributionDirectory, Paths.get(orgId, channelId).toString()));
   }
 
   /**

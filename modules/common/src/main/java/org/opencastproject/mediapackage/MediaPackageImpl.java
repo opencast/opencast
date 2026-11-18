@@ -170,6 +170,25 @@ public final class MediaPackageImpl implements MediaPackage {
   }
 
   /**
+   * JAXB post-unmarshal callback, invoked by the JAXB implementation whenever a media package
+   * has been unmarshalled, be it as the root element or nested inside another document (e.g.
+   * inside a workflow instance). This is the only lifecycle callback signature that the JAXB
+   * runtime (GlassFish JAXB 2.3.x) actually invokes — neither the no-argument nor the
+   * one-argument form is called, and callback methods on attribute values (e.g. the
+   * identifier) are not invoked at all. Enforcing the identifier rule here validates every
+   * unmarshal, even ones that do not go through {@link #valueOf(String)},
+   * {@link #valueOf(InputStream)} or {@link #valueOf(Node)}.
+   *
+   * <p>
+   * This callback is the layer that effectively rejects unsafe identifiers. The explicit
+   * checks in the {@code valueOf} methods and in {@link Adapter#unmarshal(MediaPackageImpl)}
+   * repeat the rule so that it does not depend on a JAXB implementation detail alone.
+   */
+  public void afterUnmarshal(Unmarshaller unmarshaller, Object jaxbElement) throws JAXBException {
+    MediaPackageSupport.checkPathSafety(this);
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.mediapackage.MediaPackage#getIdentifier()
@@ -1171,6 +1190,13 @@ public final class MediaPackageImpl implements MediaPackage {
 
     @Override
     public MediaPackage unmarshal(MediaPackageImpl mp) throws Exception {
+      // A media package bound through this adapter is a nested media package (e.g. inside a
+      // workflow instance), which does not pass the valueOf methods. The afterUnmarshal
+      // callback has already validated it at this point; the rule is repeated here so that
+      // it does not depend on the JAXB lifecycle callback alone.
+      if (mp != null) {
+        MediaPackageSupport.checkPathSafety(mp);
+      }
       return mp;
     }
   }
@@ -1185,7 +1211,11 @@ public final class MediaPackageImpl implements MediaPackage {
   public static MediaPackageImpl valueOf(InputStream xml) throws MediaPackageException {
     try {
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), MediaPackageImpl.class).getValue();
+      MediaPackageImpl mp = unmarshaller.unmarshal(XmlSafeParser.parse(xml), MediaPackageImpl.class).getValue();
+      MediaPackageSupport.checkPathSafety(mp);
+      return mp;
+    } catch (IllegalArgumentException e) {
+      throw new MediaPackageException(e);
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
     } catch (IOException | SAXException e) {
@@ -1220,7 +1250,9 @@ public final class MediaPackageImpl implements MediaPackage {
       try (InputStream in = new ByteArrayInputStream(out.toByteArray())) {
         // CHECKSTYLE:OFF
         // in was already parsed, therefore this is save
-        return unmarshaller.unmarshal(new StreamSource(in), MediaPackageImpl.class).getValue();
+        MediaPackageImpl mp = unmarshaller.unmarshal(new StreamSource(in), MediaPackageImpl.class).getValue();
+        MediaPackageSupport.checkPathSafety(mp);
+        return mp;
         // CHECKSTYLE:ON
       }
     } catch (Exception e) {
