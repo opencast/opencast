@@ -4,7 +4,7 @@ services:
       file: docker-compose.yml
       service: opensearch
   mariadb:
-    image: docker.io/library/mariadb:11
+    image: docker.io/library/mariadb:13
     ports:
       - 127.0.0.1:3306:3306
     environment:
