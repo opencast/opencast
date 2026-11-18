@@ -118,12 +118,18 @@ The lifetime of the signed URLs can be configured by setting a custom value for 
 The signed URLs can also be configured to restrict access to the user’s IP address by setting the property
 `url.signing.use.client.ip` to true. By default this is disabled.
 
+If you run Opencast behind a reverse proxy, that restriction depends on Opencast learning the client’s address from
+the proxy rather than from the client itself. Make sure your proxy is listed in
+[Trusted Proxies](../trusted-proxies.md) before turning this on, since otherwise clients get to choose the address
+their URLs are bound to.
+
 Overview of configuration files for services that are able to automatically sign URLs on behalf of users:
 
 |URLs That Are Signed     |Configuration File Name                                                    |
 |-------------------------|---------------------------------------------------------------------------|
 |Video player content     | org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.cfg |
 |Admin UI links           | org.opencastproject.adminui.endpoint.OsgiEventEndpoint.cfg                |
+|Video editor content     | org.opencastproject.editor.EditorServiceImpl.cfg                          |
 
 The URLs will be signed by the first signing provider that will accept the URL’s path based upon the signing provider’s
 configuration. This makes it flexible to support many different scenarios. For example, we could configure the signing

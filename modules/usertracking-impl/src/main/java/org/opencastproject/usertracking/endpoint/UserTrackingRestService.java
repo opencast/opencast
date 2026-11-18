@@ -394,12 +394,8 @@ public class UserTrackingRestService {
       }
     }
 
-    //MH-8616 the connection might be via a proxy
-    String clientIP = request.getHeader("X-FORWARDED-FOR");
-
-    if (clientIP == null) {
-      clientIP = request.getRemoteAddr();
-    }
+    //MH-8616 the connection might be via a proxy, which TransparentProxyFilter has already accounted for
+    String clientIP = request.getRemoteAddr();
     logger.debug("Got client ip: {}", clientIP);
 
     UserSession s = new UserSessionImpl();
