@@ -20,6 +20,8 @@
  */
 package org.opencastproject.assetmanager.impl;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -27,26 +29,23 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import junitparams.JUnitParamsRunner;
 
-@RunWith(JUnitParamsRunner.class)
 public class AssetManagerJobProducerTest
     extends AssetManagerTestBase {
 
   private AssetManagerJobProducer tsamjp = null;
   private ServiceRegistry sr = null;
 
-  @Before
+  @BeforeEach
   public void setup() throws Exception {
     super.setUp();
 
@@ -81,10 +80,10 @@ public class AssetManagerJobProducerTest
     createIdAndVersionExpectation(mp[1], 0, 2);
     EasyMock.replay(sr);
 
-    Assert.assertEquals("Both versions should move",
-            "{\"OK\":2}", tsamjp.internalMoveById(mp[0], REMOTE_STORE_1_ID));
-    Assert.assertEquals("Both versions should move",
-            "{\"OK\":2}", tsamjp.internalMoveById(mp[1], REMOTE_STORE_1_ID));
+    Assertions.assertEquals("{\"OK\":2}",
+            tsamjp.internalMoveById(mp[0], REMOTE_STORE_1_ID), "Both versions should move");
+    Assertions.assertEquals("{\"OK\":2}",
+            tsamjp.internalMoveById(mp[1], REMOTE_STORE_1_ID), "Both versions should move");
   }
 
   @Test
@@ -95,7 +94,7 @@ public class AssetManagerJobProducerTest
     EasyMock.replay(sr);
 
     for (Job j : jobs) {
-      Assert.assertEquals("OK", tsamjp.process(j));
+      Assertions.assertEquals("OK", tsamjp.process(j));
     }
   }
 
@@ -118,8 +117,9 @@ public class AssetManagerJobProducerTest
     createIdAndVersionExpectation(mp[1], 1, 1);
     EasyMock.replay(sr);
 
-    Assert.assertEquals("Only one version should move",
-            "OK", tsamjp.internalMoveByIdAndVersion(new VersionImpl(1L), mp[1], REMOTE_STORE_1_ID));
+    Assertions.assertEquals("OK",
+            tsamjp.internalMoveByIdAndVersion(new VersionImpl(1L), mp[1], REMOTE_STORE_1_ID),
+            "Only one version should move");
     EasyMock.verify(sr);
   }
 
@@ -131,15 +131,18 @@ public class AssetManagerJobProducerTest
     EasyMock.replay(sr);
 
     for (Job j : jobs) {
-      Assert.assertEquals("OK", tsamjp.process(j));
+      Assertions.assertEquals("OK", tsamjp.process(j));
     }
   }
 
-  @Test(expected = NotFoundException.class)
-  public void testNotFoundInternalByIdAndVersion() throws NotFoundException {
-    EasyMock.replay(sr);
-    Assert.assertEquals("Only one version should move",
-            "1", tsamjp.internalMoveByIdAndVersion(new VersionImpl(5L), "fake", REMOTE_STORE_1_ID));
+  @Test
+  public void testNotFoundInternalByIdAndVersion() {
+    assertThrows(NotFoundException.class, () -> {
+      EasyMock.replay(sr);
+      Assertions.assertEquals("1",
+          tsamjp.internalMoveByIdAndVersion(new VersionImpl(5L), "fake", REMOTE_STORE_1_ID),
+          "Only one version should move");
+    });
   }
 
   @Test
@@ -171,16 +174,20 @@ public class AssetManagerJobProducerTest
 
     EasyMock.replay(sr);
 
-    Assert.assertEquals("No versions exist between the start and before test values",
-            "0", tsamjp.internalMoveByDate(start, before, REMOTE_STORE_1_ID));
-    Assert.assertEquals("All versions should move in 2 jobs containing one mediapackage each",
-            "2", tsamjp.internalMoveByDate(before, after, REMOTE_STORE_1_ID));
-    Assert.assertEquals("No versions exist after the end date",
-            "0", tsamjp.internalMoveByDate(after, new Date(), REMOTE_STORE_1_ID));
-    Assert.assertEquals("Both versions of " + mp[0] + " should move",
-            "{\"OK\":2}", tsamjp.internalMoveByIdAndDate(mp[0], before, after, REMOTE_STORE_1_ID));
-    Assert.assertEquals("Both versions of " + mp[1] + " should move",
-            "{\"OK\":2}", tsamjp.internalMoveByIdAndDate(mp[1], before, after, REMOTE_STORE_1_ID));
+    Assertions.assertEquals("0",
+            tsamjp.internalMoveByDate(start, before, REMOTE_STORE_1_ID),
+            "No versions exist between the start and before test values");
+    Assertions.assertEquals("2",
+            tsamjp.internalMoveByDate(before, after, REMOTE_STORE_1_ID),
+            "All versions should move in 2 jobs containing one mediapackage each");
+    Assertions.assertEquals("0",
+            tsamjp.internalMoveByDate(after, new Date(), REMOTE_STORE_1_ID), "No versions exist after the end date");
+    Assertions.assertEquals("{\"OK\":2}",
+            tsamjp.internalMoveByIdAndDate(mp[0], before, after, REMOTE_STORE_1_ID),
+            "Both versions of " + mp[0] + " should move");
+    Assertions.assertEquals("{\"OK\":2}",
+            tsamjp.internalMoveByIdAndDate(mp[1], before, after, REMOTE_STORE_1_ID),
+            "Both versions of " + mp[1] + " should move");
 
     EasyMock.verify(sr);
   }
@@ -195,7 +202,7 @@ public class AssetManagerJobProducerTest
     EasyMock.replay(sr);
 
     for (Job j : jobs) {
-      Assert.assertEquals("OK", tsamjp.process(j));
+      Assertions.assertEquals("OK", tsamjp.process(j));
     }
     EasyMock.verify(sr);
   }
@@ -210,8 +217,9 @@ public class AssetManagerJobProducerTest
     EasyMock.replay(sr);
 
     tsamjp.moveByIdAndDate(mp[0], start, end, REMOTE_STORE_1_ID);
-    Assert.assertEquals("Both versions of " + mp[0] + " should move",
-            "{\"OK\":2}", tsamjp.internalMoveByIdAndDate(mp[0], start, end, REMOTE_STORE_1_ID));
+    Assertions.assertEquals("{\"OK\":2}",
+            tsamjp.internalMoveByIdAndDate(mp[0], start, end, REMOTE_STORE_1_ID),
+            "Both versions of " + mp[0] + " should move");
 
     EasyMock.verify(sr);
   }
@@ -226,12 +234,15 @@ public class AssetManagerJobProducerTest
     createIdAndVersionExpectation(mp[1], 0, 2);
     EasyMock.replay(sr);
 
-    Assert.assertEquals("No versions exist between the start and before test values",
-            "{}", tsamjp.internalMoveByIdAndDate("fake", start, before, REMOTE_STORE_1_ID));
-    Assert.assertEquals("Both versions of " + mp[1] + " should move",
-            "{\"OK\":2}", tsamjp.internalMoveByIdAndDate(mp[1], before, after, REMOTE_STORE_1_ID));
-    Assert.assertEquals("No versions of " + mp[1] + " should move",
-            "{}", tsamjp.internalMoveByIdAndDate(mp[1], after, new Date(), REMOTE_STORE_1_ID));
+    Assertions.assertEquals("{}",
+            tsamjp.internalMoveByIdAndDate("fake", start, before, REMOTE_STORE_1_ID),
+            "No versions exist between the start and before test values");
+    Assertions.assertEquals("{\"OK\":2}",
+            tsamjp.internalMoveByIdAndDate(mp[1], before, after, REMOTE_STORE_1_ID),
+            "Both versions of " + mp[1] + " should move");
+    Assertions.assertEquals("{}",
+            tsamjp.internalMoveByIdAndDate(mp[1], after, new Date(), REMOTE_STORE_1_ID),
+            "No versions of " + mp[1] + " should move");
   }
 
   @Test
@@ -242,7 +253,7 @@ public class AssetManagerJobProducerTest
     EasyMock.replay(sr);
 
     for (Job j : jobs) {
-      Assert.assertEquals("OK", tsamjp.process(j));
+      Assertions.assertEquals("OK", tsamjp.process(j));
     }
     EasyMock.verify(sr);
   }

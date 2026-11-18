@@ -37,9 +37,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -52,7 +52,7 @@ public class TransferMetadataOperationHandlerTest {
   private WorkflowOperationInstance operation;
   private DublinCoreCatalog resultCatalog = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     handler = new TransferMetadataWorkflowOperationHandler();
 
@@ -85,7 +85,7 @@ public class TransferMetadataOperationHandlerTest {
   public void testNoConfiguration() throws WorkflowOperationException {
     try {
       handler.start(instance, null);
-      Assert.fail("Operation should fail");
+      Assertions.fail("Operation should fail");
     } catch (IllegalArgumentException e) {
       // this is expected
     }
@@ -95,7 +95,7 @@ public class TransferMetadataOperationHandlerTest {
 
     try {
       handler.start(instance, null);
-      Assert.fail("Operation should fail");
+      Assertions.fail("Operation should fail");
     } catch (IllegalArgumentException e) {
       // this is expected
     }
@@ -112,7 +112,7 @@ public class TransferMetadataOperationHandlerTest {
     // execution
     try {
       handler.start(instance, null);
-      Assert.fail("Operation should have failed");
+      Assertions.fail("Operation should have failed");
     } catch (WorkflowOperationException e) {
       // expected
     }
@@ -122,12 +122,12 @@ public class TransferMetadataOperationHandlerTest {
     WorkflowOperationResult result = handler.start(instance, null);
 
     // checks
-    Assert.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
-    Assert.assertNotNull(resultCatalog);
+    Assertions.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    Assertions.assertNotNull(resultCatalog);
     EName src = EName.mk("http://purl.org/dc/terms/", "title");
     EName dest = EName.mk("http://purl.org/dc/terms/", "description");
-    Assert.assertEquals(resultCatalog.get(src).size(), resultCatalog.get(dest).size());
-    Assert.assertEquals(resultCatalog.getFirst(src), resultCatalog.getFirst(dest));
+    Assertions.assertEquals(resultCatalog.get(src).size(), resultCatalog.get(dest).size());
+    Assertions.assertEquals(resultCatalog.getFirst(src), resultCatalog.getFirst(dest));
   }
 
   @Test
@@ -140,7 +140,7 @@ public class TransferMetadataOperationHandlerTest {
 
     // skip since source catalog does not exists
     WorkflowOperationResult result = handler.start(instance, null);
-    Assert.assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
+    Assertions.assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
   }
 
 }

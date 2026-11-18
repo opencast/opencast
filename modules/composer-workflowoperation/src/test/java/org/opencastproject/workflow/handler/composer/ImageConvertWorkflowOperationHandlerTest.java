@@ -43,9 +43,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -59,7 +59,7 @@ public class ImageConvertWorkflowOperationHandlerTest {
 
   private MediaPackage mp = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws URISyntaxException, MalformedURLException, IOException, MediaPackageException {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(getClass().getResource("/image_convert_mediapackage.xml").toURI().toURL().openStream());
@@ -109,17 +109,17 @@ public class ImageConvertWorkflowOperationHandlerTest {
     // check result
     MediaPackage resultMP = result.getMediaPackage();
     Attachment[] resultElements = resultMP.getAttachments(MediaPackageElementFlavor.parseFlavor("image/converted"));
-    Assert.assertNotNull(resultElements);
-    Assert.assertEquals(1, resultElements.length);
+    Assertions.assertNotNull(resultElements);
+    Assertions.assertEquals(1, resultElements.length);
     Attachment convertedImageAttachment = resultElements[0];
-    Assert.assertTrue(convertedImageAttachment.containsTag("convert"));
+    Assertions.assertTrue(convertedImageAttachment.containsTag("convert"));
 
     // check captures
-    Assert.assertTrue(sourceImageAttachmentCapture.hasCaptured());
-    Assert.assertEquals("image/intro", sourceImageAttachmentCapture.getValue().getFlavor().toString());
+    Assertions.assertTrue(sourceImageAttachmentCapture.hasCaptured());
+    Assertions.assertEquals("image/intro", sourceImageAttachmentCapture.getValue().getFlavor().toString());
 
-    Assert.assertTrue(encodingProfilesCapture.hasCaptured());
-    Assert.assertEquals("image.convert", encodingProfilesCapture.getValue());
+    Assertions.assertTrue(encodingProfilesCapture.hasCaptured());
+    Assertions.assertEquals("image.convert", encodingProfilesCapture.getValue());
   }
 
   private WorkflowInstance mockWorkflowInstance(Map<String, String> configurations) {

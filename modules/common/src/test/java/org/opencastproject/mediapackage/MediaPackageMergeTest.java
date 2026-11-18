@@ -22,24 +22,24 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.mediapackage.MediaPackageSupport.MergeMode;
 import org.opencastproject.util.FileSupport;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,14 +64,14 @@ public class MediaPackageMergeTest {
   /** The target media package directory for merge tests */
   private MediaPackage targetPackage = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     // Get hold of the tmp directory
-    tmpDir = testFolder.newFolder();
+    tmpDir = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
 
     // Create a media package builder
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -81,7 +81,7 @@ public class MediaPackageMergeTest {
     setUpTargeMediaPackage();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteDirectory(packageDir1);
     FileUtils.deleteDirectory(packageDir2);

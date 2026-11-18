@@ -41,9 +41,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -68,7 +68,7 @@ public class SearchServicePersistenceTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     EntityManagerFactory emf = newEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
     EntityManager em = emf.createEntityManager();
@@ -109,7 +109,7 @@ public class SearchServicePersistenceTest {
     int mpCount = searchDatabase.countMediaPackages();
     Date modificationDate = new Date();
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modificationDate);
-    Assert.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
+    Assertions.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
 
     Stream<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages(50, 0);
     mediaPackages.forEach(mediaPackage -> {
@@ -119,14 +119,14 @@ public class SearchServicePersistenceTest {
       AccessControlList acl;
       try {
         acl = searchDatabase.getAccessControlList(mediaPackageId);
-        Assert.assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
-        Assert.assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
-        Assert.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
-        Assert.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
-        Assert.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
+        Assertions.assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
+        Assertions.assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
+        Assertions.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
+        Assertions.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
+        Assertions.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
         String orgId = securityService.getOrganization().getId();
-        Assert.assertEquals(orgId, mediaPackage.getB());
-        Assert.assertEquals(orgId, searchDatabase.getOrganizationId(mediaPackageId));
+        Assertions.assertEquals(orgId, mediaPackage.getB());
+        Assertions.assertEquals(orgId, searchDatabase.getOrganizationId(mediaPackageId));
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -137,10 +137,10 @@ public class SearchServicePersistenceTest {
   public void testUpdateMediaPackage() throws Exception {
     Date now = new Date();
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, now);
-    Assert.assertEquals(now, searchDatabase.getModificationDate(mediaPackage.getIdentifier().toString()));
+    Assertions.assertEquals(now, searchDatabase.getModificationDate(mediaPackage.getIdentifier().toString()));
     Date otherNow = new Date();
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, otherNow);
-    Assert.assertEquals(otherNow, searchDatabase.getModificationDate(mediaPackage.getIdentifier().toString()));
+    Assertions.assertEquals(otherNow, searchDatabase.getModificationDate(mediaPackage.getIdentifier().toString()));
   }
 
   @Test
@@ -148,7 +148,7 @@ public class SearchServicePersistenceTest {
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, new Date());
     Date deletionDate = new Date();
     searchDatabase.deleteMediaPackage(mediaPackage.getIdentifier().toString(), deletionDate);
-    Assert.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
+    Assertions.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
   }
 
   @Test
@@ -160,12 +160,12 @@ public class SearchServicePersistenceTest {
     } catch (NotFoundException e) {
       exception = true;
     }
-    Assert.assertTrue(exception);
+    Assertions.assertTrue(exception);
 
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, new Date());
 
     episode = searchDatabase.getMediaPackage(mediaPackage.getIdentifier().toString());
-    Assert.assertNotNull(episode);
+    Assertions.assertNotNull(episode);
 
     Date deletionDate = new Date();
     searchDatabase.deleteMediaPackage(mediaPackage.getIdentifier().toString(), deletionDate);
@@ -176,25 +176,23 @@ public class SearchServicePersistenceTest {
     } catch (NotFoundException notFoundException) {
       exception = true;
     }
-    Assert.assertTrue(exception);
-    Assert.assertFalse(searchDatabase.isAvailable(mediaPackage.getIdentifier().toString()));
-    Assert.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
+    Assertions.assertTrue(exception);
+    Assertions.assertFalse(searchDatabase.isAvailable(mediaPackage.getIdentifier().toString()));
+    Assertions.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
 
     Stream<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);
     AtomicInteger i = new AtomicInteger(0);
-    allMediaPackages.forEach(mediaPackage -> {
-      i.incrementAndGet();
-    });
-    Assert.assertEquals(1, i.get());
+    allMediaPackages.forEach(mediaPackage ->
+        i.incrementAndGet());
+    Assertions.assertEquals(1, i.get());
 
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, new Date());
 
     allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);
     AtomicInteger x = new AtomicInteger(0);
-    allMediaPackages.forEach(mediaPackage -> {
-      x.incrementAndGet();
-    });
-    Assert.assertEquals(1, x.get());
+    allMediaPackages.forEach(mediaPackage ->
+        x.incrementAndGet());
+    Assertions.assertEquals(1, x.get());
   }
 
 }

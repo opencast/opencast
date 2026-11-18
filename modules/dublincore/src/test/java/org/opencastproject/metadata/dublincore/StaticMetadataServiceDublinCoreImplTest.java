@@ -22,8 +22,9 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -35,7 +36,7 @@ import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -52,12 +53,14 @@ public final class StaticMetadataServiceDublinCoreImplTest {
             .map(MetadataValue::getValue).orElse(""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testDefectMetadata() throws Exception {
-    MediaPackage mp = newMediaPackage("/manifest-simple-defect.xml");
-    StaticMetadataServiceDublinCoreImpl ms = newStaticMetadataService();
-    // should throw an IllegalArgumentException
-    ms.getMetadata(mp);
+    assertThrows(IllegalArgumentException.class, () -> {
+      MediaPackage mp = newMediaPackage("/manifest-simple-defect.xml");
+      StaticMetadataServiceDublinCoreImpl ms = newStaticMetadataService();
+      // should throw an IllegalArgumentException
+      ms.getMetadata(mp);
+    });
   }
 
   private StaticMetadataServiceDublinCoreImpl newStaticMetadataService() throws Exception {

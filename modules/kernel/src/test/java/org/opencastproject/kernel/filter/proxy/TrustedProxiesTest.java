@@ -20,11 +20,11 @@
  */
 package org.opencastproject.kernel.filter.proxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -78,7 +78,7 @@ public class TrustedProxiesTest {
   @Test
   public void testInvalidEntriesAreSkipped() {
     TrustedProxies trusted = configure("not-an-address, 10.0.0.0/99, 300.1.1.1, proxy.example.org, 192.0.2.7");
-    assertTrue("valid entries are still applied", trusted.isTrusted("192.0.2.7"));
+    assertTrue(trusted.isTrusted("192.0.2.7"), "valid entries are still applied");
     assertFalse(trusted.isTrusted("10.0.0.1"));
   }
 

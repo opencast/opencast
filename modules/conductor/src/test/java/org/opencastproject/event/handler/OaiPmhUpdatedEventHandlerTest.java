@@ -24,7 +24,7 @@ import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
@@ -53,15 +53,15 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.EasyMockRule;
+import org.easymock.EasyMockExtension;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;
 import org.easymock.TestSubject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.BundleContext;
 
 import java.net.URI;
@@ -75,6 +75,7 @@ import java.util.Set;
 /**
  * This class contains some tests for the {@link OaiPmhUpdatedEventHandler}.
  */
+@ExtendWith(EasyMockExtension.class)
 public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
   private static final String MEDIA_PACKAGE_TITLE = "test.mediapackage.title";
@@ -82,9 +83,6 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   private static final String SYSTEM_ACCOUNT = "opencast_system_account";
   private static final MediaPackageBuilder MP_BUILDER = MediaPackageBuilderFactory.newInstance()
       .newMediaPackageBuilder();
-
-  @Rule
-  public EasyMockRule rule = new EasyMockRule(this);
 
   @TestSubject
   private OaiPmhUpdatedEventHandler cut = new OaiPmhUpdatedEventHandler();
@@ -107,7 +105,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   private Capture<String> mpIdCapture;
   private Capture<String> snapshotVersionCapture;
 
-  @Before
+  @BeforeEach
   public void setup() throws Exception {
     BundleContext bundleContextMock = EasyMock.createNiceMock(BundleContext.class);
     expect(bundleContextMock.getProperty("org.opencastproject.security.digest.user"))
@@ -157,12 +155,12 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
     assertEquals(updatedMp.getIdentifier().toString(), mpCapture.getValue().getIdentifier().toString());
     assertEquals(OAIPMH_REPOSITORY, repositoryCapture.getValue());
-    Assert.assertNotNull(flavorsCapture.getValue());
-    Assert.assertTrue(flavorsCapture.getValue().contains("dublincore/*"));
-    Assert.assertTrue(flavorsCapture.getValue().contains("security/*"));
-    Assert.assertTrue(tagsCapture.getValue().contains("archive"));
-    Assert.assertTrue(snapshotVersionCapture.hasCaptured());
-    Assert.assertEquals("3", snapshotVersionCapture.getValue());
+    Assertions.assertNotNull(flavorsCapture.getValue());
+    Assertions.assertTrue(flavorsCapture.getValue().contains("dublincore/*"));
+    Assertions.assertTrue(flavorsCapture.getValue().contains("security/*"));
+    Assertions.assertTrue(tagsCapture.getValue().contains("archive"));
+    Assertions.assertTrue(snapshotVersionCapture.hasCaptured());
+    Assertions.assertEquals("3", snapshotVersionCapture.getValue());
   }
 
   /**

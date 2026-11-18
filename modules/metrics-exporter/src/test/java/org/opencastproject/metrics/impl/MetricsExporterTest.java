@@ -32,9 +32,9 @@ import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class MetricsExporterTest {
 
   private MetricsExporter exporter;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     exporter = new MetricsExporter();
   }
@@ -94,7 +94,7 @@ public class MetricsExporterTest {
 
     // test exporter
     final String body = exporter.metrics().getEntity().toString();
-    Assert.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\"} 12.3"));
-    Assert.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\"} 5.0"));
+    Assertions.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\"} 12.3"));
+    Assertions.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\"} 5.0"));
   }
 }

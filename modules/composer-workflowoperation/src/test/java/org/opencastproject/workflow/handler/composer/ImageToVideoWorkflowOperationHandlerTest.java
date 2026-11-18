@@ -45,9 +45,9 @@ import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationH
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public class ImageToVideoWorkflowOperationHandlerTest {
   private static final String PROFILE_ID = "image-movie";
   private static final String CONVERTED_TRACK_ID = "converted-image";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -131,8 +131,8 @@ public class ImageToVideoWorkflowOperationHandlerTest {
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertNotNull(mpNew.getTrack(CONVERTED_TRACK_ID));
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertNotNull(mpNew.getTrack(CONVERTED_TRACK_ID));
   }
 
   @Test
@@ -150,9 +150,9 @@ public class ImageToVideoWorkflowOperationHandlerTest {
     try {
       // run the operation handler
       getWorkflowOperationResult(mp, configurations);
-      Assert.fail();
+      Assertions.fail();
     } catch (WorkflowOperationException e) {
-      Assert.assertNotNull("Duration is required!", e);
+      Assertions.assertNotNull(e, "Duration is required!");
     }
   }
 

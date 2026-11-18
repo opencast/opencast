@@ -21,8 +21,8 @@
 
 package org.opencastproject.mediapackage.identifier;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -34,6 +34,6 @@ public class IdTest {
   @Test
   public void testIds() throws Exception {
     IdImpl id = new IdImpl("c4f91f2f-bfac-43db-b3b3-8de233dad462");
-    Assert.assertEquals("c4f91f2f-bfac-43db-b3b3-8de233dad462", id.toString());
+    Assertions.assertEquals("c4f91f2f-bfac-43db-b3b3-8de233dad462", id.toString());
   }
 }

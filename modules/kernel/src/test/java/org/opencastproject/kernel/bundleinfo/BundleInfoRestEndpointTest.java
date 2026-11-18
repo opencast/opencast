@@ -24,11 +24,11 @@ package org.opencastproject.kernel.bundleinfo;
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoRestEndpoint.bundleInfoJson;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
@@ -38,11 +38,11 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
@@ -65,22 +65,22 @@ public class BundleInfoRestEndpointTest {
     }
   };
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }
 
-  @Before
+  @BeforeEach
   public void before() {
     db = DBTestEnv.newDBSession(OsgiBundleInfoDb.PERSISTENCE_UNIT);
   }
 
-  @After
+  @AfterEach
   public void after() {
     db.close();
   }

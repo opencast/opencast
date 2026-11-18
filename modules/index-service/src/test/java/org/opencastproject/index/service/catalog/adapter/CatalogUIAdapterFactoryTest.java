@@ -25,8 +25,8 @@ import org.opencastproject.util.PropertiesUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -45,7 +45,7 @@ public class CatalogUIAdapterFactoryTest {
   private Dictionary<String, String> configProperties = new Hashtable<>();
   private final CatalogUIAdapterFactory factory = new CatalogUIAdapterFactory();
 
-  @Before
+  @BeforeEach
   public void setUpClass() throws Exception {
     // Load the config properties
     InputStream in = getClass().getResourceAsStream("/catalog-adapter/event.properties");

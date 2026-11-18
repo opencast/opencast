@@ -37,11 +37,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,10 +71,10 @@ public class XACMLSecurityTest {
 
   protected XACMLAuthorizationService authzService = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     authzService = new XACMLAuthorizationService();
 
@@ -96,7 +95,7 @@ public class XACMLSecurityTest {
             EasyMock.capture(in)
         ))
         .andAnswer(() -> {
-          final File file = testFolder.newFile();
+          final File file = File.createTempFile("junit", null, testFolder);
           FileOutputStream out = new FileOutputStream(file);
           IOUtils.copyLarge(in.getValue(), out);
           IOUtils.closeQuietly(out);
@@ -106,7 +105,7 @@ public class XACMLSecurityTest {
         .anyTimes();
     EasyMock.expect(workspace.get(EasyMock.capture(uri), EasyMock.captureBoolean(EasyMock.newCapture())))
             .andAnswer(() -> {
-              File dest = testFolder.newFile();
+              File dest = File.createTempFile("junit", null, testFolder);
               FileUtils.copyFile(new File(uri.getValue()), dest);
               return dest;
             }).anyTimes();
@@ -127,12 +126,12 @@ public class XACMLSecurityTest {
 
     // Get default ACL
     AccessControlList defaultAcl = authzService.getActiveAcl(mediapackage).getA();
-    Assert.assertEquals(0, defaultAcl.getEntries().size());
+    Assertions.assertEquals(0, defaultAcl.getEntries().size());
 
     // Default with series
     mediapackage.setSeries("123");
     defaultAcl = authzService.getActiveAcl(mediapackage).getA();
-    Assert.assertEquals(0, defaultAcl.getEntries().size());
+    Assertions.assertEquals(0, defaultAcl.getEntries().size());
 
     AccessControlList aclSeries1 = new AccessControlList();
     List<AccessControlEntry> entriesSeries1 = aclSeries1.getEntries();
@@ -164,41 +163,41 @@ public class XACMLSecurityTest {
     // Ensure that the permissions specified are respected by the security service
     currentRoles.clear();
     currentRoles.add(new JaxbRole("admin", organization, ""));
-    Assert.assertTrue(authzService.hasPermission(mediapackage, "delete"));
-    Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+    Assertions.assertTrue(authzService.hasPermission(mediapackage, "delete"));
+    Assertions.assertTrue(authzService.hasPermission(mediapackage, "read"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "comment"));
     currentRoles.clear();
     currentRoles.add(new JaxbRole("student", organization, ""));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
-    Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
-    Assert.assertTrue(authzService.hasPermission(mediapackage, "comment"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "delete"));
+    Assertions.assertTrue(authzService.hasPermission(mediapackage, "read"));
+    Assertions.assertTrue(authzService.hasPermission(mediapackage, "comment"));
     currentRoles.clear();
     currentRoles.add(new JaxbRole("admin", organization));
 
     mediapackage = authzService.setAcl(mediapackage, AclScope.Episode, aclEpisode).getA();
-    Assert.assertEquals(AclScope.Merged, authzService.getActiveAcl(mediapackage).getB());
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "read"));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+    Assertions.assertEquals(AclScope.Merged, authzService.getActiveAcl(mediapackage).getB());
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "delete"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "read"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "comment"));
 
     mediapackage = authzService.removeAcl(mediapackage, AclScope.Episode);
 
     AccessControlList computedAcl = authzService.getActiveAcl(mediapackage).getA();
-    Assert.assertEquals("ACLs are the same size?", entriesSeries1.size(), computedAcl.getEntries().size());
-    Assert.assertTrue("ACLs contain the same ACEs?", computedAcl.getEntries().containsAll(entriesSeries1));
+    Assertions.assertEquals(entriesSeries1.size(), computedAcl.getEntries().size(), "ACLs are the same size?");
+    Assertions.assertTrue(computedAcl.getEntries().containsAll(entriesSeries1), "ACLs contain the same ACEs?");
 
     authzService.setAcl(mediapackage, AclScope.Series, aclSeries2);
 
     currentRoles.clear();
     currentRoles.add(new JaxbRole("student", organization));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "read"));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "delete"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "read"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "comment"));
 
     currentRoles.clear();
     currentRoles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, organization, ""));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
-    Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
-    Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "delete"));
+    Assertions.assertTrue(authzService.hasPermission(mediapackage, "read"));
+    Assertions.assertFalse(authzService.hasPermission(mediapackage, "comment"));
   }
 }

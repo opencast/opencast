@@ -20,6 +20,8 @@
  */
 package org.opencastproject.transcription.workflowoperation;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
@@ -41,9 +43,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -68,7 +70,7 @@ public class AttachTranscriptionOperationHandlerTest {
   private Job job2;
   private CaptionService captionService;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -159,18 +161,18 @@ public class AttachTranscriptionOperationHandlerTest {
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
     Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/source"));
 
-    Assert.assertNotNull(attachments);
-    Assert.assertEquals(1, attachments.length);
-    Assert.assertNotNull(attachments[0].getTags());
-    Assert.assertEquals(3, attachments[0].getTags().length);
-    Assert.assertEquals("lang:en", attachments[0].getTags()[0]);
-    Assert.assertEquals("tag1", attachments[0].getTags()[1]);
-    Assert.assertEquals("tag2", attachments[0].getTags()[2]);
+    Assertions.assertNotNull(attachments);
+    Assertions.assertEquals(1, attachments.length);
+    Assertions.assertNotNull(attachments[0].getTags());
+    Assertions.assertEquals(3, attachments[0].getTags().length);
+    Assertions.assertEquals("lang:en", attachments[0].getTags()[0]);
+    Assertions.assertEquals("tag1", attachments[0].getTags()[1]);
+    Assertions.assertEquals("tag2", attachments[0].getTags()[2]);
   }
 
   @Test
@@ -186,22 +188,23 @@ public class AttachTranscriptionOperationHandlerTest {
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
     Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/source"));
 
-    Assert.assertNotNull(attachments);
-    Assert.assertEquals(1, attachments.length);
-    Assert.assertNotNull(attachments[0].getTags());
-    Assert.assertEquals(3, attachments[0].getTags().length);
-    Assert.assertEquals("lang:en", attachments[0].getTags()[0]);
-    Assert.assertEquals("tag1", attachments[0].getTags()[1]);
-    Assert.assertEquals("tag2", attachments[0].getTags()[2]);
+    Assertions.assertNotNull(attachments);
+    Assertions.assertEquals(1, attachments.length);
+    Assertions.assertNotNull(attachments[0].getTags());
+    Assertions.assertEquals(3, attachments[0].getTags().length);
+    Assertions.assertEquals("lang:en", attachments[0].getTags()[0]);
+    Assertions.assertEquals("tag1", attachments[0].getTags()[1]);
+    Assertions.assertEquals("tag2", attachments[0].getTags()[2]);
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testStartMissingTargetFlavor() throws Exception {
-    operationHandler.start(workflowInstance, null);
+    assertThrows(WorkflowOperationException.class, () ->
+        operationHandler.start(workflowInstance, null));
   }
 }

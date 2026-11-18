@@ -49,9 +49,9 @@ import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationH
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class CompositeWorkflowOperationHandlerTest {
       + "{\"left\":1.0,\"top\":1.0} ,\"offset\": {\"y\":-20,\"x\":-20} ,\"reference\": {\"left\":1.0,\"top\":1.0} }}; "
       + "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": {\"left\":1.0,\"top\":0.0} ,"
       + "\"offset\": {\"y\":20,\"x\":20} ,\"reference\": {\"left\":1.0,\"top\":0.0} }}";
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -160,10 +160,10 @@ public class CompositeWorkflowOperationHandlerTest {
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
-    Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
-    Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
+    Assertions.assertEquals("composite/work", trackEncoded.getFlavor().toString());
+    Assertions.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
   @Test
@@ -192,10 +192,10 @@ public class CompositeWorkflowOperationHandlerTest {
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
-    Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
-    Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
+    Assertions.assertEquals("composite/work", trackEncoded.getFlavor().toString());
+    Assertions.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
   @Test
@@ -222,10 +222,10 @@ public class CompositeWorkflowOperationHandlerTest {
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
-    Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
-    Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
+    Assertions.assertEquals("composite/work", trackEncoded.getFlavor().toString());
+    Assertions.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
 
@@ -252,10 +252,10 @@ public class CompositeWorkflowOperationHandlerTest {
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
-    Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
-    Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
+    Assertions.assertEquals("composite/work", trackEncoded.getFlavor().toString());
+    Assertions.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
   @Test
@@ -280,10 +280,10 @@ public class CompositeWorkflowOperationHandlerTest {
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
-    Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
-    Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
+    Assertions.assertEquals("composite/work", trackEncoded.getFlavor().toString());
+    Assertions.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
   @Test
@@ -309,7 +309,7 @@ public class CompositeWorkflowOperationHandlerTest {
     } catch (WorkflowOperationException e) {
       return;
     }
-    Assert.fail("No error occurred when using missing layout");
+    Assertions.fail("No error occurred when using missing layout");
   }
 
   @Test

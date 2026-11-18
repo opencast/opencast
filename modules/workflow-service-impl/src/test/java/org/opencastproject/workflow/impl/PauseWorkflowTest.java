@@ -58,9 +58,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -87,7 +87,7 @@ public class PauseWorkflowTest {
 
   private AccessControlList acl = new AccessControlList();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
@@ -196,11 +196,11 @@ public class PauseWorkflowTest {
     WorkflowTestSupport.poll(pauseListener, 1);
 
     // Ensure that the first operation handler was called, but not the second
-    Assert.assertTrue(firstHandler.isStarted());
-    Assert.assertTrue(!secondHandler.isStarted());
+    Assertions.assertTrue(firstHandler.isStarted());
+    Assertions.assertTrue(!secondHandler.isStarted());
 
     // The workflow should be in the paused state
-    Assert.assertEquals(WorkflowState.PAUSED, service.getWorkflowById(workflow.getId()).getState());
+    Assertions.assertEquals(WorkflowState.PAUSED, service.getWorkflowById(workflow.getId()).getState());
 
     // Resume the workflow with some properties
     Map<String, String> properties = new HashMap<String, String>();
@@ -217,7 +217,7 @@ public class PauseWorkflowTest {
     service.removeWorkflowListener(pauseListener);
 
     // The handler should have picked up the properties
-    Assert.assertEquals(properties, firstHandler.getProperties());
+    Assertions.assertEquals(properties, firstHandler.getProperties());
   }
 
 }

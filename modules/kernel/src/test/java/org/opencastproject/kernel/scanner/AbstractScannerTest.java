@@ -21,14 +21,14 @@
 
 package org.opencastproject.kernel.scanner;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.easymock.EasyMock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;

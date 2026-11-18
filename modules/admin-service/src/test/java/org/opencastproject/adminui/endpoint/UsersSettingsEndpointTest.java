@@ -34,11 +34,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ public class UsersSettingsEndpointTest {
     JsonArray expectedArray = expected.getAsJsonArray(key);
     JsonArray actualArray = actual.getAsJsonArray(key);
 
-    Assert.assertEquals(expectedArray.size(), actualArray.size());
+    Assertions.assertEquals(expectedArray.size(), actualArray.size());
     JsonObject exObject;
     JsonObject acObject;
     int actualId;
@@ -67,12 +67,12 @@ public class UsersSettingsEndpointTest {
       actualId = acObject.get("id").getAsInt() - 1;
       exObject = expectedArray.get(actualId).getAsJsonObject();
       Set<String> exEntrySet = exObject.keySet();
-      Assert.assertEquals(exEntrySet.size(), acObject.size());
+      Assertions.assertEquals(exEntrySet.size(), acObject.size());
 
       for (String item : exEntrySet) {
         JsonElement exValue = exObject.get(item);
         JsonElement acValue = acObject.get(item);
-        Assert.assertEquals(exValue, acValue);
+        Assertions.assertEquals(exValue, acValue);
       }
 
     }
@@ -134,16 +134,16 @@ public class UsersSettingsEndpointTest {
             .body("value", equalTo(value)).when().put(rt.host("/setting/{settingId}")).asString();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }

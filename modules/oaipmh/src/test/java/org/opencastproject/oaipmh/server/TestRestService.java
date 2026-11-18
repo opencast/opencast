@@ -20,13 +20,13 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Objects;
 
 import javax.ws.rs.Path;
 
-@Ignore
+@Disabled
 @Path("/")
 public class TestRestService extends AbstractOaiPmhServerInfoRestEndpoint {
   private final OaiPmhServerInfo s = new OaiPmhServerInfo() {

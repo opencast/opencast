@@ -20,7 +20,7 @@
  */
 package org.opencastproject.publication.oaipmh.endpoint;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -33,7 +33,7 @@ import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.util.NotFoundException;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Set;
 
@@ -43,7 +43,7 @@ import javax.ws.rs.Path;
  * REST service under test.
  */
 @Path("/")
-@Ignore
+@Disabled
 public class TestOaiPmhPublicationRestService extends OaiPmhPublicationRestService {
   public TestOaiPmhPublicationRestService() throws Exception {
     final OaiPmhPublicationService pubSvc = EasyMock.createNiceMock(OaiPmhPublicationService.class);

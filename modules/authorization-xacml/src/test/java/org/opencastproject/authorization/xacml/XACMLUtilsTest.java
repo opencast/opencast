@@ -22,7 +22,7 @@
 package org.opencastproject.authorization.xacml;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
@@ -33,8 +33,8 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for class {@link XACMLUtils}
@@ -47,7 +47,7 @@ public class XACMLUtilsTest {
   private AccessControlList acl;
   private MediaPackage mp;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     xacml = IOUtils.toString(this.getClass().getResourceAsStream("/xacml.xml"));
     acl = AccessControlParser.parseAcl(this.getClass().getResourceAsStream("/acl.xml"));

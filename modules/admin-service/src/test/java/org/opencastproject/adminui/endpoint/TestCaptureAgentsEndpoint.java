@@ -31,7 +31,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import java.util.Properties;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
   private final CaptureAgentStateService captureAgentService;

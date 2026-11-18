@@ -21,14 +21,14 @@
 
 package org.opencastproject.job.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.data.Tuple;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -51,44 +51,44 @@ public class JaxbIncidentTest {
     final Incident incident = dto.toIncident();
     run(Incident.class, new Incident() {
       @Override public long getId() {
-        assertEquals("id transferred", 1L, incident.getId());
+        assertEquals(1L, incident.getId(), "id transferred");
         return 0;
       }
 
       @Override public long getJobId() {
-        assertEquals("jobId transferred", 2L, incident.getJobId());
+        assertEquals(2L, incident.getJobId(), "jobId transferred");
         return 0;
       }
 
       @Override public String getServiceType() {
-        assertEquals("serviceType transferred", "service", incident.getServiceType());
+        assertEquals("service", incident.getServiceType(), "serviceType transferred");
         return null;
       }
 
       @Override public String getProcessingHost() {
-        assertEquals("processingHost transferred", "localhost", incident.getProcessingHost());
+        assertEquals("localhost", incident.getProcessingHost(), "processingHost transferred");
         return null;
       }
 
       @Override public Date getTimestamp() {
-        assertEquals("timestamp transferred", now, incident.getTimestamp());
+        assertEquals(now, incident.getTimestamp(), "timestamp transferred");
         return null;
       }
 
       @Override public Severity getSeverity() {
-        assertEquals("severity transferred", Severity.FAILURE, incident.getSeverity());
+        assertEquals(Severity.FAILURE, incident.getSeverity(), "severity transferred");
         return null;
       }
 
       @Override public String getCode() {
-        assertEquals("code transferred", "code", incident.getCode());
+        assertEquals("code", incident.getCode(), "code transferred");
         return null;
       }
 
       @Override public List<Tuple<String, String>> getDetails() {
-        assertEquals("details transferred",
-                     Arrays.asList(tuple("detail-1", "value-1"), tuple("detail-2", "detail-2")),
-                     incident.getDetails());
+        assertEquals(Arrays.asList(tuple("detail-1", "value-1"), tuple("detail-2", "detail-2")),
+                     incident.getDetails(),
+                     "details transferred");
         return null;
       }
 
@@ -96,9 +96,9 @@ public class JaxbIncidentTest {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("param", "value");
         parameters.put("param-2", "value-2");
-        assertEquals("decriptionParameters transferred",
-                     parameters,
-                     incident.getDescriptionParameters());
+        assertEquals(parameters,
+                     incident.getDescriptionParameters(),
+                     "decriptionParameters transferred");
         return null;
       }
     });

@@ -26,9 +26,9 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.same;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.editor.api.SegmentData;
@@ -49,8 +49,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -66,7 +66,7 @@ public class EditorServiceImplTest {
   private static EditorServiceImpl editorService;
   private static Smil smil;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws Exception {
 
     /* Start of Smil mockups */

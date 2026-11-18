@@ -29,6 +29,7 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
     .COPY_NUMBER_PREFIX_PROPERTY;
 import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
@@ -71,9 +72,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.easymock.Capture;
 import org.easymock.CaptureType;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -106,7 +107,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
 
   private Capture<MediaPackage> clonedMediaPackages = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     operationHandler = new DuplicateEventWorkflowOperationHandler();
 
@@ -148,12 +149,12 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertEquals(numCopies, clonedMediaPackages.getValues().size());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(numCopies, clonedMediaPackages.getValues().size());
     for (int i = 1; i <= numCopies; i++) {
       final String expectedTitle = "copied_event_title"
           + " (" + configurations.get(COPY_NUMBER_PREFIX_PROPERTY) + " " + i + ")";
-      Assert.assertEquals(expectedTitle, clonedMediaPackages.getValues().get(i - 1).getTitle());
+      Assertions.assertEquals(expectedTitle, clonedMediaPackages.getValues().get(i - 1).getTitle());
     }
   }
 
@@ -175,11 +176,11 @@ public class DuplicateEventWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     Track track = clonedMediaPackages.getValue().getTracksByTag("tag1")[0];
-    Assert.assertEquals("tag1", track.getTags()[0]);
-    Assert.assertEquals("tag2", track.getTags()[1]);
+    Assertions.assertEquals("tag1", track.getTags()[0]);
+    Assertions.assertEquals("tag2", track.getTags()[1]);
   }
 
   @Test
@@ -197,14 +198,14 @@ public class DuplicateEventWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     Track track = clonedMediaPackages.getValue().getTracksByTag("tag3")[0];
     final List<String> newTags = Arrays.asList(track.getTags());
     final List<String> originalTags = Arrays.asList(mp.getTracksByTag("part1")[0].getTags());
-    Assert.assertEquals(originalTags.size(), newTags.size());
-    Assert.assertTrue(newTags.contains("tag3"));
-    Assert.assertFalse(newTags.contains("part1"));
+    Assertions.assertEquals(originalTags.size(), newTags.size());
+    Assertions.assertTrue(newTags.contains("tag3"));
+    Assertions.assertFalse(newTags.contains("part1"));
   }
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
@@ -265,26 +266,28 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     replay(distributionService);
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testCreateMoreThanMaximum() throws Exception {
+    assertThrows(WorkflowOperationException.class, () -> {
 
-    final int numCopies = 2;
-    final int maxCopies = 1;
+      final int numCopies = 2;
+      final int maxCopies = 1;
 
-    mockDependencies(numCopies);
+      mockDependencies(numCopies);
 
-    // operation configuration
-    Map<String, String> configurations = new HashMap<>();
-    configurations.put(SOURCE_FLAVORS_PROPERTY, "*/*");
-    configurations.put(SOURCE_TAGS_PROPERTY, "archive");
-    configurations.put(TARGET_TAGS_PROPERTY, "");
-    configurations.put(NUMBER_PROPERTY, "" + numCopies);
-    configurations.put(MAX_NUMBER_PROPERTY, "" + maxCopies);
-    configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
-    configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
+      // operation configuration
+      Map<String, String> configurations = new HashMap<>();
+      configurations.put(SOURCE_FLAVORS_PROPERTY, "*/*");
+      configurations.put(SOURCE_TAGS_PROPERTY, "archive");
+      configurations.put(TARGET_TAGS_PROPERTY, "");
+      configurations.put(NUMBER_PROPERTY, "" + numCopies);
+      configurations.put(MAX_NUMBER_PROPERTY, "" + maxCopies);
+      configurations.put(PROPERTY_NAMESPACES_PROPERTY, "org.opencastproject.assetmanager.security");
+      configurations.put(COPY_NUMBER_PREFIX_PROPERTY, "copy");
 
-    // run the operation handler
-    getWorkflowOperationResult(mp, configurations);
+      // run the operation handler
+      getWorkflowOperationResult(mp, configurations);
+    });
   }
 
 }

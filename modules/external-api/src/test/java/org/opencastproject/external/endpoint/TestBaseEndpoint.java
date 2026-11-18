@@ -32,7 +32,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +42,7 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestBaseEndpoint extends BaseEndpoint {
 
   public TestBaseEndpoint() {

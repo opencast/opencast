@@ -30,16 +30,16 @@ import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.osgi.framework.BundleContext;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
@@ -50,10 +50,10 @@ public class UIConfigTest {
 
   private UIConfigRest uiConfigRest;
 
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  private File temporaryFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // create the needed mocks
     Organization organization = EasyMock.createMock(Organization.class);
@@ -84,9 +84,8 @@ public class UIConfigTest {
     EasyMock.replay(bundleContext, properties);
 
     // Config and default are null. We expect this to fail
-    Assert.assertThrows(ConfigurationException.class, () -> {
-      uiConfigRest.activate(bundleContext, properties);
-    });
+    Assertions.assertThrows(ConfigurationException.class, () ->
+        uiConfigRest.activate(bundleContext, properties));
 
     // Providing proper configuration now. This should work
     uiConfigRest.activate(bundleContext, properties);
@@ -95,42 +94,42 @@ public class UIConfigTest {
 
   @Test
   public void testGetFile() throws Exception {
-    final File testDir = temporaryFolder.newFolder();
+    final File testDir = Files.createTempDirectory(temporaryFolder.toPath(), "junit").toFile();
 
     // configure service
     uiConfigRest.activate(null, Collections.singletonMap(UI_CONFIG_FOLDER_PROPERTY, testDir.getAbsolutePath()));
 
     // Test non-existing file
     // We expect this to not be found
-    Assert.assertThrows(NotFoundException.class, () -> {
-      uiConfigRest.getConfigFile("player", "config.json");
-    });
+    Assertions.assertThrows(NotFoundException.class, () ->
+        uiConfigRest.getConfigFile("player", "config.json"));
 
     // test existing file
     File target = Paths.get(testDir.getAbsolutePath(), "org1", "player", "config.json").toFile();
-    Assert.assertTrue(target.getParentFile().mkdirs());
+    Assertions.assertTrue(target.getParentFile().mkdirs());
     new FileOutputStream(target).close();
     Response response = uiConfigRest.getConfigFile("player", "config.json");
-    Assert.assertEquals(200, response.getStatus());
+    Assertions.assertEquals(200, response.getStatus());
 
     // Test path traversal
     // we expect access to be denied
-    Assert.assertThrows(AccessDeniedException.class, () -> {
-      uiConfigRest.getConfigFile("../player", "config.json");
-    });
+    Assertions.assertThrows(AccessDeniedException.class, () ->
+        uiConfigRest.getConfigFile("../player", "config.json"));
   }
 
   @Test
   public void testXAccel() throws Exception {
     // configure service
     uiConfigRest.activate(null, Map.of(
-        UI_CONFIG_FOLDER_PROPERTY, temporaryFolder.newFolder().getAbsolutePath(),
+        UI_CONFIG_FOLDER_PROPERTY,
+        Files.createTempDirectory(temporaryFolder.toPath(), "junit").toFile().getAbsolutePath(),
         X_ACCEL_REDIRECT_PROPERTY, "/test"));
 
     // Test response. It doesn't matter if the file exists since we rely on the reverse proxy to complain.
     // The code will fall back to the default organization due to the files non-existence.
     Response response = uiConfigRest.getConfigFile("player", "config.json");
-    Assert.assertEquals(204, response.getStatus());
-    Assert.assertEquals("/test/mh_default_org/player/config.json", response.getHeaderString(X_ACCEL_REDIRECT_PROPERTY));
+    Assertions.assertEquals(204, response.getStatus());
+    Assertions.assertEquals("/test/mh_default_org/player/config.json",
+        response.getHeaderString(X_ACCEL_REDIRECT_PROPERTY));
   }
 }

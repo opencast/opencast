@@ -33,8 +33,8 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +101,7 @@ public class MediaPackagePostOperationHandlerTest {
     try {
       tuple.workflowHandler.start(tuple.workflowInstance, null);
       /* This should raise an exception. Something is wrong if not. */
-      Assert.fail();
+      Assertions.fail();
     } catch (WorkflowOperationException e) {
       logger.info(e.toString());
     }
@@ -126,7 +126,7 @@ public class MediaPackagePostOperationHandlerTest {
     try {
       tuple.workflowHandler.start(tuple.workflowInstance, null);
       /* This should raise an exception. Something is wrong if not. */
-      Assert.fail();
+      Assertions.fail();
     } catch (WorkflowOperationException e) {
       logger.info(e.toString());
     }

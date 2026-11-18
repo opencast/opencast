@@ -21,12 +21,12 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.metadata.dublincore.DublinCore.ENC_SCHEME_URI;
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_ANY;
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_UNDEFINED;
@@ -64,12 +64,11 @@ import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -116,18 +115,18 @@ public class DublinCoreTest {
 
   private DublinCoreCatalogService service = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     catalogFile = new File(this.getClass().getResource(catalogName).toURI());
-    File tmpCatalogFile = testFolder.newFile();
+    File tmpCatalogFile = File.createTempFile("junit", null, testFolder);
     FileUtils.copyFile(catalogFile, tmpCatalogFile);
-    File tmpCatalogFile2 = testFolder.newFile();
+    File tmpCatalogFile2 = File.createTempFile("junit", null, testFolder);
     FileUtils.copyFile(catalogFile, tmpCatalogFile2);
     catalogFile2 = new File(this.getClass().getResource(catalogName2).toURI());
     if (!catalogFile.exists() || !catalogFile.canRead()) {
@@ -149,7 +148,7 @@ public class DublinCoreTest {
   /**
    * @throws java.io.IOException
    */
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(dcTempFile1);
     FileUtils.deleteQuietly(dcTempFile2);
@@ -162,9 +161,9 @@ public class DublinCoreTest {
   public void testParseDublinCoreListXML() throws Exception {
     String dublinCoreListString = IOUtils.toString(getClass().getResourceAsStream(xmlCatalogListName), "UTF-8");
     DublinCoreCatalogList catalogList = DublinCoreCatalogList.parse(dublinCoreListString);
-    Assert.assertEquals(2, catalogList.getTotalCount());
-    Assert.assertEquals("Land 1", catalogList.getCatalogList().get(0).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
-    Assert.assertEquals("Land 2", catalogList.getCatalogList().get(1).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
+    Assertions.assertEquals(2, catalogList.getTotalCount());
+    Assertions.assertEquals("Land 1", catalogList.getCatalogList().get(0).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
+    Assertions.assertEquals("Land 2", catalogList.getCatalogList().get(1).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
   }
 
   /**
@@ -174,9 +173,9 @@ public class DublinCoreTest {
   public void testParseDublinCoreListJSON() throws Exception {
     String dublinCoreListString = IOUtils.toString(getClass().getResourceAsStream(jsonCatalogListName), "UTF-8");
     DublinCoreCatalogList catalogList = DublinCoreCatalogList.parse(dublinCoreListString);
-    Assert.assertEquals(2, catalogList.getTotalCount());
-    Assert.assertEquals("Land 1", catalogList.getCatalogList().get(0).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
-    Assert.assertEquals("Land 2", catalogList.getCatalogList().get(1).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
+    Assertions.assertEquals(2, catalogList.getTotalCount());
+    Assertions.assertEquals("Land 1", catalogList.getCatalogList().get(0).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
+    Assertions.assertEquals("Land 2", catalogList.getCatalogList().get(1).getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
   }
 
   /**
@@ -197,10 +196,10 @@ public class DublinCoreTest {
     assertNotNull(dcTerms);
 
     JsonArray titleArray = dcTerms.getAsJsonArray("title");
-    assertEquals("Three titles should be present", 3, titleArray.size());
+    assertEquals(3, titleArray.size(), "Three titles should be present");
 
     JsonArray subjectArray = dcTerms.getAsJsonArray("subject");
-    assertEquals("The subject should be present", 1, subjectArray.size());
+    assertEquals(1, subjectArray.size(), "The subject should be present");
 
     DublinCoreCatalog fromJson = DublinCores.read(IOUtils.toInputStream(jsonString));
     assertEquals(3, fromJson.getLanguages(PROPERTY_TITLE).size());
@@ -226,7 +225,7 @@ public class DublinCoreTest {
 
       // Create a new catalog and fill it with a few fields
       DublinCoreCatalog dcNew = DublinCores.mkOpencastEpisode().getCatalog();
-      dcTempFile1 = testFolder.newFile();
+      dcTempFile1 = File.createTempFile("junit", null, testFolder);
 
       // Add the required fields
       dcNew.add(PROPERTY_IDENTIFIER, dcSample.getFirst(PROPERTY_IDENTIFIER));
@@ -435,8 +434,8 @@ public class DublinCoreTest {
     mp.add(catalogFile2.toURI(), Catalog.TYPE, MediaPackageElements.SERIES);
     MediaPackageMetadata metadata = service.getMetadata(mp);
 
-    assertEquals("Mediapackage metadata title not extracted from DC properly",
-            catalog.getFirst(DublinCore.PROPERTY_TITLE), metadata.getTitle());
+    assertEquals(catalog.getFirst(DublinCore.PROPERTY_TITLE),
+            metadata.getTitle(), "Mediapackage metadata title not extracted from DC properly");
   }
 
   @Test
@@ -447,19 +446,19 @@ public class DublinCoreTest {
     IOUtils.closeQuietly(in);
 
     String inputXml = IOUtils.toString(new FileInputStream(catalogFile2), "UTF-8");
-    Assert.assertTrue(inputXml.contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+    Assertions.assertTrue(inputXml.contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
 
-    Assert.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+    Assertions.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
 
     DublinCoreValue extent = EncodingSchemeUtils.encodeDuration(3000);
     dc.set(DublinCore.PROPERTY_EXTENT, extent);
 
-    Assert.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+    Assertions.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
 
     DublinCoreValue date = EncodingSchemeUtils.encodeDate(new Date(), Precision.Minute);
     dc.set(DublinCore.PROPERTY_CREATED, date);
 
-    Assert.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
+    Assertions.assertTrue(dc.toXmlString().contains("xmlns:dcterms=\"http://purl.org/dc/terms/\""));
   }
 
   // test that exceptions are thrown correctly
@@ -469,21 +468,21 @@ public class DublinCoreTest {
     Precision precision = Precision.Year;
     try {
       EncodingSchemeUtils.encodePeriod(null, precision);
-      Assert.fail("Exceptions should be thrown on null values.");
+      Assertions.fail("Exceptions should be thrown on null values.");
     } catch (Exception e) {
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       EncodingSchemeUtils.encodePeriod(period, null);
-      Assert.fail("Exceptions should be thrown on null values.");
+      Assertions.fail("Exceptions should be thrown on null values.");
     } catch (Exception e) {
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       EncodingSchemeUtils.encodePeriod(null, null);
-      Assert.fail("Exceptions should be thrown on null values.");
+      Assertions.fail("Exceptions should be thrown on null values.");
     } catch (Exception e) {
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
   }
 
@@ -497,46 +496,46 @@ public class DublinCoreTest {
       dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       dc.add(null, (DublinCoreValue) EasyMock.createNiceMock(DublinCoreValue.class));
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       String val2 = null;
       dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       dc.add(null, "");
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       String val2 = null;
       dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val2, val2);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       String val2 = null;
       dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), "", val2);
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
     try {
       dc.add(null, "", "");
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
-      Assert.assertFalse(e instanceof NullPointerException);
+      Assertions.assertFalse(e instanceof NullPointerException);
     }
   }
 
@@ -551,10 +550,10 @@ public class DublinCoreTest {
     assertEquals(mimeType, dc.getMimeType());
     // clone
     DublinCoreCatalog dcClone = (DublinCoreCatalog) dc.clone();
-    assertEquals("The mime type should be cloned", dc.getMimeType(), dcClone.getMimeType());
-    assertEquals("The flavor should be cloned", dc.getFlavor(), dcClone.getFlavor());
-    assertEquals("The values should be cloned", dc.getValues(), dcClone.getValues());
-    assertNull("The URI should not be cloned", dcClone.getURI());
-    assertNull("A media package reference should not be cloned.", dcClone.getReference());
+    assertEquals(dc.getMimeType(), dcClone.getMimeType(), "The mime type should be cloned");
+    assertEquals(dc.getFlavor(), dcClone.getFlavor(), "The flavor should be cloned");
+    assertEquals(dc.getValues(), dcClone.getValues(), "The values should be cloned");
+    assertNull(dcClone.getURI(), "The URI should not be cloned");
+    assertNull(dcClone.getReference(), "A media package reference should not be cloned.");
   }
 }

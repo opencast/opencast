@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -33,9 +35,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +70,7 @@ public class DefaultsWorkflowOperationHandlerTest {
   // local resources
   private MediaPackage mp;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.createNew();
@@ -92,7 +94,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     String configurationValue = workflowOperationResult.getProperties().get(OPT_KEY);
 
     // Make sure the default value has been applied
-    Assert.assertEquals(DEFAULT_VALUE, configurationValue);
+    Assertions.assertEquals(DEFAULT_VALUE, configurationValue);
   }
 
   @Test
@@ -112,7 +114,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     String configurationValue = workflowOperationResult.getProperties().get(OPT_KEY);
 
     // Make sure the default value has been applied
-    Assert.assertNotEquals(DEFAULT_VALUE, configurationValue);
+    assertNotEquals(DEFAULT_VALUE, configurationValue);
   }
 
   /**
@@ -181,7 +183,7 @@ public class DefaultsWorkflowOperationHandlerTest {
 
     // Run the media package through the operation handler, ensuring that metadata gets added
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(result.getAction(), Action.CONTINUE);
+    Assertions.assertEquals(result.getAction(), Action.CONTINUE);
     return result;
 
   }

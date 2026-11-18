@@ -21,16 +21,16 @@
 
 package org.opencastproject.assetmanager.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
@@ -40,15 +40,15 @@ public class DistributionPathUtilsTest {
   private static final String ORGANIZATION = "mh_default_org";
   private static final String FILE_URL = DOWNLOAD_URL + "/" + ORGANIZATION + "/engage-player/mp1/element1/video.mp4";
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   private File downloadDirectory;
   private File distributedFile;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    downloadDirectory = testFolder.newFolder("download");
+    downloadDirectory = newFolder(testFolder, "download");
     distributedFile = new File(downloadDirectory, ORGANIZATION + "/engage-player/mp1/element1/video.mp4");
     FileUtils.writeStringToFile(distributedFile, "video", StandardCharsets.UTF_8);
   }
@@ -69,7 +69,7 @@ public class DistributionPathUtilsTest {
     String query = "?policy=eyJTdGF0ZW1lbnQiOnt9fQ&keyId=mh_default_org&signature=abc123";
 
     for (String uri : new String[]{FILE_URL + query, FILE_URL + "#t=10", FILE_URL + query + "#t=10"}) {
-      assertEquals(uri, distributedFile.getAbsoluteFile(), getLocalFile(uri).getAbsoluteFile());
+      assertEquals(distributedFile.getAbsoluteFile(), getLocalFile(uri).getAbsoluteFile(), uri);
     }
   }
 
@@ -85,5 +85,14 @@ public class DistributionPathUtilsTest {
     assertNull(getLocalFile("http://example.com/static/mh_default_org/engage-player/mp1/element1/video.mp4"));
     assertNull(getLocalFile(DOWNLOAD_URL + "/" + ORGANIZATION + "/engage-player/mp1/element1/missing.mp4"));
     assertNull(getLocalFile(DOWNLOAD_URL + "/" + ORGANIZATION + "/engage-player/mp1/element1/missing.mp4?a=b"));
+  }
+
+  private static File newFolder(File root, String... subDirs) throws IOException {
+    String subFolder = String.join("/", subDirs);
+    File result = new File(root, subFolder);
+    if (!result.mkdirs()) {
+      throw new IOException("Couldn't create folders " + root);
+    }
+    return result;
   }
 }

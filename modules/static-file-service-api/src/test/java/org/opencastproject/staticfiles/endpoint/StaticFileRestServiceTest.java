@@ -23,9 +23,9 @@ package org.opencastproject.staticfiles.endpoint;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -37,10 +37,10 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.MockHttpServletRequest;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -84,7 +84,7 @@ public class StaticFileRestServiceTest {
   /** The test root directory */
   private static URI baseDir;
 
-  @BeforeClass
+  @BeforeAll
   public static void beforeClass() throws URISyntaxException {
     // baseDir = StaticFileServiceImplTest.class.getResource("/").toURI();
     // rootDir = new File(new File(baseDir), "ingest-temp");
@@ -92,12 +92,12 @@ public class StaticFileRestServiceTest {
     // videoFile = new File(StaticFileServiceImplTest.class.getResource("/" + videoFilename).getPath());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     // FileUtils.forceMkdir(rootDir);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     // FileUtils.deleteQuietly(rootDir);
   }

@@ -25,10 +25,10 @@ package org.opencastproject.caption.converters;
 import org.opencastproject.caption.api.Caption;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class DFXPConverterTest {
 
   private String expectedOutput = "<?xml version=\"1.0\" encoding=\"UTF-8\"";
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     dfxpConverter = new DFXPCaptionConverter();
     inputStream = DFXPConverterTest.class.getResourceAsStream("/sample.dfxp.xml");
@@ -65,14 +65,14 @@ public class DFXPConverterTest {
       // verify conversion parsing and exporting without exception
       List<Caption> collection = dfxpConverter.importCaption(inputStream, "en");
       dfxpConverter.exportCaption(outputStream, collection, "en");
-      Assert.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
+      Assertions.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
-  @After
+  @AfterEach
   public void tear() throws IOException {
     IOUtils.closeQuietly(inputStream);
     IOUtils.closeQuietly(outputStream);

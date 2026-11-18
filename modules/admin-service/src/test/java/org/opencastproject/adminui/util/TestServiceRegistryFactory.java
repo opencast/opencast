@@ -32,12 +32,12 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Ignore
+@Disabled
 public final class TestServiceRegistryFactory {
   private static List<ServiceStatistics> testData;
   private static List<HostRegistration> testServers;

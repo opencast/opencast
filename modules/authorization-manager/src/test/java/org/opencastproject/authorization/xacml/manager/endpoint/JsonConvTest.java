@@ -22,14 +22,14 @@
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static io.restassured.path.json.JsonPath.from;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.security.api.AccessControlUtil.entry;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

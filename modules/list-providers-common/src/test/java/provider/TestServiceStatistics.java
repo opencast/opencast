@@ -25,7 +25,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Date;
 
@@ -37,7 +37,7 @@ import java.util.Date;
  * @author ademasi
  *
  */
-@Ignore
+@Disabled
 public class TestServiceStatistics implements ServiceStatistics {
 
   public static final long MEAN_RUNTIME = 99L;

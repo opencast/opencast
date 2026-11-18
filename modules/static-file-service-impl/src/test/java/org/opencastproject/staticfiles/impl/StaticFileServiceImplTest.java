@@ -21,8 +21,9 @@
 
 package org.opencastproject.staticfiles.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -33,11 +34,11 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -66,14 +67,14 @@ public class StaticFileServiceImplTest {
   /** The org directory service */
   private OrganizationDirectoryService orgDir;
 
-  @BeforeClass
+  @BeforeAll
   public static void beforeClass() throws Exception {
     rootDir = Files.createTempDirectory("static-file-service-test").toFile();
     imageFile = new File(StaticFileServiceImplTest.class.getResource("/" + imageFilename).toURI());
     videoFile = new File(StaticFileServiceImplTest.class.getResource("/" + videoFilename).toURI());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     FileUtils.forceMkdir(rootDir);
 
@@ -82,7 +83,7 @@ public class StaticFileServiceImplTest {
     EasyMock.replay(orgDir);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     FileUtils.deleteQuietly(rootDir);
   }
@@ -113,20 +114,22 @@ public class StaticFileServiceImplTest {
   /**
    * Without the root directory the service should throw a RuntimeException.
    */
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testStoreStaticFileThrowsConfigurationException() throws Exception {
-    BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(EasyMock.anyObject(String.class))).andStubReturn(null);
-    EasyMock.replay(bundleContext);
+    assertThrows(RuntimeException.class, () -> {
+      BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
+      EasyMock.expect(bundleContext.getProperty(EasyMock.anyObject(String.class))).andStubReturn(null);
+      EasyMock.replay(bundleContext);
 
-    ComponentContext cc = EasyMock.createMock(ComponentContext.class);
-    EasyMock.expect(cc.getBundleContext()).andStubReturn(bundleContext);
-    EasyMock.replay(cc);
+      ComponentContext cc = EasyMock.createMock(ComponentContext.class);
+      EasyMock.expect(cc.getBundleContext()).andStubReturn(bundleContext);
+      EasyMock.replay(cc);
 
-    // Run the test
-    StaticFileServiceImpl staticFile = new StaticFileServiceImpl();
-    staticFile.setOrganizationDirectoryService(orgDir);
-    staticFile.activate(cc);
+      // Run the test
+      StaticFileServiceImpl staticFile = new StaticFileServiceImpl();
+      staticFile.setOrganizationDirectoryService(orgDir);
+      staticFile.activate(cc);
+    });
   }
 
   @Test
@@ -176,21 +179,21 @@ public class StaticFileServiceImplTest {
     try {
       staticFileServiceImpl.deleteFile(imageUUID);
     } catch (NotFoundException e) {
-      Assert.fail("File not found for deletion");
+      Assertions.fail("File not found for deletion");
     }
 
     try {
       staticFileServiceImpl.getFile(imageUUID);
-      Assert.fail("File not deleted");
+      Assertions.fail("File not deleted");
     } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
 
     try {
       staticFileServiceImpl.deleteFile(imageUUID);
-      Assert.fail("File not deleted");
+      Assertions.fail("File not deleted");
     } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
   }
 

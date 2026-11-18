@@ -22,18 +22,17 @@
 
 package org.opencastproject.metadata.mpeg7;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.awt.Rectangle;
 import java.io.File;
@@ -56,13 +55,13 @@ public class Mpeg7Test {
   /** Temp file for mpeg7 catalog contents */
   private File mpeg7TempFile = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     catalogFile = new File(this.getClass().getResource(catalogName).toURI());
     if (!catalogFile.exists() || !catalogFile.canRead()) {
@@ -70,7 +69,7 @@ public class Mpeg7Test {
     }
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(mpeg7TempFile);
   }
@@ -94,7 +93,7 @@ public class Mpeg7Test {
     Mpeg7Catalog mpeg7Sample = new Mpeg7CatalogImpl(catalogFile.toURI().toURL().openStream());
 
     // Create a new catalog and fill it with a few fields
-    mpeg7TempFile = testFolder.newFile();
+    mpeg7TempFile = File.createTempFile("junit", null, testFolder);
 
     // TODO: Add sample tracks to new catalog
     // TODO: Add sample video segments to new catalog

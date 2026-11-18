@@ -21,14 +21,14 @@
 
 package org.opencastproject.security.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +46,7 @@ public class UserParsingTest {
 
   private JAXBContext jaxbContext;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     jaxbContext = JAXBContext.newInstance(JaxbUser.class);
   }

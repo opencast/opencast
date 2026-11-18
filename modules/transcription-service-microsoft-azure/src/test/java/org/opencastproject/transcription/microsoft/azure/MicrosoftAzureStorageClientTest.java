@@ -23,9 +23,9 @@ package org.opencastproject.transcription.microsoft.azure;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class MicrosoftAzureStorageClientTest {
 
   private MicrosoftAzureStorageClient azureStorageClient;
 
-  @Before
+  @BeforeEach
   public void setUp() throws MicrosoftAzureStorageClientException {
     azureStorageAccountName = System.getenv().getOrDefault("AZURE_STORAGE_ACCOUNT_NAME", "");
     azureAccountAccessKey = System.getenv().getOrDefault("AZURE_ACCOUNT_ACCESS_KEY", "");
@@ -80,7 +80,7 @@ public class MicrosoftAzureStorageClientTest {
       return;
     }
     boolean containerExists = azureStorageClient.containerExists(azureStorageContainerName);
-    Assert.assertTrue(containerExists);
+    Assertions.assertTrue(containerExists);
   }
 
   @Test
@@ -91,8 +91,8 @@ public class MicrosoftAzureStorageClientTest {
       return;
     }
     Map<String, String> containerProps = azureStorageClient.getContainerProperties(azureStorageContainerName);
-    Assert.assertNotNull(containerProps);
-    Assert.assertFalse(containerProps.isEmpty());
+    Assertions.assertNotNull(containerProps);
+    Assertions.assertFalse(containerProps.isEmpty());
     logger.debug("Container properties: {}", containerProps);
   }
 
@@ -115,8 +115,8 @@ public class MicrosoftAzureStorageClientTest {
     URL testFileUrl = MicrosoftAzureStorageClientTest.class.getResource("/test.txt");
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
-    Assert.assertTrue("Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt",
-        Strings.CI.endsWith(blobUrl, "/" + azureStorageContainerName + "/test.txt"));
+    Assertions.assertTrue(Strings.CI.endsWith(blobUrl, "/" + azureStorageContainerName + "/test.txt"),
+        "Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt");
   }
 
   @Test
@@ -129,8 +129,8 @@ public class MicrosoftAzureStorageClientTest {
     URL testFileUrl = MicrosoftAzureStorageClientTest.class.getResource("/test.ogg");
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.ogg");
-    Assert.assertTrue("Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt",
-        Strings.CI.endsWith(blobUrl, "/" + azureStorageContainerName + "/test.ogg"));
+    Assertions.assertTrue(Strings.CI.endsWith(blobUrl, "/" + azureStorageContainerName + "/test.ogg"),
+        "Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt");
   }
 
   @Test
@@ -143,7 +143,7 @@ public class MicrosoftAzureStorageClientTest {
     URL testFileUrl = MicrosoftAzureStorageClientTest.class.getResource("/test.txt");
     File testFile = new File(testFileUrl.toURI());
     String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
-    Assert.assertNotNull(blobUrl);
+    Assertions.assertNotNull(blobUrl);
     azureStorageClient.deleteFile(URI.create(blobUrl).toURL());
   }
 }

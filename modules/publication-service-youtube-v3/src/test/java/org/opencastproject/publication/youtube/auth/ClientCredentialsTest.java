@@ -21,23 +21,22 @@
 
 package org.opencastproject.publication.youtube.auth;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.publication.youtube.UnitTestUtils;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ClientCredentialsTest {
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   @Test
   public void testToStringNullTolerance() {
@@ -48,7 +47,7 @@ public class ClientCredentialsTest {
   public void testParsingJSON() throws IOException {
     final String clientId = "652137994117.apps.googleusercontent.com";
     final File clientSecretsFile = UnitTestUtils.getMockClientSecretsFile(clientId,
-        testFolder.newFile("client-secrets-youtube-v3.json"));
+        newFile(testFolder, "client-secrets-youtube-v3.json"));
     try {
       final ClientCredentials cc = new ClientCredentials();
       cc.setClientSecrets(clientSecretsFile);
@@ -66,6 +65,12 @@ public class ClientCredentialsTest {
         fail("Invalid YouTube v3 auth configuration where scope = " + scope);
       }
     }
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 
 }

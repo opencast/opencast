@@ -37,7 +37,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.net.URI;
 import java.net.URL;
@@ -49,7 +49,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestJobEndpoint extends JobEndpoint {
 
   private ServiceRegistry serviceRegistry;

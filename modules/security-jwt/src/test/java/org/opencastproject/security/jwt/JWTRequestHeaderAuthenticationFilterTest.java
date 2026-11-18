@@ -24,14 +24,14 @@ package org.opencastproject.security.jwt;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.nimbusds.jose.JOSEException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedCredentialsNotFoundException;
 
 import java.security.NoSuchAlgorithmException;
@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 public class JWTRequestHeaderAuthenticationFilterTest extends JWTLoginTest {
   private JWTRequestHeaderAuthenticationFilter headerAuthFilter = new JWTRequestHeaderAuthenticationFilter();
 
-  @Override @Before
+  @Override @BeforeEach
   public void setUp() throws NoSuchAlgorithmException, JOSEException {
     super.setUp();
 

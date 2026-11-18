@@ -24,14 +24,14 @@ package org.opencastproject.security.jwt;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -46,7 +46,7 @@ public class JWTVerifierTest {
   private JWKSetProvider validProvider;
   private JWKSetProvider invalidProvider;
 
-  @Before
+  @BeforeEach
   public void setUp() throws NoSuchAlgorithmException, JOSEException {
     generator = JWTGenerator.getInstance();
 

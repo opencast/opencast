@@ -20,10 +20,10 @@
  */
 package org.opencastproject.waveform.ffmpeg;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
@@ -38,8 +38,8 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,7 +59,7 @@ public class WaveformServiceImplTest {
   private static Track audioTrack = null;
   private static Track dummyTrack = null;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws Exception {
     audioTrack = readTrackFromResource("/audio-track.xml");
     audioTrack.setURI(Objects.requireNonNull(WaveformServiceImplTest.class.getResource("/test.mp3")).toURI());

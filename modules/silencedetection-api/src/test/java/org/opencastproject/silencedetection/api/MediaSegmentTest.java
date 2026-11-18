@@ -21,11 +21,11 @@
 
 package org.opencastproject.silencedetection.api;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class MediaSegmentTest {
 
   private List<MediaSegment> segments = new LinkedList<MediaSegment>();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     List<MediaSegment> segments = new LinkedList<MediaSegment>();
     segments.add(new MediaSegment(0L, 10L));

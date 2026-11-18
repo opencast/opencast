@@ -23,8 +23,8 @@ package org.opencastproject.lifecyclemanagement.impl;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class LifeCyclePolicyTest {
   public void testPolicy() throws Exception {
     LifeCyclePolicy policy = new LifeCyclePolicyImpl();
     policy.setTitle("title");
-    Assert.assertEquals(policy.getTitle(), "title");
+    Assertions.assertEquals(policy.getTitle(), "title");
   }
 
   @Test
@@ -51,9 +51,9 @@ public class LifeCyclePolicyTest {
     entries.add(policyEntry2);
 
     policy.setAccessControlEntries(entries);
-    Assert.assertEquals(2, policy.getAccessControlEntries().size());
+    Assertions.assertEquals(2, policy.getAccessControlEntries().size());
 
     List<LifeCyclePolicyAccessControlEntry> policyEntries = policy.getAccessControlEntries();
-    Assert.assertEquals(policyEntries.get(0).getRole(), "ROLE_USER_BOB");
+    Assertions.assertEquals(policyEntries.get(0).getRole(), "ROLE_USER_BOB");
   }
 }

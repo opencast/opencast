@@ -38,8 +38,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -94,6 +94,6 @@ public class MetadataToAclWorkflowOperationHandlerTest {
     service.start(workflowInstance, null);
 
     // We should have two entries for Jane
-    Assert.assertEquals(2, acl.getValue().getEntries().size());
+    Assertions.assertEquals(2, acl.getValue().getEntries().size());
   }
 }

@@ -20,6 +20,8 @@
  */
 package org.opencastproject.email.template.impl;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
@@ -41,9 +43,9 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,7 +64,7 @@ public class EmailTemplateServiceImplTest {
   private MediaPackage mp;
   private URI uriMP;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -216,7 +218,7 @@ public class EmailTemplateServiceImplTest {
     String templateContent = "This is the media package: ${mediaPackage.identifier}";
 
     String result = service.applyTemplate(templateName, templateContent, workflowInstance);
-    Assert.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", result);
+    Assertions.assertEquals("This is the media package: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557", result);
   }
 
   @Test
@@ -225,7 +227,7 @@ public class EmailTemplateServiceImplTest {
     String templateContent = null;
 
     String result = service.applyTemplate(templateName, templateContent, workflowInstance);
-    Assert.assertEquals("Media package id: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557, workflow id: 1, "
+    Assertions.assertEquals("Media package id: 3e7bb56d-2fcc-4efe-9f0e-d6e56422f557, workflow id: 1, "
             + "title: Test Media Package, series title: Fall 2013 Test, " + "date: 2013-11-19T15:20:00Z", result);
   }
 
@@ -235,7 +237,7 @@ public class EmailTemplateServiceImplTest {
     String templateContent = null;
 
     String result = service.applyTemplate(templateName, templateContent, workflowInstance);
-    Assert.assertEquals("EPISODE creator: Rute Santos, isPartOf: 20140119997, "
+    Assertions.assertEquals("EPISODE creator: Rute Santos, isPartOf: 20140119997, "
             + "title: Test Media Package, created: 2013-11-19T15:20:00Z, "
             + "SERIES creator: Harvard Extension School, description: http://extension.harvard.edu, "
             + "subject: TEST E-19997", result);
@@ -247,7 +249,7 @@ public class EmailTemplateServiceImplTest {
     String templateContent = null;
 
     String result = service.applyTemplate(templateName, templateContent, workflowInstance);
-    Assert.assertEquals("Engage URL is: http://engage.my.edu", result);
+    Assertions.assertEquals("Engage URL is: http://engage.my.edu", result);
   }
 
   @Test
@@ -256,7 +258,7 @@ public class EmailTemplateServiceImplTest {
     String templateContent = "This is an email address: ${workflowConfig['emailAddress']}";
 
     String result = service.applyTemplate(templateName, templateContent, workflowInstance);
-    Assert.assertEquals("This is an email address: user@domain.com", result);
+    Assertions.assertEquals("This is an email address: user@domain.com", result);
   }
 
   @Test
@@ -265,15 +267,17 @@ public class EmailTemplateServiceImplTest {
     String templateContent = null;
 
     String result = service.applyTemplate(templateName, templateContent, workflowInstance);
-    Assert.assertEquals("Workflow failed in operation: operation1, "
+    Assertions.assertEquals("Workflow failed in operation: operation1, "
             + "Workflow errors: error in operation1 error in operation2 ", result);
   }
 
-  @Test(expected = Exception.class)
-  public void testErrorInTemplate() throws Exception {
-    String templateName = "templateSyntaxError";
-    String templateContent = null;
+  @Test
+  public void testErrorInTemplate() {
+    assertThrows(Exception.class, () -> {
+      String templateName = "templateSyntaxError";
+      String templateContent = null;
 
-    service.applyTemplate(templateName, templateContent, workflowInstance);
+      service.applyTemplate(templateName, templateContent, workflowInstance);
+    });
   }
 }

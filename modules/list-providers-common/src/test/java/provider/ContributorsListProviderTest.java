@@ -31,9 +31,9 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class ContributorsListProviderTest {
   private User user4;
   private JpaOrganization organization;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     String expectedFormat = "{\"organization\":\"mh_default\",\"username\":\"akm220\","
         + "\"presentation\":\"Adam McKenzie\"}";
@@ -133,18 +133,18 @@ public class ContributorsListProviderTest {
         ContributorsListProvider.NAMES_TO_USERNAMES, null
     );
 
-    Assert.assertTrue(list.containsKey(user1.getUsername()));
-    Assert.assertTrue(list.containsKey(user2.getUsername()));
-    Assert.assertTrue(list.containsKey(user3.getUsername()));
+    Assertions.assertTrue(list.containsKey(user1.getUsername()));
+    Assertions.assertTrue(list.containsKey(user2.getUsername()));
+    Assertions.assertTrue(list.containsKey(user3.getUsername()));
 
-    Assert.assertTrue(list.containsValue(user1.getName()));
-    Assert.assertTrue(list.containsValue(user2.getName()));
-    Assert.assertTrue(list.containsValue(user3.getUsername()));
+    Assertions.assertTrue(list.containsValue(user1.getName()));
+    Assertions.assertTrue(list.containsValue(user2.getName()));
+    Assertions.assertTrue(list.containsValue(user3.getUsername()));
 
-    Assert.assertTrue(list.containsKey("User 5"));
-    Assert.assertTrue(list.containsValue("User 5"));
+    Assertions.assertTrue(list.containsKey("User 5"));
+    Assertions.assertTrue(list.containsValue("User 5"));
 
-    Assert.assertEquals(5, list.size());
+    Assertions.assertEquals(5, list.size());
   }
 
   @Test
@@ -156,18 +156,18 @@ public class ContributorsListProviderTest {
     Map<String, String> list = contributorsListProvider.getList(
         ContributorsListProvider.NAMES_TO_USERNAMES, null);
 
-    Assert.assertFalse(list.containsKey(user1.getUsername()));
-    Assert.assertFalse(list.containsKey(user2.getUsername()));
-    Assert.assertFalse(list.containsKey(user3.getUsername()));
+    Assertions.assertFalse(list.containsKey(user1.getUsername()));
+    Assertions.assertFalse(list.containsKey(user2.getUsername()));
+    Assertions.assertFalse(list.containsKey(user3.getUsername()));
 
-    Assert.assertTrue(list.containsValue(user1.getName()));
-    Assert.assertFalse(list.containsValue(user2.getName()));
-    Assert.assertFalse(list.containsValue(user3.getUsername()));
+    Assertions.assertTrue(list.containsValue(user1.getName()));
+    Assertions.assertFalse(list.containsValue(user2.getName()));
+    Assertions.assertFalse(list.containsValue(user3.getUsername()));
 
-    Assert.assertTrue(list.containsKey("User 5"));
-    Assert.assertTrue(list.containsValue("User 5"));
+    Assertions.assertTrue(list.containsKey("User 5"));
+    Assertions.assertTrue(list.containsValue("User 5"));
 
-    Assert.assertEquals(2, list.size());
+    Assertions.assertEquals(2, list.size());
   }
 
   @Test
@@ -175,16 +175,16 @@ public class ContributorsListProviderTest {
     Map<String, String> list = contributorsListProvider.getList(
         ContributorsListProvider.DEFAULT, null);
 
-    Assert.assertTrue(list.containsKey(user1.getName()));
-    Assert.assertTrue(list.containsKey(user2.getName()));
+    Assertions.assertTrue(list.containsKey(user1.getName()));
+    Assertions.assertTrue(list.containsKey(user2.getName()));
 
-    Assert.assertTrue(list.containsValue(user1.getName()));
-    Assert.assertTrue(list.containsValue(user2.getName()));
+    Assertions.assertTrue(list.containsValue(user1.getName()));
+    Assertions.assertTrue(list.containsValue(user2.getName()));
 
-    Assert.assertTrue(list.containsKey("User 5"));
-    Assert.assertTrue(list.containsValue("User 5"));
+    Assertions.assertTrue(list.containsKey("User 5"));
+    Assertions.assertTrue(list.containsValue("User 5"));
 
-    Assert.assertEquals(3, list.size());
+    Assertions.assertEquals(3, list.size());
   }
 
   @Test
@@ -196,15 +196,15 @@ public class ContributorsListProviderTest {
     Map<String, String> list = contributorsListProvider.getList(
         ContributorsListProvider.DEFAULT, null);
 
-    Assert.assertTrue(list.containsKey(user1.getName()));
-    Assert.assertTrue(list.containsValue("User 1"));
-    Assert.assertFalse(list.containsKey(user2.getName()));
-    Assert.assertFalse(list.containsKey(user3.getName()));
+    Assertions.assertTrue(list.containsKey(user1.getName()));
+    Assertions.assertTrue(list.containsValue("User 1"));
+    Assertions.assertFalse(list.containsKey(user2.getName()));
+    Assertions.assertFalse(list.containsKey(user3.getName()));
 
-    Assert.assertTrue(list.containsKey("User 5"));
-    Assert.assertTrue(list.containsValue("User 5"));
+    Assertions.assertTrue(list.containsKey("User 5"));
+    Assertions.assertTrue(list.containsValue("User 5"));
 
-    Assert.assertEquals(2, list.size());
+    Assertions.assertEquals(2, list.size());
   }
 
   @Test
@@ -212,11 +212,14 @@ public class ContributorsListProviderTest {
     DefaultResourceListQuery query = new DefaultResourceListQuery();
     query.setLimit(0);
     query.setOffset(0);
-    Assert.assertEquals(5, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
+    Assertions.assertEquals(5,
+        contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
     query.setOffset(3);
-    Assert.assertEquals(2, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
+    Assertions.assertEquals(2,
+        contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
     query.setOffset(0);
     query.setLimit(1);
-    Assert.assertEquals(1, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
+    Assertions.assertEquals(1,
+        contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
   }
 }

@@ -21,7 +21,7 @@
 
 package provider;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListQuery;
@@ -32,8 +32,8 @@ import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class ServersListProviderTest {
   private static final String HOST3 = "host3";
   private static final String HOST4 = "host4";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
 

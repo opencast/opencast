@@ -21,9 +21,9 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -39,8 +39,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.apache.commons.lang3.math.Fraction;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
 
   private AnalyzeTracksWorkflowOperationHandler operationHandler;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     operationHandler = new AnalyzeTracksWorkflowOperationHandler();
   }

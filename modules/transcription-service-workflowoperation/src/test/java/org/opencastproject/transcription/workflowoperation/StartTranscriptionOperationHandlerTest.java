@@ -20,6 +20,8 @@
  */
 package org.opencastproject.transcription.workflowoperation;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -37,9 +39,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -61,7 +63,7 @@ public class StartTranscriptionOperationHandlerTest {
   private WorkflowInstance workflowInstance;
   private Capture<Track> capturedTrack;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -111,9 +113,9 @@ public class StartTranscriptionOperationHandlerTest {
     operation.setConfiguration(StartTranscriptionOperationHandler.SOURCE_FLAVOR, "audio/ogg");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertEquals("audioTrack1", capturedTrack.getValue().getIdentifier());
+    Assertions.assertEquals("audioTrack1", capturedTrack.getValue().getIdentifier());
   }
 
   @Test
@@ -121,9 +123,9 @@ public class StartTranscriptionOperationHandlerTest {
     operation.setConfiguration(StartTranscriptionOperationHandler.SOURCE_TAG, "transcript");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertEquals("audioTrack1", capturedTrack.getValue().getIdentifier());
+    Assertions.assertEquals("audioTrack1", capturedTrack.getValue().getIdentifier());
   }
 
   @Test
@@ -132,7 +134,7 @@ public class StartTranscriptionOperationHandlerTest {
     operation.setConfiguration(StartTranscriptionOperationHandler.SKIP_IF_FLAVOR_EXISTS, "audio/ogg");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   @Test
@@ -142,13 +144,14 @@ public class StartTranscriptionOperationHandlerTest {
     operation.setConfiguration(StartTranscriptionOperationHandler.SKIP_IF_FLAVOR_EXISTS, "captions/timedtext");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertEquals("audioTrack1", capturedTrack.getValue().getIdentifier());
+    Assertions.assertEquals("audioTrack1", capturedTrack.getValue().getIdentifier());
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testStartMissingConfiguration() throws Exception {
-    operationHandler.start(workflowInstance, null);
+    assertThrows(WorkflowOperationException.class, () ->
+        operationHandler.start(workflowInstance, null));
   }
 }

@@ -21,13 +21,13 @@
 
 package org.opencastproject.list.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.list.util.ListProviderUtil.filterMap;
 import static org.opencastproject.list.util.ListProviderUtil.sortMapByValue;
 
 import org.opencastproject.list.api.DefaultResourceListQuery;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 import java.util.Iterator;

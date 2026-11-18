@@ -35,8 +35,8 @@ import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.api.YamlWorkflowParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -50,7 +50,7 @@ public class WorkflowInstanceTest {
     WorkflowInstance workflow = new WorkflowInstance();
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     workflow.setMediaPackage(mp);
-    Assert.assertEquals(mp.getIdentifier(), workflow.getMediaPackage().getIdentifier());
+    Assertions.assertEquals(mp.getIdentifier(), workflow.getMediaPackage().getIdentifier());
   }
 
   @Test
@@ -62,11 +62,11 @@ public class WorkflowInstanceTest {
     Map<String, String> props = new HashMap<String, String>();
     props.put("key1", "value1");
     WorkflowInstance instance = new WorkflowInstance(def, null, null, null, props);
-    Assert.assertEquals(def.getId(), instance.getTemplate());
-    Assert.assertEquals("value1", instance.getConfiguration("key1"));
+    Assertions.assertEquals(def.getId(), instance.getTemplate());
+    Assertions.assertEquals("value1", instance.getConfiguration("key1"));
     def.setTitle("a title");
     instance = new WorkflowInstance(def, null, null, null, null);
-    Assert.assertEquals(def.getTitle(), instance.getTitle());
+    Assertions.assertEquals(def.getTitle(), instance.getTitle());
   }
 
   @Test
@@ -79,7 +79,7 @@ public class WorkflowInstanceTest {
     MediaPackage deserialized = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(MediaPackageParser.getAsXml(src));
     workflow.setMediaPackage(deserialized);
-    Assert.assertEquals(1, workflow.getMediaPackage().getTracks().length);
+    Assertions.assertEquals(1, workflow.getMediaPackage().getTracks().length);
   }
 
   @Test
@@ -101,7 +101,7 @@ public class WorkflowInstanceTest {
         + "<checksum type=\"md5\">20e466615251074e127a1627fd0dae3e</checksum></catalog></metadata></mediapackage>";
     MediaPackage src = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(xml);
     workflow.setMediaPackage(src);
-    Assert.assertEquals(2, workflow.getMediaPackage().getTracks().length);
+    Assertions.assertEquals(2, workflow.getMediaPackage().getTracks().length);
   }
 
   @Test
@@ -109,15 +109,15 @@ public class WorkflowInstanceTest {
     InputStream in = getClass().getResourceAsStream("/workflow-definition-1.yaml");
     WorkflowDefinition def = YamlWorkflowParser.parseWorkflowDefinition(in);
     IOUtils.closeQuietly(in);
-    Assert.assertEquals("The First Workflow Definition", def.getTitle());
-    Assert.assertEquals(2, def.getOperations().size());
-    Assert.assertEquals("definition-1", def.getId());
-    Assert.assertEquals("Unit testing workflow", def.getDescription());
-    Assert.assertEquals("partial-error", def.getOperations().get(1).getExceptionHandlingWorkflow());
-    Assert.assertEquals("value1", def.getOperations().get(1).getConfiguration("key1"));
-    Assert.assertEquals("value2", def.getOperations().get(1).getConfiguration("key2"));
-    Assert.assertTrue(Arrays.asList(def.getTags()).contains("tag1"));
-    Assert.assertEquals(100, def.getDisplayOrder());
+    Assertions.assertEquals("The First Workflow Definition", def.getTitle());
+    Assertions.assertEquals(2, def.getOperations().size());
+    Assertions.assertEquals("definition-1", def.getId());
+    Assertions.assertEquals("Unit testing workflow", def.getDescription());
+    Assertions.assertEquals("partial-error", def.getOperations().get(1).getExceptionHandlingWorkflow());
+    Assertions.assertEquals("value1", def.getOperations().get(1).getConfiguration("key1"));
+    Assertions.assertEquals("value2", def.getOperations().get(1).getConfiguration("key2"));
+    Assertions.assertTrue(Arrays.asList(def.getTags()).contains("tag1"));
+    Assertions.assertEquals(100, def.getDisplayOrder());
   }
 
   @Test
@@ -125,10 +125,10 @@ public class WorkflowInstanceTest {
     InputStream in = getClass().getResourceAsStream("/workflow-definition-1.xml");
     WorkflowDefinition def = XmlWorkflowParser.parseWorkflowDefinition(in);
     IOUtils.closeQuietly(in);
-    Assert.assertEquals("The First Workflow Definition", def.getTitle());
-    Assert.assertEquals(2, def.getOperations().size());
-    Assert.assertEquals("definition-1", def.getId());
-    Assert.assertEquals("Unit testing workflow", def.getDescription());
+    Assertions.assertEquals("The First Workflow Definition", def.getTitle());
+    Assertions.assertEquals(2, def.getOperations().size());
+    Assertions.assertEquals("definition-1", def.getId());
+    Assertions.assertEquals("Unit testing workflow", def.getDescription());
   }
 
   @Test
@@ -148,7 +148,7 @@ public class WorkflowInstanceTest {
 
     // Get it back from xml
     WorkflowInstance instance2 = XmlWorkflowParser.parseWorkflowInstance(xml);
-    Assert.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
+    Assertions.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
             instance2.getMediaPackage().getTracks()[0].getFlavor());
 
     String namespaceXml = "<workflow xmlns=\"http://workflow.opencastproject.org\" "
@@ -156,7 +156,7 @@ public class WorkflowInstanceTest {
         + "<mp:track type=\"presentation/source\" id=\"track-1\"><mp:url>http://testing</mp:url></mp:track>"
         + "</mp:media></mp:mediapackage></workflow>";
     WorkflowInstance instance3 = XmlWorkflowParser.parseWorkflowInstance(namespaceXml);
-    Assert.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
+    Assertions.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
             instance3.getMediaPackage().getTracks()[0].getFlavor());
   }
 }

@@ -21,14 +21,15 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
 import static org.opencastproject.util.ReflectionUtil.run;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBTestEnv;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
@@ -38,61 +39,63 @@ public class BundleInfoDbTest {
     final BundleInfoDb db = db();
     final BundleInfo info = bundleInfo("localhost", "bundle", 1L, "1.4.0", Optional.of("1345"), Optional.of("9012"));
     db.store(info);
-    assertEquals("db contains an element", 1, db.getBundles().size());
+    assertEquals(1, db.getBundles().size(), "db contains an element");
     for (final BundleInfo a : db.getBundles()) {
       run(BundleInfo.class, new BundleInfo() {
         @Override
         public String getHost() {
-          assertEquals("host persisted", info.getHost(), a.getHost());
+          assertEquals(info.getHost(), a.getHost(), "host persisted");
           return null;
         }
 
         @Override
         public String getBundleSymbolicName() {
-          assertEquals("bundle symbolic name persisted", info.getBundleSymbolicName(), a.getBundleSymbolicName());
+          assertEquals(info.getBundleSymbolicName(), a.getBundleSymbolicName(), "bundle symbolic name persisted");
           return null;
         }
 
         @Override
         public long getBundleId() {
-          assertEquals("bundle id persisted", info.getBundleId(), a.getBundleId());
+          assertEquals(info.getBundleId(), a.getBundleId(), "bundle id persisted");
           return 0L;
         }
 
         @Override
         public String getBundleVersion() {
-          assertEquals("bundle version persisted", info.getBundleVersion(), a.getBundleVersion());
+          assertEquals(info.getBundleVersion(), a.getBundleVersion(), "bundle version persisted");
           return null;
         }
 
         @Override
         public Optional<String> getBuildNumber() {
-          assertEquals("build number persisted", info.getBuildNumber(), a.getBuildNumber());
+          assertEquals(info.getBuildNumber(), a.getBuildNumber(), "build number persisted");
           return null;
         }
 
         @Override
         public BundleVersion getVersion() {
-          assertEquals("bundle version persisted", info.getVersion().getBundleVersion(), a.getVersion()
-                  .getBundleVersion());
-          assertEquals("build number persisted", info.getVersion().getBuildNumber(), a.getVersion().getBuildNumber());
+          assertEquals(info.getVersion().getBundleVersion(), a.getVersion()
+                  .getBundleVersion(), "bundle version persisted");
+          assertEquals(info.getVersion().getBuildNumber(), a.getVersion().getBuildNumber(), "build number persisted");
           return null;
         }
       });
     }
     db.clearAll();
-    assertEquals("db is empty", 0, db.getBundles().size());
+    assertEquals(0, db.getBundles().size(), "db is empty");
     //
     db.store(bundleInfo("localhost", "bundle", 2L, "1.4.1", Optional.<String> empty()));
-    assertEquals("no build number", Optional.<String> empty(), db.getBundles().get(0).getBuildNumber());
+    assertEquals(Optional.<String> empty(), db.getBundles().get(0).getBuildNumber(), "no build number");
   }
 
-  @Test(expected = BundleInfoDbException.class)
+  @Test
   public void testContstraints() {
-    final BundleInfoDb db = db();
-    db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", Optional.empty()));
-    // insert violates constraints
-    db.store(bundleInfo("localhost", "bundle-1", 5L, "1.4.0", Optional.of("ae41b09")));
+    assertThrows(BundleInfoDbException.class, () -> {
+      final BundleInfoDb db = db();
+      db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", Optional.empty()));
+      // insert violates constraints
+      db.store(bundleInfo("localhost", "bundle-1", 5L, "1.4.0", Optional.of("ae41b09")));
+    });
   }
 
   @Test
@@ -128,11 +131,11 @@ public class BundleInfoDbTest {
     final BundleInfoDb db = db();
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", Optional.empty()));
     db.store(bundleInfo("remote", "matterhorn-1", 1L, "1.4.0", Optional.empty()));
-    assertEquals("db size", 2, db.getBundles().size());
+    assertEquals(2, db.getBundles().size(), "db size");
     db.clear("localhost");
-    assertEquals("db size", 1, db.getBundles().size());
+    assertEquals(1, db.getBundles().size(), "db size");
     db.clear("remote");
-    assertEquals("db size", 0, db.getBundles().size());
+    assertEquals(0, db.getBundles().size(), "db size");
   }
 
   private BundleInfoDb db() {

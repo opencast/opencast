@@ -34,9 +34,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -53,7 +53,7 @@ public class ZipWorkflowOperationHandlerTest {
   private MediaPackage mp;
   private Workspace workspace = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(this.getClass().getResourceAsStream("/archive_mediapackage.xml"));
@@ -99,7 +99,7 @@ public class ZipWorkflowOperationHandlerTest {
 
     try {
       operationHandler.start(null, null);
-      Assert.fail("A null workflow is passed so an exception should be thrown");
+      Assertions.fail("A null workflow is passed so an exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
     }
@@ -125,7 +125,7 @@ public class ZipWorkflowOperationHandlerTest {
 
     try {
       operationHandler.start(instance, null);
-      Assert.fail("A null mediapackage is passed so an exception should be thrown");
+      Assertions.fail("A null mediapackage is passed so an exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
     }
@@ -151,10 +151,10 @@ public class ZipWorkflowOperationHandlerTest {
 
     try {
       WorkflowOperationResult result = operationHandler.start(instance, null);
-      Assert.assertEquals("workflow result action not CONTINUE: " + result.getAction(),
-          WorkflowOperationResult.Action.CONTINUE, result.getAction());
+      Assertions.assertEquals(WorkflowOperationResult.Action.CONTINUE,
+          result.getAction(), "workflow result action not CONTINUE: " + result.getAction());
     } catch (WorkflowOperationException e) {
-      Assert.fail("missing target-flavor and no default value kicked in: " + e);
+      Assertions.fail("missing target-flavor and no default value kicked in: " + e);
     }
 
   }
@@ -188,11 +188,11 @@ public class ZipWorkflowOperationHandlerTest {
 
     try {
       operationHandler.start(instance, null);
-      Assert.fail("An unsafe media package identifier must be rejected");
+      Assertions.fail("An unsafe media package identifier must be rejected");
     } catch (WorkflowOperationException e) {
-      Assert.assertTrue("Unexpected cause " + e.getCause(),
-              e.getCause() instanceof WorkflowOperationException
-                      && "Invalid media package identifier".equals(e.getCause().getMessage()));
+      Assertions.assertTrue(e.getCause() instanceof WorkflowOperationException
+                      && "Invalid media package identifier".equals(e.getCause().getMessage()),
+              "Unexpected cause " + e.getCause());
     }
   }
 }

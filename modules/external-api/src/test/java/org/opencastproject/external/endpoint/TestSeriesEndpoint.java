@@ -50,7 +50,7 @@ import org.opencastproject.util.data.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -65,7 +65,7 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 @Path("")
-@Ignore
+@Disabled
 public class TestSeriesEndpoint extends SeriesEndpoint {
 
   @SuppressWarnings("unchecked")

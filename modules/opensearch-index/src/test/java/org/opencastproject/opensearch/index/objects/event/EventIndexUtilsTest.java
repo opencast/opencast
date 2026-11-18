@@ -34,8 +34,8 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.User;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
@@ -44,7 +44,7 @@ public class EventIndexUtilsTest {
   private User user;
   private final JaxbOrganization defaultOrganization = new DefaultOrganization();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     user = new JaxbUser("test", "test", defaultOrganization, new JaxbRole(
             DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, defaultOrganization));

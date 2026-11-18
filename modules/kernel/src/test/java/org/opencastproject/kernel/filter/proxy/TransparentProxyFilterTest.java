@@ -20,13 +20,13 @@
  */
 package org.opencastproject.kernel.filter.proxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public class TransparentProxyFilterTest {
 
   private FilterChain chain;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     TrustedProxies trustedProxies = new TrustedProxies();
     trustedProxies.modified(Map.of(TrustedProxies.TRUSTED_PROXIES_KEY, "10.0.0.0/8"));
@@ -111,7 +111,7 @@ public class TransparentProxyFilterTest {
   @Test
   public void testUntrustedPeerIsLeftAlone() throws Exception {
     run(CLIENT, "192.0.2.7");
-    assertEquals("the spoofed header must be ignored", CLIENT, forwarded.getRemoteAddr());
+    assertEquals(CLIENT, forwarded.getRemoteAddr(), "the spoofed header must be ignored");
     assertNull(attributes.get(TransparentProxyFilter.FORWARDED_HEADERS_TRUSTED));
   }
 
@@ -119,8 +119,8 @@ public class TransparentProxyFilterTest {
   public void testTrustedProxyWithoutHeader() throws Exception {
     run(PROXY, (String[]) null);
     assertEquals(PROXY, forwarded.getRemoteAddr());
-    assertTrue("later filters still need to know the peer is a proxy",
-        (Boolean) attributes.get(TransparentProxyFilter.FORWARDED_HEADERS_TRUSTED));
+    assertTrue((Boolean) attributes.get(TransparentProxyFilter.FORWARDED_HEADERS_TRUSTED),
+        "later filters still need to know the peer is a proxy");
   }
 
   @Test
@@ -133,8 +133,8 @@ public class TransparentProxyFilterTest {
   public void testMultipleHeaderLinesAreJoined() throws Exception {
     // A proxy adding a header line of its own rather than extending the one the client sent, like HAProxy does
     run(PROXY, "192.0.2.7", CLIENT);
-    assertEquals("the line added by the proxy must win over the one sent by the client",
-        CLIENT, forwarded.getRemoteAddr());
+    assertEquals(CLIENT, forwarded.getRemoteAddr(),
+        "the line added by the proxy must win over the one sent by the client");
   }
 
   @Test

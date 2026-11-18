@@ -27,9 +27,9 @@ import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MediapackageMetadataImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetadataExtractionTest {
   private WorkflowServiceImpl service;
@@ -43,7 +43,7 @@ public class MetadataExtractionTest {
   private static final String TITLE = "title";
   private static final String SERIES = "series";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // set up service
     service = new WorkflowServiceImpl();
@@ -61,11 +61,11 @@ public class MetadataExtractionTest {
   @Test
   public void testMetadata() throws Exception {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    Assert.assertNull(mp.getTitle());
+    Assertions.assertNull(mp.getTitle());
     // now run the mediapackage through the metadata population process. This works here because the mock always
     // returns metadata.
     service.populateMediaPackageMetadata(mp);
-    Assert.assertEquals(TITLE, mp.getTitle());
-    Assert.assertEquals(SERIES, mp.getSeriesTitle());
+    Assertions.assertEquals(TITLE, mp.getTitle());
+    Assertions.assertEquals(SERIES, mp.getSeriesTitle());
   }
 }

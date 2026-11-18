@@ -21,23 +21,26 @@
 
 package org.opencastproject.publication.youtube;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.util.XProperties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class YouTubeUtilsTest {
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testGetWhenRequired() {
-    YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3, true);
+    assertThrows(IllegalArgumentException.class, () ->
+        YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3, true));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testGetWhenRequiredByDefault() {
-    YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3);
+    assertThrows(IllegalArgumentException.class, () ->
+        YouTubeUtils.get(new XProperties(), YouTubeKey.clientSecretsV3));
   }
 
   @Test

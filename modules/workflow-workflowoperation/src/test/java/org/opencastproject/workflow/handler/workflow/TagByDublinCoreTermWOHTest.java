@@ -31,9 +31,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class TagByDublinCoreTermWOHTest {
   private MediaPackage mp;
   private Workspace workspace;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(this.getClass().getResourceAsStream("/archive_mediapackage.xml"));
@@ -86,8 +86,8 @@ public class TagByDublinCoreTermWOHTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
-    Assert.assertEquals("tag1", catalog.getTags()[0]);
-    Assert.assertEquals("tag2", catalog.getTags()[1]);
+    Assertions.assertEquals("tag1", catalog.getTags()[0]);
+    Assertions.assertEquals("tag2", catalog.getTags()[1]);
   }
 
   @Test
@@ -105,9 +105,9 @@ public class TagByDublinCoreTermWOHTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
-    Assert.assertEquals(2, catalog.getTags().length);
-    Assert.assertEquals("tag1", catalog.getTags()[0]);
-    Assert.assertEquals("tag2", catalog.getTags()[1]);
+    Assertions.assertEquals(2, catalog.getTags().length);
+    Assertions.assertEquals("tag1", catalog.getTags()[0]);
+    Assertions.assertEquals("tag2", catalog.getTags()[1]);
   }
 
   @Test
@@ -125,8 +125,8 @@ public class TagByDublinCoreTermWOHTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
-    Assert.assertEquals(1, catalog.getTags().length);
-    Assert.assertEquals("archive", catalog.getTags()[0]);
+    Assertions.assertEquals(1, catalog.getTags().length);
+    Assertions.assertEquals("archive", catalog.getTags()[0]);
   }
 
   @Test
@@ -143,8 +143,8 @@ public class TagByDublinCoreTermWOHTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
-    Assert.assertEquals(1, catalog.getTags().length);
-    Assert.assertEquals("archive", catalog.getTags()[0]);
+    Assertions.assertEquals(1, catalog.getTags().length);
+    Assertions.assertEquals("archive", catalog.getTags()[0]);
   }
 
   @Test
@@ -161,7 +161,7 @@ public class TagByDublinCoreTermWOHTest {
     MediaPackage resultingMediapackage = result.getMediaPackage();
 
     Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
-    Assert.assertEquals(1, catalog.getTags().length);
-    Assert.assertEquals("archive", catalog.getTags()[0]);
+    Assertions.assertEquals(1, catalog.getTags().length);
+    Assertions.assertEquals("archive", catalog.getTags()[0]);
   }
 }

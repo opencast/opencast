@@ -37,9 +37,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +56,7 @@ public class ThemesServiceDatabaseTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -85,29 +85,29 @@ public class ThemesServiceDatabaseTest {
 
     Theme theme = new Theme(Optional.<Long> empty(), new Date(), true, creator, "New");
     Theme updateTheme = themesDatabase.updateTheme(theme);
-    Assert.assertEquals("New", updateTheme.getName());
-    Assert.assertEquals(1, themesDatabase.countThemes());
+    Assertions.assertEquals("New", updateTheme.getName());
+    Assertions.assertEquals(1, themesDatabase.countThemes());
     theme = new Theme(updateTheme.getId(), new Date(), true, creator, "Updated");
 
     updateTheme = themesDatabase.updateTheme(theme);
-    Assert.assertEquals("Updated", updateTheme.getName());
-    Assert.assertEquals(1, themesDatabase.countThemes());
+    Assertions.assertEquals("Updated", updateTheme.getName());
+    Assertions.assertEquals(1, themesDatabase.countThemes());
 
     try {
       theme = themesDatabase.getTheme(updateTheme.getId().get());
-      Assert.assertNotNull(theme);
+      Assertions.assertNotNull(theme);
     } catch (NotFoundException e) {
-      Assert.fail("Existing theme has not been found");
+      Assertions.fail("Existing theme has not been found");
     }
 
     themesDatabase.deleteTheme(updateTheme.getId().get());
-    Assert.assertEquals(0, themesDatabase.countThemes());
+    Assertions.assertEquals(0, themesDatabase.countThemes());
 
     try {
       themesDatabase.getTheme(updateTheme.getId().get());
-      Assert.fail("Deleted theme has been found");
+      Assertions.fail("Deleted theme has been found");
     } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
   }
 
@@ -136,7 +136,7 @@ public class ThemesServiceDatabaseTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(3, themes.size());
+    Assertions.assertEquals(3, themes.size());
 
     // With limit
     themes = themesDatabase.findThemes(
@@ -146,7 +146,7 @@ public class ThemesServiceDatabaseTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(1, themes.size());
+    Assertions.assertEquals(1, themes.size());
 
     themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
@@ -155,7 +155,7 @@ public class ThemesServiceDatabaseTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(3, themes.size());
+    Assertions.assertEquals(3, themes.size());
 
     // With offset
     themes = themesDatabase.findThemes(
@@ -165,7 +165,7 @@ public class ThemesServiceDatabaseTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, themes.size());
+    Assertions.assertEquals(2, themes.size());
 
     // With sort
     SortCriterion sortCriterion1 = new SortCriterion("creation_date", SortCriterion.Order.Descending);
@@ -180,9 +180,9 @@ public class ThemesServiceDatabaseTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals("B theme", themes.get(0).getName());
-    Assert.assertEquals("C theme", themes.get(1).getName());
-    Assert.assertEquals("A theme", themes.get(2).getName());
+    Assertions.assertEquals("B theme", themes.get(0).getName());
+    Assertions.assertEquals("C theme", themes.get(1).getName());
+    Assertions.assertEquals("A theme", themes.get(2).getName());
 
     // With filter
     themes = themesDatabase.findThemes(
@@ -192,7 +192,7 @@ public class ThemesServiceDatabaseTest {
         Optional.ofNullable("admin"),
         Optional.empty()
     );
-    Assert.assertEquals(1, themes.size());
+    Assertions.assertEquals(1, themes.size());
 
     themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
@@ -201,6 +201,6 @@ public class ThemesServiceDatabaseTest {
         Optional.empty(),
         Optional.ofNullable("admin")
     );
-    Assert.assertEquals(1, themes.size());
+    Assertions.assertEquals(1, themes.size());
   }
 }

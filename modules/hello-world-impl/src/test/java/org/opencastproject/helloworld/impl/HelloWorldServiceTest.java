@@ -23,9 +23,9 @@ package org.opencastproject.helloworld.impl;
 
 import org.opencastproject.helloworld.api.HelloWorldService;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class for Hello World Tutorial
@@ -37,23 +37,23 @@ public class HelloWorldServiceTest {
   /**
    * Setup for the Hello World Service
    */
-  @Before
+  @BeforeEach
   public void setUp() {
     service = new HelloWorldServiceImpl();
   }
 
   @Test
   public void testHelloWorld() throws Exception {
-    Assert.assertEquals("Hello World", service.helloWorld());
+    Assertions.assertEquals("Hello World", service.helloWorld());
   }
 
   @Test
   public void testHelloNameEmpty() throws Exception {
-    Assert.assertEquals("Hello!", service.helloName(""));
+    Assertions.assertEquals("Hello!", service.helloName(""));
   }
 
   @Test
   public void testHelloName() throws Exception {
-    Assert.assertEquals("Hello Johannes!", service.helloName("Johannes"));
+    Assertions.assertEquals("Hello Johannes!", service.helloName("Johannes"));
   }
 }

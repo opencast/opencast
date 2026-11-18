@@ -30,10 +30,10 @@ import org.opencastproject.util.UrlSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -47,7 +47,7 @@ public class WorkingFileRepositoryRestEndpointTest {
 
   private WorkingFileRepositoryRestEndpoint endpoint = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     Organization organization = EasyMock.createMock(Organization.class);
     EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
@@ -68,7 +68,7 @@ public class WorkingFileRepositoryRestEndpointTest {
     endpoint.servicePath = WorkingFileRepositoryImpl.URI_PREFIX;
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(new File(endpoint.rootDirectory));
   }
@@ -90,7 +90,7 @@ public class WorkingFileRepositoryRestEndpointTest {
     // execute gets, and ensure that the content types are correct
     Response response = endpoint.restGet(mediaPackageId, image, null);
 
-    Assert.assertEquals("Gif content type", "image/gif", response.getMetadata().getFirst("Content-Type"));
+    Assertions.assertEquals("image/gif", response.getMetadata().getFirst("Content-Type"), "Gif content type");
 
     // Make sure the image byte stream was not modified by the content type detection
     try {
@@ -98,7 +98,7 @@ public class WorkingFileRepositoryRestEndpointTest {
       byte[] bytesFromClasspath = IOUtils.toByteArray(in);
       responseIn = (InputStream) response.getEntity();
       byte[] bytesFromRepo = IOUtils.toByteArray(responseIn);
-      Assert.assertTrue(Arrays.equals(bytesFromClasspath, bytesFromRepo));
+      Assertions.assertTrue(Arrays.equals(bytesFromClasspath, bytesFromRepo));
     } finally {
       IOUtils.closeQuietly(in);
       IOUtils.closeQuietly(responseIn);
@@ -120,7 +120,7 @@ public class WorkingFileRepositoryRestEndpointTest {
     // execute gets, and ensure that the content types are correct
     Response response = endpoint.restGetFromCollection("collection-2", "opencast_header.gif");
 
-    Assert.assertEquals("Gif content type", "image/gif", response.getMetadata().getFirst("Content-Type"));
+    Assertions.assertEquals("image/gif", response.getMetadata().getFirst("Content-Type"), "Gif content type");
   }
 
 
@@ -135,14 +135,14 @@ public class WorkingFileRepositoryRestEndpointTest {
     // execute gets, and ensure that the content types are correct
     Response response = endpoint.restGet(mediaPackageId, dc, null);
 
-    Assert.assertEquals("DC content type", "text/xml", response.getMetadata().getFirst("Content-Type"));
+    Assertions.assertEquals("text/xml", response.getMetadata().getFirst("Content-Type"), "DC content type");
 
     // Make sure the image byte stream was not modified by the content type detection
     try (InputStream in = getClass().getResourceAsStream("/dublincore.xml")) {
       byte[] imageBytesFromClasspath = IOUtils.toByteArray(in);
       try (InputStream responseIn = (InputStream) response.getEntity()) {
         byte[] imageBytesFromRepo = IOUtils.toByteArray(responseIn);
-        Assert.assertTrue(Arrays.equals(imageBytesFromClasspath, imageBytesFromRepo));
+        Assertions.assertTrue(Arrays.equals(imageBytesFromClasspath, imageBytesFromRepo));
       }
     }
   }

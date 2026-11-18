@@ -82,11 +82,11 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -135,7 +135,7 @@ public class IngestServiceImplTest {
   private MediaPackage ingestMediaPackage;
   private MediaPackage schedulerMediaPackage;
 
-  @BeforeClass
+  @BeforeAll
   public static void beforeClass() throws URISyntaxException {
     baseDir = IngestServiceImplTest.class.getResource("/").toURI();
     urlTrack = IngestServiceImplTest.class.getResource("/av.mov").toURI();
@@ -154,7 +154,7 @@ public class IngestServiceImplTest {
 
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     //This looks dumb, but is required so we can override things in testAuthWhitelist
     setupService();
@@ -345,7 +345,7 @@ public class IngestServiceImplTest {
     service.testMode = true;
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     FileUtils.deleteQuietly(ingestTempDir);
   }
@@ -364,10 +364,10 @@ public class IngestServiceImplTest {
     mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, null,
         mediaPackage);
     WorkflowInstance instance = service.ingest(mediaPackage);
-    Assert.assertEquals(1, mediaPackage.getTracks().length);
-    Assert.assertEquals(1, mediaPackage.getCatalogs().length);
-    Assert.assertEquals(1, mediaPackage.getAttachments().length);
-    Assert.assertEquals(workflowInstanceID, instance.getId());
+    Assertions.assertEquals(1, mediaPackage.getTracks().length);
+    Assertions.assertEquals(1, mediaPackage.getCatalogs().length);
+    Assertions.assertEquals(1, mediaPackage.getAttachments().length);
+    Assertions.assertEquals(workflowInstanceID, instance.getId());
   }
 
   @Test
@@ -382,9 +382,9 @@ public class IngestServiceImplTest {
 
       // Assert.assertEquals(2, mediaPackage.getTracks().length);
       // Assert.assertEquals(3, mediaPackage.getCatalogs().length);
-      Assert.assertEquals(workflowInstanceID, instance.getId());
+      Assertions.assertEquals(workflowInstanceID, instance.getId());
     } catch (IOException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } finally {
       IOUtils.closeQuietly(packageStream);
     }
@@ -403,9 +403,9 @@ public class IngestServiceImplTest {
 
       // Assert.assertEquals(2, mediaPackage.getTracks().length);
       // Assert.assertEquals(3, mediaPackage.getCatalogs().length);
-      Assert.assertEquals(workflowInstanceID, instance.getId());
+      Assertions.assertEquals(workflowInstanceID, instance.getId());
     } catch (IOException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     } finally {
       IOUtils.closeQuietly(packageStream);
     }
@@ -420,14 +420,14 @@ public class IngestServiceImplTest {
     try {
       mediaPackage = service.addTrack(URI.create("http://www.test.com/testfile"), null, null, mediaPackage);
     } catch (Exception e) {
-      Assert.fail("Unable to read content dispostion filename: " + e.getMessage());
+      Assertions.fail("Unable to read content dispostion filename: " + e.getMessage());
     }
 
     try {
       mediaPackage = service.addTrack(urlTrackNoFilename, null, null, mediaPackage);
-      Assert.fail("Allowed adding content without filename!");
+      Assertions.fail("Allowed adding content without filename!");
     } catch (Exception e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
   }
 
@@ -473,7 +473,7 @@ public class IngestServiceImplTest {
       service.addTrack(URI.create(url), null, null, mediaPackage);
     } catch (IOException e) {
       if (!shouldFail) {
-        Assert.fail("Should not have failed!");
+        Assertions.fail("Should not have failed!");
       }
     }
     EasyMock.verify(customClient, httpClient);
@@ -534,7 +534,7 @@ public class IngestServiceImplTest {
 
     MediaPackage mediaPackage = service.createMediaPackage();
     Catalog[] catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
-    Assert.assertEquals(0, catalogs.length);
+    Assertions.assertEquals(0, catalogs.length);
 
     mediaPackage = service.addPartialTrack(presenterUri, MediaPackageElements.PRESENTER_SOURCE_PARTIAL, 60000L,
             mediaPackage);
@@ -544,22 +544,22 @@ public class IngestServiceImplTest {
             mediaPackage);
 
     catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
-    Assert.assertEquals(0, catalogs.length);
+    Assertions.assertEquals(0, catalogs.length);
 
     FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
             service, false, true);
     service.ingest(mediaPackage);
     catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
-    Assert.assertEquals(1, catalogs.length);
+    Assertions.assertEquals(1, catalogs.length);
 
-    Assert.assertEquals(MimeTypes.SMIL, catalogs[0].getMimeType());
+    Assertions.assertEquals(MimeTypes.SMIL, catalogs[0].getMimeType());
     Either<Exception, Document> eitherDoc = XmlUtil.parseNs(new InputSource(catalogs[0].getURI().toURL().openStream()));
-    Assert.assertTrue(eitherDoc.isRight());
+    Assertions.assertTrue(eitherDoc.isRight());
     Document document = eitherDoc.right().value();
-    Assert.assertEquals(1, document.getElementsByTagName("par").getLength());
-    Assert.assertEquals(2, document.getElementsByTagName("seq").getLength());
-    Assert.assertEquals(2, document.getElementsByTagName("video").getLength());
-    Assert.assertEquals(1, document.getElementsByTagName("audio").getLength());
+    Assertions.assertEquals(1, document.getElementsByTagName("par").getLength());
+    Assertions.assertEquals(2, document.getElementsByTagName("seq").getLength());
+    Assertions.assertEquals(2, document.getElementsByTagName("video").getLength());
+    Assertions.assertEquals(1, document.getElementsByTagName("audio").getLength());
   }
 
   @Test
@@ -583,26 +583,26 @@ public class IngestServiceImplTest {
     service.setDublinCoreService(dcService);
 
     MediaPackage mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
-    Assert.assertEquals(4, mergedMediaPackage.getTracks().length);
+    Assertions.assertEquals(4, mergedMediaPackage.getTracks().length);
     Track track = mergedMediaPackage.getTrack("track-1");
-    Assert.assertEquals("/vonlya1.mov", track.getURI().toString());
-    Assert.assertEquals(4, mergedMediaPackage.getCatalogs().length);
-    Assert.assertEquals(2, mergedMediaPackage.getAttachments().length);
+    Assertions.assertEquals("/vonlya1.mov", track.getURI().toString());
+    Assertions.assertEquals(4, mergedMediaPackage.getCatalogs().length);
+    Assertions.assertEquals(2, mergedMediaPackage.getAttachments().length);
     Attachment attachment = mergedMediaPackage.getAttachment("cover");
-    Assert.assertEquals("attachments/cover.png", attachment.getURI().toString());
+    Assertions.assertEquals("attachments/cover.png", attachment.getURI().toString());
 
     // Validate fields
-    Assert.assertEquals(10045L, mergedMediaPackage.getDuration().doubleValue(), 0L);
-    Assert.assertEquals("t2", mergedMediaPackage.getTitle());
-    Assert.assertEquals("s2", mergedMediaPackage.getSeries());
-    Assert.assertEquals("st2", mergedMediaPackage.getSeriesTitle());
-    Assert.assertEquals("l2", mergedMediaPackage.getLicense());
-    Assert.assertEquals(1, mergedMediaPackage.getSubjects().length);
-    Assert.assertEquals("s2", mergedMediaPackage.getSubjects()[0]);
-    Assert.assertEquals(1, mergedMediaPackage.getContributors().length);
-    Assert.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
-    Assert.assertEquals(1, mergedMediaPackage.getCreators().length);
-    Assert.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
+    Assertions.assertEquals(10045L, mergedMediaPackage.getDuration().doubleValue(), 0L);
+    Assertions.assertEquals("t2", mergedMediaPackage.getTitle());
+    Assertions.assertEquals("s2", mergedMediaPackage.getSeries());
+    Assertions.assertEquals("st2", mergedMediaPackage.getSeriesTitle());
+    Assertions.assertEquals("l2", mergedMediaPackage.getLicense());
+    Assertions.assertEquals(1, mergedMediaPackage.getSubjects().length);
+    Assertions.assertEquals("s2", mergedMediaPackage.getSubjects()[0]);
+    Assertions.assertEquals(1, mergedMediaPackage.getContributors().length);
+    Assertions.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
+    Assertions.assertEquals(1, mergedMediaPackage.getCreators().length);
+    Assertions.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
 
 
   }
@@ -629,8 +629,8 @@ public class IngestServiceImplTest {
     service.updated(properties);
     // Existing Opencast mp has 3 catalogs and 1 attachment, the ingest mp has 4 and 2.
     mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
-    Assert.assertEquals(0, mergedMediaPackage.getCatalogs().length);
-    Assert.assertEquals(1, mergedMediaPackage.getAttachments().length);
+    Assertions.assertEquals(0, mergedMediaPackage.getCatalogs().length);
+    Assertions.assertEquals(1, mergedMediaPackage.getAttachments().length);
   }
 
   @Test
@@ -649,7 +649,7 @@ public class IngestServiceImplTest {
     EasyMock.replay(dcService);
     service.setDublinCoreService(dcService);
     isAddOnlyNew = service.isAddOnlyNew;
-    Assert.assertFalse("Updated overwrite property to false", isAddOnlyNew);
+    Assertions.assertFalse(isAddOnlyNew, "Updated overwrite property to false");
     testEpisodeUpdateNewAndExisting();
   }
 
@@ -662,7 +662,8 @@ public class IngestServiceImplTest {
     properties.put("blahblah", "blahblah");
     service.updated(properties);
     isAddOnlyNew = service.isAddOnlyNew;
-    Assert.assertTrue("Is Add Only New defaults to true when param is not found (i.e. commented out)", isAddOnlyNew);
+    Assertions.assertTrue(isAddOnlyNew,
+        "Is Add Only New defaults to true when param is not found (i.e. commented out)");
 
   }
 
@@ -673,7 +674,7 @@ public class IngestServiceImplTest {
     properties = new HashMap<>();
     service.updated(properties);
     isAddOnlyNew = service.isAddOnlyNew;
-    Assert.assertTrue("Overwrite property defaults to true when param is commented out", isAddOnlyNew);
+    Assertions.assertTrue(isAddOnlyNew, "Overwrite property defaults to true when param is commented out");
   }
 
 
@@ -713,7 +714,7 @@ public class IngestServiceImplTest {
     Map<String, String> wfConfig = new HashMap<>();
     wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, "6f7a7850-3232-4719-9064-24c9bad2832f");
     service.ingest(ingestMediaPackage, null, wfConfig);
-    Assert.assertFalse(captureConfig.getValue().containsKey(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
+    Assertions.assertFalse(captureConfig.getValue().containsKey(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
   }
 
   /**
@@ -747,19 +748,19 @@ public class IngestServiceImplTest {
 
   @Test
   public void testFailedJobs() throws Exception {
-    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
-    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    Assertions.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assertions.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
     service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, null, service.createMediaPackage());
-    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
-    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    Assertions.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assertions.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
     try {
       service.addTrack(URI.create("file//baduri"), MediaPackageElements.PRESENTATION_SOURCE, null,
               service.createMediaPackage());
     } catch (Exception e) {
       // Ignore exception
     }
-    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
-    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    Assertions.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assertions.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
   }
 
   @Test
@@ -769,11 +770,11 @@ public class IngestServiceImplTest {
     try {
       service.addTrack(brokenUpload(), "track.mp4", MediaPackageElements.PRESENTATION_SOURCE,
               service.createMediaPackage());
-      Assert.fail("The interrupted upload should have failed");
+      Assertions.fail("The interrupted upload should have failed");
     } catch (IOException e) {
       // expected
     }
-    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+    Assertions.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
   }
 
   @Test
@@ -788,12 +789,12 @@ public class IngestServiceImplTest {
     for (ThrowingUpload upload : uploads) {
       try {
         upload.run();
-        Assert.fail("The interrupted upload should have failed");
+        Assertions.fail("The interrupted upload should have failed");
       } catch (IOException e) {
         // expected
       }
     }
-    Assert.assertEquals(List.of(Job.FailureReason.DATA, Job.FailureReason.DATA, Job.FailureReason.DATA),
+    Assertions.assertEquals(List.of(Job.FailureReason.DATA, Job.FailureReason.DATA, Job.FailureReason.DATA),
             failedJobReasons);
   }
 
@@ -801,11 +802,11 @@ public class IngestServiceImplTest {
   public void testInterruptedZipUploadIsDataFailure() throws Exception {
     try {
       service.addZippedMediaPackage(brokenUpload());
-      Assert.fail("The interrupted upload should have failed");
+      Assertions.fail("The interrupted upload should have failed");
     } catch (IngestException e) {
       // expected
     }
-    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+    Assertions.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
   }
 
   @Test
@@ -822,11 +823,11 @@ public class IngestServiceImplTest {
     try {
       service.addTrack(new ByteArrayInputStream("data".getBytes()), "track.mp4",
               MediaPackageElements.PRESENTATION_SOURCE, service.createMediaPackage());
-      Assert.fail("The failing storage should have failed the ingest");
+      Assertions.fail("The failing storage should have failed the ingest");
     } catch (IOException e) {
       // expected
     }
-    Assert.assertEquals(List.of(Job.FailureReason.NONE), failedJobReasons);
+    Assertions.assertEquals(List.of(Job.FailureReason.NONE), failedJobReasons);
   }
 
   /** Makes the working file repository read all of an upload, like the real one does */
@@ -864,51 +865,51 @@ public class IngestServiceImplTest {
     WorkflowInstance instance = service.ingest(partialIngestMediaPackage);
 
     MediaPackage mergedMediaPackage = instance.getMediaPackage();
-    Assert.assertEquals(4, mergedMediaPackage.getTracks().length);
+    Assertions.assertEquals(4, mergedMediaPackage.getTracks().length);
     Track track = mergedMediaPackage.getTrack("track-1");
-    Assert.assertEquals("/vonlya1.mov", track.getURI().toString());
+    Assertions.assertEquals("/vonlya1.mov", track.getURI().toString());
     // Existing mp has 3 catalogs 1 attachments, ingest mp has 4 and 2.
-    Assert.assertEquals(4, mergedMediaPackage.getCatalogs().length);
-    Assert.assertEquals(2, mergedMediaPackage.getAttachments().length);
+    Assertions.assertEquals(4, mergedMediaPackage.getCatalogs().length);
+    Assertions.assertEquals(2, mergedMediaPackage.getAttachments().length);
     Attachment attachment = mergedMediaPackage.getAttachment("cover");
 
     // The live pub is always omitted, regardless of state of isAddOnlyNew
     Publication[] pubs = this.schedulerMediaPackage.getPublications();
-    Assert.assertEquals("Pub is part of asset managed mediapackage", 1, pubs.length);
+    Assertions.assertEquals(1, pubs.length, "Pub is part of asset managed mediapackage");
     Publication[] pubs2 = mergedMediaPackage.getPublications();
-    Assert.assertEquals("Pub is not added back into ingested mediapackage", 0, pubs2.length);
+    Assertions.assertEquals(0, pubs2.length, "Pub is not added back into ingested mediapackage");
 
     // Validate fields
     if (!isAddOnlyNew) { // overwrite
-      Assert.assertEquals("attachments/cover.png", attachment.getURI().toString());
-      Assert.assertEquals("t2", mergedMediaPackage.getTitle());
-      Assert.assertEquals("t2", mergedMediaPackage.getTitle());
-      Assert.assertEquals("s2", mergedMediaPackage.getSeries());
-      Assert.assertEquals("st2", mergedMediaPackage.getSeriesTitle());
-      Assert.assertEquals("l2", mergedMediaPackage.getLicense());
-      Assert.assertEquals(1, mergedMediaPackage.getSubjects().length);
-      Assert.assertEquals("s2", mergedMediaPackage.getSubjects()[0]);
-      Assert.assertEquals(1, mergedMediaPackage.getContributors().length);
-      Assert.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
-      Assert.assertEquals(1, mergedMediaPackage.getCreators().length);
-      Assert.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
+      Assertions.assertEquals("attachments/cover.png", attachment.getURI().toString());
+      Assertions.assertEquals("t2", mergedMediaPackage.getTitle());
+      Assertions.assertEquals("t2", mergedMediaPackage.getTitle());
+      Assertions.assertEquals("s2", mergedMediaPackage.getSeries());
+      Assertions.assertEquals("st2", mergedMediaPackage.getSeriesTitle());
+      Assertions.assertEquals("l2", mergedMediaPackage.getLicense());
+      Assertions.assertEquals(1, mergedMediaPackage.getSubjects().length);
+      Assertions.assertEquals("s2", mergedMediaPackage.getSubjects()[0]);
+      Assertions.assertEquals(1, mergedMediaPackage.getContributors().length);
+      Assertions.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
+      Assertions.assertEquals(1, mergedMediaPackage.getCreators().length);
+      Assertions.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
 
     } else { // no overwrite
-      Assert.assertEquals("/cover.png", attachment.getURI().toString());
-      Assert.assertEquals("t1", mergedMediaPackage.getTitle());
-      Assert.assertEquals("t1", mergedMediaPackage.getTitle());
-      Assert.assertEquals("s1", mergedMediaPackage.getSeries());
-      Assert.assertEquals("st1", mergedMediaPackage.getSeriesTitle());
-      Assert.assertEquals("l1", mergedMediaPackage.getLicense());
-      Assert.assertEquals(1, mergedMediaPackage.getSubjects().length);
-      Assert.assertEquals("s1", mergedMediaPackage.getSubjects()[0]);
-      Assert.assertEquals(1, mergedMediaPackage.getContributors().length);
-      Assert.assertEquals("sd1", mergedMediaPackage.getContributors()[0]);
-      Assert.assertEquals(1, mergedMediaPackage.getCreators().length);
-      Assert.assertEquals("p1", mergedMediaPackage.getCreators()[0]);
+      Assertions.assertEquals("/cover.png", attachment.getURI().toString());
+      Assertions.assertEquals("t1", mergedMediaPackage.getTitle());
+      Assertions.assertEquals("t1", mergedMediaPackage.getTitle());
+      Assertions.assertEquals("s1", mergedMediaPackage.getSeries());
+      Assertions.assertEquals("st1", mergedMediaPackage.getSeriesTitle());
+      Assertions.assertEquals("l1", mergedMediaPackage.getLicense());
+      Assertions.assertEquals(1, mergedMediaPackage.getSubjects().length);
+      Assertions.assertEquals("s1", mergedMediaPackage.getSubjects()[0]);
+      Assertions.assertEquals(1, mergedMediaPackage.getContributors().length);
+      Assertions.assertEquals("sd1", mergedMediaPackage.getContributors()[0]);
+      Assertions.assertEquals(1, mergedMediaPackage.getCreators().length);
+      Assertions.assertEquals("p1", mergedMediaPackage.getCreators()[0]);
     }
 
-    Assert.assertEquals(10045L, mergedMediaPackage.getDuration().doubleValue(), 0L);
+    Assertions.assertEquals(10045L, mergedMediaPackage.getDuration().doubleValue(), 0L);
 
   }
 
@@ -985,8 +986,8 @@ public class IngestServiceImplTest {
     service.setSeriesService(seriesService);
 
     // This is true or false depending on the isAddOnlyNew value
-    Assert.assertEquals("Desire to update series is " + isUpdateSeries + ".",
-            isUpdateSeries, service.updateSeries(mp));
+    Assertions.assertEquals(isUpdateSeries,
+            service.updateSeries(mp), "Desire to update series is " + isUpdateSeries + ".");
 
     // Test with mock not found exception
     EasyMock.reset(seriesService);
@@ -997,7 +998,7 @@ public class IngestServiceImplTest {
     service.setSeriesService(seriesService);
 
     // This should be true, i.e. create new series, in all cases
-    Assert.assertEquals("Always create a new series catalog.", true, service.updateSeries(mp));
+    Assertions.assertEquals(true, service.updateSeries(mp), "Always create a new series catalog.");
   }
 
 }

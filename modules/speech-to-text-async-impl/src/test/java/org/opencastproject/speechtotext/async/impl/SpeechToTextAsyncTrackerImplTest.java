@@ -31,9 +31,9 @@ import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.speechtotext.async.persistence.SpeechToTextControl;
 import org.opencastproject.speechtotext.async.persistence.SpeechToTextDatabase;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
@@ -51,7 +51,7 @@ public class SpeechToTextAsyncTrackerImplTest {
   private SpeechToTextDatabase database;
   private SpeechToTextAsyncTrackerImpl tracker;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     EntityManagerFactory emf = newEntityManagerFactory(SpeechToTextDatabase.PERSISTENCE_UNIT);
     DBSessionFactory dbSessionFactory = getDbSessionFactory();
@@ -74,11 +74,11 @@ public class SpeechToTextAsyncTrackerImplTest {
     tracker.track(job2.toJob(), MP_ID, WF_ID);
 
     List<SpeechToTextControl> stt = database.findByWorkflowId(WF_ID);
-    Assert.assertEquals(2, stt.size());
-    Assert.assertEquals(MP_ID, stt.get(0).getMediaPackageId());
-    Assert.assertEquals(MP_ID, stt.get(1).getMediaPackageId());
-    Assert.assertEquals(SpeechToTextControl.Status.InProgress, stt.get(0).getStatus());
-    Assert.assertEquals(SpeechToTextControl.Status.InProgress, stt.get(1).getStatus());
+    Assertions.assertEquals(2, stt.size());
+    Assertions.assertEquals(MP_ID, stt.get(0).getMediaPackageId());
+    Assertions.assertEquals(MP_ID, stt.get(1).getMediaPackageId());
+    Assertions.assertEquals(SpeechToTextControl.Status.InProgress, stt.get(0).getStatus());
+    Assertions.assertEquals(SpeechToTextControl.Status.InProgress, stt.get(1).getStatus());
   }
 
   @Test
@@ -89,9 +89,9 @@ public class SpeechToTextAsyncTrackerImplTest {
     tracker.untrack(job1.toJob());
 
     SpeechToTextControl stt = database.findByJob(job1);
-    Assert.assertNotNull(stt);
-    Assert.assertEquals(MP_ID, stt.getMediaPackageId());
-    Assert.assertEquals(SpeechToTextControl.Status.Done, stt.getStatus());
+    Assertions.assertNotNull(stt);
+    Assertions.assertEquals(MP_ID, stt.getMediaPackageId());
+    Assertions.assertEquals(SpeechToTextControl.Status.Done, stt.getStatus());
   }
 
 }

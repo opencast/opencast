@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
@@ -31,11 +31,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +56,7 @@ public class SeriesEndpointTest {
     JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
     JsonObject actual = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
   }
 
   @Test
@@ -69,7 +69,7 @@ public class SeriesEndpointTest {
     JsonObject actual = JsonParser.parseString(given().queryParam("sort", "contributors:DESC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()
                 ).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
 
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_asc.json");
     reader = new InputStreamReader(stream);
@@ -78,7 +78,7 @@ public class SeriesEndpointTest {
     actual = JsonParser.parseString(given().queryParam("sort", "contributors:ASC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()
                 ).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
     // Test Sort by Created Date
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_desc.json");
     reader = new InputStreamReader(stream);
@@ -87,7 +87,7 @@ public class SeriesEndpointTest {
     actual = JsonParser.parseString(given().queryParam("sort", "createdDateTime:DESC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()
                 ).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
 
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_asc.json");
     reader = new InputStreamReader(stream);
@@ -96,7 +96,7 @@ public class SeriesEndpointTest {
     actual = JsonParser.parseString(given().queryParam("sort", "createdDateTime:ASC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()
                 ).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
     // Test Sort by Organizer
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_desc.json");
     reader = new InputStreamReader(stream);
@@ -105,7 +105,7 @@ public class SeriesEndpointTest {
     actual = JsonParser.parseString(given().queryParam("sort", "organizers:DESC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()
                 ).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
 
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_asc.json");
     reader = new InputStreamReader(stream);
@@ -114,7 +114,7 @@ public class SeriesEndpointTest {
     actual = JsonParser.parseString(given().queryParam("sort", "organizers:ASC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()
                 ).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
     // Test Sort by Title
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_desc.json");
     reader = new InputStreamReader(stream);
@@ -122,7 +122,7 @@ public class SeriesEndpointTest {
 
     actual = JsonParser.parseString(given().queryParam("sort", "title:DESC").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
 
     stream = SeriesEndpointTest.class.getResourceAsStream("/series_asc.json");
     reader = new InputStreamReader(stream);
@@ -130,7 +130,7 @@ public class SeriesEndpointTest {
 
     actual = JsonParser.parseString(given().queryParam("sort", "title:ASC").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString()).getAsJsonObject();
-    Assert.assertEquals(expected, actual);
+    Assertions.assertEquals(expected, actual);
 
     given().queryParam("sort", "managed_acl:ASC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .when().get(rt.host("/series.json"));
@@ -192,17 +192,17 @@ public class SeriesEndpointTest {
             .statusCode(HttpStatus.SC_OK).when().post(rt.host("/{seriesId}/access"));
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     Locale.setDefault(Locale.ENGLISH);
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }

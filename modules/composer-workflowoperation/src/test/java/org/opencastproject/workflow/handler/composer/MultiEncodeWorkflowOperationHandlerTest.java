@@ -43,9 +43,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -119,7 +119,7 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     return profile;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -246,16 +246,16 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
 
-    Assert.assertTrue(tracksEncoded.length == 6);
+    Assertions.assertTrue(tracksEncoded.length == 6);
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertEquals(0, trackEncoded.getTags().length);
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertEquals(0, trackEncoded.getTags().length);
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID3);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertEquals(0, trackEncoded.getTags().length);
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertEquals(0, trackEncoded.getTags().length);
+    Assertions.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -274,16 +274,16 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
 
-    Assert.assertTrue(tracksEncoded.length == 6);
+    Assertions.assertTrue(tracksEncoded.length == 6);
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertEquals(2, trackEncoded.getTags().length);
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertEquals(2, trackEncoded.getTags().length);
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID3);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertEquals(2, trackEncoded.getTags().length);
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertEquals(2, trackEncoded.getTags().length);
+    Assertions.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -306,16 +306,16 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
 
-    Assert.assertTrue(tracksEncoded.length == 6);
+    Assertions.assertTrue(tracksEncoded.length == 6);
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags1, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID3);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags2, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags2, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -338,16 +338,16 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
 
-    Assert.assertTrue(tracksEncoded.length == 6);
+    Assertions.assertTrue(tracksEncoded.length == 6);
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags1, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID3);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags2, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags2, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -368,20 +368,20 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
 
-    Assert.assertEquals(4, tracksEncoded.length);
+    Assertions.assertEquals(4, tracksEncoded.length);
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertEquals("presentation/work", trackEncoded.getFlavor().toString());
+    Assertions.assertEquals("presentation/work", trackEncoded.getFlavor().toString());
     String[] tags = (PROFILE1_ID + "," + targetTags).split(",");
     Arrays.sort(tags);
-    Assert.assertArrayEquals(tags, trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_TRACK_ID2, trackEncoded.getReference().getIdentifier());
+    Assertions.assertArrayEquals(tags, trackEncoded.getTags());
+    Assertions.assertEquals(SOURCE_TRACK_ID2, trackEncoded.getReference().getIdentifier());
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID2);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
     tags = (PROFILE2_ID + "," + targetTags).split(",");
     Arrays.sort(tags);
-    Assert.assertArrayEquals(tags, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertArrayEquals(tags, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -403,17 +403,17 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
-    Assert.assertTrue(tracksEncoded.length == 6);
+    Assertions.assertTrue(tracksEncoded.length == 6);
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags1, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID3);
-    Assert.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags2, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presentation/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags2, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID2.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -435,17 +435,17 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
-    Assert.assertTrue(tracksEncoded.length == 4);
+    Assertions.assertTrue(tracksEncoded.length == 4);
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags1, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID2);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags2, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags2, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -467,17 +467,17 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
-    Assert.assertTrue(tracksEncoded.length == 6);
+    Assertions.assertTrue(tracksEncoded.length == 6);
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags1, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID2);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags2, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags2, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   @Test
@@ -503,7 +503,7 @@ public class MultiEncodeWorkflowOperationHandlerTest {
       // no encoding profile
       configurations.put("source-flavors", "multitrack/source");
       getWorkflowOperationResult(mp, configurations);
-      Assert.fail("Since encoding profile is not specified exception should be thrown");
+      Assertions.fail("Since encoding profile is not specified exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
     }
@@ -532,22 +532,22 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracksEncoded = mpNew.getTracks();
     Track trackEncoded;
-    Assert.assertTrue(tracksEncoded.length == 5);
+    Assertions.assertTrue(tracksEncoded.length == 5);
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1); // master
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(masterTargetTags, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(masterTargetTags, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID2);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags0, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags0, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
 
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID3);
-    Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
-    Assert.assertArrayEquals(targetTags2, trackEncoded.getTags());
-    Assert.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
+    Assertions.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
+    Assertions.assertArrayEquals(targetTags2, trackEncoded.getTags());
+    Assertions.assertTrue(SOURCE_TRACK_ID1.equals(trackEncoded.getReference().getIdentifier()));
   }
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)

@@ -22,13 +22,13 @@
 package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MediaPackageElementFlavorTest {
 
@@ -55,8 +55,8 @@ public class MediaPackageElementFlavorTest {
       try {
         new MediaPackageElementFlavor(arguments[0], arguments[1]);
       } catch (Throwable t) {
-        assertEquals(format("Catched unexpected exception. The message was: %s", t.getMessage()),
-                IllegalArgumentException.class, t.getClass());
+        assertEquals(IllegalArgumentException.class,
+                t.getClass(), format("Catched unexpected exception. The message was: %s", t.getMessage()));
         continue;
       }
       fail(format("Flavor constructor did not throw an expected exception with invalid arguments \"%s\" and \"%s\"",
@@ -66,38 +66,39 @@ public class MediaPackageElementFlavorTest {
 
   @Test
   public void testEquals() {
-    assertEquals("Leading or trailing whitespace in the flavor type should be trimmed",
-            flavor(" \r \n \t type \t \n \r ", "subtype"), flavor("type", "subtype"));
-    assertEquals("Leading or trailing whitespace in the flavor subtype should be ignored",
-            flavor("type", " \r \n \t subtype \t \n \r "), flavor("type", "subtype"));
-    assertEquals("Leading or trailing whitespace in both the flavor type and subtype should be trimmed",
-            flavor(" \r \n \t type \t \n \r ", " \r \n \t subtype \t \n \r "), flavor("type", "subtype"));
-    assertEquals("Flavor type should be case-insensitive", flavor("TYPE", "subtype"), flavor("type", "subtype"));
-    assertEquals("Flavor type should be case-insensitive", flavor("type", "SUBTYPE"), flavor("type", "subtype"));
-    assertEquals("Flavor parts should be case-insensitive", flavor("TYPE", "SUBTYPE"), flavor("type", "subtype"));
+    assertEquals(flavor(" \r \n \t type \t \n \r ", "subtype"),
+            flavor("type", "subtype"), "Leading or trailing whitespace in the flavor type should be trimmed");
+    assertEquals(flavor("type", " \r \n \t subtype \t \n \r "),
+            flavor("type", "subtype"), "Leading or trailing whitespace in the flavor subtype should be ignored");
+    assertEquals(flavor(" \r \n \t type \t \n \r ", " \r \n \t subtype \t \n \r "),
+            flavor("type", "subtype"),
+            "Leading or trailing whitespace in both the flavor type and subtype should be trimmed");
+    assertEquals(flavor("TYPE", "subtype"), flavor("type", "subtype"), "Flavor type should be case-insensitive");
+    assertEquals(flavor("type", "SUBTYPE"), flavor("type", "subtype"), "Flavor type should be case-insensitive");
+    assertEquals(flavor("TYPE", "SUBTYPE"), flavor("type", "subtype"), "Flavor parts should be case-insensitive");
   }
 
   @Test
   public void testMatches() throws Exception {
-    assertFalse("null should not match any flavor", flavor("a", "b").matches(null));
-    assertTrue("Equal flavors should match", flavor("a", "b").matches(flavor("a", "b")));
-    assertFalse("Unequal flavors should not match", flavor("a", "b").matches(flavor("b", "a")));
-    assertTrue("Wildcard type did not match", flavor("*", "b").matches(flavor("a", "b")));
-    assertTrue("Match with wildcard type should be commutative",
-            flavor("a", "b").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("a", "b")));
-    assertTrue("Wildcard subtype did not match", flavor("a", "*").matches(flavor("a", "b")));
-    assertTrue("Match with wildcard subtype should be commutative",
-            flavor("a", "b").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("a", "b")));
-    assertTrue("Wildcard in both type and subtype did not match", flavor("*", "*").matches(flavor("a", "b")));
-    assertTrue("Match with wildcards in both type and subtype should be commutative",
-            flavor("*", "*").matches(flavor("a", "b")) && flavor("a", "b").matches(flavor("*", "*")));
-    assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("*", "b")));
-    assertTrue("Match between wildcards should be commutative",
-            flavor("*", "*").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("*", "*")));
-    assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("a", "*")));
-    assertTrue("Match between wildcards should be commutative",
-            flavor("*", "*").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("*", "*")));
-    assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("*", "*")));
+    assertFalse(flavor("a", "b").matches(null), "null should not match any flavor");
+    assertTrue(flavor("a", "b").matches(flavor("a", "b")), "Equal flavors should match");
+    assertFalse(flavor("a", "b").matches(flavor("b", "a")), "Unequal flavors should not match");
+    assertTrue(flavor("*", "b").matches(flavor("a", "b")), "Wildcard type did not match");
+    assertTrue(flavor("a", "b").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("a", "b")),
+            "Match with wildcard type should be commutative");
+    assertTrue(flavor("a", "*").matches(flavor("a", "b")), "Wildcard subtype did not match");
+    assertTrue(flavor("a", "b").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("a", "b")),
+            "Match with wildcard subtype should be commutative");
+    assertTrue(flavor("*", "*").matches(flavor("a", "b")), "Wildcard in both type and subtype did not match");
+    assertTrue(flavor("*", "*").matches(flavor("a", "b")) && flavor("a", "b").matches(flavor("*", "*")),
+            "Match with wildcards in both type and subtype should be commutative");
+    assertTrue(flavor("*", "*").matches(flavor("*", "b")), "Wildcard matches");
+    assertTrue(flavor("*", "*").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("*", "*")),
+            "Match between wildcards should be commutative");
+    assertTrue(flavor("*", "*").matches(flavor("a", "*")), "Wildcard matches");
+    assertTrue(flavor("*", "*").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("*", "*")),
+            "Match between wildcards should be commutative");
+    assertTrue(flavor("*", "*").matches(flavor("*", "*")), "Wildcard matches");
   }
 
   @Test
@@ -122,8 +123,8 @@ public class MediaPackageElementFlavorTest {
       try {
         MediaPackageElementFlavor.parseFlavor(invalid);
       } catch (Throwable t) {
-        assertEquals(format("Catched unexpected exception. The message was: %s", t.getMessage()),
-                IllegalArgumentException.class, t.getClass());
+        assertEquals(IllegalArgumentException.class,
+                t.getClass(), format("Catched unexpected exception. The message was: %s", t.getMessage()));
         continue;
       }
       fail(format("Invalid flavor should fail but was parsed without errors: \"%s\"", invalid));

@@ -35,9 +35,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -56,7 +56,7 @@ public class CloneWorkflowOperationHandlerTest {
   // mock services and objects
   private Workspace workspace = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -89,9 +89,9 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("presentation/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+    Assertions.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
   }
 
   @Test
@@ -104,9 +104,9 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assertions.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
   }
 
   @Test
@@ -119,9 +119,9 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("targettype/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+    Assertions.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
   }
 
   @Test
@@ -134,9 +134,9 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("targettype/source");
-    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
+    Assertions.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -149,13 +149,13 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("presentation/source");
-    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
+    Assertions.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
 
 
     newFlavor = MediaPackageElementFlavor.parseFlavor("presenter/source");
-    Assert.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
+    Assertions.assertEquals(2, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -168,9 +168,9 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertEquals(1, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
+    Assertions.assertEquals(1, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
   @Test
@@ -182,9 +182,9 @@ public class CloneWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertEquals(0, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
+    Assertions.assertEquals(0, result.getMediaPackage().getElementsByFlavor(newFlavor).length);
   }
 
 

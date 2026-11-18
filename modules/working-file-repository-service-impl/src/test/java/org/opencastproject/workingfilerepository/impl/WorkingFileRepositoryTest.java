@@ -22,7 +22,7 @@
 
 package org.opencastproject.workingfilerepository.impl;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -34,10 +34,10 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -55,7 +55,7 @@ public class WorkingFileRepositoryTest {
   private String filename = "file.gif";
   private WorkingFileRepositoryImpl repo = new WorkingFileRepositoryImpl();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     Organization organization = EasyMock.createMock(Organization.class);
     EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
@@ -100,7 +100,7 @@ public class WorkingFileRepositoryTest {
     }
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.forceDelete(new File(repo.rootDirectory));
   }
@@ -115,7 +115,7 @@ public class WorkingFileRepositoryTest {
       headerIn = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
       byte[] bytesFromRepo = IOUtils.toByteArray(fromRepo);
       byte[] bytesFromClasspath = IOUtils.toByteArray(headerIn);
-      Assert.assertEquals(bytesFromClasspath.length, bytesFromRepo.length);
+      Assertions.assertEquals(bytesFromClasspath.length, bytesFromRepo.length);
     } finally {
       IOUtils.closeQuietly(fromRepo);
       IOUtils.closeQuietly(headerIn);
@@ -127,7 +127,7 @@ public class WorkingFileRepositoryTest {
     // Delete the file and ensure that we can no longer get() it
     repo.delete(mediaPackageID, mediaPackageElementID);
     try {
-      Assert.assertTrue(repo.get(mediaPackageID, mediaPackageElementID) == null);
+      Assertions.assertTrue(repo.get(mediaPackageID, mediaPackageElementID) == null);
       fail("File " + mediaPackageID + "/" + mediaPackageElementID + " was not deleted");
     } catch (NotFoundException e) {
       // This is intended
@@ -142,7 +142,7 @@ public class WorkingFileRepositoryTest {
     try {
       in = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
       repo.put(badId, mediaPackageElementID, "opencast_header.gif", in);
-      Assert.fail();
+      Assertions.fail();
     } catch (Exception e) {
       // This is intended
     } finally {
@@ -155,7 +155,7 @@ public class WorkingFileRepositoryTest {
     String badId = "../etc";
     try {
       repo.get(badId, mediaPackageElementID);
-      Assert.fail();
+      Assertions.fail();
     } catch (Exception e) {
     }
   }
@@ -170,7 +170,7 @@ public class WorkingFileRepositoryTest {
       byte[] bytesFromRepo = IOUtils.toByteArray(fromRepo);
       headerIn = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
       byte[] bytesFromClasspath = IOUtils.toByteArray(headerIn);
-      Assert.assertEquals(bytesFromClasspath.length, bytesFromRepo.length);
+      Assertions.assertEquals(bytesFromClasspath.length, bytesFromRepo.length);
     } finally {
       IOUtils.closeQuietly(fromRepo);
       IOUtils.closeQuietly(headerIn);
@@ -179,7 +179,7 @@ public class WorkingFileRepositoryTest {
 
   @Test
   public void testCollectionSize() throws Exception {
-    Assert.assertEquals(1, repo.getCollectionSize(collectionId));
+    Assertions.assertEquals(1, repo.getCollectionSize(collectionId));
   }
 
   @Test
@@ -194,7 +194,7 @@ public class WorkingFileRepositoryTest {
       repo.copyTo(collectionId, filename, "copied-mediapackage", "copied-element", newFileName);
       in = repo.get("copied-mediapackage", "copied-element");
       byte[] bytesFromCopy = IOUtils.toByteArray(in);
-      Assert.assertTrue(Arrays.equals(bytesFromCollection, bytesFromCopy));
+      Assertions.assertTrue(Arrays.equals(bytesFromCollection, bytesFromCopy));
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -211,7 +211,7 @@ public class WorkingFileRepositoryTest {
       repo.moveTo(collectionId, filename, "moved-mediapackage", "moved-element", newFileName);
       in = repo.get("moved-mediapackage", "moved-element");
       byte[] bytesFromMove = IOUtils.toByteArray(in);
-      Assert.assertTrue(Arrays.equals(bytesFromCollection, bytesFromMove));
+      Assertions.assertTrue(Arrays.equals(bytesFromCollection, bytesFromMove));
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -221,11 +221,11 @@ public class WorkingFileRepositoryTest {
   public void testCleanupOldFilesFromCollectionNothingToDelete() throws Exception {
     // Cleanup files older than 1 day, nothing should be deleted
     boolean result = repo.cleanupOldFilesFromCollection(collectionId, 1);
-    Assert.assertTrue(result);
+    Assertions.assertTrue(result);
     InputStream in = null;
     try {
       in = repo.getFromCollection(collectionId, filename);
-      Assert.assertNotNull(in);
+      Assertions.assertNotNull(in);
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -235,9 +235,9 @@ public class WorkingFileRepositoryTest {
   public void testCleanupOldFilesFromCollectionSomethingToDelete() throws Exception {
     // Cleanup files older than 0 days, file should be deleted
     boolean result = repo.cleanupOldFilesFromCollection(collectionId, 0);
-    Assert.assertTrue(result);
+    Assertions.assertTrue(result);
     try {
-      Assert.assertTrue(repo.getFromCollection(collectionId, filename) == null);
+      Assertions.assertTrue(repo.getFromCollection(collectionId, filename) == null);
     } catch (NotFoundException e) {
       // This is intended
     }
@@ -246,30 +246,30 @@ public class WorkingFileRepositoryTest {
   @Test
   public void testCleanupOldFilesFromNonExistentCollection() throws Exception {
     boolean result = repo.cleanupOldFilesFromCollection("UNKNOWN", 0);
-    Assert.assertFalse(result);
+    Assertions.assertFalse(result);
   }
 
   @Test
   public void testCleanupOldFilesFromMediaPackageNothingToDelete() throws Exception {
     // Cleanup files older than 1 day, nothing should be deleted
     boolean result = repo.cleanupOldFilesFromMediaPackage(1);
-    Assert.assertTrue(result);
+    Assertions.assertTrue(result);
     File file = null;
     file = repo.getFile(mediaPackageID, mediaPackageElementID);
-    Assert.assertNotNull(file);
+    Assertions.assertNotNull(file);
   }
 
   @Test
   public void testCleanupOldFilesFromMediaPackageSomethingToDelete() throws Exception {
     // Cleanup files older than 1 day, something should be deleted
     boolean result = repo.cleanupOldFilesFromMediaPackage(0);
-    Assert.assertTrue(result);
+    Assertions.assertTrue(result);
     File file = null;
     try {
       file = repo.getFile(mediaPackageID, mediaPackageElementID);
-      Assert.fail();
+      Assertions.fail();
     } catch (NotFoundException e) {
-      Assert.assertNull(file);
+      Assertions.assertNull(file);
     }
   }
 
@@ -360,7 +360,7 @@ public class WorkingFileRepositoryTest {
     try {
       fromRepo = repo.get(mpId, elemId);
       headerIn = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
-      Assert.assertTrue(Arrays.equals(IOUtils.toByteArray(headerIn), IOUtils.toByteArray(fromRepo)));
+      Assertions.assertTrue(Arrays.equals(IOUtils.toByteArray(headerIn), IOUtils.toByteArray(fromRepo)));
     } finally {
       IOUtils.closeQuietly(fromRepo);
       IOUtils.closeQuietly(headerIn);
@@ -389,13 +389,13 @@ public class WorkingFileRepositoryTest {
     }
 
     // The pre-existing payload must survive the failed move untouched
-    Assert.assertTrue("Pre-existing destination must survive a failed move", dest.exists());
-    Assert.assertEquals("orphan-payload", FileUtils.readFileToString(dest, StandardCharsets.UTF_8));
+    Assertions.assertTrue(dest.exists(), "Pre-existing destination must survive a failed move");
+    Assertions.assertEquals("orphan-payload", FileUtils.readFileToString(dest, StandardCharsets.UTF_8));
     // and so must the source in the collection
     InputStream in = null;
     try {
       in = repo.getFromCollection(collectionId, filename);
-      Assert.assertNotNull(in);
+      Assertions.assertNotNull(in);
     } finally {
       IOUtils.closeQuietly(in);
     }

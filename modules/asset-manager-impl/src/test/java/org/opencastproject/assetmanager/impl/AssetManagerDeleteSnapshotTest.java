@@ -20,9 +20,9 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
 
@@ -58,9 +58,9 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     assertTotals(6, 6, 3);
     assertStoreSize(6 * 2);
     assertEquals(
-        "Two snapshots should be deleted",
         2,
-        am.deleteSnapshots(mp[0])
+        am.deleteSnapshots(mp[0]),
+        "Two snapshots should be deleted"
     );
     assertTotals(4, 4, 3);
     assertStoreSize(4 * 2);

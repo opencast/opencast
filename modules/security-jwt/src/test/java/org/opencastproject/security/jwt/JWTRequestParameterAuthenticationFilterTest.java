@@ -27,7 +27,7 @@ import static org.easymock.EasyMock.replay;
 
 import com.nimbusds.jose.JOSEException;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -40,7 +40,7 @@ public class JWTRequestParameterAuthenticationFilterTest extends JWTLoginTest {
   private JWTRequestParameterAuthenticationFilter parameterAuthenticationFilter =
           new JWTRequestParameterAuthenticationFilter();
 
-  @Override @Before
+  @Override @BeforeEach
   public void setUp() throws NoSuchAlgorithmException, JOSEException {
     super.setUp();
 

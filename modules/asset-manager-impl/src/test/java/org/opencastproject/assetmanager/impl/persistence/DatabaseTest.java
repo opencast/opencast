@@ -21,12 +21,12 @@
 
 package org.opencastproject.assetmanager.impl.persistence;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.db.DBTestEnv;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,8 +72,8 @@ public class DatabaseTest {
       claimedVersions.add(future.get());
     }
 
-    assertEquals("every concurrent claim must receive a distinct version, with none lost to a race",
-            concurrentClaims, claimedVersions.size());
+    assertEquals(concurrentClaims,
+            claimedVersions.size(), "every concurrent claim must receive a distinct version, with none lost to a race");
   }
 
   @Test

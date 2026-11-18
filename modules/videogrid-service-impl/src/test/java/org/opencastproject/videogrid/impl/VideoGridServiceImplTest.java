@@ -38,14 +38,15 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,10 +58,10 @@ public class VideoGridServiceImplTest {
   private Track sourceVideoTrack;
   private URI mockUri;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     videoGridService = new VideoGridServiceImpl();
 
@@ -68,7 +69,7 @@ public class VideoGridServiceImplTest {
     mockUri = new URI("/uri");
     EasyMock.expect(workspace.putInCollection(anyString(),
             anyString(), anyObject())).andReturn(mockUri).anyTimes();
-    final String directory = testFolder.newFolder().getAbsolutePath();
+    final String directory = Files.createTempDirectory(testFolder.toPath(), "junit").toFile().getAbsolutePath();
     EasyMock.expect(workspace.rootDirectory()).andReturn(directory).anyTimes();
 
     sourceVideoTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
@@ -107,6 +108,6 @@ public class VideoGridServiceImplTest {
             sourceVideoTrack);
     Gson gson = new Gson();
     URI parsedURI = gson.fromJson(job.getPayload(), new TypeToken<URI>() { }.getType());
-    Assert.assertTrue(mockUri.equals(parsedURI));
+    Assertions.assertTrue(mockUri.equals(parsedURI));
   }
 }

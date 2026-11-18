@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -33,10 +35,10 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +50,7 @@ public class AssertWorkflowOperationHandlerTest {
   private AssertWorkflowOperationHandler operationHandler;
   private WorkflowOperationInstance operation;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Operation handler to be tested
     operationHandler = new AssertWorkflowOperationHandler();
@@ -60,7 +62,7 @@ public class AssertWorkflowOperationHandlerTest {
     workflowInstance.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -80,56 +82,62 @@ public class AssertWorkflowOperationHandlerTest {
     workflowInstance = replaceVars(workflowInstance, "conditionFalse", "false");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testTrueConditionFail() throws Exception {
-    operation = new WorkflowOperationInstance("assert", OperationState.RUNNING);
-    operation.setConfiguration(AssertWorkflowOperationHandler.THAT_PREFIX + "-1", "${conditionThat} == 1");
-    operation.setConfiguration(AssertWorkflowOperationHandler.TRUE_PREFIX + "-1", "${conditionTrue}");
-    operation.setConfiguration(AssertWorkflowOperationHandler.FALSE_PREFIX + "-1", "${conditionFalse}");
+    assertThrows(WorkflowOperationException.class, () -> {
+      operation = new WorkflowOperationInstance("assert", OperationState.RUNNING);
+      operation.setConfiguration(AssertWorkflowOperationHandler.THAT_PREFIX + "-1", "${conditionThat} == 1");
+      operation.setConfiguration(AssertWorkflowOperationHandler.TRUE_PREFIX + "-1", "${conditionTrue}");
+      operation.setConfiguration(AssertWorkflowOperationHandler.FALSE_PREFIX + "-1", "${conditionFalse}");
 
-    List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
-    operationsList.add(operation);
-    workflowInstance.setOperations(operationsList);
+      List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
+      operationsList.add(operation);
+      workflowInstance.setOperations(operationsList);
 
-    workflowInstance = replaceVars(workflowInstance, "conditionThat", "1");
-    workflowInstance = replaceVars(workflowInstance, "conditionTrue", "false");
+      workflowInstance = replaceVars(workflowInstance, "conditionThat", "1");
+      workflowInstance = replaceVars(workflowInstance, "conditionTrue", "false");
 
-    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+      WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    });
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testFalseConditionFail() throws Exception {
-    operation = new WorkflowOperationInstance("assert", OperationState.RUNNING);
-    operation.setConfiguration(AssertWorkflowOperationHandler.TRUE_PREFIX + "-1", "${conditionTrue}");
-    operation.setConfiguration(AssertWorkflowOperationHandler.FALSE_PREFIX + "-1", "${conditionFalse}");
+    assertThrows(WorkflowOperationException.class, () -> {
+      operation = new WorkflowOperationInstance("assert", OperationState.RUNNING);
+      operation.setConfiguration(AssertWorkflowOperationHandler.TRUE_PREFIX + "-1", "${conditionTrue}");
+      operation.setConfiguration(AssertWorkflowOperationHandler.FALSE_PREFIX + "-1", "${conditionFalse}");
 
-    List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
-    operationsList.add(operation);
-    workflowInstance.setOperations(operationsList);
+      List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
+      operationsList.add(operation);
+      workflowInstance.setOperations(operationsList);
 
-    workflowInstance = replaceVars(workflowInstance, "conditionTrue", "true");
-    workflowInstance = replaceVars(workflowInstance, "conditionFalse", "true");
+      workflowInstance = replaceVars(workflowInstance, "conditionTrue", "true");
+      workflowInstance = replaceVars(workflowInstance, "conditionFalse", "true");
 
-    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+      WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    });
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testThatConditionFail() throws Exception {
-    operation = new WorkflowOperationInstance("assert", OperationState.RUNNING);
-    operation.setConfiguration(AssertWorkflowOperationHandler.TRUE_PREFIX + "-1", "${conditionTrue}");
-    operation.setConfiguration(AssertWorkflowOperationHandler.THAT_PREFIX + "-1", "${conditionThat} == 1");
+    assertThrows(WorkflowOperationException.class, () -> {
+      operation = new WorkflowOperationInstance("assert", OperationState.RUNNING);
+      operation.setConfiguration(AssertWorkflowOperationHandler.TRUE_PREFIX + "-1", "${conditionTrue}");
+      operation.setConfiguration(AssertWorkflowOperationHandler.THAT_PREFIX + "-1", "${conditionThat} == 1");
 
-    List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
-    operationsList.add(operation);
-    workflowInstance.setOperations(operationsList);
+      List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
+      operationsList.add(operation);
+      workflowInstance.setOperations(operationsList);
 
-    workflowInstance = replaceVars(workflowInstance, "conditionThat", "-1");
-    workflowInstance = replaceVars(workflowInstance, "conditionTrue", "true");
+      workflowInstance = replaceVars(workflowInstance, "conditionThat", "-1");
+      workflowInstance = replaceVars(workflowInstance, "conditionTrue", "true");
 
-    WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+      WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
+    });
   }
 
   private WorkflowInstance replaceVars(WorkflowInstance wf, String key, String value) throws WorkflowParsingException {

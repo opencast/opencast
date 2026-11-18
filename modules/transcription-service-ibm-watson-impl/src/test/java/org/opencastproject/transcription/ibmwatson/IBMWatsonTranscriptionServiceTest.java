@@ -20,6 +20,7 @@
  */
 package org.opencastproject.transcription.ibmwatson;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -72,10 +73,10 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -127,7 +128,7 @@ public class IBMWatsonTranscriptionServiceTest {
   private Dictionary<String, Object> props = new Hashtable<String, Object>();
   private ComponentContext cc;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -211,7 +212,7 @@ public class IBMWatsonTranscriptionServiceTest {
     service.setSmtpService(smtpService);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -229,8 +230,8 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     service.registerCallback();
-    Assert.assertTrue(service.isCallbackAlreadyRegistered());
-    Assert.assertEquals(
+    Assertions.assertTrue(service.isCallbackAlreadyRegistered());
+    Assertions.assertEquals(
             WATSON_URL + "/v1/register_callback?callback_url=http://ADMIN_SERVER/transcripts/watson/results",
             capturedPost.getValue().getUri().toString());
   }
@@ -249,8 +250,8 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     service.registerCallback();
-    Assert.assertTrue(service.isCallbackAlreadyRegistered());
-    Assert.assertEquals(
+    Assertions.assertTrue(service.isCallbackAlreadyRegistered());
+    Assertions.assertEquals(
             WATSON_URL + "/v1/register_callback?callback_url=http://ADMIN_SERVER/transcripts/watson/results",
             capturedPost.getValue().getUri().toString());
   }
@@ -268,7 +269,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     service.registerCallback();
-    Assert.assertFalse(service.isCallbackAlreadyRegistered());
+    Assertions.assertFalse(service.isCallbackAlreadyRegistered());
   }
 
   @Test
@@ -294,34 +295,36 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"));
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions?inactivity_timeout=-1&timestamps=true&smart_formatting=true"
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions?inactivity_timeout=-1&timestamps=true&smart_formatting=true"
             + "&user_token=" + MP_ID + "&callback_url=http://ADMIN_SERVER"
             + "/transcripts/watson/results&events=recognitions.completed_with_results,recognitions.failed",
             capturedPost.getValue().getUri().toString());
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
   }
 
-  @Test(expected = TranscriptionServiceException.class)
+  @Test
   public void testCreateRecognitionsJobErrors() throws Exception {
-    service.activate(cc);
+    assertThrows(TranscriptionServiceException.class, () -> {
+      service.activate(cc);
 
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
-    EasyMock.replay(workspace);
+      EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
+      EasyMock.replay(workspace);
 
-    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
-    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_CREATED).once(); // register callback
-    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_SERVICE_UNAVAILABLE).once();
-    EasyMock.replay(response);
+      ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+      EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_CREATED).once(); // register callback
+      EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_SERVICE_UNAVAILABLE).once();
+      EasyMock.replay(response);
 
-    Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
-    EasyMock.replay(httpClient);
+      Capture<HttpPost> capturedPost = Capture.newInstance();
+      EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class)))
+          .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+      EasyMock.replay(httpClient);
 
-    service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"));
+      service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"));
+    });
   }
 
   @Test
@@ -345,13 +348,13 @@ public class IBMWatsonTranscriptionServiceTest {
     long after = System.currentTimeMillis();
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
-    Assert.assertNotNull(job.getDateCompleted());
-    Assert.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
+    Assertions.assertNotNull(job.getDateCompleted());
+    Assertions.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
     // Check if results were saved into a collection
-    Assert.assertEquals(IBMWatsonTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
-    Assert.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
+    Assertions.assertEquals(IBMWatsonTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
+    Assertions.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
   }
 
   @Test
@@ -367,9 +370,9 @@ public class IBMWatsonTranscriptionServiceTest {
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
-    Assert.assertNull(job.getDateCompleted());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assertions.assertNull(job.getDateCompleted());
 
     EasyMock.verify(smtpService);
   }
@@ -389,9 +392,9 @@ public class IBMWatsonTranscriptionServiceTest {
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Retry.name(), job.getStatus());
-    Assert.assertNull(job.getDateCompleted());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Retry.name(), job.getStatus());
+    Assertions.assertNull(job.getDateCompleted());
   }
 
   @Test
@@ -411,9 +414,9 @@ public class IBMWatsonTranscriptionServiceTest {
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
-    Assert.assertNull(job.getDateCompleted());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assertions.assertNull(job.getDateCompleted());
 
     EasyMock.verify(smtpService);
   }
@@ -431,9 +434,9 @@ public class IBMWatsonTranscriptionServiceTest {
     service.transcriptionDone(MP_ID, obj);
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
-    Assert.assertNull(job.getDateCompleted());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assertions.assertNull(job.getDateCompleted());
 
     EasyMock.verify(smtpService);
   }
@@ -470,17 +473,17 @@ public class IBMWatsonTranscriptionServiceTest {
     service.getAndSaveJobResults(JOB_ID);
     long after = System.currentTimeMillis();
     // Check if correct url was invoked
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getUri().toString());
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
-    Assert.assertNotNull(job.getDateCompleted());
-    Assert.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
+    Assertions.assertNotNull(job.getDateCompleted());
+    Assertions.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
     // Check if results were saved into a collection
-    Assert.assertEquals(IBMWatsonTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
-    Assert.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
+    Assertions.assertEquals(IBMWatsonTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
+    Assertions.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
   }
 
   @Test
@@ -499,26 +502,28 @@ public class IBMWatsonTranscriptionServiceTest {
     try {
       service.getAndSaveJobResults(JOB_ID);
     } catch (TranscriptionServiceException e) {
-      Assert.assertEquals(404, e.getCode());
+      Assertions.assertEquals(404, e.getCode());
       return;
     }
-    Assert.fail("TranscriptionServiceException not thrown");
+    Assertions.fail("TranscriptionServiceException not thrown");
   }
 
-  @Test(expected = TranscriptionServiceException.class)
+  @Test
   public void testGetAndSaveJobResultsError503() throws Exception {
-    service.activate(cc);
+    assertThrows(TranscriptionServiceException.class, () -> {
+      service.activate(cc);
 
-    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
-    EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_SERVICE_UNAVAILABLE).anyTimes();
-    EasyMock.replay(response);
+      ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+      EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_SERVICE_UNAVAILABLE).anyTimes();
+      EasyMock.replay(response);
 
-    Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
-    EasyMock.replay(httpClient);
+      Capture<HttpGet> capturedGet = Capture.newInstance();
+      EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
+          .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+      EasyMock.replay(httpClient);
 
-    service.getAndSaveJobResults(JOB_ID);
+      service.getAndSaveJobResults(JOB_ID);
+    });
   }
 
   @Test
@@ -539,9 +544,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(workspace);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null, Track.TYPE);
-    Assert.assertEquals("captions", mpe.getFlavor().getType());
-    Assert.assertEquals("ibm-watson-json", mpe.getFlavor().getSubtype());
-    Assert.assertEquals(uri.toString(), mpe.getURI().toString());
+    Assertions.assertEquals("captions", mpe.getFlavor().getType());
+    Assertions.assertEquals("ibm-watson-json", mpe.getFlavor().getSubtype());
+    Assertions.assertEquals(uri.toString(), mpe.getURI().toString());
   }
 
   @Test
@@ -575,9 +580,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID, Track.TYPE);
-    Assert.assertEquals("captions", mpe.getFlavor().getType());
-    Assert.assertEquals("ibm-watson-json", mpe.getFlavor().getSubtype());
-    Assert.assertEquals(uri.toString(), mpe.getURI().toString());
+    Assertions.assertEquals("captions", mpe.getFlavor().getType());
+    Assertions.assertEquals("ibm-watson-json", mpe.getFlavor().getSubtype());
+    Assertions.assertEquals(uri.toString(), mpe.getURI().toString());
   }
 
   private Capture<Set<String>> mockAssetManagerAndWorkflow(String wfDefId, boolean wfStarted)
@@ -623,13 +628,13 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if only one mp has a workflow created for it
-    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assertions.assertEquals(1, capturedMpIds.getValue().size());
     // And if it was the correct one
-    Assert.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
+    Assertions.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
     // Check if status in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
   }
 
   @Test
@@ -667,16 +672,16 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getUri().toString());
     // Check if only one mp has a workflow created for it
-    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assertions.assertEquals(1, capturedMpIds.getValue().size());
     // And if it was the correct one
-    Assert.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
+    Assertions.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
     // Check if status in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
   }
 
   @Test
@@ -708,12 +713,12 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getUri().toString());
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getUri().toString());
 
     // Check if the job status was updated and email was sent
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
     EasyMock.verify(smtpService);
   }
 
@@ -739,13 +744,13 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getUri().toString());
 
     // Check if the job status was updated and email was sent
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(TranscriptionJobControl.Status.Canceled.toString(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Canceled.toString(), j.getStatus());
     EasyMock.verify(smtpService);
   }
 
@@ -777,13 +782,13 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getUri().toString());
 
     // Check if the job status was updated and email was sent
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
     EasyMock.verify(smtpService);
   }
 
@@ -818,12 +823,12 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getUri().toString());
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getUri().toString());
 
     // Check if the job status was updated and email was sent
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
   }
 
   @Test
@@ -854,12 +859,12 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getUri().toString());
+    Assertions.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getUri().toString());
 
     // Check if the job status was updated and email was sent
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
     EasyMock.verify(smtpService);
   }
 
@@ -877,12 +882,12 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if mp has a workflow created for it
-    Assert.assertEquals(1, capturedMpIds.getValue().size());
-    Assert.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
+    Assertions.assertEquals(1, capturedMpIds.getValue().size());
+    Assertions.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
     // Check if status of retry job in db was updated to error
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
   }
 
 }

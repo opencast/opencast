@@ -21,8 +21,8 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -38,8 +38,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.apache.commons.lang3.math.Fraction;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +50,7 @@ public class ProbeResolutionWorkflowOperationHandlerTest {
 
   private ProbeResolutionWorkflowOperationHandler operationHandler;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     operationHandler = new ProbeResolutionWorkflowOperationHandler();
   }
