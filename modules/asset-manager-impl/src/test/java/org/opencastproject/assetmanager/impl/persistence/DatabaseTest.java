@@ -23,6 +23,9 @@ package org.opencastproject.assetmanager.impl.persistence;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.db.DBTestEnv;
 
@@ -84,5 +87,33 @@ public class DatabaseTest {
     assertEquals(VersionImpl.FIRST.value(), database.claimVersion(mpId).value());
     assertEquals(VersionImpl.FIRST.value() + 1, database.claimVersion(mpId).value());
     assertEquals(VersionImpl.FIRST.value() + 2, database.claimVersion(mpId).value());
+  }
+
+  @Test
+  public void replacePropertiesReplacesOnlyTheGivenNamespace() {
+    final Database database = new Database(DBTestEnv.newDBSession(PERSISTENCE_UNIT));
+    final String mpId = UUID.randomUUID().toString();
+    final String aclNamespace = "org.opencastproject.assetmanager.security";
+    final String otherNamespace = "other";
+
+    database.replaceProperties(mpId, aclNamespace, List.of(
+        mkProperty(mpId, aclNamespace, "read", true),
+        mkProperty(mpId, aclNamespace, "write", true)));
+    database.replaceProperties(mpId, otherNamespace, List.of(
+        mkProperty(mpId, otherNamespace, "keep", true)));
+
+    database.replaceProperties(mpId, aclNamespace, List.of(
+        mkProperty(mpId, aclNamespace, "read", true),
+        mkProperty(mpId, aclNamespace, "read", false)));
+
+    final List<Property> aclProperties = database.selectProperties(mpId, aclNamespace);
+    assertEquals("old ACL properties must be replaced", 1, aclProperties.size());
+    assertEquals(false, aclProperties.get(0).getValue().get(Value.BOOLEAN));
+    assertEquals("properties in other namespaces must not be affected",
+        1, database.selectProperties(mpId, otherNamespace).size());
+  }
+
+  private static Property mkProperty(String mpId, String namespace, String name, boolean value) {
+    return Property.mk(PropertyId.mk(mpId, namespace, name), Value.mk(value));
   }
 }
