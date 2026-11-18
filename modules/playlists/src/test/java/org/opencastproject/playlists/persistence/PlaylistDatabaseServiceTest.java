@@ -20,6 +20,7 @@
  */
 package org.opencastproject.playlists.persistence;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
@@ -113,5 +114,21 @@ public class PlaylistDatabaseServiceTest {
     playlistDatabaseService.deletePlaylist(testPlaylist, securityService.getOrganization().getId());
     playlists = playlistDatabaseService.getPlaylists(100, 0, new SortCriterion("", SortCriterion.Order.None));
     assertTrue("Exactly zero playlists should be returned", playlists.isEmpty());
+  }
+
+  @Test
+  public void testRetrievingOnlyPlaylistsOfCurrentOrganization() throws Exception {
+    playlistDatabaseService.updatePlaylist(testPlaylist, securityService.getOrganization().getId());
+
+    Playlist otherPlaylist = new Playlist();
+    otherPlaylist.setId("43");
+    otherPlaylist.setOrganization("other_org");
+    otherPlaylist.setTitle("other title");
+    playlistDatabaseService.updatePlaylist(otherPlaylist, "other_org");
+
+    List<Playlist> playlists = playlistDatabaseService.getPlaylists(100, 0,
+        new SortCriterion("", SortCriterion.Order.None));
+    assertEquals(1, playlists.size());
+    assertEquals("42", playlists.get(0).getId());
   }
 }

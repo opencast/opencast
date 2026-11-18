@@ -97,10 +97,14 @@ http {
         location / {
 
             # Make sure to pass the real addresses as well as the fact that
-            # outwards we are using HTTPS to Opencast.
+            # outwards we are using HTTPS to Opencast. Note that these headers
+            # are set, not appended, so that a client cannot smuggle in an
+            # address of its own choosing. Opencast will only believe them if
+            # this proxy is listed in its trusted proxies (see the Trusted
+            # Proxies documentation).
             proxy_set_header        Host $host;
             proxy_set_header        X-Real-IP $remote_addr;
-            proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header        X-Forwarded-For $remote_addr;
             proxy_set_header        X-Forwarded-Proto $scheme;
 
             # Pass requests to this location. This expects Opencast to be

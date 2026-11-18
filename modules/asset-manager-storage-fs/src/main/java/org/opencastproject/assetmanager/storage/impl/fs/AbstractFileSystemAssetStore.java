@@ -217,7 +217,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    * string would collapse the path into a parent (or sibling) directory. Such components are
    * already rejected by {@link #ensureDeletionSelectorComponents(DeletionSelector)}, before
    * any lexical normalization can hide them; here, the resulting path must have exactly the
-   * shape {@code <root>/<organization>/[<prefix>/]<mediaPackage>[/version]}.
+   * shape {@code <root>/<organization>/[<prefix>/]<mediaPackage>[/version]}, with the prefix
+   * directory being present only if the store root uses one.
    *
    * @param dir
    *          the directory to check
@@ -234,8 +235,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    */
   private void ensureMediaPackageShape(File dir, AssetStoreDirectory rootDirectory, String organizationId,
           String mediaPackageId, Optional<Version> version) throws AssetStoreException {
-    // The path of the root directory is absolute and normalized, and the identifiers are
-    // resolved against it as they are
+    // The root path is absolute and normalized, and resolving the identifiers does not normalize the result. So an
+    // identifier collapsing the path makes it differ from the normalized actual path below.
     Path expected = rootDirectory.mediaPackageDir(organizationId, mediaPackageId);
     if (version.isPresent()) {
       expected = expected.resolve(version.get().toString());

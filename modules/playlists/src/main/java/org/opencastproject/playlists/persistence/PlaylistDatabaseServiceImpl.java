@@ -142,8 +142,12 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Playlist> criteriaQuery = criteriaBuilder.createQuery(Playlist.class);
         Root<Playlist> from = criteriaQuery.from(Playlist.class);
+        final String org = securityService.getOrganization().getId();
         CriteriaQuery<Playlist> select = criteriaQuery.select(from)
-            .where(criteriaBuilder.isNull(from.get("deletionDate")));
+            .where(
+                criteriaBuilder.isNull(from.get("deletionDate")),
+                criteriaBuilder.equal(from.get("organization"), org)
+            );
 
         if (sortCriterion.getOrder().equals(SortCriterion.Order.Ascending)) {
           criteriaQuery.orderBy(criteriaBuilder.asc(from.get(sortCriterion.getFieldName())));

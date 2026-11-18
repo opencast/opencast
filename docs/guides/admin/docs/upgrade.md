@@ -4,7 +4,128 @@ This guide describes how to upgrade Opencast 20.x to 21.x.
 In case you need to upgrade older versions of Opencast, please refer to the documentation of
 [those versions](https://docs.opencast.org) first.
 
-TODO
+1. Read the [release notes](releasenotes.md)
+2. Stop your current Opencast instance
+3. Set up [OpenSearch 3](#opensearch-3)
+4. Replace Opencast with the new version
+5. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
+6. Review [data changes](#data-changes)
+7. Check your workflows for [case-sensitive condition keywords](#workflow-conditions)
+8. Upgrade the database using [the upgrade script](#database-upgrade)
+9. Start Opencast
+10. [Rebuild the index](#index-rebuild)
+
+## OpenSearch 3
+
+Opencast 21 uses the OpenSearch 3.x client and therefore requires OpenSearch 3.x. Elasticsearch and OpenSearch 1.x
+are no longer supported.
+
+OpenSearch 3.x refuses to open indices whose segments were created before OpenSearch 2.0.0. Every existing Opencast
+index was created with Elasticsearch 7.10.2 or OpenSearch 1.x, so upgrading your OpenSearch node in place is not
+enough. Instead, set up a fresh OpenSearch 3.x node (or remove all existing Opencast indices) before starting
+Opencast 21. Don't forget to install the `analysis-icu` plugin. See the [OpenSearch
+configuration](configuration/searchindex/opensearch.md) for details.
+
+Opencast creates the indices automatically on startup. Afterwards, the data needs to be added again with a [full index
+rebuild](#index-rebuild).
+
+Note that the OpenSearch configuration keys in `etc/custom.properties` and the name of the index configuration file
+have changed as well. See the [configuration changes](#configuration-changes) below.
+
+## Configuration Changes
+
+Check for changes in the configuration and apply those relevant to your setup to your files. You can use the following
+command to list all changes:
+```
+git diff origin/r/{{ opencast_major_version() | int - 1 }}.x origin/r/{{ opencast_major_version() }}.x -- etc/
+```
+
+### Changes Requiring Action
+
+The following changes affect most installations. If you keep your old configuration files, Opencast may ignore your
+settings or fail to work properly.
+
+- **OpenSearch**
+    - `etc/custom.properties`: All `org.opencastproject.elasticsearch.*` options have been renamed to
+      `org.opencastproject.opensearch.*`. Old keys are ignored, so make sure to rename the hostname, scheme, port,
+      username and password options if you have set them.
+    - `etc/org.opencastproject.elasticsearch.index.ElasticsearchIndex.cfg` has been renamed to
+      `etc/org.opencastproject.opensearch.index.OpenSearchIndex.cfg`. The documentation and the default value of
+      `index.name` have been updated accordingly. If you have customized this file, move your changes to the new file.
+- **Retract workflow**
+    - `etc/workflows/delete.yaml`: The workflow `delete` has been renamed to `retract-for-deletion` to avoid confusion.
+      The file name remains `delete.yaml`.
+    - `etc/org.opencastproject.adminui.impl.AdminUIConfiguration.cfg` and
+      `etc/org.opencastproject.external.endpoint.EventsEndpoint.cfg`: The default value of `retract.workflow.id` has
+      been updated to `retract-for-deletion`. Update these files if you have set the option explicitly, and check
+      your own workflows and integrations for references to the old workflow ID `delete`.
+- **Security configuration**
+    - `etc/security/mh_default_org.xml` has received significant updates, especially for Spring 5. If you have
+      customized this file, apply your customizations to the new version instead of keeping your old file. The same
+      applies to the security configuration files of any additional organizations.
+- **LTI**
+    - `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg` has been renamed to
+      `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandlerImpl.cfg`. The options are unchanged. If you
+      have customized this file, rename it, otherwise your settings will not be applied.
+- **Paella Player 7** has been removed [[#7589](https://github.com/opencast/opencast/pull/7589)]
+    - `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`: The `opencast-plugin-paella7` plugin has been
+      removed.
+    - `etc/ui-config/mh_default_org/paella7/` has been removed.
+    - `etc/org.opencastproject.organization-mh_default_org.cfg`: The documentation has been updated to reflect the
+      removal. If you still use Paella Player 7, switch `prop.player` to Paella Player 8
+      (`/paella8/ui/watch.html?id=#{id}`, the default) and migrate your Paella configuration to
+      `etc/ui-config/<organization>/paella8/`.
+- **HTTP Client**
+    - Opencast now uses Apache HttpClient 5 instead of the end-of-life HttpClient 4 for all internal HTTP communication.
+      Requests between nodes share a connection pool whose size can be configured with the new options
+      `org.opencastproject.security.http.max.connections.per.route` and
+      `org.opencastproject.security.http.max.connections` in `etc/custom.properties`. The digest nonce retry options
+      `org.opencastproject.security.digest.nonce.*` keep their meaning but now trigger on a stale nonce reported by the
+      server. External plugins using the `TrustedHttpClient` service must be migrated to the HttpClient 5 API
+      (`ClassicHttpRequest`, `ClassicHttpResponse`, `getCode()`).
+
+### New and Changed Options
+
+- **Lifecycle management (beta)** [[#6139](https://github.com/opencast/opencast/pull/6139)]
+    - `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`: The new `opencast-plugin-lifecycle-management`
+      plugin has been added. It is disabled by default.
+    - `etc/lifecyclepolicies/`: New directory for storing lifecycle policies. An example can be found in
+      `sample.yaml.example`.
+    - `etc/org.apache.felix.fileinstall-lifecyclepolicies.cfg`: New file that governs how Opencast observes the
+      lifecycle policy directory.
+    - `etc/org.opencastproject.lifecyclemanagement.impl.LifeCycleTaskRunner.cfg`: New file with options for lifecycle
+      management.
+- **Asynchronous Whisper** [[#7040](https://github.com/opencast/opencast/pull/7040)]
+    - `etc/org.opencastproject.speechtotext.async.impl.SpeechToTextWorkflowSchedulerQuartz.cfg`: New file to configure
+      the asynchronous generation of subtitles with Whisper. The feature is disabled by default. See the
+      [Whisper documentation](configuration/transcription.configuration/whisper.md) for details.
+- **Job dispatching**
+    - `etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg`: `dispatch.interval` no longer needs to be set.
+      Dispatching is enabled on every node by default, and the active dispatcher is elected automatically from the
+      available nodes. Set `dispatch.interval` to `0` to exclude a node from the election. The new option
+      `dispatch.lock.timeout` sets how long a dispatch lease stays valid before another node may take over.
+- **Search updates**
+    - `etc/org.opencastproject.event.handler.SearchUpdatedEventHandler.cfg`: New file with the option
+      `distribution.check.availability`. It controls whether Opencast checks the availability of distributed files
+      after redistributing them, e.g. when the metadata or ACL of an event's series changes. The default behavior has
+      not changed.
+- **LDAP**
+    - `etc/org.opencastproject.kernel.security.SpringSecurityConfigurationArtifactInstaller.cfg`: New file to configure
+      the expected LDAP instance IDs for each organization.
+- **YouTube publication**
+    - `etc/org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg`: New options to set the audio
+      and metadata language in YouTube (`languageTarget`, `languagePatterns.*`), to set the Creative Commons license in
+      YouTube (`ccLicenses`), and to set the visibility of newly created playlists (`playlistPrivacy`, default:
+      `public`).
+
+### Other Changes
+
+- `etc/custom.properties`: The documentation of the database connection pool options has been updated. The listed
+  values are recommendations for production, not Opencast's defaults.
+- `etc/org.ops4j.pax.logging.cfg`: New logger configuration to stop client errors in web requests from flooding the
+  logs with stack traces.
+- `etc/workflows`: Thumbnail generation has been updated, and several bugs have been fixed. If you use your own
+  workflows based on the community workflows, review these changes.
 
 ## Data Changes
 
@@ -124,11 +245,35 @@ find "<download-root>" -mindepth 4 -maxdepth 4 -type f
 find "<download-root>" -name '*\\*'
 ```
 
-## Configuration Changes
+## Workflow Conditions
 
-- Opencast now uses Apache HttpClient 5 instead of the end-of-life HttpClient 4 for all internal HTTP communication.
-  Requests between nodes share a connection pool whose size can be configured with the new options
-  `org.opencastproject.security.http.max.connections.per.route` and `org.opencastproject.security.http.max.connections`
-  in `etc/custom.properties`. The digest nonce retry options `org.opencastproject.security.digest.nonce.*` keep their
-  meaning but now trigger on a stale nonce reported by the server. External plugins using the `TrustedHttpClient`
-  service must be migrated to the HttpClient 5 API (`ClassicHttpRequest`, `ClassicHttpResponse`, `getCode()`).
+The condition keywords `AND`, `OR`, `NOT`, `true` and `false` in workflow operation conditions (e.g. in `if`) must now
+be written exactly like this. This has always been the rule, but until now a different case happened to work. With
+Opencast 21, a wrong case makes the workflow fail. Check your own workflows before upgrading.
+
+## Database Upgrade
+
+The upgrade script drops the table `oc_bundleinfo`, whose bundle name column was too short for some bundle names.
+Opencast recreates the table automatically on startup. You will find database upgrade scripts in
+`docs/upgrade/{{ opencast_major_version() | int - 1 }}_to_{{ opencast_major_version() }}/`. **Make sure to backup your
+database before migrating, to be able to easily revert changes, if necessary.**
+
+## Index Rebuild
+
+A full index rebuild is required. Besides the switch to [OpenSearch 3](#opensearch-3), which starts with empty indices,
+the index mappings have changed for the improved search in the Admin UI and Engage
+[[#7497](https://github.com/opencast/opencast/pull/7497)] and for custom ACL actions in the search index
+[[#8028](https://github.com/opencast/opencast/pull/8028)]. The rebuild also makes sure that extended metadata is
+indexed, which is now needed by the External API.
+
+You can start the rebuild by making a POST request to `/index/rebuild`, either like this
+
+```
+curl -i -u <admin_user>:<password> -s -X POST https://example.opencast.org/index/rebuild
+```
+
+or by opening the REST docs under the “?” symbol at the top right corner of the Admin Interface, going to the
+“Index Endpoint” section and using the testing form on `/rebuild` to issue a POST request.
+
+In both cases you should get a 200 HTTP status. The log or the Admin Interface will tell you when the rebuild is
+completed. Depending on the size of your installation, this may take a while.
