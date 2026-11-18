@@ -327,7 +327,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
               type = STRING)
       },
       responses = {
-      @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.")
+          @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.")
       }
   )
   public Response getConfigurationPanel(@QueryParam("definitionId") String definitionId)
@@ -452,10 +452,10 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       returnDescription = "Returns if there are currently workflow(s) running that were started by the given user "
               + "as a boolean.",
       pathParameters = {
-              @RestParameter(name = "id", isRequired = true, description = "The user identifier", type = STRING)
+          @RestParameter(name = "id", isRequired = true, description = "The user identifier", type = STRING)
       },
       responses = {
-              @RestResponse(responseCode = SC_OK, description = "Whether there are active workflow for the user.")
+          @RestResponse(responseCode = SC_OK, description = "Whether there are active workflow for the user.")
       }
   )
   public Response userHasActiveWorkflows(@PathParam("id") String userId) {
@@ -521,7 +521,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance "
               + "identifier", type = STRING),
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n "
-              + "properties", type = TEXT) }, responses = {
+              + "properties", type = TEXT)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you "
               + "need to authenticate."),

@@ -63,8 +63,8 @@ import java.util.stream.Stream;
         immediate = true,
         service = WorkflowOperationHandler.class,
         property = {
-                "service.description=Tag Engage Workflow Operation Handler",
-                "workflow.operation=tag-engage"
+            "service.description=Tag Engage Workflow Operation Handler",
+            "workflow.operation=tag-engage"
         }
 )
 public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {

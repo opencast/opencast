@@ -56,10 +56,10 @@ import java.util.Objects;
     title = "Event Service",
     abstractText = "Provides resources and operations related to the events",
     notes = { "This service offers the event CRUD Operations for the admin UI.",
-            "<strong>Important:</strong> "
-                    + "<em>This service is for exclusive use by the module admin-ui. Its API might change anytime "
-                    + "without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-                    + "DO NOT use this for integration of third-party applications.<em>"})
+              "<strong>Important:</strong> "
+                      + "<em>This service is for exclusive use by the module admin-ui. Its API might change anytime "
+                      + "without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                      + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
     immediate = true,
     service = OsgiEventEndpoint.class,

@@ -78,7 +78,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /** Config for Tag Parsing operation */
   protected enum Configuration {
     none, one, atLeastOne, many
-  };
+  }
 
   public static final String TARGET_FLAVORS = "target-flavors";
   public static final String TARGET_FLAVOR = "target-flavor";

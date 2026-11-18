@@ -106,14 +106,14 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   /** Utility class to collect RecordInformation for moving larger
    * groups of mediapackages in combined jobs.
    */
-  private class MoveRecordInfo {
+  private final class MoveRecordInfo {
     private final Gson gson = new Gson();
     private int success = 0;
     private int failed = 0;
     private String currentMpId = "";
     public void addSuccess() {
       success++;
-    };
+    }
     public void addFailed() {
       failed ++;
     }
@@ -137,7 +137,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
       }
       return gson.toJson(result);
     }
-  };
+  }
 
   @Override
   protected String process(Job job) throws ServiceRegistryException {

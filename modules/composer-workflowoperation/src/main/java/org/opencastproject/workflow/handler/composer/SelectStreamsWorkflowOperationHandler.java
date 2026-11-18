@@ -428,8 +428,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       // be a new track with a different flavor)
       if (
           t.hasVideo() && !t.hideVideo && t.hasAudio() && !t.hideAudio  // non-hidden video and non-hidden audio
-          || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
-          || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
+            || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
+            || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
       ) {
         logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
             mediaPackage.getIdentifier());

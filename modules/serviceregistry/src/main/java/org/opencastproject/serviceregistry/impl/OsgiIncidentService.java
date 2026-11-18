@@ -54,7 +54,7 @@ import javax.persistence.EntityManagerFactory;
 
 @Component(
     property = {
-      "service.description=Incident service"
+        "service.description=Incident service"
     },
     immediate = true,
     service = { IncidentService.class }

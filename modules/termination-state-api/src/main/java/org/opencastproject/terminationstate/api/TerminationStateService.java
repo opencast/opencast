@@ -42,7 +42,7 @@ public interface TerminationStateService {
         return "ready";
       }
     }
-  };
+  }
 
   void setState(TerminationState state);
 

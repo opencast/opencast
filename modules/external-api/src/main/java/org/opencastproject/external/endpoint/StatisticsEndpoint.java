@@ -166,7 +166,7 @@ public class StatisticsEndpoint {
           @RestResponse(
               description = "If the current user is not authorized to perform this action",
               responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-    })
+      })
   public Response getProviders(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
         @QueryParam("withparameters") Boolean withParameters) {
 
@@ -229,7 +229,7 @@ public class StatisticsEndpoint {
           @RestResponse(
               description = "Returns the requested statistics provider as JSON",
               responseCode = HttpServletResponse.SC_OK)
-    })
+      })
   public Response getProvider(@HeaderParam("Accept") String acceptHeader, @PathParam("providerId") String id,
         @QueryParam("withparameters") Boolean withParameters) {
 
@@ -264,7 +264,7 @@ public class StatisticsEndpoint {
           @RestResponse(
               description = "If the current user is not authorized to perform this action",
               responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-    })
+      })
   public Response getStatistics(@HeaderParam("Accept") String acceptHeader, @FormParam("data") String data) {
 
     List<QueryUtils.Query> queries = null;
@@ -313,7 +313,7 @@ public class StatisticsEndpoint {
           @RestResponse(
               description = "If the current user is not authorized to perform this action",
               responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-  })
+      })
   public Response getExportCSV(
           @HeaderParam("Accept") String acceptHeader,
           @FormParam("data") String data,

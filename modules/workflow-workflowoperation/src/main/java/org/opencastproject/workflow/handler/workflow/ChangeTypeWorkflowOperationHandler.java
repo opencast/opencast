@@ -56,8 +56,8 @@ import java.util.List;
         immediate = true,
         service = WorkflowOperationHandler.class,
         property = {
-                "service.description=Change Type Workflow Operation Handler",
-                "workflow.operation=changetype"
+            "service.description=Change Type Workflow Operation Handler",
+            "workflow.operation=changetype"
         }
 )
 public class ChangeTypeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {

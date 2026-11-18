@@ -55,7 +55,7 @@ import java.util.List;
  * used by the current workflow.
  */
 @Component(immediate = true, service = WorkflowOperationHandler.class, property = {
-        "service.description=Selects a mp version from the archive", "workflow.operation=select-version" })
+    "service.description=Selects a mp version from the archive", "workflow.operation=select-version" })
 public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SelectVersionWorkflowOperationHandler.class);

@@ -48,7 +48,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
 @Component(property = { "service.description=Speech-to-Text Persistence" }, immediate = true, service = {
-        SpeechToTextDatabase.class })
+    SpeechToTextDatabase.class })
 public class SpeechToTextDatabase {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SpeechToTextDatabase.class);

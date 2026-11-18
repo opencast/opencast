@@ -107,9 +107,9 @@ public final class JpaGroup implements Group {
   @JoinTable(name = "oc_group_role", joinColumns = {
       @JoinColumn(name = "group_id")
       }, inverseJoinColumns = {
-      @JoinColumn(name = "role_id")
+          @JoinColumn(name = "role_id")
       }, uniqueConstraints = {
-      @UniqueConstraint(name = "UNQ_oc_group_role", columnNames = { "group_id", "role_id" }) })
+          @UniqueConstraint(name = "UNQ_oc_group_role", columnNames = { "group_id", "role_id" }) })
   private Set<JpaRole> roles;
 
   /**

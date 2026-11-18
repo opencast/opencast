@@ -79,7 +79,7 @@ public interface Segment extends XmlElement {
   /** The segment type */
   enum Type {
     AudioSegment, VideoSegment, AudioVisualSegment
-  };
+  }
 
   /**
    * Returns the segment identifier.

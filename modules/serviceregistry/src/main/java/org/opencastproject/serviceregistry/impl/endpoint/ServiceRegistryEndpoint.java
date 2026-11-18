@@ -109,9 +109,9 @@ import javax.ws.rs.core.Response.Status;
         + "or cluster.")
 @Component(
     property = {
-      "service.description=Service Registry REST Endpoint",
-      "opencast.service.type=org.opencastproject.serviceregistry",
-      "opencast.service.path=/services"
+        "service.description=Service Registry REST Endpoint",
+        "opencast.service.type=org.opencastproject.serviceregistry",
+        "opencast.service.path=/services"
     },
     immediate = true,
     service = { ServiceRegistryEndpoint.class }
@@ -344,11 +344,12 @@ public class ServiceRegistryEndpoint {
       description = "Removes a server from the cluster.",
       returnDescription = "No content.",
       restParameters = {
-        @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol",
-            type = Type.STRING)
+          @RestParameter(name = "host", isRequired = true,
+              description = "The host name, including the http(s) protocol",
+              type = Type.STRING)
       },
       responses = {
-        @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully")
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully")
       })
   public Response unregister(@FormParam("host") String host) {
     try {

@@ -55,12 +55,12 @@ public class EventCommentsListProvider implements ResourceListProvider {
   /** The list of filter criteria for this provider */
   public enum CommentsFilterList {
     REASON, RESOLUTION;
-  };
+  }
 
   /** The resolutions */
   public enum RESOLUTION {
     ALL, UNRESOLVED, RESOLVED;
-  };
+  }
 
   /** The names of the different list available through this provider */
   private final List<String> listNames = new ArrayList<String>();

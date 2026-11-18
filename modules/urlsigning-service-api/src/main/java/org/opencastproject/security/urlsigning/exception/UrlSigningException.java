@@ -30,7 +30,7 @@ public class UrlSigningException extends Exception {
 
   private enum Reason {
     URL_NOT_SUPPORTED, INTERNAL_PROVIDER_ERROR;
-  };
+  }
 
   /** The reason for the exception. */
   private Reason reason;

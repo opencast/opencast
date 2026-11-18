@@ -59,7 +59,7 @@ import javax.persistence.criteria.Root;
     immediate = true,
     service = { LifeCycleDatabaseService.class },
     property = {
-      "service.description=LifeCycle Database Service"
+        "service.description=LifeCycle Database Service"
     })
 public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   /**

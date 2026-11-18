@@ -109,7 +109,7 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   private boolean active = true;
 
   @Column(name = "maintenance", nullable = false)
-  private boolean maintenanceMode = false;;
+  private boolean maintenanceMode = false;
 
   /**
    * Creates a new host registration which is online

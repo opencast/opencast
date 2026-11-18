@@ -248,7 +248,7 @@ public class EventsEndpoint {
   /** The resolutions */
   private enum CommentResolution {
     ALL, UNRESOLVED, RESOLVED;
-  };
+  }
 
   /* OSGi service references */
   private AssetManager assetManager;

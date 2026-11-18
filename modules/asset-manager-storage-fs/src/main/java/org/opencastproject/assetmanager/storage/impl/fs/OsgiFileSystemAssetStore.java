@@ -56,8 +56,8 @@ import javax.naming.ConfigurationException;
 
 @Component(
     property = {
-    "service.description=File system based asset store",
-    "store.type=local-filesystem"
+        "service.description=File system based asset store",
+        "store.type=local-filesystem"
     },
     immediate = true,
     service = { AssetStore.class, StorageUsage.class }

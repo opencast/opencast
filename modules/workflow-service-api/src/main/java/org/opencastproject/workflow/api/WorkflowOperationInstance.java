@@ -86,8 +86,8 @@ public class WorkflowOperationInstance implements Configurable {
           name = "oc_workflow_operation_configuration",
           joinColumns = @JoinColumn(name = "workflow_operation_id"),
           indexes = {
-                @Index(name = "IX_oc_workflow_operation_configuration_workflow_operation_id",
-                    columnList = ("workflow_operation_id")),
+              @Index(name = "IX_oc_workflow_operation_configuration_workflow_operation_id",
+                  columnList = ("workflow_operation_id")),
           }
   )
   @MapKeyColumn(name = "configuration_key", nullable = false)

@@ -31,7 +31,7 @@ public interface SearchTerms<T extends Object> {
   /** The search quantifier */
   enum Quantifier {
     All, Any
-  };
+  }
 
   /**
    * Adds a term to this list of terms.

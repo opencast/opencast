@@ -61,7 +61,7 @@ import java.util.stream.Stream;
  */
 @Component(
     property = {
-      "service.description=Workflow Definition Scanner"
+        "service.description=Workflow Definition Scanner"
     },
     immediate = true,
     service = { ArtifactInstaller.class, WorkflowDefinitionScanner.class }

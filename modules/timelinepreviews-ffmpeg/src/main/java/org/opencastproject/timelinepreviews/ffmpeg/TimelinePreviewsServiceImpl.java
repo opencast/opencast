@@ -87,7 +87,7 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
   /** List of available operations on jobs */
   protected enum Operation {
     TimelinePreview
-  };
+  }
 
   /** Path to the executable */
   protected String binary = FFMPEG_BINARY_DEFAULT;

@@ -98,16 +98,16 @@ import javax.ws.rs.core.Response;
 @Component(
     name = "org.opencastproject.workingfilerepository.impl.WorkingFileRepository",
     property = {
-      "service.description=Working File Repository REST Endpoint",
-      "opencast.service.type=org.opencastproject.files",
-      "opencast.service.path=/files"
+        "service.description=Working File Repository REST Endpoint",
+        "opencast.service.type=org.opencastproject.files",
+        "opencast.service.path=/files"
     },
     immediate = true,
     service = {
-            WorkingFileRepositoryRestEndpoint.class,
-            WorkingFileRepository.class,
-            PathMappable.class,
-            StorageUsage.class
+        WorkingFileRepositoryRestEndpoint.class,
+        WorkingFileRepository.class,
+        PathMappable.class,
+        StorageUsage.class
     }
 )
 @JaxrsResource
@@ -324,8 +324,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
               isRequired = true, type = STRING)
       },
       responses = {
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Files deleted"),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection not found")
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Files deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection not found")
       }
   )
   public Response restCleanupOldFilesFromCollection(@PathParam("collectionId") String collectionId,
@@ -524,7 +524,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
               isRequired = true, type = STRING)
       },
       responses = {
-      @RestResponse(responseCode = SC_OK, description = "URL returned")
+          @RestResponse(responseCode = SC_OK, description = "URL returned")
       }
   )
   public Response restGetUri(@PathParam("mediaPackageID") String mediaPackageID,

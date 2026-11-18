@@ -41,7 +41,7 @@ public final class Options {
   private static final Gson gson = new Gson();
 
   /* Hide utility class constructor */
-  private Options() { };
+  private Options() { }
 
   /**
    * Parse the media inspection service options JSON string

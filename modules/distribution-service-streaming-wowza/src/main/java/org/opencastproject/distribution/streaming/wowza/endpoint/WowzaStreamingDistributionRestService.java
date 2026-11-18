@@ -144,8 +144,8 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
           returnDescription = "Returns whether publish to streaming is configured for the current organization as a "
                             + "boolean.",
           responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Whether publish to streaming is configured for "
-                                                                  + "the current organization.")})
+              @RestResponse(responseCode = SC_OK, description = "Whether publish to streaming is configured for "
+                                                              + "the current organization.")})
   public Response publishToStreaming() {
     return Response.ok(Boolean.toString(service.publishToStreaming())).build();
   }

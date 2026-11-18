@@ -46,32 +46,32 @@ import javax.xml.bind.annotation.XmlAttribute;
 @Entity(name = "SpeechToTextControl")
 //@formatter:off
 @Table(name = "oc_speech_to_text_control", indexes = {
-        @Index(name = "IX_oc_stt_status", columnList = ("status")),
-        @Index(name = "IX_oc_stt_workflow_id", columnList = ("workflow_id")),
-        @Index(name = "IX_oc_stt_job", columnList = ("job"))
+    @Index(name = "IX_oc_stt_status", columnList = ("status")),
+    @Index(name = "IX_oc_stt_workflow_id", columnList = ("workflow_id")),
+    @Index(name = "IX_oc_stt_job", columnList = ("job"))
 })
 @NamedQueries({
-        @NamedQuery(name = "SpeechToTextControl.findByWorkflowId",
-            query = "SELECT stt FROM SpeechToTextControl stt "
-                + "WHERE stt.workflowId = :workflowId"),
-        @NamedQuery(name = "SpeechToTextControl.findDistinctWorkflowIdByStatus",
-            query = "SELECT DISTINCT stt.workflowId FROM SpeechToTextControl stt "
-                + "WHERE stt.status IN :status"),
-        @NamedQuery(name = "SpeechToTextControl.findDistinctWorkflowIdByMediaPackage",
+    @NamedQuery(name = "SpeechToTextControl.findByWorkflowId",
+        query = "SELECT stt FROM SpeechToTextControl stt "
+            + "WHERE stt.workflowId = :workflowId"),
+    @NamedQuery(name = "SpeechToTextControl.findDistinctWorkflowIdByStatus",
+        query = "SELECT DISTINCT stt.workflowId FROM SpeechToTextControl stt "
+            + "WHERE stt.status IN :status"),
+    @NamedQuery(name = "SpeechToTextControl.findDistinctWorkflowIdByMediaPackage",
         query = "SELECT DISTINCT stt.workflowId FROM SpeechToTextControl stt "
             + "WHERE stt.mediaPackageId = :mpId"),
-        @NamedQuery(name = "SpeechToTextControl.findByJob",
-            query = "SELECT stt FROM SpeechToTextControl stt WHERE stt.job = :job"),
-        @NamedQuery(name = "SpeechToTextControl.findByStatus",
-            query = "SELECT stt FROM SpeechToTextControl stt WHERE stt.status IN :status"),
-        @NamedQuery(name = "SpeechToTextControl.updateStatusByJob",
-            query = "UPDATE SpeechToTextControl stt SET stt.status = :status "
-                + "WHERE stt.job IN :jobs"),
-        @NamedQuery(name = "SpeechToTextControl.deleteByWorkflow",
+    @NamedQuery(name = "SpeechToTextControl.findByJob",
+        query = "SELECT stt FROM SpeechToTextControl stt WHERE stt.job = :job"),
+    @NamedQuery(name = "SpeechToTextControl.findByStatus",
+        query = "SELECT stt FROM SpeechToTextControl stt WHERE stt.status IN :status"),
+    @NamedQuery(name = "SpeechToTextControl.updateStatusByJob",
+        query = "UPDATE SpeechToTextControl stt SET stt.status = :status "
+            + "WHERE stt.job IN :jobs"),
+    @NamedQuery(name = "SpeechToTextControl.deleteByWorkflow",
         query = "DELETE FROM SpeechToTextControl stt WHERE stt.workflowId = :workflowId"),
-        @NamedQuery(name = "SpeechToTextControl.updateStatusByStatusAndDate",
-            query = "UPDATE SpeechToTextControl stt SET stt.status = :newStatus "
-                + "WHERE stt.status IN :oldStatus and stt.dateCreated < :date")})
+    @NamedQuery(name = "SpeechToTextControl.updateStatusByStatusAndDate",
+        query = "UPDATE SpeechToTextControl stt SET stt.status = :newStatus "
+            + "WHERE stt.status IN :oldStatus and stt.dateCreated < :date")})
 // @formatter:on
 
 /**

@@ -46,11 +46,11 @@ public abstract class AbstractOaiPmhServerInfoRestEndpoint {
              description = "Ask if the OAI-PMH server knows about a repository",
              returnDescription = "true|false",
              pathParameters = {
-                     @RestParameter(name = "repoId", isRequired = true,
-                             description = "The id of the repository",
-                             type = RestParameter.Type.STRING)},
+                 @RestParameter(name = "repoId", isRequired = true,
+                         description = "The id of the repository",
+                         type = RestParameter.Type.STRING)},
              responses = {
-                     @RestResponse(responseCode = SC_OK, description = "true|false")})
+                 @RestResponse(responseCode = SC_OK, description = "true|false")})
   public Response hasRepo(@PathParam("repoId") String repoId) {
     return ok(getOaiPmhServerInfo().hasRepo(repoId));
   }
@@ -62,7 +62,7 @@ public abstract class AbstractOaiPmhServerInfoRestEndpoint {
              description = "Ask for the mount point of the OAI-PMH server",
              returnDescription = "The mount point",
              responses = {
-                     @RestResponse(responseCode = SC_OK, description = "The mount point")})
+                 @RestResponse(responseCode = SC_OK, description = "The mount point")})
   public Response getMountPoint() {
     return ok(getOaiPmhServerInfo().getMountPoint());
   }

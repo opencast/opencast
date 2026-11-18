@@ -251,7 +251,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       }
       fileInstallCfg = null;
     }
-  };
+  }
 
   /**
    * Setup an Apache FileInstall configuration for the inbox folder this scanner is responsible for.

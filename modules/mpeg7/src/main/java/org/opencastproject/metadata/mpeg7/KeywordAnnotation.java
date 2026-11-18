@@ -58,7 +58,7 @@ public interface KeywordAnnotation extends XmlElement {
    */
   enum Type {
     main, secondary, other
-  };
+  }
 
   /**
    * Returns the keyword.
