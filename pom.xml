@@ -1219,9 +1219,9 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>xmlunit</groupId>
-        <artifactId>xmlunit</artifactId>
-        <version>1.6</version>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-core</artifactId>
+        <version>2.14.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
