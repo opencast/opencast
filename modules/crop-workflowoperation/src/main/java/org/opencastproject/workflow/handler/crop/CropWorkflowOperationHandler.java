@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.crop;
 
 import org.opencastproject.crop.api.CropException;

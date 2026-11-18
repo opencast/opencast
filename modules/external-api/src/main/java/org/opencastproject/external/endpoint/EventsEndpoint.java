@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;

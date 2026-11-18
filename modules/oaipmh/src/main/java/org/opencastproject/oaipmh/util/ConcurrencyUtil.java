@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh.util;
 
 import java.util.concurrent.ExecutorService;

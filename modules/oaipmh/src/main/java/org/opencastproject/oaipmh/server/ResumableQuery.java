@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh.server;
 
 import java.util.Date;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.waveform.remote;
 
 import org.opencastproject.job.api.Job;

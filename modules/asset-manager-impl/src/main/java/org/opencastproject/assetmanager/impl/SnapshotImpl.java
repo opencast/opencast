@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl;
 
 import org.opencastproject.assetmanager.api.Availability;

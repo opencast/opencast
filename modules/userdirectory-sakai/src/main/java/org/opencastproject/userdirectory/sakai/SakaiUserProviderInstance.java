@@ -259,7 +259,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -269,7 +269,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -306,7 +306,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * Loads a user from Sakai.
-   * 
+   *
    * @param userName
    *          the username
    * @return the user
@@ -535,7 +535,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * Get the internal Sakai user Id for the supplied user. If the user exists, set the user's email address.
-   * 
+   *
    * @param eid
    * @return
    */
@@ -577,7 +577,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * Build a Opencast role "foo_user" from the given Sakai locations
-   * 
+   *
    * @param sakaiLocationReference
    * @param sakaiRole
    * @return
@@ -595,7 +595,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * Get a value for for a tag in the element
-   * 
+   *
    * @param sTag
    * @param eElement
    * @return

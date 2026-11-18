@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.endpoint;
 
 import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;

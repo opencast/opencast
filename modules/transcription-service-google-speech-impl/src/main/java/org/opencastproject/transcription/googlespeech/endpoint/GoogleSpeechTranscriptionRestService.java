@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.googlespeech.endpoint;
 
 import org.opencastproject.job.api.JobProducer;

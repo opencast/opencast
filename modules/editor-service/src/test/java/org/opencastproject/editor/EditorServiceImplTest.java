@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.editor;
 
 import static org.easymock.EasyMock.anyObject;

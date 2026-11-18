@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.server;
 
 import org.opencastproject.util.doc.rest.RestService;

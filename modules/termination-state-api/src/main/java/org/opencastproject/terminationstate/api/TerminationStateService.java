@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.terminationstate.api;
 
 public interface TerminationStateService {

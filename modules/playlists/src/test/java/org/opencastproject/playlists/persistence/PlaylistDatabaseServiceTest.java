@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.playlists.persistence;
 
 import static org.junit.Assert.assertTrue;

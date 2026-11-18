@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh;
 
 import java.text.DateFormat;

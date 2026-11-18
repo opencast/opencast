@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.mediapackage.MediaPackage;

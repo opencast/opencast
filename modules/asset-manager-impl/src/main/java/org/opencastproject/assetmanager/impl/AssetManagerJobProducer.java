@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -102,7 +103,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
     return store.isPresent();
   }
 
-  /** Utility class to collect RecordInformation for moving larger 
+  /** Utility class to collect RecordInformation for moving larger
    * groups of mediapackages in combined jobs.
    */
   private class MoveRecordInfo {

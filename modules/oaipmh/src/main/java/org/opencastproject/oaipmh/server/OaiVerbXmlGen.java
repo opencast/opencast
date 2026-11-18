@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh.server;
 
 import org.w3c.dom.Element;

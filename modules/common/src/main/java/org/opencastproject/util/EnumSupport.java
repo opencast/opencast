@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util;
 
 import org.checkerframework.checker.units.qual.A;

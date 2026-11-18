@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.silencedetection.api;
 
 import org.opencastproject.util.XmlSafeParser;

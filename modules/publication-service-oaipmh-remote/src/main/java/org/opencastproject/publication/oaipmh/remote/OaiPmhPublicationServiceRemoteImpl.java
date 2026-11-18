@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.publication.oaipmh.remote;
 
 import static java.lang.String.format;

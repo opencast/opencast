@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.playlists;
 
 import org.opencastproject.playlists.serialization.JaxbPlaylist;

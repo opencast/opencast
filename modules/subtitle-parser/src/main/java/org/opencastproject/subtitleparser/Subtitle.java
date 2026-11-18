@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.subtitleparser;
 
 import java.util.ArrayList;

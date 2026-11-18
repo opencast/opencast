@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.publication.configurable.remote;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

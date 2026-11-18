@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.graphql.playlist.type.output;
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;

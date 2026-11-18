@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.amberscript;
 
 import org.opencastproject.assetmanager.api.AssetManager;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl.endpoint;
 
 import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;

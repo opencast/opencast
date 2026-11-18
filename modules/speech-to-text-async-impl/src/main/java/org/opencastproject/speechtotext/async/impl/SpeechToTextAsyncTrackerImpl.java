@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.speechtotext.async.impl;
 
 import org.opencastproject.job.api.Job;

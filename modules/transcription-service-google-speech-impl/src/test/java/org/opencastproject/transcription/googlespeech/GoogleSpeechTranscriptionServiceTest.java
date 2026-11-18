@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.googlespeech;
 
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;

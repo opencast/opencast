@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.timelinepreviews;
 
 import org.opencastproject.job.api.Job;

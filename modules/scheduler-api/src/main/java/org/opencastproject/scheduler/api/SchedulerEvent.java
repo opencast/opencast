@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.scheduler.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -36,7 +37,7 @@ public interface SchedulerEvent {
 
   /**
    * Returns the version of the event
-   * 
+   *
    * @return the version of the event
    */
   String getVersion();

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl;
 
 import static java.lang.String.format;

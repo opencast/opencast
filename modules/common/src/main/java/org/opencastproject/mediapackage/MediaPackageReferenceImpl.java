@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage;
 
 import java.util.HashMap;

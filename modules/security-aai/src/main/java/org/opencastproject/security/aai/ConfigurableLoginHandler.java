@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.aai;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;

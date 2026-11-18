@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.email.template.impl;
 
 import org.opencastproject.job.api.Incident;

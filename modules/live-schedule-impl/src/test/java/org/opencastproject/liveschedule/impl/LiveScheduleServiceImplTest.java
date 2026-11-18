@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.liveschedule.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;

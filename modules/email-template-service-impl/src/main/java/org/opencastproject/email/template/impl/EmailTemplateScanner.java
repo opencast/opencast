@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.email.template.impl;
 
 import org.apache.commons.io.IOUtils;
@@ -52,7 +53,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * Returns the list of templates.
-   * 
+   *
    * @return the email templates
    */
   public Map<String, String> getTemplates() {
@@ -61,7 +62,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * OSGi callback on component activation.
-   * 
+   *
    * @param ctx
    *          the bundle context
    */
@@ -72,7 +73,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * Returns the email template for the given file name or <code>null</code> if no such one.
-   * 
+   *
    * @param fileName
    *          the template file name
    * @return the email template text
@@ -83,7 +84,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
    */
   @Override
@@ -93,7 +94,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
@@ -107,7 +108,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#uninstall(java.io.File)
    */
   @Override
@@ -123,7 +124,7 @@ public class EmailTemplateScanner implements ArtifactInstaller {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#update(java.io.File)
    */
   @Override

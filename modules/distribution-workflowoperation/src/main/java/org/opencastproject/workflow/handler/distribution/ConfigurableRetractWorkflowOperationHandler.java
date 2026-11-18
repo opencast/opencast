@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.opencastproject.util.RequireUtil.notNull;

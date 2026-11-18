@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.userdirectory.brightspace.client;
 
 import org.opencastproject.userdirectory.brightspace.client.api.BrightspaceUser;

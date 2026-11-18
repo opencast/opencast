@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -29,7 +30,7 @@ import org.opencastproject.util.NotFoundException;
 public interface OaiPmhDatabase {
   /**
    * Stores or updates a mediapackage from the OAI-PMH persistence
-   * 
+   *
    * @param mediaPackage
    *          the mediapackage
    * @param repository
@@ -41,7 +42,7 @@ public interface OaiPmhDatabase {
 
   /**
    * Marks a existing mediapackage as deleted
-   * 
+   *
    * @param mediaPackageId
    *          the mediapackage id
    * @param repository
@@ -55,7 +56,7 @@ public interface OaiPmhDatabase {
 
   /**
    * Searches mediapackages from the OAI-PMH persistence storage
-   * 
+   *
    * @param q
    *          the query
    * @return a search result

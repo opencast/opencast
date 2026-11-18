@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.playlists.persistence;
 
 import org.opencastproject.playlists.PlaylistEntryType;

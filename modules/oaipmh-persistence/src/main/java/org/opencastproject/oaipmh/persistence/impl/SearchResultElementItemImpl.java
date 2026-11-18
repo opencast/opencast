@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence.impl;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.playlists;
 
 import java.util.Objects;

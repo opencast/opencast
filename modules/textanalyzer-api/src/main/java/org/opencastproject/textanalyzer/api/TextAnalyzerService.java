@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.textanalyzer.api;
 
 import org.opencastproject.job.api.Job;

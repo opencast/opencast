@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.util;
 
 import static java.time.ZoneOffset.UTC;

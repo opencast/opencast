@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.message.broker.api.assetmanager;
 
 import org.opencastproject.mediapackage.Catalog;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workspace.impl;
 
 import static org.junit.Assert.assertEquals;

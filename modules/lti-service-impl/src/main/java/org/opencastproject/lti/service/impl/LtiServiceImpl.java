@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lti.service.impl;
 
 import static org.opencastproject.util.MimeType.mimeType;

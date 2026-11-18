@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.impl;
 
 import org.opencastproject.opensearch.api.SearchResultItem;
@@ -68,7 +67,7 @@ public class SearchResultItemImpl<T> implements SearchResultItem<T> {
 
   /**
    * Returns the search result's source.
-   * 
+   *
    * @see SearchResultItem#getSource()
    */
   public T getSource() {

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.ingest.scanner;
 
 import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.composer.impl;
 
 import static org.junit.Assert.assertEquals;

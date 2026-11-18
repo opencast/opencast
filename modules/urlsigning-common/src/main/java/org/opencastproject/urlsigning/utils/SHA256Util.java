@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.urlsigning.utils;
 
 import org.apache.commons.codec.binary.Hex;

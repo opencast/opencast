@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.waveform.endpoint;
 
 import org.opencastproject.job.api.JaxbJob;

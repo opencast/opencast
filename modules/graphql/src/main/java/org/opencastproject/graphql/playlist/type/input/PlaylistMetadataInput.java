@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.graphql.playlist.type.input;
 
 import graphql.annotations.annotationTypes.GraphQLConstructor;

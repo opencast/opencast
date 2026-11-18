@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.data.functions;
 
 import java.text.Format;

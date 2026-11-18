@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.publication.oaipmh.endpoint;
 
 import static org.junit.Assert.assertEquals;

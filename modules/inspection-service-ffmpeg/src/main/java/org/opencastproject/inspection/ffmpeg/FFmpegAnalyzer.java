@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.inspection.ffmpeg;
 
 import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;

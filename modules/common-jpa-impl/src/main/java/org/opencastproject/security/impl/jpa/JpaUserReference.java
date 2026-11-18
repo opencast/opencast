@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.impl.jpa;
 
 import org.opencastproject.security.api.JaxbOrganization;

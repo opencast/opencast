@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.job.jpa;
 
 import static org.opencastproject.job.api.Job.FailureReason.NONE;

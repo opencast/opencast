@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.metadata.dublincore;
 
 import java.util.Date;

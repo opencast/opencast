@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl.persistence;
 
 import static org.junit.Assert.assertFalse;

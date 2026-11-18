@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.terminationstate.endpoint.aws;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;

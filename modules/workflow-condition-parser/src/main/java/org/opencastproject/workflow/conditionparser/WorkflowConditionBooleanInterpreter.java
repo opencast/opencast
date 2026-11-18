@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.conditionparser;
 
 import org.opencastproject.workflow.conditionparser.antlr.WorkflowConditionBaseVisitor;

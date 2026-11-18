@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.api;
 
 import static org.junit.Assert.assertEquals;

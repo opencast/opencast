@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
@@ -140,7 +141,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   /**
    * {@inheritDoc}
-   * @see LifeCycleService#getLifeCyclePolicyById(String) 
+   * @see LifeCycleService#getLifeCyclePolicyById(String)
    */
   @Override
   public LifeCyclePolicy getLifeCyclePolicyById(String id)

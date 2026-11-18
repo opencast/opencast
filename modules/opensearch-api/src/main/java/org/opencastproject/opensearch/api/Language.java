@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
 import java.io.Serializable;
@@ -29,14 +28,14 @@ import java.util.Locale;
  * A <code>Language</code> consists of a language identifier, e.g. <code>de</code> to identify the German language, and
  * of the language description in the various supported languages. There is also a connection to the associate
  * <code>Locale</code>.
- * 
+ *
  * @see Locale
  */
 public interface Language extends Serializable, Comparable<Language> {
 
   /**
    * Returns the locale that is associated with the language.
-   * 
+   *
    * @return the locale
    */
   Locale getLocale();
@@ -48,7 +47,7 @@ public interface Language extends Serializable, Comparable<Language> {
    * <li><code>Deutsch</code> for German</li>
    * <li><code>Français</code> for French</li>
    * </ul>
-   * 
+   *
    * @return the language name in its own language
    */
   String getDescription();
@@ -61,7 +60,7 @@ public interface Language extends Serializable, Comparable<Language> {
    * <li><code>Deutsch</code> for German</li>
    * <li><code>Französisch</code> for French</li>
    * </ul>
-   * 
+   *
    * @param language
    *          the language version of this language
    * @return the language name in the specified language
@@ -70,7 +69,7 @@ public interface Language extends Serializable, Comparable<Language> {
 
   /**
    * Returns the language's identifier, which corresponds to the locales name for this language.
-   * 
+   *
    * @return the language identifier
    */
   String getIdentifier();

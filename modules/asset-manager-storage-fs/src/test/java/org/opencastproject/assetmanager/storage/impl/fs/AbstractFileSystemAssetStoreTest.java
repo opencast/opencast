@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.storage.impl.fs;
 
 import static org.junit.Assert.assertArrayEquals;

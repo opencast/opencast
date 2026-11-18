@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.waveform.ffmpeg;
 
 import org.opencastproject.job.api.AbstractJobProducer;

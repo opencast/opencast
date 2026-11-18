@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.data;
 
 import static org.junit.Assert.assertEquals;

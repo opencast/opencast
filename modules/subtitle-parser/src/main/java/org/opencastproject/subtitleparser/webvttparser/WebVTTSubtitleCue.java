@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.subtitleparser.webvttparser;
 
 import org.opencastproject.subtitleparser.SubtitleCue;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.notification;
 
 import org.opencastproject.email.template.api.EmailTemplateService;

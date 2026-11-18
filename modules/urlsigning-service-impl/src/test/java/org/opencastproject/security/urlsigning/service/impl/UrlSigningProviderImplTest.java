@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning.service.impl;
 
 import static org.junit.Assert.assertEquals;

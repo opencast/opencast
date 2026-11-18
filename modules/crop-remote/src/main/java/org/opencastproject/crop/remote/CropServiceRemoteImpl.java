@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.crop.remote;
 
 import org.opencastproject.crop.api.CropException;

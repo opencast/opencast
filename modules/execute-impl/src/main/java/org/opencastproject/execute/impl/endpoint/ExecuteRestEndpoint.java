@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.execute.impl.endpoint;
 
 import org.opencastproject.execute.api.ExecuteException;
@@ -192,7 +191,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -206,7 +205,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * Checks if the service or services are available, if not it handles it by returning a 503 with a message
-   * 
+   *
    * @param services
    *          an array of services to check
    */

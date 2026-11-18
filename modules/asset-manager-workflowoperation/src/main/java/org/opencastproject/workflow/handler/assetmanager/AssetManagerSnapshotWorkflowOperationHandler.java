@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.assetmanager;
 
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;

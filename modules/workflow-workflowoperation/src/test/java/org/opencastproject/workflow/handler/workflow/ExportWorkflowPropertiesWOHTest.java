@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.workflow;
 
 import static org.easymock.EasyMock.createMock;

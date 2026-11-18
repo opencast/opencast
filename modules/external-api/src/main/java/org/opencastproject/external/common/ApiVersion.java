@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.common;
 
 /** The existing External API versions */

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.speechtotext.async.impl;
 
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;

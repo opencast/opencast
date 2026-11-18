@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.scheduler.impl;
 
 import org.opencastproject.mediapackage.Catalog;

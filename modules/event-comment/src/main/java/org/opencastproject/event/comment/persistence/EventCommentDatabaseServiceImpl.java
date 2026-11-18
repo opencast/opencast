@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.event.comment.persistence;
 
 import static org.opencastproject.db.Queries.namedQuery;

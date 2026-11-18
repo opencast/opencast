@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl.endpoint;
 
 import org.opencastproject.assetmanager.api.AssetManager;

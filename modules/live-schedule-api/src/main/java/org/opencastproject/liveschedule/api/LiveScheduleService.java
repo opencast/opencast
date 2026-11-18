@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.liveschedule.api;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;

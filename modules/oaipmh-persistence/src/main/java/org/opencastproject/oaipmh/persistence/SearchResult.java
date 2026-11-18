@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence;
 
 import java.util.List;
@@ -29,28 +30,28 @@ public interface SearchResult {
 
   /**
    * The search item list
-   * 
+   *
    * @return Item list.
    */
   List<SearchResultItem> getItems();
 
   /**
    * Get the total number of items found, limited by the value returned by {@link #getLimit()}.
-   * 
+   *
    * @return The number.
    */
   long size();
 
   /**
    * Get the offset.
-   * 
+   *
    * @return The offset.
    */
   long getOffset();
 
   /**
    * Get the limit.
-   * 
+   *
    * @return The limit.
    */
   long getLimit();

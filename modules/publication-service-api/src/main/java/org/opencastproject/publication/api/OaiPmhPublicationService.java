@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.publication.api;
 
 import org.opencastproject.job.api.Job;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.api;
 
 import java.util.HashMap;

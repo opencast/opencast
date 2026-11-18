@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.storage.impl.fs;
 
 import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR;

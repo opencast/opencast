@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.persistence;
 
 public class TranscriptionProviderControl {

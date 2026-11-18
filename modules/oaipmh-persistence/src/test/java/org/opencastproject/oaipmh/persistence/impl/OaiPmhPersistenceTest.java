@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence.impl;
 
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.speechtotext.async.persistence;
 
 import org.opencastproject.job.jpa.JpaJob;

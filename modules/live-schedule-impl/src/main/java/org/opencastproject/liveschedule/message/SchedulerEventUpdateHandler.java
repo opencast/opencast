@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.liveschedule.message;
 
 import static org.opencastproject.scheduler.api.SchedulerService.WORKFLOW_CONFIG_PREFIX;

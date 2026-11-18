@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.workflow.impl;
 
 import org.opencastproject.util.NotFoundException;

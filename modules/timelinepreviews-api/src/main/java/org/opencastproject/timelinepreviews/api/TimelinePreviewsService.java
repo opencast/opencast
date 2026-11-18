@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.timelinepreviews.api;
 
 import org.opencastproject.job.api.Job;

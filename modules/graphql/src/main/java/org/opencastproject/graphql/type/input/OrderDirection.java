@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.graphql.type.input;
 
 import org.opencastproject.util.requests.SortCriterion.Order;

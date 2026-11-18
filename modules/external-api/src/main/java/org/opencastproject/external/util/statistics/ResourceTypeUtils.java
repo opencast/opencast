@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.util.statistics;
 
 import org.opencastproject.statistics.api.ResourceType;

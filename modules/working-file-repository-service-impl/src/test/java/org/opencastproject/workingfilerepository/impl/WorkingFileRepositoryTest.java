@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.workingfilerepository.impl;
 
 import static org.junit.Assert.fail;

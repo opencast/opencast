@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.composer.api;
 
 import org.apache.commons.lang3.StringUtils;
@@ -226,7 +225,7 @@ public class EncodingProfileImpl implements EncodingProfile {
   /**
    * sets the mimetype of the output if applicable
    * @param mimeType
-   * 
+   *
    */
   @Override
   public void setMimeType(String mimeType) {

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.util;
 
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;

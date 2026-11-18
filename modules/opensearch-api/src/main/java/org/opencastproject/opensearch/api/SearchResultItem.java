@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
 /**
@@ -30,14 +29,14 @@ public interface SearchResultItem<T extends Object> extends Comparable<SearchRes
   /**
    * Returns the relevance of this hit with respect to the search terms. Greater values mean increased relevance, a 1.0
    * signifies a direct hit while 0.0 means a very unlikely hit.
-   * 
+   *
    * @return the relevance
    */
   double getRelevance();
 
   /**
    * Returns the source of this search result. This will usually be the site or a site's module.
-   * 
+   *
    * @return the source
    */
   T getSource();

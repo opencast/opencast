@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.data;
 
 import java.util.ArrayList;

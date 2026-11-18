@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.mediapackage.XmlElement;

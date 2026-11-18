@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.googlespeech;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -513,7 +514,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       throw new TranscriptionServiceException("Could not create recognition job. Audio file or access token invalid");
     }
 
-    // Create json for configuration and audio file 
+    // Create json for configuration and audio file
     JsonObject configValues = new JsonObject();
     JsonObject audioValues = new JsonObject();
     JsonObject container = new JsonObject();

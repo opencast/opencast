@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl.scanner;
 
 import java.io.File;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.metadata.dublincore;
 
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_ANY;

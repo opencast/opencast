@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.server;
 
 // use the class extensions to mock concrete classes (DublinCoreCatalogService)

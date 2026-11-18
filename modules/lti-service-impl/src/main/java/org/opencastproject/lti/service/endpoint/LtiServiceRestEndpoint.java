@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lti.service.endpoint;
 
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;

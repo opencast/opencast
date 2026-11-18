@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.kernel.rest.docs;
 
 import org.opencastproject.util.doc.rest.RestParameter;

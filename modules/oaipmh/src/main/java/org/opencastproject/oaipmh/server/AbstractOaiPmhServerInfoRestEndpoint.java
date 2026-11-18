@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.server;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;

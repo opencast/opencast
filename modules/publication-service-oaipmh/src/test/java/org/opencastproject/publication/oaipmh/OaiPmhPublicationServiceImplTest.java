@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.publication.oaipmh;
 
 import static org.easymock.EasyMock.anyString;

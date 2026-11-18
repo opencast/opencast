@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning.service;
 
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;

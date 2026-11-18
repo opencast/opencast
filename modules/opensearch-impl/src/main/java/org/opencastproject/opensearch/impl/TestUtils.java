@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.impl;
 
 /**
@@ -49,7 +48,7 @@ public final class TestUtils {
 
   /**
    * Returns <code>true</code> if a test is currently going on.
-   * 
+   *
    * @return <code>true</code> if the current code is being executed as a test
    */
   public static boolean isTest() {

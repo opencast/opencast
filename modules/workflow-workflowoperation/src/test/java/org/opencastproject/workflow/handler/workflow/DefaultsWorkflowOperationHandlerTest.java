@@ -117,7 +117,7 @@ public class DefaultsWorkflowOperationHandlerTest {
 
   /**
    * Setup a workflow instance to test the preset values.
-   * 
+   *
    * @param seriesID
    *          The series id to get the presets.
    * @param workflowConfiguration

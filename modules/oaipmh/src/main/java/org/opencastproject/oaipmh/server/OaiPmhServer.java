@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.server;
 
 import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;

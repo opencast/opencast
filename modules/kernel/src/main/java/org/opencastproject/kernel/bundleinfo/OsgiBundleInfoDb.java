@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.kernel.bundleinfo;
 
 import org.opencastproject.db.DBSession;

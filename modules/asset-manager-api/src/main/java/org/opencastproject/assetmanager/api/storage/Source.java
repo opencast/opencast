@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.api.storage;
 
 import org.opencastproject.util.MimeType;
@@ -27,7 +28,7 @@ import java.util.Optional;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-/** 
+/**
  * A data source along with some optional content hints.
  */
 @ParametersAreNonnullByDefault
