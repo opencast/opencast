@@ -1,0 +1,7 @@
+Opencast's Paella integration (for both, 7 and 8) now supports JWT authentication, as well as on-demand JWT updates in iframe-contexts.
+If the `jwt` URL query parameter is provided, Paella will use that JWT when talking to Opencast APIs (instead of assuming those requests would be cookie-authenticated).
+Further, there is a new (default off) config option that will make Paella authenticate all static file requests with a JWT, making it possible to enable static file authentication while remaining completely cookie-less.
+When embedded in an iframe, enabling this feature will also request new JWTs from the iframe whenever the current one expires.
+For more details, see the documentation.
+
+https://github.com/opencast/opencast/pull/7249
