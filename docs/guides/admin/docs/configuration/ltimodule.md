@@ -24,11 +24,11 @@ Configuration
 
 ### Configure OAuth
 
-LTI uses OAuth to authenticate users. To enable OAuth in Opencast, edit `etc/security/mh_default_org.xml` and uncomment
-the oauthProtectedResourceFilter in the authentication filters section:
+LTI uses OAuth to authenticate users. To enable LTI in Opencast, edit `etc/security/mh_default_org.xml` and uncomment
+the `lti11AuthenticationFilter` in the authentication filters section:
 
 ```xml
-<ref bean="oauthProtectedResourceFilter" />
+<ref bean="lti11AuthenticationFilter" />
 ```
 
 Next, configure the OAuth consumer by setting custom credentials in
@@ -47,7 +47,7 @@ Opencast's LTI module allows additional configuration like making a OAuth consum
 Opencast from generating a temporary username, or to block some specific usernames like the system administrator.
 
 For more details, take a look at the options in
-`etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
+`etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandlerImpl.cfg`.
 
 
 The “delete” key in the series overview tool can be configured by specifying the retraction workflow in
