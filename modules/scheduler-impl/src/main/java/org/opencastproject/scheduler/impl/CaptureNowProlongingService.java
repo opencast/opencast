@@ -56,11 +56,14 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.TriggerUtils;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,9 +166,10 @@ public class CaptureNowProlongingService {
       quartz = new StdSchedulerFactory().getScheduler();
       quartz.start();
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(JOB_NAME, JOB_GROUP, Runner.class);
-      job.setDurability(true);
-      job.setVolatility(true);
+      final JobDetail job = JobBuilder.newJob(Runner.class)
+          .withIdentity(JOB_NAME, JOB_GROUP)
+          .storeDurably()
+          .build();
       job.getJobDataMap().put(JOB_PARAM_PARENT, this);
       quartz.addJob(job, true);
     } catch (org.quartz.SchedulerException e) {
@@ -208,22 +212,23 @@ public class CaptureNowProlongingService {
    */
   public void schedule(String agentId) throws org.quartz.SchedulerException {
     logger.debug("Capture prolonging job for agent '{}' is run every minute.", agentId);
-    final Trigger trigger = TriggerUtils.makeMinutelyTrigger();
-    trigger.setStartTime(DateTime.now().plusMinutes(1).toDate());
-    trigger.setName(agentId);
-    trigger.setGroup(TRIGGER_GROUP);
-    trigger.setJobName(JOB_NAME);
-    trigger.setJobGroup(JOB_GROUP);
-    if (quartz.getTrigger(agentId, TRIGGER_GROUP) == null) {
+    final TriggerKey triggerKey = TriggerKey.triggerKey(agentId, TRIGGER_GROUP);
+    final Trigger trigger = TriggerBuilder.newTrigger()
+        .withIdentity(triggerKey)
+        .forJob(JOB_NAME, JOB_GROUP)
+        .startAt(DateTime.now().plusMinutes(1).toDate())
+        .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever())
+        .build();
+    if (quartz.getTrigger(triggerKey) == null) {
       quartz.scheduleJob(trigger);
     } else {
-      quartz.rescheduleJob(agentId, TRIGGER_GROUP, trigger);
+      quartz.rescheduleJob(triggerKey, trigger);
     }
   }
 
   public void stop(String agentId) {
     try {
-      quartz.unscheduleJob(agentId, TRIGGER_GROUP);
+      quartz.unscheduleJob(TriggerKey.triggerKey(agentId, TRIGGER_GROUP));
       logger.info("Stopped prolonging capture for agent '{}'", agentId);
     } catch (Exception e) {
       logger.error("Error stopping Quartz job for agent '{}'", agentId, e);
@@ -283,14 +288,15 @@ public class CaptureNowProlongingService {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-      logger.debug("Starting ad-hoc prolonging job for agent '{}'", jobExecutionContext.getTrigger().getName());
+      final String agentId = jobExecutionContext.getTrigger().getKey().getName();
+      logger.debug("Starting ad-hoc prolonging job for agent '{}'", agentId);
       try {
         execute((CaptureNowProlongingService) jobExecutionContext.getJobDetail().getJobDataMap().get(JOB_PARAM_PARENT),
-                jobExecutionContext.getTrigger().getName());
+                agentId);
       } catch (Exception e) {
         throw new JobExecutionException("An error occurred while prolonging ad-hoc recordings", e);
       }
-      logger.debug("Finished ad-hoc prolonging job for agent '{}'", jobExecutionContext.getTrigger().getName());
+      logger.debug("Finished ad-hoc prolonging job for agent '{}'", agentId);
     }
 
     private void execute(final CaptureNowProlongingService prolongingService, final String agentId) {

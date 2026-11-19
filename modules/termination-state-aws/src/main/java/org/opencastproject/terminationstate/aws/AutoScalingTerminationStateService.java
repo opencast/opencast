@@ -56,13 +56,16 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.TriggerUtils;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -297,11 +300,15 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   protected void startPollingLifeCycleHook() {
     try {
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_POLLING_JOB, CheckLifeCycleState.class);
+      final JobDetail job = JobBuilder.newJob(CheckLifeCycleState.class)
+          .withIdentity(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_POLLING_JOB)
+          .build();
       job.getJobDataMap().put(SCHEDULE_JOB_PARAM_PARENT, this);
-      final Trigger trigger = TriggerUtils.makeSecondlyTrigger(lifecyclePollingPeriod);
-      trigger.setGroup(SCHEDULE_GROUP);
-      trigger.setName(SCHEDULE_LIFECYCLE_POLLING_TRIGGER);
+      final Trigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(SCHEDULE_LIFECYCLE_POLLING_TRIGGER, SCHEDULE_GROUP)
+          .startNow()
+          .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(lifecyclePollingPeriod))
+          .build();
       scheduler.scheduleJob(job, trigger);
       scheduler.start();
       logger.info("Started polling for Lifecycle state change");
@@ -312,7 +319,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
 
   protected void stopPollingLifeCycleHook() {
     try {
-      scheduler.deleteJob(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_POLLING_JOB);
+      scheduler.deleteJob(JobKey.jobKey(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_POLLING_JOB));
     } catch (SchedulerException e) {
       // ignore
     }
@@ -348,12 +355,15 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   protected void startPollingTerminationState() {
     try {
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(
-          SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_HEARTBEAT_JOB, CheckTerminationState.class);
+      final JobDetail job = JobBuilder.newJob(CheckTerminationState.class)
+          .withIdentity(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_HEARTBEAT_JOB)
+          .build();
       job.getJobDataMap().put(SCHEDULE_JOB_PARAM_PARENT, this);
-      final Trigger trigger = TriggerUtils.makeSecondlyTrigger(lifecycleHeartbeatPeriod);
-      trigger.setGroup(SCHEDULE_GROUP);
-      trigger.setName(SCHEDULE_LIFECYCLE_HEARTBEAT_TRIGGER);
+      final Trigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(SCHEDULE_LIFECYCLE_HEARTBEAT_TRIGGER, SCHEDULE_GROUP)
+          .startNow()
+          .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(lifecycleHeartbeatPeriod))
+          .build();
       scheduler.scheduleJob(job, trigger);
       scheduler.start();
       logger.info("Started emitting heartbeat until jobs are complete");
@@ -364,7 +374,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
 
   protected void stopPollingTerminationState() {
     try {
-      scheduler.deleteJob(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_HEARTBEAT_JOB);
+      scheduler.deleteJob(JobKey.jobKey(SCHEDULE_GROUP, SCHEDULE_LIFECYCLE_HEARTBEAT_JOB));
     } catch (SchedulerException e) {
       // ignore
     }

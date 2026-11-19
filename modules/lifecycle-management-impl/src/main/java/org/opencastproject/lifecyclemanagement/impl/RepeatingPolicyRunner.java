@@ -33,13 +33,19 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 
+import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +103,10 @@ public class RepeatingPolicyRunner {
       quartz = new StdSchedulerFactory().getScheduler();
       quartz.start();
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(dynamicJobName, dynamicJobGroup, Runner.class);
-      job.setDurability(false);
-      job.setVolatility(true);
+      final JobDetail job = JobBuilder.newJob(Runner.class)
+          .withIdentity(dynamicJobName, dynamicJobGroup)
+          .storeDurably()
+          .build();
       job.getJobDataMap().put(JOB_PARAM_PARENT, this);
       quartz.addJob(job, true);
     } catch (org.quartz.SchedulerException e) {
@@ -130,17 +137,16 @@ public class RepeatingPolicyRunner {
   public void schedule() {
     logger.info("Scheduling repeating policy runner to run every {} seconds.", policy.getCronTrigger());
     try {
-      final CronTrigger trigger = new CronTrigger();
-      trigger.setCronExpression(policy.getCronTrigger());
-      trigger.setName(dynamicTriggerName);
-      trigger.setGroup(dynamicTriggerGroup);
-      trigger.setJobName(dynamicJobName);
-      trigger.setJobGroup(dynamicJobGroup);
+      final CronTrigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(dynamicTriggerName, dynamicTriggerGroup)
+          .forJob(dynamicJobName, dynamicJobGroup)
+          .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(policy.getCronTrigger())))
+          .build();
 
-      if (quartz.getTriggersOfJob(dynamicJobName, dynamicJobGroup).length == 0) {
+      if (quartz.getTriggersOfJob(JobKey.jobKey(dynamicJobName, dynamicJobGroup)).isEmpty()) {
         quartz.scheduleJob(trigger);
       } else {
-        quartz.rescheduleJob(dynamicTriggerName, dynamicTriggerGroup, trigger);
+        quartz.rescheduleJob(TriggerKey.triggerKey(dynamicTriggerName, dynamicTriggerGroup), trigger);
       }
     } catch (Exception e) {
       logger.error("Error scheduling Quartz job", e);
@@ -150,7 +156,7 @@ public class RepeatingPolicyRunner {
   public void unschedule() {
     try {
       if (quartz != null) {
-        quartz.unscheduleJob(dynamicTriggerName, dynamicTriggerGroup);
+        quartz.unscheduleJob(TriggerKey.triggerKey(dynamicTriggerName, dynamicTriggerGroup));
       }
     } catch (SchedulerException e) {
       logger.error("Error unscheduling " + policy.getTitle(), e);

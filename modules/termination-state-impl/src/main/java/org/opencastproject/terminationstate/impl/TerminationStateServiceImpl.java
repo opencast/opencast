@@ -34,13 +34,16 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.TriggerUtils;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,11 +124,15 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
   protected void startJobPolling() {
     try {
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(SCHEDULE_GROUP, SCHEDULE_JOB_POLLING, CheckTerminationState.class);
+      final JobDetail job = JobBuilder.newJob(CheckTerminationState.class)
+          .withIdentity(SCHEDULE_GROUP, SCHEDULE_JOB_POLLING)
+          .build();
       job.getJobDataMap().put(SCHEDULE_JOB_PARAM_PARENT, this);
-      final Trigger trigger = TriggerUtils.makeSecondlyTrigger(jobPollingPeriod);
-      trigger.setGroup(SCHEDULE_GROUP);
-      trigger.setName(SCHEDULE_JOB_POLLING_TRIGGER);
+      final Trigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(SCHEDULE_JOB_POLLING_TRIGGER, SCHEDULE_GROUP)
+          .startNow()
+          .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(jobPollingPeriod))
+          .build();
       scheduler.scheduleJob(job, trigger);
       scheduler.start();
       logger.info("Started polling if jobs are complete");
@@ -136,7 +143,7 @@ public final class TerminationStateServiceImpl extends AbstractJobTerminationSta
 
   protected void stopJobPolling() {
     try {
-      scheduler.deleteJob(SCHEDULE_GROUP, SCHEDULE_JOB_POLLING);
+      scheduler.deleteJob(JobKey.jobKey(SCHEDULE_GROUP, SCHEDULE_JOB_POLLING));
     } catch (SchedulerException e) {
       // ignore
     }
