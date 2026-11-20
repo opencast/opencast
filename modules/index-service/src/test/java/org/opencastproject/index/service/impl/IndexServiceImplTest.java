@@ -1277,9 +1277,9 @@ public class IndexServiceImplTest {
     EasyMock.verify(assetManager, schedulerService, workflowService);
   }
 
-  /** An event which does not exist at all must be reported as not found rather than as unauthorized. */
+  /** Report as unauthorized to not tell an unauthorized user which events exist. */
   @Test
-  public void testRemoveEventWithoutSnapshotIsNotFound() throws Exception {
+  public void testRemoveEventWithoutSnapshotIsUnauthorized() throws Exception {
     final String mpId = "event-which-does-not-exist";
 
     AssetManager assetManager = EasyMock.createMock(AssetManager.class);
@@ -1293,8 +1293,8 @@ public class IndexServiceImplTest {
 
     try {
       indexServiceImpl.removeEvent(mpId);
-      fail("Removing an event which does not exist should throw a NotFoundException");
-    } catch (NotFoundException e) {
+      fail("Removing an event which does not exist by a non-admin should throw an UnauthorizedException");
+    } catch (UnauthorizedException e) {
       // expected
     }
   }
