@@ -544,12 +544,12 @@ public class SchedulerRestService {
               + "be retrieved", type = Type.STRING)
       },
       responses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Capture Agent properties of "
-                      + "event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with "
-                      + "specified ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have "
-                      + "permission to remove the event. Maybe you need to authenticate.")
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Capture Agent properties of "
+              + "event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with "
+              + "specified ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have "
+              + "permission to remove the event. Maybe you need to authenticate.")
       }
   )
   public Response getCaptureAgentMetadata(@PathParam("id") String eventId) throws UnauthorizedException {
@@ -1275,24 +1275,24 @@ public class SchedulerRestService {
       description = "Searches recordings and returns result as XML or JSON",
       returnDescription = "XML or JSON formated results",
        pathParameters = {
-          @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]",
-              type = Type.STRING)
+           @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]",
+               type = Type.STRING)
        },
        restParameters = {
-          @RestParameter(name = "agent", description = "Search by device", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "startsfrom", description = "Search by when does event start", isRequired = false,
-              type = Type.INTEGER),
-          @RestParameter(name = "startsto", description = "Search by when does event start", isRequired = false,
-              type = Type.INTEGER),
-          @RestParameter(name = "endsfrom", description = "Search by when does event finish", isRequired = false,
-              type = Type.INTEGER),
-          @RestParameter(name = "endsto", description = "Search by when does event finish", isRequired = false,
-              type = Type.INTEGER)
+           @RestParameter(name = "agent", description = "Search by device", isRequired = false, type = Type.STRING),
+           @RestParameter(name = "startsfrom", description = "Search by when does event start", isRequired = false,
+               type = Type.INTEGER),
+           @RestParameter(name = "startsto", description = "Search by when does event start", isRequired = false,
+               type = Type.INTEGER),
+           @RestParameter(name = "endsfrom", description = "Search by when does event finish", isRequired = false,
+               type = Type.INTEGER),
+           @RestParameter(name = "endsto", description = "Search by when does event finish", isRequired = false,
+               type = Type.INTEGER)
        },
        responses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK,
-              description = "Search completed, results returned in body")
-      }
+           @RestResponse(responseCode = HttpServletResponse.SC_OK,
+               description = "Search completed, results returned in body")
+       }
   )
   public Response getEventsAsList(@PathParam("type") final String type, @QueryParam("agent") String device,
           @QueryParam("startsfrom") Long startsFromTime,
@@ -1396,35 +1396,36 @@ public class SchedulerRestService {
       returnDescription = "Returns NO CONTENT if no recordings are in conflict within specified period or list of "
           + "conflicting recordings in XML or JSON",
         pathParameters = {
-           @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]",
-               type = Type.STRING)
+            @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]",
+                type = Type.STRING)
         },
         restParameters = {
-           @RestParameter(name = "agent", description = "Device identifier for which conflicts will be searched",
-               isRequired = true, type = Type.STRING),
-           @RestParameter(name = "start", description = "Start time of conflicting period, in milliseconds",
-               isRequired = true, type = Type.INTEGER),
-           @RestParameter(name = "end", description = "End time of conflicting period, in milliseconds",
-               isRequired = true, type = Type.INTEGER),
-           @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, "
-               + "specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. "
-               + "BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.",
-               isRequired = false, type = Type.STRING),
-           @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each "
-               + "conflicting period, in milliseconds", isRequired = false, type = Type.INTEGER),
-           @RestParameter(name = "timezone", description = "The timezone of the capture device",
-               isRequired = false, type = Type.STRING)
+            @RestParameter(name = "agent", description = "Device identifier for which conflicts will be searched",
+                isRequired = true, type = Type.STRING),
+            @RestParameter(name = "start", description = "Start time of conflicting period, in milliseconds",
+                isRequired = true, type = Type.INTEGER),
+            @RestParameter(name = "end", description = "End time of conflicting period, in milliseconds",
+                isRequired = true, type = Type.INTEGER),
+            @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, "
+                + "specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. "
+                + "BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.",
+                isRequired = false, type = Type.STRING),
+            @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each "
+                + "conflicting period, in milliseconds", isRequired = false, type = Type.INTEGER),
+            @RestParameter(name = "timezone", description = "The timezone of the capture device",
+                isRequired = false, type = Type.STRING)
         },
         responses = {
-           @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
-           @RestResponse(responseCode = HttpServletResponse.SC_OK,
-               description = "Found conflicting events, returned in body of response"),
-           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST,
-               description = "Missing or invalid parameters"),
-           @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED,
-               description = "Not authorized to make this request"),
-           @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-               description = "A detailed stack track of the internal issue.")
+            @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT,
+                description = "No conflicting events found"),
+            @RestResponse(responseCode = HttpServletResponse.SC_OK,
+                description = "Found conflicting events, returned in body of response"),
+            @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST,
+                description = "Missing or invalid parameters"),
+            @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED,
+                description = "Not authorized to make this request"),
+            @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                description = "A detailed stack track of the internal issue.")
         }
   )
   public Response getConflicts(@PathParam("type") final String type, @QueryParam("agent") String device,

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.impl;
 
 import org.opencastproject.opensearch.api.SearchQuery;
@@ -90,7 +89,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getItems()
    */
   @SuppressWarnings("unchecked")
@@ -103,7 +102,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getLimit()
    */
   public long getLimit() {
@@ -112,7 +111,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getOffset()
    */
   public long getOffset() {
@@ -121,7 +120,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getPage()
    */
   public long getPage() {
@@ -133,7 +132,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getPageSize()
    */
   public long getPageSize() {
@@ -159,7 +158,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getSearchTime()
    */
   public long getSearchTime() {
@@ -168,7 +167,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getHitCount()
    */
   public long getHitCount() {
@@ -177,7 +176,7 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchResult#getDocumentCount()
    */
   public long getDocumentCount() {

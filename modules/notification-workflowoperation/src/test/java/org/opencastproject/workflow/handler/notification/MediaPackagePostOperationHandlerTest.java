@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.workflow.handler.notification;
 
 import org.opencastproject.mediapackage.MediaPackage;

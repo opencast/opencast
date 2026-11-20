@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.videosegmenter.api;
 
 import org.opencastproject.job.api.Job;

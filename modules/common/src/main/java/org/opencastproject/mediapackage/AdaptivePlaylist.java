@@ -665,7 +665,7 @@ public interface AdaptivePlaylist extends Track {
    */
   class HLSMediaPackageCheck {
     private HashMap<String, String> fileMap = new HashMap<String, String>();
-    private HashMap<String, Rep> repMap = new HashMap<String, Rep>();;
+    private HashMap<String, Rep> repMap = new HashMap<String, Rep>();
     private List<Rep> reps;
     private List<Rep> playlists;
     private List<Rep> segments;

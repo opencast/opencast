@@ -48,21 +48,21 @@ public class DublinCoreMetadataCollectionTest {
 
   private static MetadataField createField(final String label, final Integer order, final String value) {
     return new MetadataField(
-      label,
-      null,
-      label,
-      false,
-      false,
-      value,
-      null,
-      MetadataField.Type.TEXT,
-      null,
-      null,
-      order,
-      null,
-      null,
-      null,
-      null);
+        label,
+        null,
+        label,
+        false,
+        false,
+        value,
+        null,
+        MetadataField.Type.TEXT,
+        null,
+        null,
+        order,
+        null,
+        null,
+        null,
+        null);
   }
 
   @Before

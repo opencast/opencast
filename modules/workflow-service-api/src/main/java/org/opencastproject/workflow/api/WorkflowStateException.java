@@ -37,7 +37,7 @@ public class WorkflowStateException extends WorkflowException {
 
   /**
    * Constructs a new workflow state exception with a message.
-   * 
+   *
    * @param message
    *          the message describing the exception
    */

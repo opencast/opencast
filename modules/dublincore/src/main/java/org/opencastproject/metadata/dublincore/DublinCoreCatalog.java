@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.mediapackage.EName;
@@ -128,11 +129,11 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
 
   private final Function<CatalogEntry, DublinCoreValue> toDublinCoreValue =
       new Function<CatalogEntry, DublinCoreValue>() {
-    @Override
-    public DublinCoreValue apply(CatalogEntry e) {
-      return toDublinCoreValue(e);
-    }
-  };
+        @Override
+        public DublinCoreValue apply(CatalogEntry e) {
+          return toDublinCoreValue(e);
+        }
+      };
 
   @Override
   public Map<EName, List<DublinCoreValue>> getValues() {

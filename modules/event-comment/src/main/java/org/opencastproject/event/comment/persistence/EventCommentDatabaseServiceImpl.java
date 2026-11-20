@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.event.comment.persistence;
 
 import static org.opencastproject.db.Queries.namedQuery;
@@ -357,11 +358,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
   private static final Function<EventComment, Boolean> filterNeedsCuttingComment =
       new Function<EventComment, Boolean>() {
-    @Override
-    public Boolean apply(EventComment comment) {
-      return EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()) && !comment.isResolvedStatus();
-    }
-  };
+        @Override
+        public Boolean apply(EventComment comment) {
+          return EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()) && !comment.isResolvedStatus();
+        }
+      };
 
   @Override
   public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {

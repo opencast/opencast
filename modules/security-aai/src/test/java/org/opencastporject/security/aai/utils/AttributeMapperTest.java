@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastporject.security.aai.utils;
 
 import static org.junit.Assert.assertEquals;

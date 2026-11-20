@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.mediapackage;
 
 import org.osgi.service.component.annotations.Component;

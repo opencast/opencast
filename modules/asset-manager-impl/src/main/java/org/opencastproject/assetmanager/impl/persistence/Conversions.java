@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl.persistence;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.impl;
 
 import org.opencastproject.opensearch.api.Language;
@@ -60,7 +59,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#getName()
    */
   public String getName() {
@@ -69,7 +68,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#isLocalized()
    */
   public boolean isLocalized() {
@@ -100,7 +99,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#getLocalizedValues()
    */
   public Map<Language, List<T>> getLocalizedValues() {
@@ -112,7 +111,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#addValue(java.lang.Object)
    */
   public void addValue(T v) {
@@ -126,7 +125,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#getValues()
    */
   public List<T> getValues() {
@@ -138,7 +137,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#getValue()
    */
   @Override
@@ -151,7 +150,7 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchMetadata#clear()
    */
   public void clear() {

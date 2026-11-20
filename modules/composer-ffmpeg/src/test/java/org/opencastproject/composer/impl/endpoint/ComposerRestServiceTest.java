@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.composer.impl.endpoint;
 
 import org.opencastproject.composer.api.ComposerService;

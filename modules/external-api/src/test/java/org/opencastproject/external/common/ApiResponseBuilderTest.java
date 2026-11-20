@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.common;
 
 import static org.junit.Assert.assertEquals;

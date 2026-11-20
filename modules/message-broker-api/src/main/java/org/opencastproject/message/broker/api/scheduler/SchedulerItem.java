@@ -61,7 +61,7 @@ public class SchedulerItem implements Serializable {
   public enum Type {
     UpdateCatalog, UpdateProperties, UpdateAcl, UpdateAgentId, UpdateEnd, UpdatePresenters, UpdateRecordingStatus,
     UpdateStart, DeleteRecordingStatus, Delete
-  };
+  }
 
   /**
    * @param event

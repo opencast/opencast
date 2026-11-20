@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;

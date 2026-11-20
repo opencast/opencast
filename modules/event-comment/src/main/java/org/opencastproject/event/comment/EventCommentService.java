@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.event.comment;
 
 import org.opencastproject.util.NotFoundException;

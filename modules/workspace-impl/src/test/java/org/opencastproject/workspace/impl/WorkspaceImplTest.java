@@ -259,9 +259,9 @@ public class WorkspaceImplTest {
                             + "foo/bar/header.gif"));
     EasyMock.expect(
             repo.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
-                    EasyMock.anyObject(InputStream.class))).andReturn(
-            new URI("http://localhost:8080/files" + WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX
-                    + "foo/bar/header.gif"));
+                    EasyMock.anyObject(InputStream.class)))
+        .andReturn(new URI("http://localhost:8080/files" + WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX
+            + "foo/bar/header.gif"));
     EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
     EasyMock.replay(repo);
 
@@ -296,9 +296,9 @@ public class WorkspaceImplTest {
                             WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, "foo", "bar", "header.gif")));
     EasyMock.expect(
             repo.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
-                    EasyMock.anyObject(InputStream.class))).andReturn(
-            new URI("http://localhost:8080/files" + WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX
-                    + "foo/bar/header.gif"));
+                    EasyMock.anyObject(InputStream.class)))
+        .andReturn(new URI("http://localhost:8080/files" + WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX
+            + "foo/bar/header.gif"));
     EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
     EasyMock.replay(repo);
     workspace.setRepository(repo);

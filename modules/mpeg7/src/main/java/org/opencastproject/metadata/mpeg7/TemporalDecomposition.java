@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.mediapackage.XmlElement;
@@ -36,7 +35,7 @@ public interface TemporalDecomposition<T extends Segment> extends XmlElement {
    */
   enum DecompositionCriteria {
     Temporal
-  };
+  }
 
   /**
    * Set the <code>hasGap</code> property indicating that there may be gaps in between the segments.

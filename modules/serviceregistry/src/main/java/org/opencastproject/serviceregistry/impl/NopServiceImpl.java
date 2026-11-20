@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component(
     property = {
-      "service.description=No operation service"
+        "service.description=No operation service"
     },
     immediate = true,
     service = { NopService.class }

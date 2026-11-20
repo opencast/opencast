@@ -131,7 +131,7 @@ public class AgentImpl implements Agent {
    * Required 0-arg constructor for JAXB, creates a blank agent.
    */
   public AgentImpl() {
-  };
+  }
 
   /**
    * Builds a representation of the agent.

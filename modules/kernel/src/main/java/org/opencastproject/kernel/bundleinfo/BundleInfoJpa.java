@@ -48,16 +48,16 @@ import javax.persistence.criteria.Root;
 
 @Entity(name = "BundleInfo")
 @Table(name = "oc_bundleinfo", uniqueConstraints = { @UniqueConstraint(columnNames = { "host", "bundle_name",
-        "bundle_version" }) })
+    "bundle_version" }) })
 @NamedQueries({
-        @NamedQuery(name = "BundleInfo.findAll",
-            query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
-        @NamedQuery(name = "BundleInfo.deleteAll",
-            query = "delete from BundleInfo"),
-        @NamedQuery(name = "BundleInfo.deleteByHost",
-            query = "delete from BundleInfo where host = :host"),
-        @NamedQuery(name = "BundleInfo.delete",
-            query = "delete from BundleInfo where host = :host and bundleId = :bundleId")
+    @NamedQuery(name = "BundleInfo.findAll",
+        query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
+    @NamedQuery(name = "BundleInfo.deleteAll",
+        query = "delete from BundleInfo"),
+    @NamedQuery(name = "BundleInfo.deleteByHost",
+        query = "delete from BundleInfo where host = :host"),
+    @NamedQuery(name = "BundleInfo.delete",
+        query = "delete from BundleInfo where host = :host and bundleId = :bundleId")
 })
 public class BundleInfoJpa {
   @Id

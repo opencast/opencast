@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.util;
 
 import java.util.Dictionary;

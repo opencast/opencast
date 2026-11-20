@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.composer.impl;
 
 import org.opencastproject.composer.api.EncoderException;

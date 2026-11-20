@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.ibmwatson;
 
 import static org.opencastproject.systems.OpencastConstants.ADMIN_EMAIL_PROPERTY;

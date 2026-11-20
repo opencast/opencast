@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.server;
 
 import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION;

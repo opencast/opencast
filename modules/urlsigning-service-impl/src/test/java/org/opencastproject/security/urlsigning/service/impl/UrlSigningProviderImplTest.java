@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning.service.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +36,7 @@ import org.junit.Test;
 public class UrlSigningProviderImplTest {
   private static final String SIGNED_URL = "signedUrl";
   private static final String URL = "http://testurl.com";
-  private DateTime before = new DateTime(2020, 03, 01, 00, 46, 17, 0, DateTimeZone.UTC);;
+  private DateTime before = new DateTime(2020, 03, 01, 00, 46, 17, 0, DateTimeZone.UTC);
 
   @Test
   public void testFindsSigningProviders() throws UrlSigningException {
@@ -72,7 +73,7 @@ public class UrlSigningProviderImplTest {
     assertEquals(SIGNED_URL, result);
   }
 
-  private class TestRejectingSigningProvider implements UrlSigningProvider {
+  private final class TestRejectingSigningProvider implements UrlSigningProvider {
     @Override
     public boolean accepts(String baseUrl) {
       return false;
@@ -84,7 +85,7 @@ public class UrlSigningProviderImplTest {
     }
   }
 
-  private class TestAcceptingSigningProvider implements UrlSigningProvider {
+  private final class TestAcceptingSigningProvider implements UrlSigningProvider {
     @Override
     public boolean accepts(String baseUrl) {
       return true;

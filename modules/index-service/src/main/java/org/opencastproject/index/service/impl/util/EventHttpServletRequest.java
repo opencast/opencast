@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.index.service.impl.util;
 
 import org.opencastproject.index.service.exception.IndexServiceException;

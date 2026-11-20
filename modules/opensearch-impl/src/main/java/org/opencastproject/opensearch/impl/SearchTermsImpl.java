@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.impl;
 
 import org.opencastproject.opensearch.api.SearchTerms;
@@ -58,7 +57,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchTerms#add(java.lang.Object)
    */
   @Override
@@ -70,7 +69,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchTerms#getTerms()
    */
   @Override
@@ -80,7 +79,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchTerms#contains(java.lang.Object)
    */
   @Override
@@ -90,7 +89,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchTerms#size()
    */
   @Override
@@ -100,7 +99,7 @@ public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see SearchTerms#getQuantifier()
    */
   @Override

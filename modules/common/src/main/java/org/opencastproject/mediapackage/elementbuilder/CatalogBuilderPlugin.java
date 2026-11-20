@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage.elementbuilder;
 
 import org.opencastproject.mediapackage.Catalog;

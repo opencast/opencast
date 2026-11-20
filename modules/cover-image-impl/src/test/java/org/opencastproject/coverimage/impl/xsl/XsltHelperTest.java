@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.coverimage.impl.xsl;
 
 import static org.junit.Assert.assertEquals;

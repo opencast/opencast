@@ -23,9 +23,9 @@ package org.opencastproject.adminui.exception;
 
 /**
  * An exception which indicates a non existing or non readable path.
- * 
+ *
  * @author ademasi
- * 
+ *
  */
 public class IllegalPathException extends Exception {
 
@@ -33,7 +33,7 @@ public class IllegalPathException extends Exception {
 
   /**
    * Constructor without cause.
-   * 
+   *
    * @param message
    */
   public IllegalPathException(String message) {
@@ -42,7 +42,7 @@ public class IllegalPathException extends Exception {
 
   /**
    * Full fledged constructor.
-   * 
+   *
    * @param message
    * @param cause
    */

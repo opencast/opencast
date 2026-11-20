@@ -68,7 +68,7 @@ public final class EventCommentParser {
 
   /**
    * Parses the comment catalog and returns its object representation.
-   * 
+   *
    * @param xml
    *          the serialized comment
    * @param userDirectoryService
@@ -201,7 +201,7 @@ public final class EventCommentParser {
 
   /**
    * Serializes a comment collection.
-   * 
+   *
    * @param comments
    *          the comment collection
    * @return the serialized comment collection
@@ -224,7 +224,7 @@ public final class EventCommentParser {
 
   /**
    * Serializes the comment.
-   * 
+   *
    * @param comment
    *          the comment
    * @return the serialized comment
@@ -240,7 +240,7 @@ public final class EventCommentParser {
 
   /**
    * Serializes the comment reply.
-   * 
+   *
    * @param reply
    *          the comment reply
    * @return the serialized comment reply
@@ -254,7 +254,7 @@ public final class EventCommentParser {
 
   /**
    * Serializes the comment to a {@link org.w3c.dom.Document}.
-   * 
+   *
    * @param comment
    *          the comment
    * @return the serialized comment
@@ -315,7 +315,7 @@ public final class EventCommentParser {
 
   /**
    * Serializes the comment reply to a {@link org.w3c.dom.Document}.
-   * 
+   *
    * @param reply
    *          the comment reply
    * @return the serialized comment reply

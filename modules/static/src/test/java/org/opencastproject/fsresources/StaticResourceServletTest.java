@@ -34,9 +34,9 @@ import javax.servlet.ServletOutputStream;
 
 /**
  * Test for StaticResourceServlet
- * 
+ *
  * Sept 22, 2014 MH-10447, fix for files of size 2048*C bytes in copyRange()
- * 
+ *
  */
 public class StaticResourceServletTest {
 
@@ -74,7 +74,7 @@ public class StaticResourceServletTest {
 
   /**
    * Helper utility for copyRange() method test
-   * 
+   *
    * @param byteArray
    * @param start
    * @param end

@@ -230,7 +230,7 @@ public class StaticFileServiceImpl implements StaticFileService {
         return Files.isDirectory(entry) && entry.getFileName().toString().equals(uuid);
       }
     };
-  };
+  }
 
   /**
    * Returns the temporary storage directory for an organization.
@@ -315,7 +315,7 @@ public class StaticFileServiceImpl implements StaticFileService {
   }
 
   /** Scheduled service for purging temporary storage sections. */
-  private class PurgeTemporaryStorageService extends AbstractScheduledService {
+  private final class PurgeTemporaryStorageService extends AbstractScheduledService {
 
     @Override
     protected void runOneIteration() throws Exception {

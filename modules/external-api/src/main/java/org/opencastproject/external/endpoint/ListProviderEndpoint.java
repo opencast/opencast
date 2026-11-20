@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.endpoint;
 
 import org.opencastproject.external.common.ApiMediaType;
@@ -66,9 +67,9 @@ import javax.ws.rs.core.Response;
         immediate = true,
         service = ListProviderEndpoint.class,
         property = {
-                "service.description=External API - List Providers Endpoint",
-                "opencast.service.type=org.opencastproject.external.listproviders",
-                "opencast.service.path=/api/listproviders"
+            "service.description=External API - List Providers Endpoint",
+            "opencast.service.type=org.opencastproject.external.listproviders",
+            "opencast.service.path=/api/listproviders"
         }
 )
 @JaxrsResource

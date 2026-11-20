@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.assetmanager;
 
 import org.opencastproject.assetmanager.api.AssetManager;

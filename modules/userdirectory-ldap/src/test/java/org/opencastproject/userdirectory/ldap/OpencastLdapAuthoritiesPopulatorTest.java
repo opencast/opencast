@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.userdirectory.ldap;
 
 import static java.lang.String.format;

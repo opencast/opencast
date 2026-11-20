@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public interface SearchIndex {
 
   /**
    * Clears the search index.
-   * 
+   *
    * @throws IOException
    *           if clearing the index fails
    */
@@ -40,7 +39,7 @@ public interface SearchIndex {
   /**
    * Returns the index's version number. If that number is different from {@link #INDEX_VERSION}, a reindex is needed,
    * since the index's structure could have changed significantly.
-   * 
+   *
    * @return the index version
    */
   int getIndexVersion();

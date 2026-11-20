@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.composer;
 
 import static org.junit.Assert.assertEquals;

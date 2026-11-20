@@ -138,7 +138,7 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param tags
-   *           Tags to add to the Track 
+   *           Tags to add to the Track
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackageManifest The manifest of a specific Opencast MediaPackage element

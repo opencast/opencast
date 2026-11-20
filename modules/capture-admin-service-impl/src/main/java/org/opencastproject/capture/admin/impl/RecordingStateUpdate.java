@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.capture.admin.impl;
 
 import org.opencastproject.scheduler.api.Recording;

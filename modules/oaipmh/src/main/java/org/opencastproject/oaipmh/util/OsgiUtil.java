@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh.util;
 
 import org.apache.commons.lang3.StringUtils;

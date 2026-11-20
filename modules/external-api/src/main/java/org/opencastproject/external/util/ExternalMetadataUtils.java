@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.util;
 
 import org.opencastproject.metadata.dublincore.DublinCore;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.userdirectory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

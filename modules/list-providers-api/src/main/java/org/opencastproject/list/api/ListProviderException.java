@@ -30,7 +30,7 @@ public class ListProviderException extends Exception {
 
   /**
    * Constructor without cause.
-   * 
+   *
    * @param message
    */
   public ListProviderException(String message) {
@@ -39,7 +39,7 @@ public class ListProviderException extends Exception {
 
   /**
    * Full fledged constructor.
-   * 
+   *
    * @param message
    * @param cause
    */

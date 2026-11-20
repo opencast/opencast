@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.smil.api.util;
 
 import org.opencastproject.mediapackage.Catalog;

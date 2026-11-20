@@ -36,7 +36,7 @@ import java.util.Map;
 public final class RestParamData {
   public enum Type {
     BOOLEAN, FILE, STRING, TEXT, INTEGER, FLOAT, LONG
-  };
+  }
 
   private String name; // unique key
   private String defaultValue;

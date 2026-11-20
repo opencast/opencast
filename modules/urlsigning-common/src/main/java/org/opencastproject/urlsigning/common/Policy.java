@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.urlsigning.common;
 
 import static java.util.Objects.requireNonNull;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage.identifier;
 
 import org.opencastproject.mediapackage.MediaPackageSupport;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.userdirectory.brightspace;
 
 import org.opencastproject.security.api.Group;

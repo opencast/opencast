@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.api;
 
 import static org.opencastproject.util.RequireUtil.notNull;

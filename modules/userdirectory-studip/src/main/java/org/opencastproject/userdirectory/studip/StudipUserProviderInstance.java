@@ -216,7 +216,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
@@ -226,7 +226,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override
@@ -250,7 +250,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * Loads a user from Stud.IP.
-   * 
+   *
    * @param userName
    *          the username
    * @return the user
@@ -319,7 +319,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   /**
    * Get the internal Stud.IP user Id for the supplied user. If the user exists, set the user's email address.
-   * 
+   *
    * @param uid Identifier of the user to look for
    * @return JSON object containing user information
    */

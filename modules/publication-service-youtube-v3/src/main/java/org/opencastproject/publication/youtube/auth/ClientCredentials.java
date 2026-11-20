@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.publication.youtube.auth;
 
 import org.opencastproject.util.GsonUtil;

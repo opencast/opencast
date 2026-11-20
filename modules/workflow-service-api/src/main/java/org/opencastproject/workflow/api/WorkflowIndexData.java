@@ -38,27 +38,27 @@ import javax.persistence.Table;
 @Table(name = "oc_workflow")
 @Entity
 @NamedNativeQueries({
-        @NamedNativeQuery(
-                name = "WorkflowIndexData.getAll",
-                query = "SELECT id, state, mediapackage_id, organization_id, template FROM oc_workflow "
-                        + "ORDER BY mediapackage_id, id DESC",
-                resultSetMapping = "DataResult"
-        ),
+    @NamedNativeQuery(
+        name = "WorkflowIndexData.getAll",
+        query = "SELECT id, state, mediapackage_id, organization_id, template FROM oc_workflow "
+            + "ORDER BY mediapackage_id, id DESC",
+        resultSetMapping = "DataResult"
+    ),
 })
 @SqlResultSetMapping(
-        name = "DataResult",
-        entities = {
-                @EntityResult(
-                        entityClass = WorkflowIndexData.class,
-                        fields = {
-                                  @FieldResult(name = "id",column = "id"),
-                                  @FieldResult(name = "state", column = "state"),
-                                  @FieldResult(name = "mediaPackageId", column = "mediapackage_id"),
-                                  @FieldResult(name = "organizationId", column = "organization_id"),
-                                  @FieldResult(name = "template", column = "template")
-                        }
-                )
-})
+    name = "DataResult",
+    entities = {
+        @EntityResult(
+            entityClass = WorkflowIndexData.class,
+            fields = {
+                @FieldResult(name = "id", column = "id"),
+                @FieldResult(name = "state", column = "state"),
+                @FieldResult(name = "mediaPackageId", column = "mediapackage_id"),
+                @FieldResult(name = "organizationId", column = "organization_id"),
+                @FieldResult(name = "template", column = "template")
+            }
+        )
+    })
 
 
 public class WorkflowIndexData {

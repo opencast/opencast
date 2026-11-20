@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
@@ -183,7 +182,7 @@ public interface SearchQuery {
 
   /**
    * Sort the result set by the field and the given order. The insertion-order is kept.
-   * 
+   *
    * @param field
    *          the field name, must not be {@code null}
    * @param order
@@ -194,7 +193,7 @@ public interface SearchQuery {
 
   /**
    * Returns all the known sort orders. The insertion-order is kept.
-   * 
+   *
    * @return a map with all known sort orders
    */
   Map<String, Order> getSortOrders();
@@ -202,7 +201,7 @@ public interface SearchQuery {
   /**
    * Returns the sort order of a field. If no sort order has been set for the given field, {@link Order#None} is
    * returned.
-   * 
+   *
    * @param field
    *          the field name, must not be {@code null}
    * @return the sort order

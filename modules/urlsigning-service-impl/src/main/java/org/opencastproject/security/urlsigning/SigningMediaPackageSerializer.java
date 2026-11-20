@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning;
 
 import org.opencastproject.mediapackage.MediaPackageSerializer;

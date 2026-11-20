@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
@@ -247,7 +248,7 @@ public class EventsEndpoint {
   /** The resolutions */
   private enum CommentResolution {
     ALL, UNRESOLVED, RESOLVED;
-  };
+  }
 
   /* OSGi service references */
   private AssetManager assetManager;

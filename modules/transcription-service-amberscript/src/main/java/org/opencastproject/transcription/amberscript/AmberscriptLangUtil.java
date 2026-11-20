@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.amberscript;
 
 import org.slf4j.Logger;

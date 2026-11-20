@@ -102,7 +102,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Component(
     property = {
-    "service.description=Workspace"
+        "service.description=Workspace"
     },
     immediate = true,
     service = { Workspace.class, StorageUsage.class }

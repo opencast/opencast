@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.scheduler.api;
 
 import org.opencastproject.rest.ErrorCodeException;

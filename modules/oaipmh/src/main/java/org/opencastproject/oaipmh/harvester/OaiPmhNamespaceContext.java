@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh.harvester;
 
 import org.opencastproject.oaipmh.OaiPmhConstants;

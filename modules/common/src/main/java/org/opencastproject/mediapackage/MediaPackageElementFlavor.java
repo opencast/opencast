@@ -254,8 +254,8 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   public boolean matches(MediaPackageElementFlavor other) {
     return other != null
-      && typeMatches(type, other.type)
-      && typeMatches(subtype, other.subtype);
+        && typeMatches(type, other.type)
+        && typeMatches(subtype, other.subtype);
   }
 
   @Override
@@ -266,8 +266,8 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   @Override
   public boolean equals(Object other) {
     return (other instanceof MediaPackageElementFlavor)
-      && type.equals(((MediaPackageElementFlavor) other).type)
-      && subtype.equals(((MediaPackageElementFlavor) other).subtype);
+        && type.equals(((MediaPackageElementFlavor) other).type)
+        && subtype.equals(((MediaPackageElementFlavor) other).subtype);
   }
 
 }

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.terminationstate.aws;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistry;

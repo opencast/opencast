@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.composer.api;
 
 import java.util.Comparator;

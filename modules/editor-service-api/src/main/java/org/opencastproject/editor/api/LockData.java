@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.editor.api;
 
 import static java.util.Objects.requireNonNull;

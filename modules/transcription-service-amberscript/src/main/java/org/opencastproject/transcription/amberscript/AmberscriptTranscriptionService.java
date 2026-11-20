@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.amberscript;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -747,8 +748,10 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               transcriptionDone(mpId, jobId);
               return true;
             default:
-              return false; // only here to obey checkstyle
+              break;
           }
+          // Unknown status: treat as not yet finished
+          return false;
         default:
           String error = GsonUtil.getStringOrNull(jsonObject, "error");
           String errorMessage = GsonUtil.getStringOrNull(jsonObject, "errorMessage");

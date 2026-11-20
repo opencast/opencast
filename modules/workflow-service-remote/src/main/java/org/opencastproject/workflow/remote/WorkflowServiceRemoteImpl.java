@@ -79,7 +79,7 @@ import java.util.Optional;
  */
 @Component(
     property = {
-      "service.description=Workflow Remote Service Proxy"
+        "service.description=Workflow Remote Service Proxy"
     },
     immediate =  true,
     service = { WorkflowService.class }

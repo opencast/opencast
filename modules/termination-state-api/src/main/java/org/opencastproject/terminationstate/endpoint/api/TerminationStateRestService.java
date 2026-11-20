@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.terminationstate.endpoint.api;
 
 import javax.ws.rs.core.Response;

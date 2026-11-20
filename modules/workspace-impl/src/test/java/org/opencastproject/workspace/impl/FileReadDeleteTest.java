@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workspace.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -174,7 +175,7 @@ public class FileReadDeleteTest {
     }
   }
 
-  private static class Sink implements WritableByteChannel {
+  private static final class Sink implements WritableByteChannel {
     private boolean closed = false;
 
     @Override public int write(ByteBuffer byteBuffer) throws IOException {

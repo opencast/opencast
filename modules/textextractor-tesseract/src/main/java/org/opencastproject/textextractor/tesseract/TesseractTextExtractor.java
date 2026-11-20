@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.textextractor.tesseract;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl.util;
 
 import org.opencastproject.security.api.DefaultOrganization;

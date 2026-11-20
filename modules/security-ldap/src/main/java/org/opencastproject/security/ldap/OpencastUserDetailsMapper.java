@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.ldap;
 
 import org.springframework.ldap.core.DirContextAdapter;
@@ -38,7 +39,7 @@ public class OpencastUserDetailsMapper implements UserDetailsContextMapper {
    * Activate component
    *
    * @param userDetailsService Reference to the UserDetailsService.
-   * 
+   *
    */
   public OpencastUserDetailsMapper(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;

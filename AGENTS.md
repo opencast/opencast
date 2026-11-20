@@ -146,9 +146,9 @@ podman compose -f docker-compose-all-sql.yml down --timeout 0
 
 ## Checkstyle
 
-Style is enforced by `docs/checkstyle/opencast-checkstyle.xml` (Checkstyle 8.36.2), bound to the Maven
+Style is enforced by `docs/checkstyle/opencast-checkstyle.xml` (Checkstyle 14.4.0), bound to the Maven
 `validate` phase with `failOnViolation=true` — so a style violation breaks the build before compilation,
-for `src/main` **and** `src/test`. Spotless runs before it (see below) and takes care of the imports.
+for `src/main` **and** `src/test`. Spotless runs before it (see below) and takes care of imports, license header and whitespace.
 
 Check a single module without a full build:
 
@@ -161,12 +161,13 @@ Sections can be exempted with `// CHECKSTYLE:OFF` … `// CHECKSTYLE:ON`
 
 ## Imports and Spotless
 
-Import order, unused imports and the final newline are not maintained by hand: the Spotless Maven
-plugin fixes them. It is bound to the `initialize` phase, so any lifecycle build (`./mvnw install`, even
-with `-Dcheckstyle.skip=true`) rewrites the imports of the modules it builds. Do not hand-sort imports.
+Import order, unused imports, the license header, trailing whitespace, LF line endings and the final
+newline are not maintained by hand: the Spotless Maven plugin fixes them. It is bound to the `initialize`
+phase, so any lifecycle build (`./mvnw install`, even with `-Dcheckstyle.skip=true`) rewrites the Java
+sources of the modules it builds. Do not hand-sort imports or fiddle with the header.
 
 Invoking a goal directly (`checkstyle:check`, …) does **not** run Spotless, and Checkstyle no longer
-checks imports. So after editing Java files without running a full build, run:
+checks any of these. So after editing Java files without running a full build, run:
 
 ```
 ./mvnw -pl modules/<module> spotless:apply
@@ -175,20 +176,19 @@ checks imports. So after editing Java files without running a full build, run:
 CI runs `spotless:check` and fails on anything Spotless would change.
 
 Never wrap an import statement over two lines, even if it exceeds 120 characters: Spotless parses
-imports line by line and silently drops the continuation line.
+imports line by line and silently drops the continuation line. Checkstyle's line length limit does not
+apply to imports.
 
-Still enforced by Checkstyle: no star imports (`AvoidStarImport`), no redundant imports (same package /
-`java.lang`), no `sun.*`.
+Spotless also rejects star imports (it cannot fix them). Still enforced by Checkstyle: no redundant
+imports (same package / `java.lang`), no `sun.*`.
 
 ## Other formatting rules worth remembering
 
 - Indentation: 2 spaces; `case` 2; wrapped lines 4; `throws` continuation 8. Spaces only, no tabs.
 - Max line length: 120 characters.
 - Opening brace on the same line; braces mandatory for every `if`/`else`/`for`/`while`/`do`.
-- Files must end with a single LF newline (LF line separators).
-- Every `.java` and `.js` file needs the ECL license header from `docs/checkstyle/opencast-header.txt`
-  (line 3, the copyright year line, is exempt from matching). Copy it from a neighbouring file when
-  creating a new one.
+- Every `.java` file needs the ECL license header from `docs/checkstyle/opencast-header.txt`, followed
+  by one blank line. Spotless inserts it, so a new file may simply start with `package`.
 - Modifier order per JLS; no redundant modifiers (e.g. `public` on interface methods).
 
 ## Release notes

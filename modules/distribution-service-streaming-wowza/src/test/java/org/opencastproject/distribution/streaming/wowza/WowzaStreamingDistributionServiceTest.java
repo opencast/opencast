@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.distribution.streaming.wowza;
 
 import static java.lang.String.format;

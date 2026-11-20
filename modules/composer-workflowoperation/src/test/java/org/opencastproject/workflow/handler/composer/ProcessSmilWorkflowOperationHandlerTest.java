@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.composer;
 
 import org.opencastproject.composer.api.ComposerService;

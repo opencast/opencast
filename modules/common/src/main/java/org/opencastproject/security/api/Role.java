@@ -81,7 +81,7 @@ public interface Role {
 
   /**
    * Returns the role's {@link Type}
-   * 
+   *
    * @return the type
    */
   Type getType();

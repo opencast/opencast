@@ -32,10 +32,10 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
     property = {
-      "service.description=Maintenance Command (m:set id true|false, m:list)",
-      "osgi.command.scope=maintain",
-      "osgi.command.function=set",
-      "osgi.command.function=list"
+        "service.description=Maintenance Command (m:set id true|false, m:list)",
+        "osgi.command.scope=maintain",
+        "osgi.command.function=set",
+        "osgi.command.function=list"
     },
     immediate = true,
     service = { MaintenanceCommand.class }

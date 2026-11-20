@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.api;
 
 import org.opencastproject.metadata.api.util.Interval;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.distribution.aws.s3.remote;
 
 import static java.lang.String.format;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.runtimeinfo;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistration;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.publication.oaipmh.endpoint;
 
 import static io.restassured.RestAssured.given;

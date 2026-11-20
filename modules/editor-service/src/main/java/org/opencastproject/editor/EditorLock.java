@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.editor;
 
 import org.opencastproject.editor.api.EditorServiceException;

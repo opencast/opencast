@@ -44,7 +44,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * <p>
  * Write REST unit tests using <a href="http://code.google.com/p/rest-assured/">rest assured</a>.
  * <h2>Example Usage</h2>
- * 
+ *
  * <pre>
  *   import static com.jayway.restassured.RestAssured.*;
  *   import static com.jayway.restassured.matcher.RestAssuredMatchers.*;
@@ -65,9 +65,9 @@ import java.util.concurrent.ThreadLocalRandom;
  *   }
  *   }
  * </pre>
- * 
+ *
  * Add the following dependencies to your pom
- * 
+ *
  * <pre>
  * &lt;dependency&gt;
  *   &lt;groupId&gt;com.jayway.restassured&lt;/groupId&gt;

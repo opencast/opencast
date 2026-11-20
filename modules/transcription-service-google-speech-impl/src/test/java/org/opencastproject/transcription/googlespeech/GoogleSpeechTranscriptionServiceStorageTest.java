@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.googlespeech;
 
 import org.opencastproject.workspace.api.Workspace;

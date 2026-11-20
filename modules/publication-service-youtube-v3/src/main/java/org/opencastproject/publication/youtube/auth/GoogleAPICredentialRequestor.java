@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.publication.youtube.auth;
 
 import com.google.api.client.auth.oauth2.StoredCredential;

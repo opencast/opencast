@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.aai.api;
 
 import org.slf4j.Logger;

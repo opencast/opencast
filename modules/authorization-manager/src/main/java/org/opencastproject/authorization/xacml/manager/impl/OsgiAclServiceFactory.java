@@ -33,7 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 /** OSGi implementation of {@link org.opencastproject.authorization.xacml.manager.api.AclServiceFactory}. */
 @Component(
         property = {
-                "service.description=Factory to create ACL services"
+            "service.description=Factory to create ACL services"
         },
         immediate = true,
         service = { AclServiceFactory.class }

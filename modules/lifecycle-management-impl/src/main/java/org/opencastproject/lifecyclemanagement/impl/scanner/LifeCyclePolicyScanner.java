@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl.scanner;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;

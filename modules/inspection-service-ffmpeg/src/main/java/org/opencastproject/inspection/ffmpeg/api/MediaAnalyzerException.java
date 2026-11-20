@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.inspection.ffmpeg.api;
 
 /**

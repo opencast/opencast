@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.api.util;
 
 import java.util.Date;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.persistence;
 
 import static org.opencastproject.db.Queries.namedQuery;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.common;
 
 public final class ApiMediaTypeException extends RuntimeException {

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.videogrid;
 
 import static java.lang.String.format;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.dublincore;
 
 import org.joda.time.Duration;

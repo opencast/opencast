@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.oaipmh.matterhorn;
 
 import static org.opencastproject.util.UrlSupport.uri;

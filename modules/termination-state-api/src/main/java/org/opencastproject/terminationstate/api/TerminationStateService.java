@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.terminationstate.api;
 
 public interface TerminationStateService {
@@ -41,7 +42,7 @@ public interface TerminationStateService {
         return "ready";
       }
     }
-  };
+  }
 
   void setState(TerminationState state);
 

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.kernel.security;
 
 import static org.easymock.EasyMock.createMock;

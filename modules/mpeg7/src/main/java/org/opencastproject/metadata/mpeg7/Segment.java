@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.mediapackage.XmlElement;
@@ -80,7 +79,7 @@ public interface Segment extends XmlElement {
   /** The segment type */
   enum Type {
     AudioSegment, VideoSegment, AudioVisualSegment
-  };
+  }
 
   /**
    * Returns the segment identifier.

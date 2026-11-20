@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencast.metadata.api.util;
 
 import static org.junit.Assert.assertFalse;

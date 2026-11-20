@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.scheduler.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;

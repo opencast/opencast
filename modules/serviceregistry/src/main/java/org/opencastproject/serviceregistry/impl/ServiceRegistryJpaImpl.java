@@ -113,7 +113,7 @@ import javax.persistence.TypedQuery;
 /** JPA implementation of the {@link ServiceRegistry} */
 @Component(
     property = {
-      "service.description=Service registry"
+        "service.description=Service registry"
     },
     immediate = true,
     service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }

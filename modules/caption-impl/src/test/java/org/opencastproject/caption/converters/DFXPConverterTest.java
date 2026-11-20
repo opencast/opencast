@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.caption.converters;
 
 import org.opencastproject.caption.api.Caption;

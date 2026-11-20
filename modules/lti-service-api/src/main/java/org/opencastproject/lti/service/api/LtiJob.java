@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lti.service.api;
 
 /**

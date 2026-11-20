@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.playlists.serialization;
 
 import org.opencastproject.playlists.PlaylistAccessControlEntry;
