@@ -852,10 +852,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
         throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
       }
-      else {
-        // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
-        throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
-      }
+    }
+    else {
+      // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
+      throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
   }
 
