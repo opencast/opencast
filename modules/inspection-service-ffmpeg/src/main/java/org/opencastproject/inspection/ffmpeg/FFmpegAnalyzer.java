@@ -184,6 +184,15 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       JsonArray streams = jsonObject.getAsJsonArray("streams");
       for (JsonElement streamElement : streams) {
         JsonObject stream = streamElement.getAsJsonObject();
+
+        /* Cover art is reported as a video stream, but is a picture attached to the file and not part of its content */
+        JsonObject disposition = GsonUtil.getObjectOrNull(stream, "disposition");
+        JsonElement attachedPic = disposition == null ? null : member(disposition, "attached_pic");
+        if (attachedPic != null && attachedPic.getAsLong() == 1) {
+          logger.debug("Ignoring attached picture stream {}", member(stream, "index"));
+          continue;
+        }
+
         /* Check type of string */
         String codecType = GsonUtil.getStringOrNull(stream, "codec_type");
 
