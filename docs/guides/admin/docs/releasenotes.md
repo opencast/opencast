@@ -1,5 +1,91 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.11
+
+This version contains only a number of security issue fixes, two of which are rated critical.  The fixes, in order of
+severity rating are:
+
+- [[GHSA-87w3-phwh-q8vx](https://github.com/opencast/opencast/security/advisories/GHSA-87w3-phwh-q8vx)] -
+  Path traversal through unvalidated media package and element identifiers leading to arbitrary file write, deletion,
+  and remote code execution
+- [[GHSA-gr3h-hxr8-phqm](https://github.com/opencast/opencast/security/advisories/GHSA-gr3h-hxr8-phqm)] -
+  Server-side template injection via workflow properties in FreeMarker-rendered workflow operation settings
+- [[GHSA-hgqh-jpvg-xx9f](https://github.com/opencast/opencast/security/advisories/GHSA-hgqh-jpvg-xx9f)] -
+  Users can delete events they only have read access to
+- [[GHSA-x4wc-h58f-2wm9](https://github.com/opencast/opencast/security/advisories/GHSA-x4wc-h58f-2wm9)] -
+  Unauthenticated reflected XSS in the REST documentation endpoint (/docs.html)
+- [[GHSA-qqqp-5j2v-jvfp](https://github.com/opencast/opencast/security/advisories/GHSA-qqqp-5j2v-jvfp)] -
+  Cross-tenant exposure of playlists in multi-organization installations
+- [[GHSA-jrcq-hch7-gvv5](https://github.com/opencast/opencast/security/advisories/GHSA-jrcq-hch7-gvv5)] -
+  Unconditional Trust of X-Forwarded-* Headers (No Trusted-Proxy Allowlist)
+
+### Potentially breaking changes
+
+This release is unusual in the sense that there are additional checks you should run __before__
+applying the upgrade.  Please read the following completely and address
+
+__Path traversal via media package and element components (GHSA-hgqh-jpvg-xx9f)__
+
+Media package and media package element identifiers are now validated for path traversal when a
+media package is ingested or otherwise parsed from XML. The validation covers the media package
+identifier and the identifiers of all of its elements, including the tracks, attachments and
+catalogs nested inside a publication. Identifiers that are empty, that consist of the current or
+parent directory reference (``.`` or ``..``), or that contain a path separator (``/`` or ``\``)
+are rejected; such identifiers could be used to read, write or delete files outside the
+configured storage roots. A ``..`` sequence *inside* an identifier (e.g. ``track..1``) is a
+harmless literal file system name and keeps working. Media packages with an explicitly empty
+identifier (``id=""``) are rejected at the parse boundary; media packages without an ``id``
+attribute at all keep working and receive a generated identifier.
+
+Note for existing data: media package or element identifiers that contain a path separator (e.g.
+DOI-style ids like ``10.0000/2``), or that are empty or consist of ``.`` or ``..``, were
+accepted by some Opencast versions, but are now rejected at the parse boundary. Media packages
+with such identifiers can no longer be loaded - events or snapshots that use them cannot be
+listed or retracted through the API. If your deployment uses such identifiers, the affected
+events must be dealt with before the upgrade; the upgrade guide has queries for finding them.
+Operations that load several media packages no longer fail because of a single affected one:
+when the search index is rebuilt, when the search service
+fills in missing series ids at start-up, when a series is loaded, and when the asset manager
+rebuilds its index or loads several snapshots at once (e.g. all snapshots of a series), an
+affected media package is skipped and an error is logged.
+
+The working file repository rejects unsafe identifiers for media packages, elements,
+collections and file names in every operation that resolves a path, including the read-only
+collection operations (size, contents, cleanup). The file system asset stores reject unsafe
+organization, media package and element identifiers and, for deletions, additionally verify
+that the target is exactly the media package directory (or one of its version sub-directories)
+below the store root. The download and the streaming distribution services reject publication
+channel identifiers that are empty, ``.`` or ``..`` or contain a path separator, and verify that
+every resolved file system path stays within the organization's distribution subtree (the checks
+are lexical, so deployments that keep parts of the storage tree in symlinked directories, e.g.
+on separate mounts, keep working). The download distribution service also rejects distribute and
+retract operations in which the publication URI of an element does not refer to the channel and
+media package of the operation, as well as retractions whose target is not a regular file, and
+the streaming distribution service derives the location of a SMIL file from the channel, the
+media package and the element flavor instead of parsing it from the element URI; it no longer
+distributes an element whose URI already points to the streaming server. The workspace rejects
+files that resolve outside its root.
+
+The working file repository copy and move operations no longer delete a pre-existing
+destination file when the operation fails; they report the failure instead.
+
+No database schema or search index changes.  Prior to upgrading run the checks listed in the [upgrade guide](../upgrade#data-changes-1911-only).
+
+__Email templates and workflow operation templating (GHSA-gr3h-hxr8-phqm)__
+
+The FreeMarker engine used to render templates (e.g. email templates or workflow operation settings
+such as the publish URL pattern) is now restricted: templates can no longer instantiate Java classes
+(`?new` built-in), access the Java API (`?api` built-in) or load other templates
+(`#include`/`<#include>`, `#import`/`<#import>`). Templates that relied on these features now fail to
+process; the failure is logged with details to `data/log/opencast.log`.
+
+In addition, when template processing fails, the error message shown in workflow error output no
+longer contains the template source and the data model; only the template name is shown. The full
+details are available in the log.
+
+There are no database schema or search index changes.
+
+
 ## Opencast 19.10
 
 This version contains minor updates for the admin, and editor submodules.  This release also updates Karaf to
