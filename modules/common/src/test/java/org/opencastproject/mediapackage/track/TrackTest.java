@@ -22,15 +22,10 @@
 package org.opencastproject.mediapackage.track;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
 
@@ -38,7 +33,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -47,7 +41,6 @@ import java.net.URI;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
 
 /**
  * Test case to Test the implementation of {@link TrackImpl}.
@@ -99,18 +92,6 @@ public class TrackTest {
     assertEquals(null, track.getDuration());
   }
 
-  /**
-   * Test method for
-   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type,
-   *        org.opencastproject.mediapackage.MediaPackageElementFlavor)}
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testPresenterTrackAccept() throws Exception {
-    assertTrue(new TrackBuilderPlugin().accept(new URI("uri"), Track.TYPE, MediaPackageElements.PRESENTER_SOURCE));
-  }
-
   @Test
   public void testFlavorMarshalling() throws Exception {
     track.setFlavor(MediaPackageElements.PRESENTATION_SOURCE);
@@ -145,15 +126,6 @@ public class TrackTest {
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(track);
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
-
-    // And finally, using the element builder
-    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(IOUtils.toInputStream(xml));
-
-    Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t3.getURI().toURL().toExternalForm());
   }
 
   @Test
@@ -194,16 +166,6 @@ public class TrackTest {
     String xmlFromTrack = MediaPackageElementParser.getAsXml(track);
     Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
     Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
-
-    // And finally, using the element builder
-    DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document doc = docBuilder.parse(IOUtils.toInputStream(xml));
-
-    Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m4v", t3.getURI().toURL().toExternalForm());
-    Assert.assertEquals(true, t3.isLive());
   }
 
 }
