@@ -78,6 +78,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -820,8 +821,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private boolean isAdmin() {
-    return (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)
-            || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
+    final User currentUser = securityService.getUser();
+
+    // Global admin
+    if (currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // Organization admin
+    final Organization currentOrg = securityService.getOrganization();
+    return currentUser.getOrganization().getId().equals(currentOrg.getId()) && currentUser.hasRole(
+        currentOrg.getAdminRole());
   }
 
   /**
@@ -833,10 +843,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *           if the current user may not remove the event
    */
   private void assertCanRemoveEvent(String mediaPackageId) throws UnauthorizedException {
-    // Note that hasPermission() already grants access to global and organization administrators.
     Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
     if (mediaPackage.isPresent()) {
-      if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
+      if (!isAdmin() && !authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
         throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
       }
       return;
