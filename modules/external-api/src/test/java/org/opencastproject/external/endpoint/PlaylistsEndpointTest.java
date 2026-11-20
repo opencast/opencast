@@ -137,6 +137,19 @@ public class PlaylistsEndpointTest {
   }
 
   @Test
+  public void testGetPlaylistsMultiValueAcceptHeader() throws Exception {
+    // Browsers and XHR clients commonly send an Accept header with several values, e.g. the jQuery/XHR default
+    // "text/plain, */*; q=0.01". That is not a single media type, so it must not be passed straight through as one.
+    given()
+        .header("Accept", "text/plain, */*; q=0.01")
+        .queryParam("limit", 100)
+        .queryParam("offset", 0)
+        .expect()
+        .statusCode(SC_OK).when()
+        .get(env.host("/"));
+  }
+
+  @Test
   public void testCreatePlaylist() throws Exception {
     String response = given()
         .formParam("playlist", new Playlist())

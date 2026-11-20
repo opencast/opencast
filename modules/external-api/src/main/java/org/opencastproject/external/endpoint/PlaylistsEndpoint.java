@@ -233,7 +233,7 @@ public class PlaylistsEndpoint {
       playlistsJson.add(playlistToJson(p));
     }
 
-    return Response.ok(playlistsJson.toString(), acceptHeader).build();
+    return ApiResponseBuilder.Json.ok(acceptHeader, playlistsJson);
   }
 
   @POST
