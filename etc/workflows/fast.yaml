@@ -106,6 +106,7 @@ operations:
 
   - id: publish-engage
     if: ${straightToPublishing}
+    retry-strategy: retry
     max-attempts: 2
     fail-on-error: true
     exception-handler-workflow: partial-error

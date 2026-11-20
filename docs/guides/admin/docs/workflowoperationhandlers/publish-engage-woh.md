@@ -41,6 +41,7 @@ Operation Example
 
 ```yaml
   - id: publish-engage
+    retry-strategy: retry
     max-attempts: 2
     fail-on-error: true
     exception-handler-workflow: error

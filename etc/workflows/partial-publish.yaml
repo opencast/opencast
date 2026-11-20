@@ -244,6 +244,7 @@ operations:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Publish to engage player
   - id: publish-engage
+    retry-strategy: retry
     max-attempts: 2
     exception-handler-workflow: partial-error
     description: Publishing to Opencast Media Module
