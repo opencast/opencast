@@ -56,6 +56,11 @@
       <artifactId>org.osgi.service.component.annotations</artifactId>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
