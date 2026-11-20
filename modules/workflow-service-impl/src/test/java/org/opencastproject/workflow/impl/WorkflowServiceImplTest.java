@@ -453,6 +453,29 @@ public class WorkflowServiceImplTest {
   }
 
   @Test
+  public void testMaxAttemptsWithoutRetryStrategy() throws Exception {
+    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
+    def.setId("workflow-definition-1");
+    def.setTitle("workflow-definition-1");
+    def.setDescription("workflow-definition-1");
+
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once",
+        null, true);
+    opDef.setMaxAttempts(2);
+    def.add(opDef);
+
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+
+    WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.SUCCEEDED);
+
+    WorkflowOperationInstance operation = service.getWorkflowById(workflow.getId()).getOperations().get(0);
+    Assert.assertEquals(OperationState.SUCCEEDED, operation.getState());
+    Assert.assertEquals(RetryStrategy.RETRY, operation.getRetryStrategy());
+    Assert.assertEquals(2, operation.getMaxAttempts());
+    Assert.assertEquals(1, operation.getFailedAttempts());
+  }
+
+  @Test
   public void testRetryStrategyRetry() throws Exception {
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("workflow-definition-1");

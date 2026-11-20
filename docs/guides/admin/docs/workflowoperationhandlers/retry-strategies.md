@@ -10,9 +10,9 @@ An operation can have a retry-strategy specified to define what will happen if t
 
 ## max-attempts
 
-`max-attempts` limits how often an operation is attempted. It only takes effect together with a
-`retry-strategy` of `retry` or `hold`: with the default strategy `none` a failed operation is never
-retried, so setting `max-attempts` on its own has no effect and is logged as a warning.
+`max-attempts` limits how often an operation is attempted. If an operation sets `max-attempts` to more than `1`
+without a `retry-strategy`, or with the strategy `none`, the strategy `retry` is used, so the operation is retried
+automatically. With `retry` or `hold`, an operation is attempted at least twice.
 
 **Example 1**: No retry
 
