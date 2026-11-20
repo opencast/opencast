@@ -22,7 +22,6 @@ package org.opencastproject.scheduler.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
@@ -78,6 +77,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -818,8 +818,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private boolean isAdmin() {
-    return (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)
-            || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
+    final User currentUser = securityService.getUser();
+
+    // Global admin
+    if (currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // Organization admin
+    final Organization currentOrg = securityService.getOrganization();
+    return currentUser.getOrganization().getId().equals(currentOrg.getId()) && currentUser.hasRole(
+        currentOrg.getAdminRole());
   }
 
   /**
@@ -831,18 +840,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *           if the current user may not remove the event
    */
   private void assertCanRemoveEvent(String mediaPackageId) throws UnauthorizedException {
-    // Note that hasPermission() already grants access to global and organization administrators.
+
+    if (isAdmin()) {
+      return;
+    }
+
     Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
     if (mediaPackage.isPresent()) {
       if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
         throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
       }
-      return;
     }
-
-    // The media package could not be read. If it exists nonetheless, the current user is not allowed to see it and
-    // must not be allowed to remove it either. If it does not exist, leave it to the regular not-found handling.
-    if (assetManager.snapshotExists(mediaPackageId, securityService.getOrganization().getId())) {
+    else {
+      // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
       throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
   }
