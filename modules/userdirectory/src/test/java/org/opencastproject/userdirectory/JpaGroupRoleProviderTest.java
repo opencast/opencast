@@ -32,6 +32,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
@@ -313,5 +314,88 @@ public class JpaGroupRoleProviderTest {
     groupRoles = provider.getRolesForUser("user");
     Assert.assertEquals("Make sure there is no issue with users that are not part of any group",
             0, groupRoles.size());
+  }
+
+  @Test
+  public void testRemoveMemberInvalidatesUserAfterPersisting() throws Exception {
+    provider.addGroup(new JpaGroup("test", org1, "Test", "Test group", new HashSet<>(), Set.of("user", "user2")));
+
+    // The removal must already be persisted when the cached user is invalidated
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    userDirectoryService.invalidate("user");
+    EasyMock.expectLastCall().andAnswer(() -> {
+      assertEquals(Set.of("user2"), provider.loadGroup("test", org1.getId()).getMembers());
+      return null;
+    }).once();
+    EasyMock.replay(userDirectoryService);
+    provider.setUserDirectoryService(userDirectoryService);
+
+    Assert.assertTrue(provider.removeMemberFromGroup("test", "user"));
+    EasyMock.verify(userDirectoryService);
+  }
+
+  @Test
+  public void testAddMemberInvalidatesUserAfterPersisting() throws Exception {
+    provider.addGroup(new JpaGroup("test", org1, "Test", "Test group", new HashSet<>(), Set.of("user2")));
+
+    // The new member must already be persisted when the cached user is invalidated
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    userDirectoryService.invalidate("user");
+    EasyMock.expectLastCall().andAnswer(() -> {
+      assertEquals(Set.of("user", "user2"), provider.loadGroup("test", org1.getId()).getMembers());
+      return null;
+    }).once();
+    EasyMock.replay(userDirectoryService);
+    provider.setUserDirectoryService(userDirectoryService);
+
+    Assert.assertTrue(provider.addMemberToGroup("test", "user"));
+    EasyMock.verify(userDirectoryService);
+  }
+
+  @Test
+  public void testUpdateGroupInvalidatesUsersAfterPersisting() throws Exception {
+    provider.addGroup(new JpaGroup("test", org1, "Test", "Test group", new HashSet<>(), Set.of("user", "user2")));
+
+    // The new members must already be persisted when the added and the removed user are invalidated
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    for (String member : List.of("user", "user3")) {
+      userDirectoryService.invalidate(member);
+      EasyMock.expectLastCall().andAnswer(() -> {
+        assertEquals(Set.of("user2", "user3"), provider.loadGroup("test", org1.getId()).getMembers());
+        return null;
+      }).once();
+    }
+    EasyMock.replay(userDirectoryService);
+    provider.setUserDirectoryService(userDirectoryService);
+
+    provider.updateGroup("test", "Test", "Test group", null, "user2,user3");
+    EasyMock.verify(userDirectoryService);
+  }
+
+  @Test
+  public void testNoUserInvalidationIfGroupChangeIsNotAllowed() throws Exception {
+    provider.addGroup(new JpaGroup("test", org1, "Test", "Test group",
+            Set.of(new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)), Set.of("user")));
+
+    JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
+            Set.of(new JpaRole("ROLE_USER", org1)));
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
+    EasyMock.replay(securityService);
+    provider.setSecurityService(securityService);
+
+    // No call is expected: nothing changed, so no cached user may be invalidated
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    EasyMock.replay(userDirectoryService);
+    provider.setUserDirectoryService(userDirectoryService);
+
+    Assert.assertThrows(UnauthorizedException.class, () -> provider.removeMemberFromGroup("test", "user"));
+    Assert.assertThrows(UnauthorizedException.class, () -> provider.addMemberToGroup("test", "user2"));
+    Assert.assertThrows(UnauthorizedException.class,
+        () -> provider.updateGroup("test", "Test", "Test group", SecurityConstants.GLOBAL_ADMIN_ROLE, "user2"));
+
+    assertEquals(Set.of("user"), provider.loadGroup("test", org1.getId()).getMembers());
+    EasyMock.verify(userDirectoryService);
   }
 }

@@ -596,9 +596,10 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       return false; // nothing to do here
     }
     group.removeMember(member);
-    userDirectoryService.invalidate(member);
 
     addGroup(group);
+    // Invalidate only after the change is persisted, so a concurrent load cannot cache the old membership again
+    userDirectoryService.invalidate(member);
     return true;
   }
 
@@ -623,9 +624,10 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       return false; // nothing to do here
     }
     group.addMember(member);
-    userDirectoryService.invalidate(member);
 
     addGroup(group);
+    // Invalidate only after the change is persisted, so a concurrent load cannot cache the old membership again
+    userDirectoryService.invalidate(member);
     return true;
   }
 
@@ -663,9 +665,9 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       group.setRoles(new HashSet<>());
     }
 
+    HashSet<String> invalidateUsers = new HashSet<>();
     if (users != null) {
       HashSet<String> members = new HashSet<>();
-      HashSet<String> invalidateUsers = new HashSet<>();
 
       Set<String> groupMembers = group.getMembers();
 
@@ -684,12 +686,13 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
       }
 
       group.setMembers(members);
-
-      // Invalidate cache entries for users who have been added or removed
-      for (String member : invalidateUsers) {
-        userDirectoryService.invalidate(member);
-      }
     }
     addGroup(group);
+
+    // Invalidate cache entries for users who have been added or removed. This happens only after the change is
+    // persisted, so a concurrent load cannot cache the old membership again
+    for (String member : invalidateUsers) {
+      userDirectoryService.invalidate(member);
+    }
   }
 }
