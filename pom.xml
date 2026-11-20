@@ -74,6 +74,7 @@
          sync; the suffixed version is the ServiceMix rebuild of the same upstream release. -->
     <spring-security-ldap.version>5.8.6</spring-security-ldap.version>
     <spring-security-ldap-servicemix.version>5.8.6_1</spring-security-ldap-servicemix.version>
+    <tink.version>1.24.0</tink.version>
   </properties>
   <modules>
     <module>modules/admin-service</module>
@@ -1441,7 +1442,7 @@
       <dependency>
         <groupId>com.google.crypto.tink</groupId>
         <artifactId>tink</artifactId>
-        <version>1.24.0</version>
+        <version>${tink.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jettison</groupId>
