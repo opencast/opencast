@@ -24,6 +24,7 @@ package org.opencastproject.fsresources;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.FileFetchListener;
 import org.opencastproject.util.MimeTypes;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -45,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +102,23 @@ public class StaticResourceServlet extends HttpServlet {
   private SecurityService securityService = null;
 
   private List<StaticFileAuthorization> authorizations = new ArrayList<>();
+
+  /** Gets told about fetched files, if there is one. Serving files must work without it. */
+  private volatile FileFetchListener fileFetchListener;
+
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC
+  )
+  public void setFileFetchListener(FileFetchListener listener) {
+    this.fileFetchListener = listener;
+  }
+
+  public void unsetFileFetchListener(FileFetchListener listener) {
+    if (this.fileFetchListener == listener) {
+      this.fileFetchListener = null;
+    }
+  }
 
   /**
    * No-arg constructor
@@ -215,12 +234,18 @@ public class StaticResourceServlet extends HttpServlet {
     }
     resp.setHeader("ETag", eTag);
 
+    String contentType = MimeTypes.getMimeType(path);
+
     if (xAccelRedirect != null) {
       resp.setHeader("X-Accel-Redirect", Paths.get(xAccelRedirect, path).toString());
+      // The actual bytes are served by the proxy from here on, so this is the only point left to record the
+      // fetch. Range requests are handled by the proxy as well, so they cannot be attributed here.
+      if (withBody) {
+        recordFileFetched(contentType, req, Instant.now(), path, 0, null);
+      }
       return;
     }
 
-    String contentType = MimeTypes.getMimeType(path);
     if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
       resp.setContentType(contentType);
     }
@@ -239,7 +264,16 @@ public class StaticResourceServlet extends HttpServlet {
 
     if ((((ranges == null) || (ranges.isEmpty())) && (req.getHeader("Range") == null)) || (ranges == FULL_RANGE)) {
       if (withBody) {
+        Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            0,
+            null
+        );
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -272,7 +306,16 @@ public class StaticResourceServlet extends HttpServlet {
         } catch (IllegalStateException e) {
           logger.debug(e.getMessage(), e);
         }
+        Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            range.start,
+            range.endSpecified ? range.end : null
+        );
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -294,7 +337,18 @@ public class StaticResourceServlet extends HttpServlet {
       } catch (IllegalStateException e) {
         logger.debug(e.getMessage(), e);
       }
+      Instant requestTimestamp = Instant.now();
       copy(file, resp.getOutputStream(), ranges.iterator(), contentType);
+      for (Range range : ranges) {
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            range.start,
+            range.endSpecified ? range.end : null
+        );
+      }
     }
   }
 
@@ -440,6 +494,7 @@ public class StaticResourceServlet extends HttpServlet {
           currentRange.start = Long.parseLong(rangeDefinition.substring(0, dashPos));
           if (dashPos < rangeDefinition.length() - 1) {
             currentRange.end = Long.parseLong(rangeDefinition.substring(dashPos + 1, rangeDefinition.length()));
+            currentRange.endSpecified = true;
           } else {
             currentRange.end = fileLength - 1;
           }
@@ -522,6 +577,8 @@ public class StaticResourceServlet extends HttpServlet {
     protected long start;
     protected long end;
     protected long length;
+    /** Whether the request names the end of the range, and not just that it goes to the end of the file */
+    protected boolean endSpecified;
 
     /**
      * Validate range.
@@ -537,6 +594,38 @@ public class StaticResourceServlet extends HttpServlet {
       start = 0;
       end = 0;
       length = 0;
+      endSpecified = false;
+    }
+  }
+
+  /**
+   * Tells the file fetch listener, if there is one, that a file was fetched
+   * @param contentType Mimetype string of the file
+   * @param request http request of the client that fetched the file
+   * @param timestamp time of the response
+   * @param path request path of the file
+   * @param from range start, 0 if the request is not a range request
+   * @param to range end, or null if the request did not specify one
+   */
+  private void recordFileFetched(
+      String contentType,
+      HttpServletRequest request,
+      Instant timestamp,
+      String path,
+      long from,
+      Long to
+  ) {
+    try {
+      FileFetchListener listener = fileFetchListener;
+      if (listener != null) {
+        listener.fileFetched(path, contentType, timestamp, from, to, request);
+      }
+    } catch (IllegalArgumentException e) {
+      // Expected for requests with a missing or unparseable client IP or user agent, e.g. from crawlers. Not
+      // worth a warning with a stack trace, which could otherwise be logged once per fetched file or HLS segment.
+      logger.debug("Cannot report fetched file to the file fetch listener: {}", e.getMessage());
+    } catch (Exception | InternalError e) {
+      logger.warn("Cannot report fetched file to the file fetch listener", e);
     }
   }
 }
