@@ -59,10 +59,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -248,7 +248,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     return profile;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     workingDirectory = FileSupport.getTempDirectory("processSmiltest");
@@ -440,7 +440,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     operationHandler.setComposerService(composerService);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.forceDelete(workingDirectory);
   }
@@ -462,13 +462,13 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_PRESENTER_TRACK_ID);
-    Assert.assertEquals("presenter/livery", trackEncoded.getFlavor().toString());
+    Assertions.assertEquals("presenter/livery", trackEncoded.getFlavor().toString());
     String[] mytags = targetTags.split(",");
     Arrays.sort(mytags);
-    Assert.assertArrayEquals(mytags, trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier()); // reference the
+    Assertions.assertArrayEquals(mytags, trackEncoded.getTags());
+    Assertions.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier()); // reference the
                                                                                                  // correct flavor
-    Assert.assertEquals(10, result.getTimeInQueue()); // Tracking queue time
+    Assertions.assertEquals(10, result.getTimeInQueue()); // Tracking queue time
   }
 
   @Test
@@ -486,13 +486,13 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_PRESENTER_TRACK_ID);
-    Assert.assertEquals("presenter/deli", trackEncoded.getFlavor().toString());
-    Assert.assertEquals(0, trackEncoded.getTags().length);
-    Assert.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier()); // reference the
+    Assertions.assertEquals("presenter/deli", trackEncoded.getFlavor().toString());
+    Assertions.assertEquals(0, trackEncoded.getTags().length);
+    Assertions.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier()); // reference the
                                                                                                  // correct flavor
-    Assert.assertEquals(10, result.getTimeInQueue()); // Tracking queue time
+    Assertions.assertEquals(10, result.getTimeInQueue()); // Tracking queue time
     Track trackPresentationEncoded = mpNew.getTrack(ENCODED_PRESENTATION_TRACK_ID);
-    Assert.assertNull(trackPresentationEncoded); // not encoded
+    Assertions.assertNull(trackPresentationEncoded); // not encoded
   }
 
   @Test
@@ -509,12 +509,12 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackPresenterEncoded = mpNew.getTrack(ENCODED_PRESENTER_TRACK_ID);
-    Assert.assertNull(trackPresenterEncoded.getFlavor());
+    Assertions.assertNull(trackPresenterEncoded.getFlavor());
     // Assert.assertEquals("presenter/delivery", trackEncoded.getFlavor().toString());
-    Assert.assertEquals(0, trackPresenterEncoded.getTags().length);
+    Assertions.assertEquals(0, trackPresenterEncoded.getTags().length);
 
     Track trackPresentationEncoded = mpNew.getTrack(ENCODED_PRESENTATION_TRACK_ID);
-    Assert.assertEquals(0, trackPresentationEncoded.getTags().length);
+    Assertions.assertEquals(0, trackPresentationEncoded.getTags().length);
   }
 
   @Test
@@ -538,22 +538,22 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     MediaPackageElement[] mpelems = mpNew
             .getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presentation/delivery"));
     logger.info("Encoded tracks are : " + Arrays.toString(mpelems));
-    Assert.assertEquals(mpelems.length, 2); // Hack because of the mock
+    Assertions.assertEquals(mpelems.length, 2); // Hack because of the mock
     Track trackEncoded = (Track) mpelems[0];
     String[] mytags = trackEncoded.getTags();
     Arrays.sort(mytags);
     logger.info("Encoded tracks are tagged: {} should be {}", Arrays.toString(trackEncoded.getTags()), targetTags);
-    Assert.assertArrayEquals(targetTags.split(","), mytags);
+    Assertions.assertArrayEquals(targetTags.split(","), mytags);
 
-    Assert.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
 
     mpelems = mpNew.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presenter/delivery"));
-    Assert.assertEquals(mpelems.length, 1);
+    Assertions.assertEquals(mpelems.length, 1);
     trackEncoded = (Track) mpelems[0];
-    Assert.assertEquals("presenter/delivery", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split(","), trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier());
-    Assert.assertEquals(ENCODED_PRESENTER_TRACK_ID, trackEncoded.getIdentifier());
+    Assertions.assertEquals("presenter/delivery", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split(","), trackEncoded.getTags());
+    Assertions.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals(ENCODED_PRESENTER_TRACK_ID, trackEncoded.getIdentifier());
   }
 
   @Test
@@ -576,13 +576,13 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     // Track trackEncoded = mpNew.getTrack(ENCODED_PRESENTER_TRACK_ID);
     MediaPackageElement[] mpelems = mpNew
             .getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presenter/delivery"));
-    Assert.assertEquals(mpelems.length, 1);
+    Assertions.assertEquals(mpelems.length, 1);
     Track trackEncoded = (Track) mpelems[0];
     targetTags += "," + PROFILE_ID;
     String[] mytags = targetTags.split(",");
     Arrays.sort(mytags);
-    Assert.assertArrayEquals(mytags, trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertArrayEquals(mytags, trackEncoded.getTags());
+    Assertions.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier());
   }
 
   @Test
@@ -606,7 +606,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     // Track trackEncoded = mpNew.getTrack(ENCODED_PRESENTER_TRACK_ID);
     MediaPackageElement[] mpelems = mpNew
             .getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presentation/delivery"));
-    Assert.assertEquals(mpelems.length, 2); // Should have 2 tracks here
+    Assertions.assertEquals(mpelems.length, 2); // Should have 2 tracks here
     logger.info("Encoded presentation tracks are : " + Arrays.toString(mpelems));
     Track trackEncoded = (Track) mpelems[0]; // This is not ordered
     if (trackEncoded.getURI().toString().endsWith(profile3.getSuffix())) {
@@ -617,24 +617,24 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     String[] mytags = trackEncoded.getTags();
     Arrays.sort(mytags);
     logger.info("Encoded presentation tracks are tagged: " + Arrays.toString(mytags) + " == " + targetTags2);
-    Assert.assertArrayEquals(targetTags2.split(","), mytags);
-    Assert.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
-    Assert.assertEquals(ENCODED_PRESENTATION_TRACK_ID, trackEncoded.getIdentifier());
+    Assertions.assertArrayEquals(targetTags2.split(","), mytags);
+    Assertions.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals(ENCODED_PRESENTATION_TRACK_ID, trackEncoded.getIdentifier());
 
     mpelems = mpNew.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presenter/delivery"));
-    Assert.assertEquals(mpelems.length, 1);
+    Assertions.assertEquals(mpelems.length, 1);
     trackEncoded = (Track) mpelems[0];
     logger.info("Encoded presenter tracks are : " + Arrays.toString(mpelems));
-    Assert.assertEquals("presenter/delivery", trackEncoded.getFlavor().toString());
+    Assertions.assertEquals("presenter/delivery", trackEncoded.getFlavor().toString());
     targetTags += "," + profile.getIdentifier();
     logger.info(
             "Encoded presenter tracks are tagged: " + Arrays.toString(trackEncoded.getTags()) + " == " + targetTags);
-    Assert.assertEquals(new HashSet<String>(Arrays.asList(targetTags.split(","))),
+    Assertions.assertEquals(new HashSet<String>(Arrays.asList(targetTags.split(","))),
             new HashSet<String>(Arrays.asList(trackEncoded.getTags())));
     // Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
-    Assert.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier());
-    Assert.assertEquals(ENCODED_PRESENTER_TRACK_ID, trackEncoded.getIdentifier());
-    Assert.assertEquals(23, result.getTimeInQueue()); // Tracking queue time
+    Assertions.assertEquals(SOURCE_PRESENTER_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals(ENCODED_PRESENTER_TRACK_ID, trackEncoded.getIdentifier());
+    Assertions.assertEquals(23, result.getTimeInQueue()); // Tracking queue time
   }
 
   @Test
@@ -663,7 +663,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
       configurations.put("smil-flavor", "smil/smil");
       configurations.put("target-flavors", "presenter/delivery");
       getWorkflowOperationResult(mp, configurations);
-      Assert.fail("Since encoding profile is not specified exception should be thrown");
+      Assertions.fail("Since encoding profile is not specified exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
     }
@@ -691,20 +691,20 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     MediaPackageElement[] mpelems = mpNew
             .getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presentation/delivery"));
     logger.info("Encoded tracks are : " + Arrays.toString(mpelems));
-    Assert.assertEquals(mpelems.length, 3);
+    Assertions.assertEquals(mpelems.length, 3);
     Track trackEncoded = (Track) mpelems[0];
     String[] mytags = trackEncoded.getTags();
     Arrays.sort(mytags);
     logger.info("Encoded tracks are tagged: {} should be {}", Arrays.toString(trackEncoded.getTags()), targetTags);
     // Assert.assertArrayEquals(("MASTER," + targetTags).split(","), mytags);
-    Assert.assertArrayEquals(targetTags.split(","), mytags);
+    Assertions.assertArrayEquals(targetTags.split(","), mytags);
 
-    Assert.assertEquals(ENCODED_MASTER_ID, trackEncoded.getIdentifier());
-    Assert.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
+    Assertions.assertEquals(ENCODED_MASTER_ID, trackEncoded.getIdentifier());
+    Assertions.assertEquals(SOURCE_PRESENTATION_TRACK_ID, trackEncoded.getReference().getIdentifier());
     mpelems = mpNew.getElementsByTags(Arrays.asList((PROFILE_HLS)));
-    Assert.assertEquals(mpelems.length, 2);
+    Assertions.assertEquals(mpelems.length, 2);
     mpelems = mpNew.getElementsByTags(Arrays.asList((PROFILE_ID2)));
-    Assert.assertEquals(mpelems.length, 1);
+    Assertions.assertEquals(mpelems.length, 1);
 
   }
 

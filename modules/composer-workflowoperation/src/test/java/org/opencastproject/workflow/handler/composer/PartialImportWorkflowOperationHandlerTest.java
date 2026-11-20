@@ -20,9 +20,9 @@
  */
 package org.opencastproject.workflow.handler.composer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
@@ -45,9 +45,9 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
@@ -70,7 +70,7 @@ public class PartialImportWorkflowOperationHandlerTest {
   private static List<String> defaultExtensions = new ArrayList<String>();
   private static List<String> moreExtensions = new ArrayList<String>();
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() {
     defaultExtensions.add("mp4");
     moreExtensions.add("mp4");
@@ -165,7 +165,7 @@ public class PartialImportWorkflowOperationHandlerTest {
     EasyMock.replay(operation);
     PartialImportWorkflowOperationHandler handler = new PartialImportWorkflowOperationHandler();
     List<String> result = handler.getRequiredExtensions(operation);
-    assertEquals("There should be 3 required extensions", 3, result.size());
+    assertEquals(3, result.size(), "There should be 3 required extensions");
   }
 
   @Test
@@ -340,9 +340,9 @@ public class PartialImportWorkflowOperationHandlerTest {
             throws EncoderException, MediaPackageException, WorkflowOperationException, NotFoundException,
             ServiceRegistryException, IOException {
       if (expectedVideo == null || expectedAudio == null) {
-        Assert.fail("This test was not expected to mux a video and audio track together.");
+        Assertions.fail("This test was not expected to mux a video and audio track together.");
       } else if (expectedVideo != video || expectedAudio != audio) {
-        Assert.fail("The expected tracks are not being muxed together.");
+        Assertions.fail("The expected tracks are not being muxed together.");
       }
       return 100L;
     }

@@ -30,9 +30,9 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.endpoint.WorkflowRestService;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class WorkflowRestEndpointTest {
   private WorkflowRestService restService;
   private WorkflowInstance workflow;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Create a workflow for the service to return
     workflow = new WorkflowInstance();
@@ -65,19 +65,19 @@ public class WorkflowRestEndpointTest {
   public void testGetWorkflowInstance() throws Exception {
     try {
       restService.getWorkflowAsJson(-1);
-      Assert.fail("This should have thrown a not found exception");
+      Assertions.fail("This should have thrown a not found exception");
     } catch (NotFoundException e) {
       // expected
     }
 
     try {
       restService.getWorkflowAsXml(-1);
-      Assert.fail("This should have thrown a not found exception");
+      Assertions.fail("This should have thrown a not found exception");
     } catch (NotFoundException e) {
       // expected
     }
 
     JaxbWorkflowInstance xmlResponse = restService.getWorkflowAsXml(1);
-    Assert.assertNotNull(xmlResponse);
+    Assertions.assertNotNull(xmlResponse);
   }
 }

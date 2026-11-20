@@ -22,8 +22,9 @@
 
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.util.IoSupport.fileInputStream;
 import static org.opencastproject.util.IoSupport.locked;
 import static org.opencastproject.util.IoSupport.withFile;
@@ -34,13 +35,12 @@ import org.opencastproject.util.data.Either;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -67,14 +67,14 @@ public class IoSupportTest {
           + "                                 Miguel de Cervantes Saavedra\n"
           + "                      \"El ingenioso hidalgo don Quijote de la Mancha\"\n";
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * @throws URISyntaxException
    * @throws IOException
    */
-  @BeforeClass
+  @BeforeAll
   public static void setUpBeforeClass() throws IOException, URISyntaxException {
     baseDir = new File(IoSupportTest.class.getResource("/").toURI()).getCanonicalFile();
     spacesDir = new File(baseDir, "spaces in name").getCanonicalFile();
@@ -82,12 +82,12 @@ public class IoSupportTest {
     spacesFileURL = spacesFile.toURI().toURL();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    assertTrue("Couldn't create directory", spacesDir.mkdir());
+    assertTrue(spacesDir.mkdir(), "Couldn't create directory");
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws IOException {
     FileUtils.deleteDirectory(spacesDir);
   }
@@ -100,7 +100,8 @@ public class IoSupportTest {
   @Test
   public void testWriteUTF8FileURLString() throws IOException {
     IoSupport.writeUTF8File(spacesFileURL, sampleText);
-    Assert.assertTrue("File " + spacesFile.getAbsolutePath() + " was not created or is not valid", spacesFile.isFile());
+    Assertions.assertTrue(spacesFile.isFile(),
+        "File " + spacesFile.getAbsolutePath() + " was not created or is not valid");
     String line = null;
     StringBuilder sb = new StringBuilder();
     BufferedReader br = null;
@@ -116,7 +117,7 @@ public class IoSupportTest {
         br.close();
       }
     }
-    Assert.assertEquals("File contents comparison", sampleText, sb.toString());
+    Assertions.assertEquals(sampleText, sb.toString(), "File contents comparison");
   }
 
   /**
@@ -127,7 +128,8 @@ public class IoSupportTest {
   @Test
   public void testWriteUTF8FileFileString() throws IOException {
     IoSupport.writeUTF8File(spacesFile, sampleText);
-    Assert.assertTrue("File " + spacesFile.getAbsolutePath() + " was not created or is not valid", spacesFile.isFile());
+    Assertions.assertTrue(spacesFile.isFile(),
+        "File " + spacesFile.getAbsolutePath() + " was not created or is not valid");
     String line = null;
     StringBuilder sb = new StringBuilder();
     BufferedReader br = null;
@@ -143,16 +145,18 @@ public class IoSupportTest {
         br.close();
       }
     }
-    Assert.assertEquals("File contents comparison", sampleText, sb.toString());
+    Assertions.assertEquals(sampleText, sb.toString(), "File contents comparison");
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void testWithResource() throws Exception {
-    final InputStream r = this.getClass().getResourceAsStream("/cover.png");
-    final String s = withResource(r, in -> "read");
-    assertEquals("read", s);
-    // this will throw an IOException
-    r.read();
+    assertThrows(IOException.class, () -> {
+      final InputStream r = this.getClass().getResourceAsStream("/cover.png");
+      final String s = withResource(r, in -> "read");
+      assertEquals("read", s);
+      // this will throw an IOException
+      r.read();
+    });
   }
 
   @Test
@@ -190,7 +194,7 @@ public class IoSupportTest {
 
   @Test
   public void testDeleteLockedFile() throws Exception {
-    final File dst = testFolder.newFile("test.tmp");
+    final File dst = newFile(testFolder, "test.tmp");
     final File src = new File(this.getClass().getResource("/dublincore.xml").toURI());
     locked(dst, file -> {
       try {
@@ -204,26 +208,44 @@ public class IoSupportTest {
     assertEquals(src.length(), dst.length());
   }
 
-  @Test(expected = NotFoundException.class)
-  public void testLockedNotFoundException() throws NotFoundException, IOException {
-    final File file = IoSupport.file("foo/bar.txt");
-    // Just call locked — it should throw NotFoundException because the path does not exist
-    IoSupport.locked(file, f -> {
-      // this lambda won't be executed
-      return null;
+  @Test
+  public void testLockedNotFoundException() throws IOException {
+    assertThrows(NotFoundException.class, () -> {
+      final File file = IoSupport.file("foo/bar.txt");
+      // Just call locked — it should throw NotFoundException because the path does not exist
+      IoSupport.locked(file, f ->
+        // this lambda won't be executed
+          null);
     });
   }
 
-  @Test(expected = NotFoundException.class)
-  public void testLockedParentDirNotExist() throws NotFoundException, IOException {
-    File parent = testFolder.newFolder("foo");
-    File file = IoSupport.file(parent.toPath().toString(), "bar/some.txt");
+  @Test
+  public void testLockedParentDirNotExist() throws IOException {
+    assertThrows(NotFoundException.class, () -> {
+      File parent = newFolder(testFolder, "foo");
+      File file = IoSupport.file(parent.toPath().toString(), "bar/some.txt");
 
-    try {
-      // Just call locked — it should throw NotFoundException because "bar" does not exist
-      IoSupport.locked(file, f -> null);
-    } finally {
-      FileUtils.deleteQuietly(parent);
+      try {
+        // Just call locked — it should throw NotFoundException because "bar" does not exist
+        IoSupport.locked(file, f -> null);
+      } finally {
+        FileUtils.deleteQuietly(parent);
+      }
+    });
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
+  }
+
+  private static File newFolder(File root, String... subDirs) throws IOException {
+    String subFolder = String.join("/", subDirs);
+    File result = new File(root, subFolder);
+    if (!result.mkdirs()) {
+      throw new IOException("Couldn't create folders " + root);
     }
+    return result;
   }
 }

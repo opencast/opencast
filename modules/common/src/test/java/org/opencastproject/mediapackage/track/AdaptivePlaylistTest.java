@@ -21,9 +21,9 @@
 
 package org.opencastproject.mediapackage.track;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.AdaptivePlaylist.HLSMediaPackageCheck;
@@ -47,11 +47,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.persistence.tools.file.FileUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -64,6 +63,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -114,15 +114,15 @@ public class AdaptivePlaylistTest {
   private static final String masterFileName = "master.m3u8";
 
   private static final String hls_mp_raw = "source-hls-manifest.xml";
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    baseDir = testFolder.newFolder();
+    baseDir = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
     srcDir = new File(baseDir, srcDirName);
     srcFile = new File(srcDir, srcFileName);
     srcFile1 = new File(srcDir, srcFileName1);
@@ -211,7 +211,7 @@ public class AdaptivePlaylistTest {
     assertFalse(AdaptivePlaylist.isPlaylist(srcFile));
     // Tracks
     Set<MediaPackageElement> elements = new TreeSet<MediaPackageElement>();
-    Assert.assertFalse(AdaptivePlaylist.hasHLSPlaylist(elements));
+    Assertions.assertFalse(AdaptivePlaylist.hasHLSPlaylist(elements));
     Track tm3u8 = makeTrack(variantFile.toURI(), variantFileName);
     assertTrue(AdaptivePlaylist.isHLSTrackPred.test(tm3u8));
     assertTrue(AdaptivePlaylist.isPlaylist(tm3u8));
@@ -219,9 +219,9 @@ public class AdaptivePlaylistTest {
     assertFalse(AdaptivePlaylist.isHLSTrackPred.test(tmp4));
     assertFalse(AdaptivePlaylist.isPlaylist(tmp4));
     elements.add(tmp4);
-    Assert.assertFalse(AdaptivePlaylist.hasHLSPlaylist(elements));
+    Assertions.assertFalse(AdaptivePlaylist.hasHLSPlaylist(elements));
     elements.add(tm3u8);
-    Assert.assertTrue(AdaptivePlaylist.hasHLSPlaylist(elements));
+    Assertions.assertTrue(AdaptivePlaylist.hasHLSPlaylist(elements));
   }
 
   @Test
@@ -242,9 +242,8 @@ public class AdaptivePlaylistTest {
     files.add(srcFile1);
     HashMap<File, File> movedFiles = hlsmoveFiles(files);
     HashMap<String, String> nameMap = new HashMap<String, String>();
-    movedFiles.forEach((k, v) -> {
-      nameMap.put(k.getName(), v.getName());
-    });
+    movedFiles.forEach((k, v) ->
+        nameMap.put(k.getName(), v.getName()));
     for (File f : movedFiles.values()) {
       if (AdaptivePlaylist.isPlaylist(f)) {
         File destFile = File.createTempFile(f.getName(), FilenameUtils.getExtension(f.getName()),
@@ -280,9 +279,8 @@ public class AdaptivePlaylistTest {
     files.add(srcFile1);
     HashMap<File, File> movedFiles = hlsmoveFiles(files);
     HashMap<String, String> nameMap = new HashMap<String, String>();
-    movedFiles.forEach((k, v) -> {
-      nameMap.put(k.getName(), v.getName());
-    });
+    movedFiles.forEach((k, v) ->
+        nameMap.put(k.getName(), v.getName()));
     for (File f : movedFiles.values()) {
       if (AdaptivePlaylist.isPlaylist(f)) {
         Set<String> oldref = AdaptivePlaylist.getVariants(f);
@@ -341,7 +339,7 @@ public class AdaptivePlaylistTest {
     try {
       TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)
               .getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
       // Assert.assertTrue(t1.isMaster());
     } finally {
       IoSupport.closeQuietly(inputStream);
@@ -354,15 +352,15 @@ public class AdaptivePlaylistTest {
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
-      Assert.assertEquals(hlsUrl, t2.getURI());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+      Assertions.assertEquals(hlsUrl, t2.getURI());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
 
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(adaptiveplaylist);
-    Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
+    Assertions.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -370,8 +368,8 @@ public class AdaptivePlaylistTest {
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals(hlsUrl.toURL().toExternalForm(), t3.getURI().toURL().toExternalForm());
+    Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
+    Assertions.assertEquals(hlsUrl.toURL().toExternalForm(), t3.getURI().toURL().toExternalForm());
 
   }
 
@@ -390,8 +388,8 @@ public class AdaptivePlaylistTest {
     InputStream inputStream = IOUtils.toInputStream(writer.toString(), "UTF-8");
     try {
       TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
-      Assert.assertEquals(logicalName, t1.getLogicalName());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+      Assertions.assertEquals(logicalName, t1.getLogicalName());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
@@ -404,17 +402,18 @@ public class AdaptivePlaylistTest {
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
-      Assert.assertEquals(fmp4Url, t2.getURI());
-      Assert.assertEquals(logicalName, t2.getLogicalName());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+      Assertions.assertEquals(fmp4Url, t2.getURI());
+      Assertions.assertEquals(logicalName, t2.getLogicalName());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
 
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(fragmentedFile);
-    Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
-    Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<logicalname>" + logicalName + "</logicalname>"));
+    Assertions.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
+    Assertions.assertTrue(xmlFromTrack.replaceAll("\\b+", "")
+        .contains("<logicalname>" + logicalName + "</logicalname>"));
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -422,9 +421,9 @@ public class AdaptivePlaylistTest {
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals(fmp4Url, t3.getURI());
-    Assert.assertEquals(logicalName, t3.getLogicalName());
+    Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
+    Assertions.assertEquals(fmp4Url, t3.getURI());
+    Assertions.assertEquals(logicalName, t3.getLogicalName());
   }
 
   @Test
@@ -444,8 +443,8 @@ public class AdaptivePlaylistTest {
     try {
       TrackImpl t1 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)
               .getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
-      Assert.assertEquals(logicalName, t1.getLogicalName());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t1.getFlavor());
+      Assertions.assertEquals(logicalName, t1.getLogicalName());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
@@ -459,19 +458,19 @@ public class AdaptivePlaylistTest {
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)
               .getValue();
-      Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
-      Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m3u8", t2.getURI().toString());
-      Assert.assertEquals(logicalName, t2.getLogicalName());
-      Assert.assertTrue(t2.isMaster());
+      Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t2.getFlavor());
+      Assertions.assertEquals("http://downloads.opencastproject.org/media/movie.m3u8", t2.getURI().toString());
+      Assertions.assertEquals(logicalName, t2.getLogicalName());
+      Assertions.assertTrue(t2.isMaster());
     } finally {
       IoSupport.closeQuietly(inputStream);
     }
 
     // Get the xml from the object itself
     String xmlFromTrack = MediaPackageElementParser.getAsXml(adaptiveplaylist);
-    Assert.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
-    Assert.assertFalse(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
-    Assert.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<master>true</master>"));
+    Assertions.assertTrue(xmlFromTrack.contains(MediaPackageElements.PRESENTATION_SOURCE.toString()));
+    Assertions.assertFalse(xmlFromTrack.replaceAll("\\b+", "").contains("<live>true</live>"));
+    Assertions.assertTrue(xmlFromTrack.replaceAll("\\b+", "").contains("<master>true</master>"));
 
     // And finally, using the element builder
     DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
@@ -479,9 +478,10 @@ public class AdaptivePlaylistTest {
 
     Track t3 = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-    Assert.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
-    Assert.assertEquals("http://downloads.opencastproject.org/media/movie.m3u8", t3.getURI().toURL().toExternalForm());
-    Assert.assertEquals(logicalName, t3.getLogicalName());
+    Assertions.assertEquals(MediaPackageElements.PRESENTATION_SOURCE, t3.getFlavor());
+    Assertions.assertEquals("http://downloads.opencastproject.org/media/movie.m3u8",
+        t3.getURI().toURL().toExternalForm());
+    Assertions.assertEquals(logicalName, t3.getLogicalName());
   }
 
   @Test
@@ -542,51 +542,51 @@ public class AdaptivePlaylistTest {
             .collect(Collectors.toList());
     // Check that metadata are loaded
     for (Track t : pl) {
-      Assert.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
+      Assertions.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
       t.getMimeType();
-      Assert.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
-      Assert.assertTrue(1300L == t.getDuration());
+      Assertions.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
+      Assertions.assertTrue(1300L == t.getDuration());
     }
     Checksum cs = pl.get(0).getChecksum();
 
     // Create the object for testing
     HLSMediaPackageCheck hlsCheck = new HLSMediaPackageCheck(Arrays.asList(tracks),
             getFileFromWSURI);
-    Assert.assertNotNull(hlsCheck);
+    Assertions.assertNotNull(hlsCheck);
     // Check that it read the files correctly and the files need fixing
-    Assert.assertTrue(hlsCheck.needsRewriting());
+    Assertions.assertTrue(hlsCheck.needsRewriting());
 
     // Do the rewrite operation which replaces tracks in the WS
     hlsCheck.rewriteHLS(mp, replaceHLSPlaylistInWS, removeFromWS);
-    Assert.assertNotNull(hlsCheck);
+    Assertions.assertNotNull(hlsCheck);
 
     tracks = mp.getTracks();
-    Assert.assertEquals(tracks.length, numTracks);
+    Assertions.assertEquals(tracks.length, numTracks);
 
     pl = Arrays.asList(tracks).stream().filter(AdaptivePlaylist.isHLSTrackPred).collect(Collectors.toList());
     // Check that metadata are preserved
     for (Track t : pl) {
-      Assert.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
+      Assertions.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
     }
     for (Track t : tracks) {
-      Assert.assertTrue(1300L == t.getDuration());
-      Assert.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
-      Assert.assertNotNull(t.getLogicalName());
+      Assertions.assertTrue(1300L == t.getDuration());
+      Assertions.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
+      Assertions.assertNotNull(t.getLogicalName());
     }
-    Assert.assertTrue(cs != pl.get(0).getChecksum());
+    Assertions.assertTrue(cs != pl.get(0).getChecksum());
     for (Track track : pl) {
-      Assert.assertTrue(track.getURI().getPath()
+      Assertions.assertTrue(track.getURI().getPath()
               .startsWith(
                       track.getIdentifier() + "/"));
       File file = new File(srcDir + "/" + track.getURI().getPath());
       for (String name : AdaptivePlaylist.getVariants(file)) {
-        Assert.assertTrue(name.startsWith("../"));
+        Assertions.assertTrue(name.startsWith("../"));
       }
     }
 
     // Run it again with fixed tracks, it should know that the references are correct
     hlsCheck = new HLSMediaPackageCheck(Arrays.asList(tracks), getFileFromURI2);
-    Assert.assertFalse(hlsCheck.needsRewriting());
+    Assertions.assertFalse(hlsCheck.needsRewriting());
 
   }
 
@@ -622,8 +622,8 @@ public class AdaptivePlaylistTest {
 
     // Run it with correctly referenced tracks in an WS, it should know that the references are correct
     HLSMediaPackageCheck hlsCheck = new HLSMediaPackageCheck(Arrays.asList(tracks), getFileFromWSURI);
-    Assert.assertNotNull(hlsCheck);
-    Assert.assertFalse(hlsCheck.needsRewriting());
+    Assertions.assertNotNull(hlsCheck);
+    Assertions.assertFalse(hlsCheck.needsRewriting());
 
   }
 
@@ -694,47 +694,47 @@ public class AdaptivePlaylistTest {
             .collect(Collectors.toList());
     // Check that metadata are loaded
     for (Track t : pl) {
-      Assert.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
+      Assertions.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
       t.getMimeType();
-      Assert.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
-      Assert.assertTrue(1300L == t.getDuration());
+      Assertions.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
+      Assertions.assertTrue(1300L == t.getDuration());
     }
     Checksum cs = pl.get(0).getChecksum();
 
     // Create the object for testing
     HLSMediaPackageCheck hlsCheck = new HLSMediaPackageCheck(Arrays.asList(tracks), getFileFromWSURI);
-    Assert.assertNotNull(hlsCheck);
+    Assertions.assertNotNull(hlsCheck);
     // Check that it read the files correctly and the files need fixing
-    Assert.assertTrue(hlsCheck.needsRewriting());
+    Assertions.assertTrue(hlsCheck.needsRewriting());
 
     // Do the rewrite operation which replaces tracks in the WS
     hlsCheck.rewriteHLS(mp, replaceHLSPlaylistInWS, removeFromWS);
-    Assert.assertNotNull(hlsCheck);
+    Assertions.assertNotNull(hlsCheck);
 
     tracks = mp.getTracks();
 
     pl = Arrays.asList(tracks).stream().filter(AdaptivePlaylist.isHLSTrackPred).collect(Collectors.toList());
     // Check that metadata are preserved
     for (Track t : pl) {
-      Assert.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
+      Assertions.assertEquals(MimeType.mimeType("application", "x-mpegURL"), t.getMimeType());
     }
     for (Track t : tracks) {
-      Assert.assertTrue(1300L == t.getDuration());
-      Assert.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
-      Assert.assertNotNull(t.getLogicalName());
+      Assertions.assertTrue(1300L == t.getDuration());
+      Assertions.assertEquals(MediaPackageElementFlavor.flavor("hollandaise", "sauce"), t.getFlavor());
+      Assertions.assertNotNull(t.getLogicalName());
     }
-    Assert.assertTrue(cs != pl.get(0).getChecksum());
+    Assertions.assertTrue(cs != pl.get(0).getChecksum());
     for (Track track : pl) {
-      Assert.assertTrue(track.getURI().getPath().startsWith(track.getIdentifier() + "/"));
+      Assertions.assertTrue(track.getURI().getPath().startsWith(track.getIdentifier() + "/"));
       File file = new File(srcDir + "/" + track.getURI().getPath());
       for (String name : AdaptivePlaylist.getVariants(file)) {
-        Assert.assertTrue(name.startsWith("../"));
+        Assertions.assertTrue(name.startsWith("../"));
       }
     }
 
     // Run it again with fixed tracks, it should know that the references are correct
     hlsCheck = new HLSMediaPackageCheck(Arrays.asList(tracks), getFileFromURI2);
-    Assert.assertFalse(hlsCheck.needsRewriting());
+    Assertions.assertFalse(hlsCheck.needsRewriting());
 
   }
 }

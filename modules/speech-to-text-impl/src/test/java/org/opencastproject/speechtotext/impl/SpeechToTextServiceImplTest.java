@@ -34,13 +34,12 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -66,10 +65,10 @@ public class SpeechToTextServiceImplTest {
 
   private SpeechToTextServiceImpl speechToTextService;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @BeforeClass
+  @BeforeAll
   public static void setupClass() {
     Process process = null;
     try {
@@ -82,11 +81,11 @@ public class SpeechToTextServiceImplTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     // Skip tests if vosk-cli is not installed
-    Assume.assumeTrue(runVoskTest);
+    Assumptions.assumeTrue(runVoskTest);
 
     speechToTextService = new SpeechToTextServiceImpl();
     VoskEngine voskEngine = new VoskEngine();
@@ -97,7 +96,7 @@ public class SpeechToTextServiceImplTest {
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 
     Workspace workspace = EasyMock.createMock(Workspace.class);
-    final String directory = testFolder.newFolder().getAbsolutePath();
+    final String directory = Files.createTempDirectory(testFolder.toPath(), "junit").toFile().getAbsolutePath();
     EasyMock.expect(workspace.rootDirectory()).andReturn(directory).anyTimes();
 
     EasyMock.expect(workspace.get(EasyMock.anyObject()))
@@ -156,12 +155,12 @@ public class SpeechToTextServiceImplTest {
     URI videoUri = getClass().getResource("/speech_to_text_test.mp4").toURI();
     Job job = speechToTextService.transcribe(videoUri, "eng", false, false);
     File output = new File(new URI(job.getPayload().split(",")[0]));
-    Assert.assertEquals("eng", job.getPayload().split(",")[1]);
+    Assertions.assertEquals("eng", job.getPayload().split(",")[1]);
     String textFromSpeech = Files.lines(Paths.get(output.getPath()), StandardCharsets.UTF_8)
             .collect(Collectors.joining("\n"));
-    Assert.assertTrue(output.isFile());
+    Assertions.assertTrue(output.isFile());
     Stream<String> testWordsStream = Arrays.stream("look celia we have to follow our passions".split(" "));
-    Assert.assertTrue(testWordsStream.allMatch(textFromSpeech::contains));
+    Assertions.assertTrue(testWordsStream.allMatch(textFromSpeech::contains));
   }
 
 }

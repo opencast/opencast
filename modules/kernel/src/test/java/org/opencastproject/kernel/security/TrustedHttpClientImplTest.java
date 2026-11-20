@@ -26,10 +26,10 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -57,9 +57,9 @@ import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -136,7 +136,7 @@ public class TrustedHttpClientImplTest {
     return response;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Setup bundle context for TrustedHttpClientImpl
     bundleContextMock = createNiceMock(BundleContext.class);
@@ -218,7 +218,7 @@ public class TrustedHttpClientImplTest {
     try {
       client.execute(new HttpPost("http://localhost:9/fakeEndpoint"));
       // It should fail without a default http connection factory
-      Assert.fail();
+      Assertions.fail();
     } catch (TrustedHttpClientException e) {
 
     }
@@ -240,22 +240,22 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.activate(componentContextMock);
-    Assert.assertEquals(TrustedHttpClientImpl.DEFAULT_NONCE_TIMEOUT_RETRIES, client.getNonceTimeoutRetries());
+    Assertions.assertEquals(TrustedHttpClientImpl.DEFAULT_NONCE_TIMEOUT_RETRIES, client.getNonceTimeoutRetries());
 
     setupNonceRetries(0);
-    Assert.assertEquals(0, client.getNonceTimeoutRetries());
+    Assertions.assertEquals(0, client.getNonceTimeoutRetries());
 
     setupNonceRetries(1);
-    Assert.assertEquals(1, client.getNonceTimeoutRetries());
+    Assertions.assertEquals(1, client.getNonceTimeoutRetries());
 
     setupNonceRetries(100);
-    Assert.assertEquals(100, client.getNonceTimeoutRetries());
+    Assertions.assertEquals(100, client.getNonceTimeoutRetries());
 
     setupNonceRetries(Integer.MAX_VALUE);
-    Assert.assertEquals(Integer.MAX_VALUE, client.getNonceTimeoutRetries());
+    Assertions.assertEquals(Integer.MAX_VALUE, client.getNonceTimeoutRetries());
 
     setupNonceRetries(Integer.MIN_VALUE);
-    Assert.assertEquals(Integer.MIN_VALUE, client.getNonceTimeoutRetries());
+    Assertions.assertEquals(Integer.MIN_VALUE, client.getNonceTimeoutRetries());
   }
 
   private void setupNonceRetries(int retries) {
@@ -294,22 +294,22 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.activate(componentContextMock);
-    Assert.assertEquals(TrustedHttpClientImpl.DEFAULT_RETRY_BASE_TIME, client.getRetryBaseDelay());
+    Assertions.assertEquals(TrustedHttpClientImpl.DEFAULT_RETRY_BASE_TIME, client.getRetryBaseDelay());
 
     setupNonceBaseDelay(0);
-    Assert.assertEquals(0, client.getRetryBaseDelay());
+    Assertions.assertEquals(0, client.getRetryBaseDelay());
 
     setupNonceBaseDelay(1);
-    Assert.assertEquals(1, client.getRetryBaseDelay());
+    Assertions.assertEquals(1, client.getRetryBaseDelay());
 
     setupNonceBaseDelay(100);
-    Assert.assertEquals(100, client.getRetryBaseDelay());
+    Assertions.assertEquals(100, client.getRetryBaseDelay());
 
     setupNonceBaseDelay(Integer.MAX_VALUE);
-    Assert.assertEquals(Integer.MAX_VALUE, client.getRetryBaseDelay());
+    Assertions.assertEquals(Integer.MAX_VALUE, client.getRetryBaseDelay());
 
     setupNonceBaseDelay(Integer.MIN_VALUE);
-    Assert.assertEquals(Integer.MIN_VALUE, client.getRetryBaseDelay());
+    Assertions.assertEquals(Integer.MIN_VALUE, client.getRetryBaseDelay());
   }
 
   private void setupNonceBaseDelay(int baseDelay) {
@@ -348,23 +348,23 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.activate(componentContextMock);
-    Assert.assertEquals(TrustedHttpClientImpl.DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME,
+    Assertions.assertEquals(TrustedHttpClientImpl.DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME,
         client.getRetryMaximumVariableTime());
 
     setupNonceMaximumVariableDelay(0);
-    Assert.assertEquals(0, client.getRetryMaximumVariableTime());
+    Assertions.assertEquals(0, client.getRetryMaximumVariableTime());
 
     setupNonceMaximumVariableDelay(1);
-    Assert.assertEquals(1, client.getRetryMaximumVariableTime());
+    Assertions.assertEquals(1, client.getRetryMaximumVariableTime());
 
     setupNonceMaximumVariableDelay(100);
-    Assert.assertEquals(100, client.getRetryMaximumVariableTime());
+    Assertions.assertEquals(100, client.getRetryMaximumVariableTime());
 
     setupNonceMaximumVariableDelay(Integer.MAX_VALUE);
-    Assert.assertEquals(Integer.MAX_VALUE, client.getRetryMaximumVariableTime());
+    Assertions.assertEquals(Integer.MAX_VALUE, client.getRetryMaximumVariableTime());
 
     setupNonceMaximumVariableDelay(Integer.MIN_VALUE);
-    Assert.assertEquals(Integer.MIN_VALUE, client.getRetryMaximumVariableTime());
+    Assertions.assertEquals(Integer.MIN_VALUE, client.getRetryMaximumVariableTime());
   }
 
   private void setupNonceMaximumVariableDelay(int maxVariableDelay) {
@@ -391,8 +391,8 @@ public class TrustedHttpClientImplTest {
     final CannedResponseClient canned = cannedClient(0, digestResponse(), staleNonceResponse());
 
     final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
-    Assert.assertEquals(401, response.getCode());
-    Assert.assertEquals(0, canned.remainingResponses());
+    Assertions.assertEquals(401, response.getCode());
+    Assertions.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
@@ -401,8 +401,8 @@ public class TrustedHttpClientImplTest {
         digestResponse(), staleNonceResponse(), digestResponse(), staleNonceResponse());
 
     final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
-    Assert.assertEquals(401, response.getCode());
-    Assert.assertEquals(0, canned.remainingResponses());
+    Assertions.assertEquals(401, response.getCode());
+    Assertions.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
@@ -411,8 +411,8 @@ public class TrustedHttpClientImplTest {
         digestResponse(), staleNonceResponse(), digestResponse(), okResponse());
 
     final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
-    Assert.assertEquals(200, response.getCode());
-    Assert.assertEquals(0, canned.remainingResponses());
+    Assertions.assertEquals(200, response.getCode());
+    Assertions.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
@@ -424,8 +424,8 @@ public class TrustedHttpClientImplTest {
         digestResponse(), okResponse());
 
     final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
-    Assert.assertEquals(200, response.getCode());
-    Assert.assertEquals(0, canned.remainingResponses());
+    Assertions.assertEquals(200, response.getCode());
+    Assertions.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
@@ -433,8 +433,8 @@ public class TrustedHttpClientImplTest {
     final CannedResponseClient canned = cannedClient(3, digestResponse(), digestResponse());
 
     final ClassicHttpResponse response = canned.execute(new HttpPost("http://localhost:8080/fake"));
-    Assert.assertEquals(401, response.getCode());
-    Assert.assertEquals(0, canned.remainingResponses());
+    Assertions.assertEquals(401, response.getCode());
+    Assertions.assertEquals(0, canned.remainingResponses());
   }
 
   @Test
@@ -446,8 +446,8 @@ public class TrustedHttpClientImplTest {
     post.setEntity(new InputStreamEntity(new ByteArrayInputStream(new byte[] { 1, 2, 3 }),
         ContentType.APPLICATION_OCTET_STREAM));
     final ClassicHttpResponse response = canned.execute(post);
-    Assert.assertEquals(401, response.getCode());
-    Assert.assertEquals(2, canned.remainingResponses());
+    Assertions.assertEquals(401, response.getCode());
+    Assertions.assertEquals(2, canned.remainingResponses());
   }
 
   @Test
@@ -457,31 +457,31 @@ public class TrustedHttpClientImplTest {
     final HttpPost post = new HttpPost("http://localhost:8080/fake?a=b");
     post.setEntity(new StringEntity("data", ContentType.TEXT_PLAIN));
     final ClassicHttpResponse response = canned.execute(post);
-    Assert.assertEquals(200, response.getCode());
+    Assertions.assertEquals(200, response.getCode());
 
     final List<ClassicHttpRequest> requests = canned.getRequests();
-    Assert.assertEquals(2, requests.size());
+    Assertions.assertEquals(2, requests.size());
     // The probe carries no body but asks for digest authentication
     final ClassicHttpRequest probe = requests.get(0);
-    Assert.assertEquals("POST", probe.getMethod());
-    Assert.assertEquals(post.getUri(), probe.getUri());
-    Assert.assertNull(probe.getEntity());
-    Assert.assertEquals(DelegatingAuthenticationEntryPoint.DIGEST_AUTH,
+    Assertions.assertEquals("POST", probe.getMethod());
+    Assertions.assertEquals(post.getUri(), probe.getUri());
+    Assertions.assertNull(probe.getEntity());
+    Assertions.assertEquals(DelegatingAuthenticationEntryPoint.DIGEST_AUTH,
         probe.getFirstHeader(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER).getValue());
     // The actual request carries the authorization computed from the challenge
     final Header authorization = requests.get(1).getFirstHeader(HttpHeaders.AUTHORIZATION);
     assertNotNull(authorization);
     final String value = authorization.getValue();
-    assertTrue(value, value.startsWith("Digest "));
-    assertTrue(value, value.contains("username=\"u\""));
-    assertTrue(value, value.contains("realm=\"testrealm@host.com\""));
-    assertTrue(value, value.contains("nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\""));
-    assertTrue(value, value.contains("uri=\"/fake?a=b\""));
-    assertTrue(value, value.contains("qop=auth"));
-    assertTrue(value, value.contains("nc=00000001"));
-    assertTrue(value, value.contains("cnonce="));
-    assertTrue(value, value.contains("opaque=\"5ccc069c403ebaf9f0171e9517f40e41\""));
-    assertTrue(value, value.contains("response=\""));
+    assertTrue(value.startsWith("Digest "), value);
+    assertTrue(value.contains("username=\"u\""), value);
+    assertTrue(value.contains("realm=\"testrealm@host.com\""), value);
+    assertTrue(value.contains("nonce=\"dcd98b7102dd2f0e8b11d0f600bfb0c093\""), value);
+    assertTrue(value.contains("uri=\"/fake?a=b\""), value);
+    assertTrue(value.contains("qop=auth"), value);
+    assertTrue(value.contains("nc=00000001"), value);
+    assertTrue(value.contains("cnonce="), value);
+    assertTrue(value.contains("opaque=\"5ccc069c403ebaf9f0171e9517f40e41\""), value);
+    assertTrue(value.contains("response=\""), value);
   }
 
   @Test

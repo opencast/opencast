@@ -22,7 +22,7 @@
 package org.opencastproject.job.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.xmlmatchers.XmlMatchers.similarTo;
@@ -31,7 +31,7 @@ import static org.xmlmatchers.transform.XmlConverters.the;
 import org.opencastproject.job.api.Incident.Severity;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

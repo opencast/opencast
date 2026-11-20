@@ -28,7 +28,7 @@ import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestServerEndpoint extends ServerEndpoint {
 
   private static final String HOST1 = "host1";

@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.assetmanager;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -37,9 +39,9 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
   private MediaPackageBuilder builder;
   private AssetManager assetManager;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -118,7 +120,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
 
     for (MediaPackageElement el : elementSelector.select(resultMp, false)) {
       for (String tag : el.getTags()) {
-        Assert.assertTrue(tag.indexOf("hls") == -1);
+        Assertions.assertTrue(tag.indexOf("hls") == -1);
       }
     }
   }
@@ -139,34 +141,40 @@ public class SelectVersionWorkflowOperationHandlerTest {
 
     for (MediaPackageElement el : elementSelector.select(resultMp, false)) {
       for (String tag : el.getTags()) {
-        Assert.assertTrue(tag.indexOf("hls") == -1);
+        Assertions.assertTrue(tag.indexOf("hls") == -1);
       }
     }
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testSelectInvalidVersion() throws Exception {
-    mockAssetManager(1);
-    operationHandler.setAssetManager(assetManager);
-    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_VERSION, "invalid");
-    operationHandler.start(wfInstance, null);
+    assertThrows(WorkflowOperationException.class, () -> {
+      mockAssetManager(1);
+      operationHandler.setAssetManager(assetManager);
+      operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_VERSION, "invalid");
+      operationHandler.start(wfInstance, null);
+    });
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testSelectWithNoConfiguration() throws Exception {
-    mockAssetManager(2);
-    operationHandler.setAssetManager(assetManager);
-    operationHandler.start(wfInstance, null);
+    assertThrows(WorkflowOperationException.class, () -> {
+      mockAssetManager(2);
+      operationHandler.setAssetManager(assetManager);
+      operationHandler.start(wfInstance, null);
+    });
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testSelectWithBothConfiguration() throws Exception {
-    mockAssetManager(1);
-    operationHandler.setAssetManager(assetManager);
-    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_VERSION, "0");
-    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_NO_TAGS, "hls");
-    operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_SOURCE_FLAVORS, "presenter/delivery");
-    operationHandler.start(wfInstance, null);
+    assertThrows(WorkflowOperationException.class, () -> {
+      mockAssetManager(1);
+      operationHandler.setAssetManager(assetManager);
+      operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_VERSION, "0");
+      operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_NO_TAGS, "hls");
+      operation.setConfiguration(SelectVersionWorkflowOperationHandler.OPT_SOURCE_FLAVORS, "presenter/delivery");
+      operationHandler.start(wfInstance, null);
+    });
   }
 
 }

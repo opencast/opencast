@@ -75,8 +75,8 @@ import org.opencastproject.util.requests.SortCriterion.Order;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ import java.util.Properties;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestSeriesEndpoint extends SeriesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TestSeriesEndpoint.class);
 
@@ -471,10 +471,10 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
                   EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems3.length).anyTimes();
                 } else {
                   if (!captureEventSearchQuery.hasCaptured()) {
-                    Assert.fail("Haven't captured an event search query yet.");
+                    Assertions.fail("Haven't captured an event search query yet.");
                   } else {
                     logger.info("IDs for search query" + captureEventSearchQuery.getValue().getSeriesId());
-                    Assert.fail("Tried to get an event collection that doesn't exist.");
+                    Assertions.fail("Tried to get an event collection that doesn't exist.");
                   }
                 }
                 EasyMock.replay(eventsSearchResult);

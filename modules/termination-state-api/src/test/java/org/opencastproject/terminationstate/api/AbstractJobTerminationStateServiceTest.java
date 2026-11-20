@@ -24,16 +24,16 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class AbstractJobTerminationStateServiceTest {
   private static final String LOCALHOST = "http://localhost:8080";
 
   private ServiceRegistryJpaImpl serviceRegistry;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     serviceRegistry = EasyMock.createMock(ServiceRegistryJpaImpl.class);
     EasyMock.expect(serviceRegistry.getRegistryHostname()).andReturn(LOCALHOST).anyTimes();
@@ -48,12 +48,12 @@ public class AbstractJobTerminationStateServiceTest {
     service.setServiceRegistry(serviceRegistry);
 
     // jobs running, state NONE
-    Assert.assertEquals(false, service.readyToTerminate());
+    Assertions.assertEquals(false, service.readyToTerminate());
     // jobs running state WAIT
     service.setState(TerminationStateService.TerminationState.WAIT);
-    Assert.assertEquals(false, service.readyToTerminate());
+    Assertions.assertEquals(false, service.readyToTerminate());
     // no jobs running state WAIT
-    Assert.assertEquals(true, service.readyToTerminate());
-    Assert.assertEquals(TerminationStateService.TerminationState.READY, service.getState());
+    Assertions.assertEquals(true, service.readyToTerminate());
+    Assertions.assertEquals(TerminationStateService.TerminationState.READY, service.getState());
   }
 }

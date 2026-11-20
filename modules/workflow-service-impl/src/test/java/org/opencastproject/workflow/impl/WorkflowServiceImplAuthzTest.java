@@ -23,7 +23,7 @@ package org.opencastproject.workflow.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
@@ -62,8 +62,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public class WorkflowServiceImplAuthzTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     Map<String, Integer> servers = new HashMap<String, Integer>();
     servers.put("http://somewhere", 80);

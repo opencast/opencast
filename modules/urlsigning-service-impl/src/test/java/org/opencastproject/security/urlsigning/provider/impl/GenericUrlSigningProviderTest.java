@@ -20,9 +20,9 @@
  */
 package org.opencastproject.security.urlsigning.provider.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.SecurityService;
@@ -32,9 +32,9 @@ import org.opencastproject.urlsigning.common.Policy;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public class GenericUrlSigningProviderTest {
 
   private static Map<String, Object> properties;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws Exception {
 
     /* Create mockup for organization a */
@@ -105,7 +105,7 @@ public class GenericUrlSigningProviderTest {
     signer = signerA;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     properties = new HashMap<>();
     signerA.updated(properties);

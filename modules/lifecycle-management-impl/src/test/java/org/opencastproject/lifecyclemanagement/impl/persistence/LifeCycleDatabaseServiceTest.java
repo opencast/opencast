@@ -20,9 +20,9 @@
  */
 package org.opencastproject.lifecyclemanagement.impl.persistence;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -47,8 +47,8 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class LifeCycleDatabaseServiceTest {
   private LifeCyclePolicy testPolicy;
   private LifeCycleTask testTask;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Init default policy
     List<LifeCyclePolicyAccessControlEntry> policyAccessControlEntries = new ArrayList<>();
@@ -128,14 +128,13 @@ public class LifeCycleDatabaseServiceTest {
 
     policyDatabaseService.getLifeCyclePolicy(testPolicy.getId(), securityService.getOrganization().getId());
     List policies = policyDatabaseService.getLifeCyclePolicies(100, 0, new SortCriterion("", SortCriterion.Order.None));
-    assertTrue("Exactly one policy should be returned", policies.size() == 1);
+    assertTrue(policies.size() == 1, "Exactly one policy should be returned");
 
     policyDatabaseService.deleteLifeCyclePolicy(testPolicy, securityService.getOrganization().getId());
-    Exception exception = assertThrows(NotFoundException.class, () -> {
-      policyDatabaseService.getLifeCyclePolicy(testPolicy.getId(), securityService.getOrganization().getId());
-    });
+    Exception exception = assertThrows(NotFoundException.class, () ->
+        policyDatabaseService.getLifeCyclePolicy(testPolicy.getId(), securityService.getOrganization().getId()));
     policies = policyDatabaseService.getLifeCyclePolicies(100, 0, new SortCriterion("", SortCriterion.Order.None));
-    assertTrue("Exactly zero policies should be returned", policies.isEmpty());
+    assertTrue(policies.isEmpty(), "Exactly zero policies should be returned");
   }
 
   @Test
@@ -164,8 +163,7 @@ public class LifeCycleDatabaseServiceTest {
     policyDatabaseService.getLifeCycleTask(testTask.getId());
 
     policyDatabaseService.deleteLifeCycleTask(testTask, securityService.getOrganization().getId());
-    Exception exception = assertThrows(NotFoundException.class, () -> {
-      policyDatabaseService.getLifeCycleTask(testTask.getId());
-    });
+    Exception exception = assertThrows(NotFoundException.class, () ->
+        policyDatabaseService.getLifeCycleTask(testTask.getId()));
   }
 }

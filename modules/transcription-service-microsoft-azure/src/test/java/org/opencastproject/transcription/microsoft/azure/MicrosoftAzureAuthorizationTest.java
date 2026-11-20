@@ -21,9 +21,9 @@
 
 package org.opencastproject.transcription.microsoft.azure;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class MicrosoftAzureAuthorizationTest {
 
   private MicrosoftAzureAuthorization azureAuthorization;
 
-  @Before
+  @BeforeEach
   public void setUp() throws MicrosoftAzureStorageClientException {
     String azureStorageAccountName = "azurestorageaccount";
     String azureAccountAccessKey = "mysecretaccesskey";
@@ -53,12 +53,12 @@ public class MicrosoftAzureAuthorizationTest {
     c.set(2023,Calendar.JANUARY,16,12,0,0);
     Date end = c.getTime();
     String sasToken = azureAuthorization.generateAccountSASToken("r", "c", start, end, null, null);
-    Assert.assertNotNull(sasToken);
-    Assert.assertTrue(sasToken.contains("sp=r"));
-    Assert.assertTrue(sasToken.contains("srt=c"));
-    Assert.assertTrue(sasToken.contains("st=2023-01-15T11:00:00Z"));
-    Assert.assertTrue(sasToken.contains("se=2023-01-16T11:00:00Z"));
-    Assert.assertTrue(sasToken.contains("spr=https"));
-    Assert.assertTrue(sasToken.contains("sig=1oAO19BF8zsHJ7xKO1AzVtgSacN8xgqM6dFBZoQMZUM%3D"));
+    Assertions.assertNotNull(sasToken);
+    Assertions.assertTrue(sasToken.contains("sp=r"));
+    Assertions.assertTrue(sasToken.contains("srt=c"));
+    Assertions.assertTrue(sasToken.contains("st=2023-01-15T11:00:00Z"));
+    Assertions.assertTrue(sasToken.contains("se=2023-01-16T11:00:00Z"));
+    Assertions.assertTrue(sasToken.contains("spr=https"));
+    Assertions.assertTrue(sasToken.contains("sig=1oAO19BF8zsHJ7xKO1AzVtgSacN8xgqM6dFBZoQMZUM%3D"));
   }
 }

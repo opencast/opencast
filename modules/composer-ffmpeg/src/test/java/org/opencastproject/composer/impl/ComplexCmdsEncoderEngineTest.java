@@ -22,7 +22,7 @@ package org.opencastproject.composer.impl;
 
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.capture;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -53,12 +53,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public class ComplexCmdsEncoderEngineTest {
   /** Encoding profile scanner */
   private EncodingProfileScanner profileScanner;
 
-  @BeforeClass
+  @BeforeAll
   public static void testForFFmpeg() {
     try {
       Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
@@ -129,10 +129,10 @@ public class ComplexCmdsEncoderEngineTest {
     return new File(ComplexCmdsEncoderEngineTest.class.getResource(path).toURI());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Skip tests if FFmpeg is not installed
-    Assume.assumeTrue(ffmpegInstalled);
+    Assumptions.assumeTrue(ffmpegInstalled);
     engine = new EncoderEngine(FFMPEG_BINARY);
 
     File f = getFile("/video.mp4");
@@ -225,7 +225,7 @@ public class ComplexCmdsEncoderEngineTest {
 
     profileScanner = new EncodingProfileScanner();
     File encodingProfile = getFile("/encodingprofiles.properties");
-    Assert.assertNotNull("Encoding profile must exist", encodingProfile);
+    Assertions.assertNotNull(encodingProfile, "Encoding profile must exist");
     profileScanner.install(encodingProfile);
 
     MediaInspectionService inspectionService = new MediaInspectionService() {
@@ -289,9 +289,8 @@ public class ComplexCmdsEncoderEngineTest {
       @Override
       protected List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
         List<Track> tracks = new ArrayList<Track>(uris.size());
-        uris.forEach(uri -> {
-          tracks.add(inspectedTrack);
-        });
+        uris.forEach(uri ->
+            tracks.add(inspectedTrack));
         return tracks;
       }
     };
@@ -306,7 +305,7 @@ public class ComplexCmdsEncoderEngineTest {
     composerService.setMediaInspectionService(inspectionService);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     return;
   }
@@ -784,10 +783,10 @@ public class ComplexCmdsEncoderEngineTest {
     Job multiencode = composerService.multiEncode(sourceTrack, Arrays.asList(profiles));
     @SuppressWarnings("unchecked")
     List<Track> processedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(multiencode.getPayload());
-    Assert.assertNotNull(processedTracks);
-    Assert.assertEquals(profiles.length, processedTracks.size()); // Same number of outputs as profiles
+    Assertions.assertNotNull(processedTracks);
+    Assertions.assertEquals(profiles.length, processedTracks.size()); // Same number of outputs as profiles
     for (Track processedTrack : processedTracks) {
-      Assert.assertNotNull(processedTrack.getIdentifier());
+      Assertions.assertNotNull(processedTrack.getIdentifier());
     }
   }
 }

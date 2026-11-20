@@ -21,8 +21,8 @@
 
 package org.opencastproject.dictionary.regexp;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DictionaryServiceImplTest {
 
@@ -31,7 +31,7 @@ public class DictionaryServiceImplTest {
     DictionaryServiceImpl service = new DictionaryServiceImpl();
     String pattern = "123";
     service.setPattern(pattern);
-    Assert.assertEquals(pattern, service.getPattern());
+    Assertions.assertEquals(pattern, service.getPattern());
   }
 
   @Test
@@ -40,13 +40,13 @@ public class DictionaryServiceImplTest {
     String pattern = service.getPattern();
     /* The service should fail to compile this */
     service.setPattern("*[[[[");
-    Assert.assertEquals(pattern, service.getPattern());
+    Assertions.assertEquals(pattern, service.getPattern());
   }
 
   @Test
   public void testEmpty() throws Exception {
     DictionaryServiceImpl service = new DictionaryServiceImpl();
-    Assert.assertEquals(null, service.cleanUpText(""));
+    Assertions.assertEquals(null, service.cleanUpText(""));
   }
 
   @Test
@@ -54,7 +54,7 @@ public class DictionaryServiceImplTest {
     DictionaryServiceImpl service = new DictionaryServiceImpl();
     String in       = "This is a test sentence.";
     String out      = "This is a test sentence";
-    Assert.assertEquals(out, service.cleanUpText(in).getText());
+    Assertions.assertEquals(out, service.cleanUpText(in).getText());
   }
 
   @Test
@@ -63,7 +63,7 @@ public class DictionaryServiceImplTest {
     String in = "Zwölf Boxkämpfer jagten Victor quer über den großen Sylter Deich.";
     /* This will match German special characters and basic punctuation */
     service.setPattern("[\\wßäöüÄÖÜ,.!]+");
-    Assert.assertEquals(in, service.cleanUpText(in).getText());
+    Assertions.assertEquals(in, service.cleanUpText(in).getText());
   }
 
   @Test
@@ -73,7 +73,7 @@ public class DictionaryServiceImplTest {
         + "La cigüeña tocaba el saxofón detrás del palenque de paja.";
     /* This will match Spanish special characters and basic punctuation */
     service.setPattern("[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*");
-    Assert.assertEquals(in, service.cleanUpText(in).getText());
+    Assertions.assertEquals(in, service.cleanUpText(in).getText());
   }
 
 

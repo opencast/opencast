@@ -30,7 +30,8 @@ import static org.easymock.EasyMock.newCapture;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.workflow.handler.workflow.StartWorkflowWorkflowOperationHandler.MEDIA_PACKAGE_ID;
 import static org.opencastproject.workflow.handler.workflow.StartWorkflowWorkflowOperationHandler.WORKFLOW_DEFINITION;
 
@@ -52,8 +53,8 @@ import org.opencastproject.workflow.api.WorkflowService;
 import com.google.common.collect.Lists;
 
 import org.easymock.Capture;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class StartWorkflowWorkflowOperationHandlerTest {
   private static final String MP_ID = "c3066908-39e3-44b1-842a-9ae93ef8d314";
   private static final String WD_ID = "test-workflow";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     assetManager = createNiceMock(AssetManager.class);
     expect(assetManager.getMediaPackage(anyString())).andReturn(Optional.empty()).anyTimes();
@@ -96,18 +97,21 @@ public class StartWorkflowWorkflowOperationHandlerTest {
     workflowInstance.setOperations(Lists.newArrayList(operation));
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testNoMediaPackage() throws Exception {
-    operationHandler.start(workflowInstance, null);
+    assertThrows(WorkflowOperationException.class, () ->
+        operationHandler.start(workflowInstance, null));
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testNoWorkflowDefinition() throws Exception {
-    reset(workflowService);
-    expect(workflowService.getWorkflowDefinitionById(WD_ID)).andThrow(new NotFoundException());
-    replay(workflowService);
+    assertThrows(WorkflowOperationException.class, () -> {
+      reset(workflowService);
+      expect(workflowService.getWorkflowDefinitionById(WD_ID)).andThrow(new NotFoundException());
+      replay(workflowService);
 
-    operationHandler.start(workflowInstance, null);
+      operationHandler.start(workflowInstance, null);
+    });
   }
 
   @Test

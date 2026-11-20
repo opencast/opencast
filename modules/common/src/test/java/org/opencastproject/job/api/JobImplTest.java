@@ -21,13 +21,13 @@
 
 package org.opencastproject.job.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.job.api.Job.FailureReason.NONE;
 import static org.opencastproject.job.api.Job.Status.DISPATCHING;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class JobImplTest {
     uri =  new URI("http://test");
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     job = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", arguments, DISPATCHING, "localhost", "remotehost",
             created, started, completed, 100L, 200L, "result", 3L, 1L, true, uri, 1.5F);

@@ -42,10 +42,10 @@ import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -73,7 +73,7 @@ public class AwsS3DistributionServiceImplTest {
   private File storageDir = null;
   private DefaultOrganization defaultOrganization;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Set up the service
     s3 = EasyMock.createNiceMock(AmazonS3Client.class);
@@ -126,7 +126,7 @@ public class AwsS3DistributionServiceImplTest {
     distributedMp = builder.loadFromXml(mpURI.toURL().openStream());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -247,7 +247,7 @@ public class AwsS3DistributionServiceImplTest {
     MediaPackageElement[] mpes = service.distributeElements("channelId", mp, mpeIds, false);
     MediaPackageElement mpe = mpes[0];
 
-    Assert.assertEquals(new URI(
+    Assertions.assertEquals(new URI(
         "http://XYZ.cloudfront.net/" + defaultOrganization.getId() + "/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
             + "presenter-delivery/video-presenter-delivery.mp4"),
         mpe.getURI());
@@ -289,7 +289,7 @@ public class AwsS3DistributionServiceImplTest {
     MediaPackageElement[] mpes = service.distributeElements("channelId", mp, mpeIds, false);
     MediaPackageElement mpe = mpes[0];
 
-    Assert.assertEquals(new URI(
+    Assertions.assertEquals(new URI(
         "http://XYZ.cloudfront.net/"
             + defaultOrganization.getId()
             + "/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
@@ -297,13 +297,13 @@ public class AwsS3DistributionServiceImplTest {
         mpe.getURI());
     // Test that temp directory is removed
     Path tempfile = storageDir.toPath().resolve(mp.getIdentifier().toString());
-    Assert.assertFalse(Files.exists(tempfile));
+    Assertions.assertFalse(Files.exists(tempfile));
   }
 
   @Test
   public void testBuildObjectName() {
     MediaPackageElement element = mp.getElementById("presenter-delivery");
-    Assert.assertEquals(
+    Assertions.assertEquals(
         defaultOrganization.getId()
             + "/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-delivery/video-presenter-delivery.mp4",
             service.buildObjectName("channelId", mp.getIdentifier().toString(), element));
@@ -311,7 +311,7 @@ public class AwsS3DistributionServiceImplTest {
 
   @Test
   public void testGetDistributionUri() throws Exception {
-    Assert.assertEquals(new URI(
+    Assertions.assertEquals(new URI(
         "http://XYZ.cloudfront.net/" + defaultOrganization.getId() + "/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
             + "presenter-delivery/video-presenter-delivery.mp4"),
         service.getDistributionUri(defaultOrganization.getId() + "/channelId/efd6e4df-63b6-49af-be5f-15f598778877/"
@@ -321,7 +321,7 @@ public class AwsS3DistributionServiceImplTest {
   @Test
   public void testGetDistributedObjectName() {
     MediaPackageElement element = distributedMp.getElementById("presenter-delivery-distributed");
-    Assert.assertEquals(
+    Assertions.assertEquals(
         defaultOrganization.getId()
             + "/channelId/efd6e4df-63b6-49af-be5f-15f598778877/presenter-delivery/video-presenter-delivery.mp4",
             service.getDistributedObjectName(element));

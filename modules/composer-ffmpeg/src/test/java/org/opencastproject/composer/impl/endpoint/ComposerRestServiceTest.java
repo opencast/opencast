@@ -39,9 +39,9 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.NotFoundException;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class ComposerRestServiceTest {
   private String profileIds;
   private ComposerRestService restService;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     // Set up our arguments and return values
@@ -120,60 +120,60 @@ public class ComposerRestServiceTest {
   public void testMissingArguments() throws Exception {
     // Ensure the rest endpoint tests for missing parameters
     Response response = restService.encode(generateVideoTrack(), null);
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     response = restService.encode(null, "profile");
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     response = restService.mux(generateAudioTrack(), null, null, "profile");
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     response = restService.mux(null, generateVideoTrack(), null, "profile");
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     response = restService.mux(generateAudioTrack(), generateVideoTrack(), null, null);
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
     response = restService.mux(null, null, null, "profile");
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testEncode() throws Exception {
     Response response = restService.encode(generateVideoTrack(), profileId);
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals(new JaxbJob(job), response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(new JaxbJob(job), response.getEntity());
   }
 
   @Test
   public void testMux() throws Exception {
     Response response = restService.mux(generateAudioTrack(), generateVideoTrack(),null, profileId);
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals(new JaxbJob(job), response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(new JaxbJob(job), response.getEntity());
   }
 
   @Test
   public void testMultiEncode() throws Exception {
     Response response = restService.multiEncode(generateVideoTrack(), profileIds);
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals(new JaxbJob(job), response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(new JaxbJob(job), response.getEntity());
   }
 
   @Test
   public void testProfiles() throws Exception {
     Response response = restService.getProfile(profileId);
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertEquals(profile, response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(profile, response.getEntity());
 
     try {
       restService.getProfile("some other ID");
-      Assert.fail("This ID should cause the rest endpoint to throw");
+      Assertions.fail("This ID should cause the rest endpoint to throw");
     } catch (NotFoundException e) {
       // expected
     }
 
     EncodingProfileList list = restService.listProfiles();
-    Assert.assertEquals(profileList, list);
+    Assertions.assertEquals(profileList, list);
   }
 
   @Test
@@ -183,8 +183,8 @@ public class ComposerRestServiceTest {
     String sourceTracks = MediaPackageElementParser.getArrayAsXml(List.of(videoTrack, videoTrack));
     Response response = restService.concat(
             sourceTracks, profileId, Serializer.json(dimension).toString(), "25", "false");
-    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-    Assert.assertNotNull("Concat rest endpoint should send a job in response", response.getEntity());
+    Assertions.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertNotNull(response.getEntity(), "Concat rest endpoint should send a job in response");
   }
 
   protected String generateVideoTrack() {

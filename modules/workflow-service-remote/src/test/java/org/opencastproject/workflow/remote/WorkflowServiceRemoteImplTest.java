@@ -24,17 +24,18 @@ package org.opencastproject.workflow.remote;
 import static org.apache.hc.core5.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.hc.core5.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.hc.core5.http.HttpStatus.SC_NO_CONTENT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.security.api.UnauthorizedException;
 
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -91,9 +92,10 @@ public class WorkflowServiceRemoteImplTest {
   }
 
   // The remote service would use the default action (read) if there was none, and so check a weaker permission
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testGetRunningWorkflowInstanceWithoutActionIsRejected() throws Exception {
-    new CapturingWorkflowServiceRemoteImpl().getRunningWorkflowInstanceByMediaPackage("mp-1", null);
+    assertThrows(IllegalArgumentException.class, () ->
+        new CapturingWorkflowServiceRemoteImpl().getRunningWorkflowInstanceByMediaPackage("mp-1", null));
   }
 
   @Test
@@ -115,7 +117,7 @@ public class WorkflowServiceRemoteImplTest {
     } catch (UnauthorizedException e) {
       // expected
     }
-    assertTrue("403 must be accepted as a response", service.expectedStatuses.contains(SC_FORBIDDEN));
+    assertTrue(service.expectedStatuses.contains(SC_FORBIDDEN), "403 must be accepted as a response");
   }
 
   @Test
@@ -130,6 +132,6 @@ public class WorkflowServiceRemoteImplTest {
       // expected
     }
     assertEquals("/mediaPackage/mp-1/instances.xml", service.requestUri);
-    assertTrue("403 must be accepted as a response", service.expectedStatuses.contains(SC_FORBIDDEN));
+    assertTrue(service.expectedStatuses.contains(SC_FORBIDDEN), "403 must be accepted as a response");
   }
 }

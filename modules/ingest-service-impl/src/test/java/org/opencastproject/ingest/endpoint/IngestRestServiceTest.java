@@ -21,7 +21,7 @@
 
 package org.opencastproject.ingest.endpoint;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.ingest.impl.IngestServiceImpl;
@@ -38,9 +38,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class IngestRestServiceTest {
   private File testDir = null;
   private LimitVerifier limitVerifier;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     testDir = new File("./target", "ingest-rest-service-test");
     if (testDir.exists()) {
@@ -182,8 +182,8 @@ public class IngestRestServiceTest {
     EasyMock.replay(bc);
     restService.setIngestService(ingestService);
     restService.activate(cc);
-    Assert.assertEquals(expectedLimit, restService.getIngestLimit());
-    Assert.assertEquals(expectedEnabled, restService.isIngestLimitEnabled());
+    Assertions.assertEquals(expectedLimit, restService.getIngestLimit());
+    Assertions.assertEquals(expectedEnabled, restService.isIngestLimitEnabled());
   }
 
   @Test
@@ -234,10 +234,10 @@ public class IngestRestServiceTest {
 
     String mpId = "6f7a7850-3232-4719-9064-24c9bad2832f";
     Response response = restService.addZippedMediaPackage(setupAddZippedMediaPackageHttpServletRequest(), "test", mpId);
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     Map<String, String> config = workflowConfigCapture.getValue();
-    Assert.assertFalse(config.isEmpty());
-    Assert.assertEquals(mpId, config.get(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
+    Assertions.assertFalse(config.isEmpty());
+    Assertions.assertEquals(mpId, config.get(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
   }
 
   @Test
@@ -264,10 +264,10 @@ public class IngestRestServiceTest {
     EasyMock.expect(request.getParameterMap()).andReturn(metadataMap).anyTimes();
     EasyMock.replay(request);
     Response response = restService.ingest(request);
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     Map<String, String> config = workflowConfigCapture.getValue();
-    Assert.assertFalse(config.isEmpty());
-    Assert.assertEquals(mpId, config.get(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
+    Assertions.assertFalse(config.isEmpty());
+    Assertions.assertEquals(mpId, config.get(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
   }
 
   public void setupAndTestIngestingLimit(String limit, int numberOfIngests, int expectedOK, int expectedBusy) {
@@ -278,11 +278,13 @@ public class IngestRestServiceTest {
     limitVerifier = new LimitVerifier(numberOfIngests);
     limitVerifier.start();
 
-    Assert.assertEquals("There should be no errors when making requests.", 0, limitVerifier.getError());
-    Assert.assertEquals("There should have been the same number of successful ingests finished as expected.",
-            expectedOK, limitVerifier.getOk());
-    Assert.assertEquals("The extra ingests beyond the limit should have received a server unavailable error. ",
-            expectedBusy, limitVerifier.getUnavailable());
+    Assertions.assertEquals(0, limitVerifier.getError(), "There should be no errors when making requests.");
+    Assertions.assertEquals(expectedOK,
+            limitVerifier.getOk(),
+            "There should have been the same number of successful ingests finished as expected.");
+    Assertions.assertEquals(expectedBusy,
+            limitVerifier.getUnavailable(),
+            "The extra ingests beyond the limit should have received a server unavailable error. ");
   }
 
   private class LimitVerifier {
@@ -367,7 +369,7 @@ public class IngestRestServiceTest {
     try {
       EasyMock.expect(request.getInputStream()).andReturn(setupAddZippedMediaPackageServletInputStream());
     } catch (IOException e) {
-      Assert.fail("Failed due to exception " + e.getMessage());
+      Assertions.fail("Failed due to exception " + e.getMessage());
     }
     EasyMock.replay(request);
     return request;
@@ -408,7 +410,7 @@ public class IngestRestServiceTest {
                 return new WorkflowInstance();
               }).anyTimes();
     } catch (Exception e) {
-      Assert.fail("Threw exception " + e.getMessage());
+      Assertions.fail("Threw exception " + e.getMessage());
     }
     EasyMock.replay(ingestService);
     return ingestService;
@@ -417,14 +419,14 @@ public class IngestRestServiceTest {
   @Test
   public void testCreateMediaPackage() throws Exception {
     Response response = restService.createMediaPackage();
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     MediaPackage mp = (MediaPackage) response.getEntity();
-    Assert.assertNotNull(mp);
+    Assertions.assertNotNull(mp);
 
     response = restService.createMediaPackage("1a6f70ab-4262-4523-9f8e-babce22a1ea8");
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     mp = (MediaPackage) response.getEntity();
-    Assert.assertNotNull(mp);
+    Assertions.assertNotNull(mp);
 
   }
 
@@ -432,42 +434,42 @@ public class IngestRestServiceTest {
   public void testAddMediaPackageTrack() throws Exception {
     Response response = restService.addMediaPackageTrack("http://foo/av.mov", "presenter/source", "testtag",
             MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity())));
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testAddMediaPackageCatalog() throws Exception {
     Response response = restService.addMediaPackageCatalog("http://foo/dc.xml", "dublincore/episode", null,
             MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity())));
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testAddMediaPackageAttachment() throws Exception {
     Response response = restService.addMediaPackageAttachment("http://foo/cover.png", "image/cover", null,
             MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity())));
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testAddMediaPackageAttachmentFromRequest() throws Exception {
     // Upload the mediapackage with its new element
     Response postResponse = restService.addMediaPackageAttachment(newMockRequest());
-    Assert.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
   }
 
   @Test
   public void testAddMediaPackageCatalogFromRequest() throws Exception {
     // Upload the mediapackage with its new element
     Response postResponse = restService.addMediaPackageCatalog(newMockRequest());
-    Assert.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
   }
 
   @Test
   public void testAddMediaPackageTrackFromRequest() throws Exception {
     // Upload the mediapackage with its new element
     Response postResponse = restService.addMediaPackageTrack(newMockRequest());
-    Assert.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
   }
 
   @Test
@@ -476,10 +478,10 @@ public class IngestRestServiceTest {
 
     Response response = restService.addMediaPackagePartialTrack("http://foo/av.mov", "presenter/source+partial", 1000L,
             mediaPackage);
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
     response = restService.addMediaPackagePartialTrack(newPartialMockRequest());
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
@@ -584,7 +586,7 @@ public class IngestRestServiceTest {
     // An unparsable date used to be accepted here and only blow up much later during indexing, surfacing as a 500.
     // The validation has to reject it up front, before the catalog is built.
     Response response = restService.addMediaPackage(newMockRequestWithDate("created", "banana"), null);
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
 
   @Test
@@ -594,7 +596,7 @@ public class IngestRestServiceTest {
     // fail with 400 either - that would mean legitimate scheduled recordings were being turned away.
     String period = "start=2024-01-01T00:00:00Z; end=2024-01-01T01:00:00Z; scheme=W3C-DTF;";
     Response response = restService.addMediaPackage(newMockRequestWithDate("temporal", period), null);
-    Assert.assertNotEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assertions.assertNotEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
 
   private HttpServletRequest newMockRequestWithDate(String field, String value) throws Exception {

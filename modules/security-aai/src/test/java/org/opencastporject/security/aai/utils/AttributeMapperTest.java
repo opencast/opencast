@@ -20,15 +20,15 @@
  */
 package org.opencastporject.security.aai.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.security.aai.api.AttributeMapper;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -41,7 +41,7 @@ public class AttributeMapperTest {
 
   protected AttributeMapper attributeMapper;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("attributemapper.xml");
     attributeMapper = (AttributeMapper) ctx.getBean("attributeMapper");
@@ -76,13 +76,15 @@ public class AttributeMapperTest {
     assertEquals("John Doe", displayName.get(0));
   }
 
-  @Test (expected = IllegalArgumentException.class)
+  @Test
   public void testServletMappingFailure() {
-    final MockHttpServletRequest mockRequest = new MockHttpServletRequest(
-        "GET", null);
+    assertThrows(IllegalArgumentException.class, () -> {
+      final MockHttpServletRequest mockRequest = new MockHttpServletRequest(
+          "GET", null);
 
-    List<String> any = attributeMapper.getMappedAttributes(mockRequest,
-        "notExisting");
+      List<String> any = attributeMapper.getMappedAttributes(mockRequest,
+          "notExisting");
+    });
   }
 
   @Test
@@ -119,8 +121,7 @@ public class AttributeMapperTest {
     assertEquals(1, displayName.size());
     assertEquals("John Doe", displayName.get(0));
     assertNotEquals("Charles", displayName.get(0));
-    assertThrows(IndexOutOfBoundsException.class, () -> {
-      displayName.get(1);
-    });
+    assertThrows(IndexOutOfBoundsException.class, () ->
+        displayName.get(1));
   }
 }

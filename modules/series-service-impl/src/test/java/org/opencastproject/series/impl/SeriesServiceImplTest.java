@@ -21,10 +21,10 @@
 
 package org.opencastproject.series.impl;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -53,10 +53,10 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -90,7 +90,7 @@ public class SeriesServiceImplTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     long currentTime = System.currentTimeMillis();
 
@@ -154,7 +154,7 @@ public class SeriesServiceImplTest {
   /**
    * @throws java.lang.Exception
    */
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     seriesDatabase = null;
     FileUtils.deleteQuietly(new File(root));
@@ -165,17 +165,17 @@ public class SeriesServiceImplTest {
     testCatalog.set(DublinCore.PROPERTY_TITLE, "Some title");
     seriesService.updateSeries(testCatalog);
     DublinCoreCatalog retrivedSeries = seriesService.getSeries(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    Assert.assertEquals("Some title", retrivedSeries.getFirst(DublinCore.PROPERTY_TITLE));
+    Assertions.assertEquals("Some title", retrivedSeries.getFirst(DublinCore.PROPERTY_TITLE));
 
     testCatalog.set(DublinCore.PROPERTY_TITLE, "Some other title");
     seriesService.updateSeries(testCatalog);
     retrivedSeries = seriesService.getSeries(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    Assert.assertEquals("Some other title", retrivedSeries.getFirst(DublinCore.PROPERTY_TITLE));
+    Assertions.assertEquals("Some other title", retrivedSeries.getFirst(DublinCore.PROPERTY_TITLE));
 
     seriesService.deleteSeries(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
     try {
       seriesService.getSeries(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-      Assert.fail("Series should not be available after removal.");
+      Assertions.fail("Series should not be available after removal.");
     } catch (NotFoundException e) {
       // expected
     }
@@ -186,9 +186,9 @@ public class SeriesServiceImplTest {
   public void testAddingSeriesWithoutID() throws Exception {
     testCatalog.remove(DublinCore.PROPERTY_IDENTIFIER);
     DublinCoreCatalog newSeries = seriesService.updateSeries(testCatalog);
-    Assert.assertNotNull("New series DC should be returned", newSeries);
+    Assertions.assertNotNull(newSeries, "New series DC should be returned");
     String id = newSeries.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-    Assert.assertNotNull("New series should have id set", id);
+    Assertions.assertNotNull(id, "New series should have id set");
   }
 
   @Test
@@ -200,7 +200,7 @@ public class SeriesServiceImplTest {
 
     try {
       seriesService.updateAccessControl("failid", accessControlList);
-      Assert.fail("Should fail when adding ACL to nonexistent series,");
+      Assertions.fail("Should fail when adding ACL to nonexistent series,");
     } catch (NotFoundException e) {
       // expected
     }
@@ -209,20 +209,20 @@ public class SeriesServiceImplTest {
     seriesService.updateAccessControl(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER), accessControlList);
     AccessControlList retrievedACL = seriesService.getSeriesAccessControl(testCatalog
             .getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    Assert.assertNotNull(retrievedACL);
+    Assertions.assertNotNull(retrievedACL);
     acl = retrievedACL.getEntries();
-    Assert.assertEquals(acl.size(), 1);
-    Assert.assertEquals("admin", acl.get(0).getRole());
+    Assertions.assertEquals(acl.size(), 1);
+    Assertions.assertEquals("admin", acl.get(0).getRole());
 
     acl = accessControlList.getEntries();
     acl.clear();
     acl.add(new AccessControlEntry("student", Permissions.Action.READ.toString(), true));
     seriesService.updateAccessControl(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER), accessControlList);
     retrievedACL = seriesService.getSeriesAccessControl(testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    Assert.assertNotNull(retrievedACL);
+    Assertions.assertNotNull(retrievedACL);
     acl = retrievedACL.getEntries();
-    Assert.assertEquals(acl.size(), 1);
-    Assert.assertEquals("student", acl.get(0).getRole());
+    Assertions.assertEquals(acl.size(), 1);
+    Assertions.assertEquals("student", acl.get(0).getRole());
   }
 
   @Test

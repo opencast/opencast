@@ -22,9 +22,9 @@ package org.opencastproject.assetmanager.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Availability;
@@ -41,7 +41,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderImpl;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.Date;
@@ -63,8 +63,8 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     final Version v1 = am.takeSnapshot(OWNER, mp).getVersion();
     final Version v2 = am.takeSnapshot(OWNER, mp).getVersion();
-    assertTrue("First version must be older", v1.isOlder(v2));
-    assertTrue("Second version must be younger", v2.isYounger(v1));
+    assertTrue(v1.isOlder(v2), "First version must be older");
+    assertTrue(v2.isYounger(v1), "Second version must be younger");
     assertTrue(v1.equals(v1));
     assertFalse(v1.equals(v2));
   }
@@ -73,7 +73,7 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
   public void testSerializeVersion() throws Exception {
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     final Version v1 = am.takeSnapshot(OWNER, mp).getVersion();
-    assertTrue("Version should be ", am.toVersion(v1.toString()).isPresent());
+    assertTrue(am.toVersion(v1.toString()).isPresent(), "Version should be ");
     assertEquals(v1, am.toVersion(v1.toString()).get());
   }
 
@@ -104,14 +104,14 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
         v1
     );
     Snapshot snapshot = optSnapshot.get();
-    assertEquals("One offline snapshot should be found", Availability.OFFLINE, snapshot.getAvailability());
+    assertEquals(Availability.OFFLINE, snapshot.getAvailability(), "One offline snapshot should be found");
   }
 
   @Test
   public void testSetPropertyOnNonExistingMediaPackage() throws Exception {
-    assertFalse("Property should not be stored since the referenced media package does not exist",
-                am.setProperty(Property.mk(PropertyId.mk("id", "namespace", "name"),
-                    Value.mk("value"))));
+    assertFalse(am.setProperty(Property.mk(PropertyId.mk("id", "namespace", "name"),
+                    Value.mk("value"))),
+                "Property should not be stored since the referenced media package does not exist");
   }
 
   @Test
@@ -141,35 +141,36 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     final Date d2 = new Date(1);
     final Date d3 = new Date(2);
     logger.info("Add a property to the media package");
-    assertTrue("The property should be set", am.setProperty(p.start(mpId, d1)));
+    assertTrue(am.setProperty(p.start(mpId, d1)), "The property should be set");
     logger.info("Select all properties of the media package");
     {
       List<Property> properties = am.selectProperties(mpId, null);
-      assertEquals("One property should be found", 1, properties.size());
-      assertEquals("Value check", d1, properties.stream().findFirst().get().getValue().get(Value.DATE));
+      assertEquals(1, properties.size(), "One property should be found");
+      assertEquals(d1, properties.stream().findFirst().get().getValue().get(Value.DATE), "Value check");
     }
     logger.info("Update the property");
-    assertTrue("The property should be updated", am.setProperty(p.start(mpId, d2)));
+    assertTrue(am.setProperty(p.start(mpId, d2)), "The property should be updated");
     {
       List<Property> properties = am.selectProperties(mpId, null);
-      assertEquals("One property should be found", 1, properties.size());
-      assertEquals("Value check", d2, properties.stream().findFirst().get().getValue().get(Value.DATE));
+      assertEquals(1, properties.size(), "One property should be found");
+      assertEquals(d2, properties.stream().findFirst().get().getValue().get(Value.DATE), "Value check");
     }
     logger.info("The existence of multiple versions of a media package should not affect property storage");
     logger.info("Add a new version of the media package");
     am.takeSnapshot(OWNER, mp);
     logger.info("Update the property again");
-    assertTrue("The property should be updated", am.setProperty(p.start(mpId, d3)));
+    assertTrue(am.setProperty(p.start(mpId, d3)), "The property should be updated");
     {
       List<Snapshot> snapshots = am.getSnapshotsById(mpId);
       List<Property> properties = am.selectProperties(mpId, null);
-      assertEquals("Two records should be found since there are now two versions of the media package and no"
-                  + "version restriction has been applied",
-                   2, snapshots.size());
-      assertEquals("One properties should be found", 1, properties.size());
-      assertEquals("There should be one distinct property in all of the found records",
-          1, new HashSet(properties).size());
-      assertEquals("Value check", d3, properties.stream().findFirst().get().getValue().get(Value.DATE));
+      assertEquals(2,
+                   snapshots.size(),
+                   "Two records should be found since there are now two versions of the media package and no"
+                  + "version restriction has been applied");
+      assertEquals(1, properties.size(), "One properties should be found");
+      assertEquals(1,
+          new HashSet(properties).size(), "There should be one distinct property in all of the found records");
+      assertEquals(d3, properties.stream().findFirst().get().getValue().get(Value.DATE), "Value check");
     }
   }
 }

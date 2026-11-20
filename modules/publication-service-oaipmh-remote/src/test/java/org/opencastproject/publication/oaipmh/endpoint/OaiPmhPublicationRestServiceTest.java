@@ -21,7 +21,7 @@
 package org.opencastproject.publication.oaipmh.endpoint;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.UrlSupport.uri;
 
@@ -44,9 +44,9 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.apache.hc.client5.http.auth.AuthChallenge;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.easymock.EasyMock;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -131,12 +131,12 @@ public class OaiPmhPublicationRestServiceTest {
 
   // Great. Checkstyle: "This method should no be static". JUnit: "Method setUp() should be static." ;)
   // CHECKSTYLE:OFF
-  @BeforeClass
+  @BeforeAll
   public static void setUp() throws Exception {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDownAfterClass() {
     rt.tearDownServer();
   }

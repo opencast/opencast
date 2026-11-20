@@ -20,16 +20,16 @@
  */
 package org.opencastproject.workspace.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.FileSupport;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class FileReadDeleteTest {
   private volatile long totalRead = 0;
   private long expectedSize = 0;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     totalRead = 0;
     expectedSize = resourceAsFile(FILE).length();
@@ -73,7 +73,7 @@ public class FileReadDeleteTest {
           throws Exception {
     final File source = resourceAsFile(FILE);
     final File work = FileSupport.copy(source, new File(source.getParentFile(), UUID.randomUUID().toString() + ".tmp"));
-    assertTrue("Work file could not be created", work.exists());
+    assertTrue(work.exists(), "Work file could not be created");
     try {
       final Thread readerThread = new Thread(mkRunnable(work, mkReader));
       synchronized (start) {
@@ -81,13 +81,13 @@ public class FileReadDeleteTest {
         // wait for reader
         start.wait();
       }
-      assertEquals("Reader already finished", 0, totalRead);
-      assertTrue("File could not be deleted", work.delete());
-      assertFalse("File still exists", work.exists());
+      assertEquals(0, totalRead, "Reader already finished");
+      assertTrue(work.delete(), "File could not be deleted");
+      assertFalse(work.exists(), "File still exists");
       logger.debug("Work file deleted");
       // wait for reader to complete
       readerThread.join();
-      assertEquals("File not completely read", expectedSize, totalRead);
+      assertEquals(expectedSize, totalRead, "File not completely read");
     } finally {
       // cleanup
       FileSupport.delete(work);

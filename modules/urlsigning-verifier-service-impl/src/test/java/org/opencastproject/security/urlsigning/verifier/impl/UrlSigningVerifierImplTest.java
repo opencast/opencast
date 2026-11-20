@@ -20,7 +20,7 @@
  */
 package org.opencastproject.security.urlsigning.verifier.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.urlsigning.common.Policy;
 import org.opencastproject.urlsigning.common.ResourceRequest;
@@ -28,7 +28,7 @@ import org.opencastproject.urlsigning.common.ResourceRequest.Status;
 import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;

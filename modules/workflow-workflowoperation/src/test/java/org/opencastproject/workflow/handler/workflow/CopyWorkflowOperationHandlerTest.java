@@ -36,9 +36,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -58,7 +58,7 @@ public class CopyWorkflowOperationHandlerTest {
   // mock services and objects
   private Workspace workspace = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -98,8 +98,8 @@ public class CopyWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertTrue(copy.exists());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertTrue(copy.exists());
   }
 
   @Test
@@ -117,8 +117,8 @@ public class CopyWorkflowOperationHandlerTest {
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
-    Assert.assertTrue(copy.exists());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertTrue(copy.exists());
   }
 
   @Test
@@ -132,7 +132,7 @@ public class CopyWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   @Test
@@ -146,9 +146,9 @@ public class CopyWorkflowOperationHandlerTest {
     // run the operation handler
     try {
       WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-      Assert.assertEquals(Action.CONTINUE, result.getAction());
+      Assertions.assertEquals(Action.CONTINUE, result.getAction());
     } catch (WorkflowOperationException e) {
-      Assert.fail("The workflow should ");
+      Assertions.fail("The workflow should ");
     }
   }
 

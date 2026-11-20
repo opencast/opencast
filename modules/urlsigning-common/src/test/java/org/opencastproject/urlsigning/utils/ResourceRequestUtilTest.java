@@ -20,9 +20,9 @@
  */
 package org.opencastproject.urlsigning.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.urlsigning.common.Policy;
 import org.opencastproject.urlsigning.common.ResourceRequest;
@@ -31,8 +31,8 @@ import org.opencastproject.urlsigning.common.ResourceRequest.Status;
 import org.apache.hc.core5.http.NameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,7 +45,7 @@ public class ResourceRequestUtilTest {
   private static final String clientIp = "10.0.0.1";
   private Properties properties;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     properties = new Properties();
     properties.put(keyId, key);
@@ -80,9 +80,9 @@ public class ResourceRequestUtilTest {
       }
     }
 
-    assertTrue("Didn't find the organization value.", foundOrg);
-    assertTrue("Didn't find the policy value.", foundPolicy);
-    assertTrue("Didn't find the signature value.", foundSignature);
+    assertTrue(foundOrg, "Didn't find the organization value.");
+    assertTrue(foundPolicy, "Didn't find the policy value.");
+    assertTrue(foundSignature, "Didn't find the signature value.");
   }
 
   @Test

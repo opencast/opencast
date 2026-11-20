@@ -31,9 +31,9 @@ import org.opencastproject.util.NotFoundException;
 import com.google.gson.Gson;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +53,7 @@ public class SchedulerServiceDatabaseImplTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -73,22 +73,22 @@ public class SchedulerServiceDatabaseImplTest {
 
     try {
       schedulerDatabase.getLastModified(agentId);
-      Assert.fail();
+      Assertions.fail();
     } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
 
-    Assert.assertTrue(schedulerDatabase.getLastModifiedDates().isEmpty());
+    Assertions.assertTrue(schedulerDatabase.getLastModifiedDates().isEmpty());
 
     schedulerDatabase.touchLastEntry(agentId);
 
     Date lastModified = schedulerDatabase.getLastModified(agentId);
-    Assert.assertTrue(lastModified.after(now));
+    Assertions.assertTrue(lastModified.after(now));
 
     Map<String, Date> dates = schedulerDatabase.getLastModifiedDates();
-    Assert.assertEquals(1, dates.size());
+    Assertions.assertEquals(1, dates.size());
     lastModified = dates.get(agentId);
-    Assert.assertTrue(lastModified.after(now));
+    Assertions.assertTrue(lastModified.after(now));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class SchedulerServiceDatabaseImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("cafoo", "cabar");
 
     final Optional<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertFalse(initialEvent.isPresent());
+    Assertions.assertFalse(initialEvent.isPresent());
 
     schedulerDatabase.storeEvent(
         mpId,
@@ -126,20 +126,20 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.of(caProperties)
     );
     final Optional<ExtendedEventDto> newEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(newEvent.isPresent());
-    Assert.assertEquals(mpId, newEvent.get().getMediaPackageId());
-    Assert.assertEquals(orgId, newEvent.get().getOrganization());
-    Assert.assertEquals(agentId, newEvent.get().getCaptureAgentId());
-    Assert.assertEquals(start, newEvent.get().getStartDate());
-    Assert.assertEquals(end, newEvent.get().getEndDate());
-    Assert.assertEquals(source, newEvent.get().getSource());
-    Assert.assertEquals(recordingState, newEvent.get().getRecordingState());
-    Assert.assertEquals(lastHeard, newEvent.get().getRecordingLastHeard());
-    Assert.assertEquals(presenters, newEvent.get().getPresenters());
-    Assert.assertEquals(lastModifiedDate, newEvent.get().getLastModifiedDate());
-    Assert.assertEquals(checksum, newEvent.get().getChecksum());
-    Assert.assertEquals(new Gson().toJson(wfProperties), newEvent.get().getWorkflowProperties());
-    Assert.assertEquals(new Gson().toJson(caProperties), newEvent.get().getCaptureAgentProperties());
+    Assertions.assertTrue(newEvent.isPresent());
+    Assertions.assertEquals(mpId, newEvent.get().getMediaPackageId());
+    Assertions.assertEquals(orgId, newEvent.get().getOrganization());
+    Assertions.assertEquals(agentId, newEvent.get().getCaptureAgentId());
+    Assertions.assertEquals(start, newEvent.get().getStartDate());
+    Assertions.assertEquals(end, newEvent.get().getEndDate());
+    Assertions.assertEquals(source, newEvent.get().getSource());
+    Assertions.assertEquals(recordingState, newEvent.get().getRecordingState());
+    Assertions.assertEquals(lastHeard, newEvent.get().getRecordingLastHeard());
+    Assertions.assertEquals(presenters, newEvent.get().getPresenters());
+    Assertions.assertEquals(lastModifiedDate, newEvent.get().getLastModifiedDate());
+    Assertions.assertEquals(checksum, newEvent.get().getChecksum());
+    Assertions.assertEquals(new Gson().toJson(wfProperties), newEvent.get().getWorkflowProperties());
+    Assertions.assertEquals(new Gson().toJson(caProperties), newEvent.get().getCaptureAgentProperties());
   }
 
   @Test
@@ -159,7 +159,7 @@ public class SchedulerServiceDatabaseImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("cafoo", "cabar");
 
     final Optional<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertFalse(initialEvent.isPresent());
+    Assertions.assertFalse(initialEvent.isPresent());
 
     schedulerDatabase.storeEvent(
         mpId,
@@ -199,20 +199,20 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.of(updatedCaProperties)
     );
     final Optional<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(updatedEvent.isPresent());
-    Assert.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
-    Assert.assertEquals(orgId, updatedEvent.get().getOrganization());
-    Assert.assertEquals(agentId, updatedEvent.get().getCaptureAgentId());
-    Assert.assertEquals(start, updatedEvent.get().getStartDate());
-    Assert.assertEquals(end, updatedEvent.get().getEndDate());
-    Assert.assertEquals(source, updatedEvent.get().getSource());
-    Assert.assertEquals(updatedRecordingState, updatedEvent.get().getRecordingState());
-    Assert.assertEquals(lastHeard, updatedEvent.get().getRecordingLastHeard());
-    Assert.assertEquals(presenters, updatedEvent.get().getPresenters());
-    Assert.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
-    Assert.assertEquals(checksum, updatedEvent.get().getChecksum());
-    Assert.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
-    Assert.assertEquals(new Gson().toJson(updatedCaProperties), updatedEvent.get().getCaptureAgentProperties());
+    Assertions.assertTrue(updatedEvent.isPresent());
+    Assertions.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
+    Assertions.assertEquals(orgId, updatedEvent.get().getOrganization());
+    Assertions.assertEquals(agentId, updatedEvent.get().getCaptureAgentId());
+    Assertions.assertEquals(start, updatedEvent.get().getStartDate());
+    Assertions.assertEquals(end, updatedEvent.get().getEndDate());
+    Assertions.assertEquals(source, updatedEvent.get().getSource());
+    Assertions.assertEquals(updatedRecordingState, updatedEvent.get().getRecordingState());
+    Assertions.assertEquals(lastHeard, updatedEvent.get().getRecordingLastHeard());
+    Assertions.assertEquals(presenters, updatedEvent.get().getPresenters());
+    Assertions.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
+    Assertions.assertEquals(checksum, updatedEvent.get().getChecksum());
+    Assertions.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
+    Assertions.assertEquals(new Gson().toJson(updatedCaProperties), updatedEvent.get().getCaptureAgentProperties());
   }
 
   @Test
@@ -257,11 +257,11 @@ public class SchedulerServiceDatabaseImplTest {
     }
     final int separationMillis = 60 * 1000;
     final List<String> eventIds = schedulerDatabase.getEvents(agentId, intervalStart, intervalEnd, separationMillis);
-    Assert.assertEquals(3, eventIds.size());
-    Assert.assertFalse(eventIds.contains(mpId + 0));
-    Assert.assertTrue(eventIds.contains(mpId + 1));
-    Assert.assertTrue(eventIds.contains(mpId + 2));
-    Assert.assertTrue(eventIds.contains(mpId + 3));
+    Assertions.assertEquals(3, eventIds.size());
+    Assertions.assertFalse(eventIds.contains(mpId + 0));
+    Assertions.assertTrue(eventIds.contains(mpId + 1));
+    Assertions.assertTrue(eventIds.contains(mpId + 2));
+    Assertions.assertTrue(eventIds.contains(mpId + 3));
   }
 
   @Test
@@ -314,9 +314,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, events1.size());
-    Assert.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
-    Assert.assertTrue(events1.get(1).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(2, events1.size());
+    Assertions.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertTrue(events1.get(1).getMediaPackageId().equals(mpId + 3));
 
     // All events which start to now. expected: no.1 and no.2
     final List<ExtendedEventDto> events2 = schedulerDatabase.search(
@@ -327,9 +327,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, events2.size());
-    Assert.assertTrue(events2.get(0).getMediaPackageId().equals(mpId + 0));
-    Assert.assertTrue(events2.get(1).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertEquals(2, events2.size());
+    Assertions.assertTrue(events2.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertTrue(events2.get(1).getMediaPackageId().equals(mpId + 1));
 
     // All events which end from now. expected: no.2, no.3, and no.4
     final List<ExtendedEventDto> events3 = schedulerDatabase.search(
@@ -340,10 +340,10 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(3, events3.size());
-    Assert.assertTrue(events3.get(0).getMediaPackageId().equals(mpId + 1));
-    Assert.assertTrue(events3.get(1).getMediaPackageId().equals(mpId + 2));
-    Assert.assertTrue(events3.get(2).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(3, events3.size());
+    Assertions.assertTrue(events3.get(0).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertTrue(events3.get(1).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertTrue(events3.get(2).getMediaPackageId().equals(mpId + 3));
 
     // All events which end to now. expected: no.1,
     final List<ExtendedEventDto> events4 = schedulerDatabase.search(
@@ -354,11 +354,11 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.of(new Date(nowMillis)),
         Optional.empty()
     );
-    Assert.assertEquals(1, events4.size());
-    Assert.assertTrue(events4.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertEquals(1, events4.size());
+    Assertions.assertTrue(events4.get(0).getMediaPackageId().equals(mpId + 0));
 
     // All events which start from now AND start to now -> illegal combination, no results expected
-    Assert.assertTrue(schedulerDatabase.search(
+    Assertions.assertTrue(schedulerDatabase.search(
         Optional.empty(),
         Optional.of(new Date(nowMillis)),
         Optional.of(new Date(nowMillis)),
@@ -368,7 +368,7 @@ public class SchedulerServiceDatabaseImplTest {
     ).isEmpty());
 
     // All events which end from now AND end to now -> illegal combination, no results expected
-    Assert.assertTrue(schedulerDatabase.search(
+    Assertions.assertTrue(schedulerDatabase.search(
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
@@ -378,7 +378,7 @@ public class SchedulerServiceDatabaseImplTest {
     ).isEmpty());
 
     // All events which start from now AND end to now -> illegal combination, no results expected
-    Assert.assertTrue(schedulerDatabase.search(
+    Assertions.assertTrue(schedulerDatabase.search(
         Optional.empty(),
         Optional.of(new Date(nowMillis)),
         Optional.empty(),
@@ -396,9 +396,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, events5.size());
-    Assert.assertTrue(events5.get(0).getMediaPackageId().equals(mpId + 2));
-    Assert.assertTrue(events5.get(1).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(2, events5.size());
+    Assertions.assertTrue(events5.get(0).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertTrue(events5.get(1).getMediaPackageId().equals(mpId + 3));
 
     // All events which start to now + 1 hour. expected: no. 1 and no. 2, but not no. 3
     final List<ExtendedEventDto> events6 = schedulerDatabase.search(
@@ -409,9 +409,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, events6.size());
-    Assert.assertTrue(events6.get(0).getMediaPackageId().equals(mpId + 0));
-    Assert.assertTrue(events6.get(1).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertEquals(2, events6.size());
+    Assertions.assertTrue(events6.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertTrue(events6.get(1).getMediaPackageId().equals(mpId + 1));
 
     // All events which end from now + 1 hour. expected: no2., no.3, and no.4
     final List<ExtendedEventDto> events7 = schedulerDatabase.search(
@@ -422,10 +422,10 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(3, events7.size());
-    Assert.assertTrue(events7.get(0).getMediaPackageId().equals(mpId + 1));
-    Assert.assertTrue(events7.get(1).getMediaPackageId().equals(mpId + 2));
-    Assert.assertTrue(events7.get(2).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(3, events7.size());
+    Assertions.assertTrue(events7.get(0).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertTrue(events7.get(1).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertTrue(events7.get(2).getMediaPackageId().equals(mpId + 3));
 
     // All events which end to now + 1 hour. expected: no.1
     final List<ExtendedEventDto> events8 = schedulerDatabase.search(
@@ -436,8 +436,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.of(new Date(nowMillis + oneHourMillis)),
         Optional.empty()
     );
-    Assert.assertEquals(1, events8.size());
-    Assert.assertTrue(events8.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertEquals(1, events8.size());
+    Assertions.assertTrue(events8.get(0).getMediaPackageId().equals(mpId + 0));
 
     // No start/end dates given. expected: all events are returned
     final List<ExtendedEventDto> events9 = schedulerDatabase.search(
@@ -448,11 +448,11 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(4, events9.size());
-    Assert.assertTrue(events9.get(0).getMediaPackageId().equals(mpId + 0));
-    Assert.assertTrue(events9.get(1).getMediaPackageId().equals(mpId + 1));
-    Assert.assertTrue(events9.get(2).getMediaPackageId().equals(mpId + 2));
-    Assert.assertTrue(events9.get(3).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(4, events9.size());
+    Assertions.assertTrue(events9.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertTrue(events9.get(1).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertTrue(events9.get(2).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertTrue(events9.get(3).getMediaPackageId().equals(mpId + 3));
 
     // All events which start to now and end to now. expected: no. 1
     final List<ExtendedEventDto> eventsA = schedulerDatabase.search(
@@ -463,8 +463,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.of(new Date(nowMillis)),
         Optional.empty()
     );
-    Assert.assertEquals(1, eventsA.size());
-    Assert.assertTrue(eventsA.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertEquals(1, eventsA.size());
+    Assertions.assertTrue(eventsA.get(0).getMediaPackageId().equals(mpId + 0));
 
     // All events which start to now and end from now. expected: no. 2
     final List<ExtendedEventDto> eventsB = schedulerDatabase.search(
@@ -475,8 +475,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(1, eventsB.size());
-    Assert.assertTrue(eventsB.get(0).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertEquals(1, eventsB.size());
+    Assertions.assertTrue(eventsB.get(0).getMediaPackageId().equals(mpId + 1));
 
     // All events which start from now and end from now. expected: no. 3 and no. 4
     final List<ExtendedEventDto> eventsC = schedulerDatabase.search(
@@ -487,9 +487,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, eventsC.size());
-    Assert.assertTrue(eventsC.get(0).getMediaPackageId().equals(mpId + 2));
-    Assert.assertTrue(eventsC.get(1).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(2, eventsC.size());
+    Assertions.assertTrue(eventsC.get(0).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertTrue(eventsC.get(1).getMediaPackageId().equals(mpId + 3));
   }
 
   @Test
@@ -542,8 +542,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.of(1)
     );
-    Assert.assertEquals(1, events1.size());
-    Assert.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertEquals(1, events1.size());
+    Assertions.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
   }
 
   @Test
@@ -596,8 +596,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(1, events1.size());
-    Assert.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertEquals(1, events1.size());
+    Assertions.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
 
     // All events which start from now on agent 2. expected: no.4
     final List<ExtendedEventDto> events2 = schedulerDatabase.search(
@@ -608,8 +608,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(1, events2.size());
-    Assert.assertTrue(events2.get(0).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(1, events2.size());
+    Assertions.assertTrue(events2.get(0).getMediaPackageId().equals(mpId + 3));
 
     // No start/end dates given. expected: all events of agent 1 are returned
     final List<ExtendedEventDto> events3 = schedulerDatabase.search(
@@ -620,9 +620,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, events3.size());
-    Assert.assertTrue(events3.get(0).getMediaPackageId().equals(mpId + 0));
-    Assert.assertTrue(events3.get(1).getMediaPackageId().equals(mpId + 2));
+    Assertions.assertEquals(2, events3.size());
+    Assertions.assertTrue(events3.get(0).getMediaPackageId().equals(mpId + 0));
+    Assertions.assertTrue(events3.get(1).getMediaPackageId().equals(mpId + 2));
 
     // No start/end dates given. expected: all events of agent 2 are returned
     final List<ExtendedEventDto> events4 = schedulerDatabase.search(
@@ -633,9 +633,9 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty()
     );
-    Assert.assertEquals(2, events4.size());
-    Assert.assertTrue(events4.get(0).getMediaPackageId().equals(mpId + 1));
-    Assert.assertTrue(events4.get(1).getMediaPackageId().equals(mpId + 3));
+    Assertions.assertEquals(2, events4.size());
+    Assertions.assertTrue(events4.get(0).getMediaPackageId().equals(mpId + 1));
+    Assertions.assertTrue(events4.get(1).getMediaPackageId().equals(mpId + 3));
   }
 
   @Test
@@ -662,12 +662,12 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty()
     );
     final Optional<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(initialEvent.isPresent());
+    Assertions.assertTrue(initialEvent.isPresent());
 
     schedulerDatabase.deleteEvent(mpId);
 
     final Optional<ExtendedEventDto> newEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertFalse(newEvent.isPresent());
+    Assertions.assertFalse(newEvent.isPresent());
   }
 
   @Test
@@ -706,10 +706,10 @@ public class SchedulerServiceDatabaseImplTest {
       );
     }
     final List<ExtendedEventDto> knownEvents = schedulerDatabase.getKnownRecordings();
-    Assert.assertEquals(2, knownEvents.size());
-    Assert.assertTrue(knownEvents.get(0).getMediaPackageId().equals(mpId + 0)
+    Assertions.assertEquals(2, knownEvents.size());
+    Assertions.assertTrue(knownEvents.get(0).getMediaPackageId().equals(mpId + 0)
         || knownEvents.get(1).getMediaPackageId().equals(mpId + 0));
-    Assert.assertTrue(knownEvents.get(0).getMediaPackageId().equals(mpId + 2)
+    Assertions.assertTrue(knownEvents.get(0).getMediaPackageId().equals(mpId + 2)
         || knownEvents.get(1).getMediaPackageId().equals(mpId + 2));
   }
 
@@ -748,20 +748,20 @@ public class SchedulerServiceDatabaseImplTest {
     schedulerDatabase.resetRecordingState(mpId);
 
     final Optional<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(updatedEvent.isPresent());
-    Assert.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
-    Assert.assertEquals(orgId, updatedEvent.get().getOrganization());
-    Assert.assertEquals(agentId, updatedEvent.get().getCaptureAgentId());
-    Assert.assertEquals(start, updatedEvent.get().getStartDate());
-    Assert.assertEquals(end, updatedEvent.get().getEndDate());
-    Assert.assertEquals(source, updatedEvent.get().getSource());
-    Assert.assertNull(updatedEvent.get().getRecordingState());
-    Assert.assertNull(updatedEvent.get().getRecordingLastHeard());
-    Assert.assertEquals(presenters, updatedEvent.get().getPresenters());
-    Assert.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
-    Assert.assertEquals(checksum, updatedEvent.get().getChecksum());
-    Assert.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
-    Assert.assertEquals(new Gson().toJson(caProperties), updatedEvent.get().getCaptureAgentProperties());
+    Assertions.assertTrue(updatedEvent.isPresent());
+    Assertions.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
+    Assertions.assertEquals(orgId, updatedEvent.get().getOrganization());
+    Assertions.assertEquals(agentId, updatedEvent.get().getCaptureAgentId());
+    Assertions.assertEquals(start, updatedEvent.get().getStartDate());
+    Assertions.assertEquals(end, updatedEvent.get().getEndDate());
+    Assertions.assertEquals(source, updatedEvent.get().getSource());
+    Assertions.assertNull(updatedEvent.get().getRecordingState());
+    Assertions.assertNull(updatedEvent.get().getRecordingLastHeard());
+    Assertions.assertEquals(presenters, updatedEvent.get().getPresenters());
+    Assertions.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
+    Assertions.assertEquals(checksum, updatedEvent.get().getChecksum());
+    Assertions.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
+    Assertions.assertEquals(new Gson().toJson(caProperties), updatedEvent.get().getCaptureAgentProperties());
   }
 
   @Test
@@ -797,6 +797,6 @@ public class SchedulerServiceDatabaseImplTest {
       );
     }
     int count = schedulerDatabase.countEvents();
-    Assert.assertEquals(4, count);
+    Assertions.assertEquals(4, count);
   }
 }

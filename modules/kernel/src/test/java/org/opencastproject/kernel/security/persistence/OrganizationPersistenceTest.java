@@ -36,9 +36,9 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +56,7 @@ public class OrganizationPersistenceTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     securityService = EasyMock.createNiceMock(SecurityService.class);
     User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
@@ -81,30 +81,30 @@ public class OrganizationPersistenceTest {
 
     organizationDatabase.storeOrganization(org);
 
-    Assert.assertTrue(organizationDatabase.containsOrganization("newOrg"));
+    Assertions.assertTrue(organizationDatabase.containsOrganization("newOrg"));
 
     Organization orgById = organizationDatabase.getOrganization("newOrg");
     try {
       organizationDatabase.getOrganizationByHost("test.org", 8081);
-      Assert.fail();
+      Assertions.fail();
     } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
     Organization orgByHost = organizationDatabase.getOrganizationByHost("test.org", 8080);
-    Assert.assertEquals(orgById, orgByHost);
+    Assertions.assertEquals(orgById, orgByHost);
 
-    Assert.assertEquals("newOrg", orgById.getId());
-    Assert.assertEquals("test organization", orgById.getName());
-    Assert.assertEquals("ROLE_TEST_ADMIN", orgById.getAdminRole());
-    Assert.assertEquals("ROLE_TEST_ANONYMOUS", orgById.getAnonymousRole());
+    Assertions.assertEquals("newOrg", orgById.getId());
+    Assertions.assertEquals("test organization", orgById.getName());
+    Assertions.assertEquals("ROLE_TEST_ADMIN", orgById.getAdminRole());
+    Assertions.assertEquals("ROLE_TEST_ANONYMOUS", orgById.getAnonymousRole());
     Map<String, Integer> servers = orgById.getServers();
-    Assert.assertEquals(1, servers.size());
-    Assert.assertTrue(servers.containsKey("test.org"));
-    Assert.assertTrue(servers.containsValue(8080));
+    Assertions.assertEquals(1, servers.size());
+    Assertions.assertTrue(servers.containsKey("test.org"));
+    Assertions.assertTrue(servers.containsValue(8080));
     Map<String, String> properties = orgById.getProperties();
-    Assert.assertEquals(1, properties.size());
-    Assert.assertTrue(properties.containsKey("test"));
-    Assert.assertTrue(properties.containsValue("one"));
+    Assertions.assertEquals(1, properties.size());
+    Assertions.assertTrue(properties.containsKey("test"));
+    Assertions.assertTrue(properties.containsValue("one"));
   }
 
   @Test
@@ -123,13 +123,13 @@ public class OrganizationPersistenceTest {
 
     organizationDatabase.storeOrganization(org2);
 
-    Assert.assertEquals(2, organizationDatabase.countOrganizations());
+    Assertions.assertEquals(2, organizationDatabase.countOrganizations());
 
     List<Organization> organizations = organizationDatabase.getOrganizations();
-    Assert.assertEquals(2, organizations.size());
+    Assertions.assertEquals(2, organizations.size());
 
-    Assert.assertEquals(org1, organizations.get(0));
-    Assert.assertEquals(org2, organizations.get(1));
+    Assertions.assertEquals(org1, organizations.get(0));
+    Assertions.assertEquals(org2, organizations.get(1));
   }
 
   @Test
@@ -141,23 +141,23 @@ public class OrganizationPersistenceTest {
 
     organizationDatabase.storeOrganization(org);
 
-    Assert.assertTrue(organizationDatabase.containsOrganization("newOrg"));
+    Assertions.assertTrue(organizationDatabase.containsOrganization("newOrg"));
 
     try {
       organizationDatabase.getOrganization("newOrg");
     } catch (NotFoundException e) {
-      Assert.fail("Organization not found");
+      Assertions.fail("Organization not found");
     }
 
     organizationDatabase.deleteOrganization("newOrg");
 
-    Assert.assertFalse(organizationDatabase.containsOrganization("newOrg"));
+    Assertions.assertFalse(organizationDatabase.containsOrganization("newOrg"));
 
     try {
       organizationDatabase.getOrganization("newOrg");
-      Assert.fail("Organization found");
+      Assertions.fail("Organization found");
     } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
+      Assertions.assertNotNull(e);
     }
   }
 

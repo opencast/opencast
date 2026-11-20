@@ -23,9 +23,9 @@
 package org.opencastproject.mediapackage;
 
 import static io.restassured.path.xml.XmlPath.from;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTATION_SOURCE;
 import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTER_SOURCE;
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClassPath;
@@ -36,7 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.XmlSafeParser;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -138,22 +138,22 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
   public void testPublicationElement() throws Exception {
     final MediaPackage mp = mediaPackageBuilder.createNew();
     mp.add(publication("1", "engage", new URI("http://localhost/1.html"), mimeType("text", "html")));
-    assertEquals("Number of media package elements", 1, mp.getElements().length);
+    assertEquals(1, mp.getElements().length, "Number of media package elements");
     final String xml = MediaPackageParser.getAsXml(mp);
     logger.info(xml);
-    assertEquals("Media package identifier", mp.getIdentifier().toString(), from(xml).get("mediapackage.@id"));
-    assertEquals("Publication channel name", "engage", from(xml).get("mediapackage.publications.publication.@channel"));
+    assertEquals(mp.getIdentifier().toString(), from(xml).get("mediapackage.@id"), "Media package identifier");
+    assertEquals("engage", from(xml).get("mediapackage.publications.publication.@channel"), "Publication channel name");
   }
 
   @Test
   public void testPublicationElementFromFile() throws Exception {
     final MediaPackage mp = loadFromClassPath("/manifest.xml");
-    assertEquals("Number of publication elements", 1, mp.getPublications().length);
-    assertEquals("Publication channel name in deserialized mediapackage", "engage",
-            mp.getPublications()[0].getChannel());
+    assertEquals(1, mp.getPublications().length, "Number of publication elements");
+    assertEquals("engage", mp.getPublications()[0].getChannel(),
+            "Publication channel name in deserialized mediapackage");
     final String xml = MediaPackageParser.getAsXml(mp);
-    assertEquals("Publication channel name in serialized mediapackage", "engage",
-            from(xml).get("mediapackage.publications.publication.@channel"));
+    assertEquals("engage", from(xml).get("mediapackage.publications.publication.@channel"),
+            "Publication channel name in serialized mediapackage");
   }
 
   @Test
@@ -170,12 +170,12 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
     final Set<MediaPackageElement> elements = new HashSet<MediaPackageElement>();
     elements.add(presentation);
     elements.add(presenter);
-    assertEquals("Expect two elements", 2, elements.size());
-    assertTrue("Expect presenter to be in set", elements.contains(presenter));
-    assertTrue("Expect presentation to be in set", elements.contains(presentation));
+    assertEquals(2, elements.size(), "Expect two elements");
+    assertTrue(elements.contains(presenter), "Expect presenter to be in set");
+    assertTrue(elements.contains(presentation), "Expect presentation to be in set");
 
     mp1.add(presentation);
-    assertEquals("Expect parent mediapackage to be mp1", mp1, presentation.getMediaPackage());
+    assertEquals(mp1, presentation.getMediaPackage(), "Expect parent mediapackage to be mp1");
 
     // breaks element <-> parent relationship
     mp2.add(presentation);

@@ -26,13 +26,13 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.FileSupport;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 
 /**
  * Base class for media package tests.
@@ -87,15 +87,15 @@ public abstract class AbstractMediaPackageTest {
   /** The audio track */
   protected File audioFile = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * Creates everything that is needed to test a media package.
    *
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     // Create a media package builder
@@ -107,7 +107,7 @@ public abstract class AbstractMediaPackageTest {
     identifier = new IdImpl("123");
 
     // Get hold of the tmp directory
-    tmpDir = testFolder.newFolder();
+    tmpDir = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
 
     // Create the media package directory
     packageDir = new File(tmpDir, Long.toString(System.currentTimeMillis()));
@@ -149,7 +149,7 @@ public abstract class AbstractMediaPackageTest {
    *
    * @throws Exception
    */
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     if (packageDir.getParentFile().getName().equals(identifier.toString())) {
       FileSupport.delete(packageDir.getParentFile(), true);

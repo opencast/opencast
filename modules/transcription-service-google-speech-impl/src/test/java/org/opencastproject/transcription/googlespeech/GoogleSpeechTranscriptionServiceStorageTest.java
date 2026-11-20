@@ -30,10 +30,10 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
@@ -51,7 +51,7 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
   private Workspace workspace;
   private GoogleSpeechTranscriptionServiceStorage service;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     httpClient = EasyMock.createNiceMock(CloseableHttpClient.class);
     service = new GoogleSpeechTranscriptionServiceStorage() {
@@ -61,7 +61,7 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
     };
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -78,8 +78,9 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
 
     // Check if correct url was invoked
     service.startUpload(httpClient, bucket, mpId, fileExtension, file, size, contentType, token);
-    Assert.assertEquals("https://www.googleapis.com/upload/storage/v1/b/bucket/o?uploadType=resumable&name=mpId.flac",
-            capturedPost.getValue().getUri().toString());
+    Assertions.assertEquals(
+        "https://www.googleapis.com/upload/storage/v1/b/bucket/o?uploadType=resumable&name=mpId.flac",
+        capturedPost.getValue().getUri().toString());
   }
 
   @Test
@@ -94,7 +95,7 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
     EasyMock.replay(httpClient);
 
     service.deleteGoogleStorageFile(httpClient, bucket, fileName, token);
-    Assert.assertEquals("https://www.googleapis.com/storage/v1/b/bucket/o/myFile",
+    Assertions.assertEquals("https://www.googleapis.com/storage/v1/b/bucket/o/myFile",
             capturedDel.getValue().getUri().toString());
   }
 

@@ -22,8 +22,8 @@
 package org.opencastproject.videoeditor.impl;
 
 import static org.easymock.EasyMock.capture;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.ffmpeg.FFmpegAnalyzer;
@@ -62,12 +62,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -75,9 +74,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,8 +94,8 @@ public class VideoEditorTest {
   private static final String FFMPEG_BINARY = "ffmpeg";
   /** SMIL file to run the editing */
   protected static Smil smil = null;
-  @Rule
-  public TemporaryFolder folder = new TemporaryFolder();
+  @TempDir
+  private File folder;
 
   /** Videos file to test. 2 videos of different framerate, must have same resolution */
   protected static final String mediaResource = "/testresources/testvideo_320x180.mp4";// 320x180, 30fps h264
@@ -134,7 +135,7 @@ public class VideoEditorTest {
    * @throws Exception
    *           if setup fails
    */
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws Exception {
     /* Set up the 2 tracks for merging */
     track1 = TrackImpl.fromURI(VideoEditorTest.class.getResource(mediaResource).toURI());
@@ -294,10 +295,10 @@ public class VideoEditorTest {
    * @throws Exception
    *           if setup fails
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
-    File tmpDir = folder.newFolder(getClass().getName());
+    File tmpDir = newFolder(folder, getClass().getName());
     tempFile1 = new File(tmpDir, "testoutput.mp4"); // output file
 
     /* mock the workspace for the input/output file */
@@ -332,7 +333,7 @@ public class VideoEditorTest {
 
     /* mock the osgi init for the video editor itself */
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-    File storageDir = folder.newFolder();
+    File storageDir = Files.createTempDirectory(folder.toPath(), "junit").toFile();
     logger.info("storageDir: {}", storageDir);
     EasyMock.expect(bc.getProperty("org.opencastproject.storage.dir")).andReturn(storageDir.getPath()).anyTimes();
     EasyMock.expect(bc.getProperty("org.opencastproject.composer.ffmpegpath")).andReturn(FFMPEG_BINARY).anyTimes();
@@ -399,7 +400,7 @@ public class VideoEditorTest {
 
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(tempFile1);
   }
@@ -412,10 +413,19 @@ public class VideoEditorTest {
     logger.debug("SMIL is " + smil.toXML());
     String wat = smil.toXML();
     for (Job receipt : veditor.processSmil(smil)) {
-      assertNotNull("Audiovisual content expected", receipt.getPayload());
-      assertTrue("Merged File exists", tempFile1.exists());
-      assertTrue("Merged video is is not empty", tempFile1.length() > 0);
+      assertNotNull(receipt.getPayload(), "Audiovisual content expected");
+      assertTrue(tempFile1.exists(), "Merged File exists");
+      assertTrue(tempFile1.length() > 0, "Merged video is is not empty");
       logger.info("Resulting file size {} ", tempFile1.length());
     }
+  }
+
+  private static File newFolder(File root, String... subDirs) throws IOException {
+    String subFolder = String.join("/", subDirs);
+    File result = new File(root, subFolder);
+    if (!result.mkdirs()) {
+      throw new IOException("Couldn't create folders " + root);
+    }
+    return result;
   }
 }

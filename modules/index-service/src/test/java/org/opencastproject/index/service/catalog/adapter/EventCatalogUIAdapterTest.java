@@ -43,8 +43,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 
 import java.io.File;
@@ -80,7 +80,7 @@ public class EventCatalogUIAdapterTest {
   private MediaPackageElementFlavor mediaPackageElementFlavor;
   private Workspace workspace;
 
-  @Before
+  @BeforeEach
   public void setUp() throws URISyntaxException, NotFoundException, IOException, ListProviderException {
     TreeMap<String, String> collection = new TreeMap<String, String>();
     collection.put("Entry 1", "Value 1");

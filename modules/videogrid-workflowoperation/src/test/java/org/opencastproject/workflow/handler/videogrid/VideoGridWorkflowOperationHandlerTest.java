@@ -51,9 +51,9 @@ import org.opencastproject.workspace.api.Workspace;
 import com.google.gson.Gson;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -83,7 +83,7 @@ public class VideoGridWorkflowOperationHandlerTest {
   private static final String SOURCE_SMIL_FLAVOR = "source-smil-flavor";
   private static final String SOURCE_SMIL_FLAVOR_KEY = "smil/partial";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     handler = new VideoGridWorkflowOperationHandler() {
@@ -184,11 +184,11 @@ public class VideoGridWorkflowOperationHandlerTest {
     EasyMock.expect(instance.getConfiguration(ENCODING_PROFILE)).andReturn(ENCODING_PROFILE_ID).anyTimes();
     EasyMock.replay(instance);
     WorkflowOperationResult result = handler.start(workflow, null);
-    Assert.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
 
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracks = mpNew.getTracks(MediaPackageElementFlavor.parseFlavor(TARGET_FLAVOR_RETURN));
-    Assert.assertEquals(1, tracks.length);
+    Assertions.assertEquals(1, tracks.length);
   }
 
   @Test
@@ -197,7 +197,7 @@ public class VideoGridWorkflowOperationHandlerTest {
     EasyMock.expect(instance.getConfiguration(SOURCE_SMIL_FLAVOR)).andReturn(SOURCE_SMIL_FLAVOR_KEY).anyTimes();
     EasyMock.expect(instance.getConfiguration(ENCODING_PROFILE)).andReturn(ENCODING_PROFILE_ID).anyTimes();
     EasyMock.replay(instance);
-    Assert.assertTrue(handler.start(workflow, null).allowsContinue());
+    Assertions.assertTrue(handler.start(workflow, null).allowsContinue());
   }
 
   @Test
@@ -212,7 +212,7 @@ public class VideoGridWorkflowOperationHandlerTest {
       return;
     }
     // We expect this to fail and the test should never reach this point
-    Assert.fail();
+    Assertions.fail();
   }
 
   @Test
@@ -227,6 +227,6 @@ public class VideoGridWorkflowOperationHandlerTest {
       return;
     }
     // We expect this to fail and the test should never reach this point
-    Assert.fail();
+    Assertions.fail();
   }
 }

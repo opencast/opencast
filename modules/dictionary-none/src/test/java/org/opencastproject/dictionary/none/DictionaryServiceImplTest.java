@@ -21,8 +21,8 @@
 
 package org.opencastproject.dictionary.none;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DictionaryServiceImplTest {
 
@@ -32,7 +32,7 @@ public class DictionaryServiceImplTest {
     String in = "This is a test sentence.";
 
     // There shouldn't be any modification
-    Assert.assertEquals(in, service.cleanUpText(in).getText());
+    Assertions.assertEquals(in, service.cleanUpText(in).getText());
   }
 
 

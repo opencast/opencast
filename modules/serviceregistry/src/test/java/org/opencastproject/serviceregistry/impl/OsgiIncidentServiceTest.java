@@ -24,7 +24,7 @@ package org.opencastproject.serviceregistry.impl;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 
 import org.opencastproject.db.DBSession;
@@ -36,9 +36,9 @@ import org.opencastproject.workflow.api.WorkflowService;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class OsgiIncidentServiceTest {
   private Incidents incidents;
 
   /** @throws java.lang.Exception */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     db = newDBSession(AbstractIncidentService.PERSISTENCE_UNIT_NAME);
 
@@ -106,7 +106,7 @@ public class OsgiIncidentServiceTest {
   }
 
   /** @throws java.lang.Exception */
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     db.close();
   }

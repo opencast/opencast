@@ -22,21 +22,22 @@
 
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.util.FileSupport.deleteHierarchyIfEmpty;
 import static org.opencastproject.util.FileSupport.isParent;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -49,27 +50,27 @@ public class FileSupportTest {
   private File fileSupportTestsDirectory;
   private File fileSupportTestsDestinationDirectory;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
-    fileSupportTestsDirectory = testFolder.newFolder();
-    fileSupportTestsDestinationDirectory = testFolder.newFolder();
+    fileSupportTestsDirectory = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
+    fileSupportTestsDestinationDirectory = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
     fileToLink = new File(fileSupportTestsDirectory.getAbsolutePath(), "file-to-link");
     linkLocation = new File(fileSupportTestsDirectory.getAbsolutePath(), "link-location");
     // Create test directory
     FileUtils.forceMkdir(fileSupportTestsDirectory);
-    assertTrue("Can't read from test directory " + fileSupportTestsDirectory.getAbsolutePath(),
-            fileSupportTestsDirectory.canRead());
-    assertTrue("Can't write to test directory " + fileSupportTestsDirectory.getAbsolutePath(),
-            fileSupportTestsDirectory.canWrite());
+    assertTrue(fileSupportTestsDirectory.canRead(),
+            "Can't read from test directory " + fileSupportTestsDirectory.getAbsolutePath());
+    assertTrue(fileSupportTestsDirectory.canWrite(),
+            "Can't write to test directory " + fileSupportTestsDirectory.getAbsolutePath());
     // Create file that we could link.
     FileUtils.touch(fileToLink);
-    assertTrue("Can't read from file directory " + fileToLink.getAbsolutePath(), fileToLink.canRead());
+    assertTrue(fileToLink.canRead(), "Can't read from file directory " + fileToLink.getAbsolutePath());
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     FileUtils.deleteQuietly(fileSupportTestsDirectory);
     FileUtils.deleteQuietly(fileSupportTestsDestinationDirectory);
@@ -84,9 +85,10 @@ public class FileSupportTest {
     assertTrue(FileSupport.supportsLinking(fileToLink, linkLocation));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void supportsLinkingReturnsFalseOnMissingFile() {
-    FileSupport.supportsLinking(linkLocation, fileToLink);
+    assertThrows(IllegalArgumentException.class, () ->
+        FileSupport.supportsLinking(linkLocation, fileToLink));
   }
 
   @Test
@@ -101,14 +103,16 @@ public class FileSupportTest {
     assertTrue(linkLocation.exists());
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void missingLinkTestFailsWithoutForce() throws Exception {
-    FileSupport.link(linkLocation, fileToLink, false);
+    assertThrows(IOException.class, () ->
+        FileSupport.link(linkLocation, fileToLink, false));
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void missingLinkTestFailsWithForce() throws Exception {
-    FileSupport.link(linkLocation, fileToLink, true);
+    assertThrows(IOException.class, () ->
+        FileSupport.link(linkLocation, fileToLink, true));
   }
 
   @Test
@@ -127,7 +131,7 @@ public class FileSupportTest {
 
   @Test
   public void testDeleteHierarchyIfEmpty() throws Exception {
-    final File a = testFolder.newFile("test.tmp");
+    final File a = newFile(testFolder, "test.tmp");
     a.deleteOnExit();
     final File tmpDir = a.getParentFile();
     assertFalse(deleteHierarchyIfEmpty(tmpDir, a));
@@ -139,18 +143,18 @@ public class FileSupportTest {
     final File subDir1File = createFileWithRandomNameIn(subDir1);
     final File subDir3File = createFileWithRandomNameIn(subDir3);
     //
-    assertFalse("file in sub dir 3 prevents deletion", deleteHierarchyIfEmpty(subDir1, subDir3));
+    assertFalse(deleteHierarchyIfEmpty(subDir1, subDir3), "file in sub dir 3 prevents deletion");
     assertTrue(subDir3.exists());
     assertTrue(subDir3File.exists());
     assertTrue(subDir3File.delete());
-    assertTrue("sub dir 3 and sub dir 2 are empty", deleteHierarchyIfEmpty(subDir1, subDir3));
+    assertTrue(deleteHierarchyIfEmpty(subDir1, subDir3), "sub dir 3 and sub dir 2 are empty");
     assertFalse(subDir3.exists());
     assertFalse(subDir2.exists());
-    assertTrue("sub dir 1 has not been deleted", subDir1.exists());
+    assertTrue(subDir1.exists(), "sub dir 1 has not been deleted");
     assertTrue(subDir2.mkdirs());
     assertTrue(subDir3.mkdirs());
     assertTrue(subDir1File.delete());
-    assertTrue("all sub dirs are empty", deleteHierarchyIfEmpty(tmpDir, subDir3));
+    assertTrue(deleteHierarchyIfEmpty(tmpDir, subDir3), "all sub dirs are empty");
     assertFalse(subDir3.exists());
     assertFalse(subDir2.exists());
     assertFalse(subDir1.exists());
@@ -169,5 +173,11 @@ public class FileSupportTest {
     file.deleteOnExit();
     assertTrue(file.createNewFile());
     return file;
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 }

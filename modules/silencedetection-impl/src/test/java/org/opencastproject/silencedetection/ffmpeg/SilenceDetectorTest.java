@@ -21,9 +21,9 @@
 
 package org.opencastproject.silencedetection.ffmpeg;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
@@ -31,10 +31,10 @@ import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class SilenceDetectorTest {
   private static boolean ffmpegInstalled = true;
 
 
-  @BeforeClass
+  @BeforeAll
   public static void setupClass() {
     try {
       Process p = new ProcessBuilder(FFmpegSilenceDetector.FFMPEG_BINARY_DEFAULT, "-version").start();
@@ -64,10 +64,10 @@ public class SilenceDetectorTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Skip tests if FFmpeg is not installed
-    Assume.assumeTrue(ffmpegInstalled);
+    Assumptions.assumeTrue(ffmpegInstalled);
   }
 
   /** Setup test. */

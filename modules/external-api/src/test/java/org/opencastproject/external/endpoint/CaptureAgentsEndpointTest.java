@@ -34,9 +34,9 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import com.google.gson.JsonArray;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -49,13 +49,13 @@ public class CaptureAgentsEndpointTest {
 
   private static List<Agent> allAgents;
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() throws IOException, URISyntaxException {
     env.setUpServer();
     allAgents = loadAgents();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     env.tearDownServer();
   }

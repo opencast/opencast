@@ -38,9 +38,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
   /** The operation instance */
   private WorkflowOperationInstance operation;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Map<String, String> orgProperties = new HashMap<>();
     orgProperties.put("transcriber", "azure-1");
@@ -107,7 +107,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     Set<String> expected = Set.of(MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_FLAVOR,
         MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_TAGS,
         MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_TAG);
-    Assert.assertEquals(expected, operationHandler.getTemplatedConfigurationKeys());
+    Assertions.assertEquals(expected, operationHandler.getTemplatedConfigurationKeys());
   }
 
   @Test
@@ -127,13 +127,13 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     setUpWorkflow(workflowProperties, operationConfigurations, track);
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     Track[] tracks = result.getMediaPackage().getTracks();
-    Assert.assertEquals(1, tracks.length);
+    Assertions.assertEquals(1, tracks.length);
     // The property holds a complete flavor and a complete comma-separated tag list
-    Assert.assertEquals(MediaPackageElementFlavor.parseFlavor("captions/dfxp"), tracks[0].getFlavor());
-    Assert.assertArrayEquals(new String[] {"tag1", "tag2"}, tracks[0].getTags());
+    Assertions.assertEquals(MediaPackageElementFlavor.parseFlavor("captions/dfxp"), tracks[0].getFlavor());
+    Assertions.assertArrayEquals(new String[] {"tag1", "tag2"}, tracks[0].getTags());
   }
 
   @Test
@@ -154,15 +154,15 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     setUpWorkflow(workflowProperties, operationConfigurations, track);
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     Track[] tracks = result.getMediaPackage().getTracks();
-    Assert.assertEquals(1, tracks.length);
+    Assertions.assertEquals(1, tracks.length);
     // The target flavor is rendered with the workflow properties
-    Assert.assertEquals(MediaPackageElementFlavor.parseFlavor("captions/series1"), tracks[0].getFlavor());
+    Assertions.assertEquals(MediaPackageElementFlavor.parseFlavor("captions/series1"), tracks[0].getFlavor());
     // The tags are rendered with the workflow properties and the organization properties; a workflow property
     // takes precedence over an organization property with the same name
-    Assert.assertArrayEquals(new String[] {"org-azure-1", "transcript-series1"}, tracks[0].getTags());
+    Assertions.assertArrayEquals(new String[] {"org-azure-1", "transcript-series1"}, tracks[0].getTags());
   }
 
   @Test
@@ -182,17 +182,17 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     setUpWorkflow(workflowProperties, operationConfigurations, track);
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     Track[] tracks = result.getMediaPackage().getTracks();
-    Assert.assertEquals(MediaPackageElementFlavor.parseFlavor("captions/dfxp"), tracks[0].getFlavor());
-    Assert.assertArrayEquals(new String[] {"tag1", "tag2"}, tracks[0].getTags());
+    Assertions.assertEquals(MediaPackageElementFlavor.parseFlavor("captions/dfxp"), tracks[0].getFlavor());
+    Assertions.assertArrayEquals(new String[] {"tag1", "tag2"}, tracks[0].getTags());
     // The rendered values must not be written back to the operation: the workflow is persisted after the
     // operation, and a retry would then render the rendered values again, evaluating the property values
     // as template source
-    Assert.assertEquals("${captionFlavor}",
+    Assertions.assertEquals("${captionFlavor}",
         operation.getConfiguration(MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_FLAVOR));
-    Assert.assertEquals("${myTags}",
+    Assertions.assertEquals("${myTags}",
         operation.getConfiguration(MicrosoftAzureAttachTranscriptionOperationHandler.TARGET_TAGS));
   }
 
@@ -212,9 +212,9 @@ public class MicrosoftAzureAttachTranscriptionOperationHandlerTest {
     setUpWorkflow(workflowProperties, operationConfigurations, track);
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     Track[] tracks = result.getMediaPackage().getTracks();
-    Assert.assertArrayEquals(new String[] {"dotted-value"}, tracks[0].getTags());
+    Assertions.assertArrayEquals(new String[] {"dotted-value"}, tracks[0].getTags());
   }
 }

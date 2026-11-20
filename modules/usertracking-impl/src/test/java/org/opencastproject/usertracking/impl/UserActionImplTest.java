@@ -24,8 +24,8 @@ package org.opencastproject.usertracking.impl;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserSession;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class UserActionImplTest {
 
@@ -48,16 +48,16 @@ public class UserActionImplTest {
     ua.setSession(us);
     ua.setType("test");
 
-    Assert.assertEquals(new Long(4), ua.getId());
-    Assert.assertEquals(90, ua.getInpoint());
-    Assert.assertEquals(true, ua.getIsPlaying());
-    Assert.assertEquals("false", ua.getMediapackageId());
-    Assert.assertEquals(100, ua.getOutpoint());
-    Assert.assertEquals("4", ua.getSession().getSessionId());
-    Assert.assertEquals("test", ua.getType());
-    Assert.assertEquals("testing user", ua.getSession().getUserId());
-    Assert.assertEquals("127.0.0.1", ua.getSession().getUserIp());
-    Assert.assertEquals(10, ua.getLength());
+    Assertions.assertEquals(new Long(4), ua.getId());
+    Assertions.assertEquals(90, ua.getInpoint());
+    Assertions.assertEquals(true, ua.getIsPlaying());
+    Assertions.assertEquals("false", ua.getMediapackageId());
+    Assertions.assertEquals(100, ua.getOutpoint());
+    Assertions.assertEquals("4", ua.getSession().getSessionId());
+    Assertions.assertEquals("test", ua.getType());
+    Assertions.assertEquals("testing user", ua.getSession().getUserId());
+    Assertions.assertEquals("127.0.0.1", ua.getSession().getUserIp());
+    Assertions.assertEquals(10, ua.getLength());
   }
 
   /**
@@ -79,16 +79,16 @@ public class UserActionImplTest {
     ua.setSession(us);
     ua.setType("test");
 
-    Assert.assertEquals(new Long(4), ua.getId());
-    Assert.assertEquals(100, ua.getInpoint());
-    Assert.assertEquals(true, ua.getIsPlaying());
-    Assert.assertEquals("false", ua.getMediapackageId());
-    Assert.assertEquals(90, ua.getOutpoint());
-    Assert.assertEquals("4", ua.getSession().getSessionId());
-    Assert.assertEquals("test", ua.getType());
-    Assert.assertEquals("testing user", ua.getSession().getUserId());
-    Assert.assertEquals("127.0.0.1", ua.getSession().getUserIp());
-    Assert.assertEquals(-10, ua.getLength());
+    Assertions.assertEquals(new Long(4), ua.getId());
+    Assertions.assertEquals(100, ua.getInpoint());
+    Assertions.assertEquals(true, ua.getIsPlaying());
+    Assertions.assertEquals("false", ua.getMediapackageId());
+    Assertions.assertEquals(90, ua.getOutpoint());
+    Assertions.assertEquals("4", ua.getSession().getSessionId());
+    Assertions.assertEquals("test", ua.getType());
+    Assertions.assertEquals("testing user", ua.getSession().getUserId());
+    Assertions.assertEquals("127.0.0.1", ua.getSession().getUserIp());
+    Assertions.assertEquals(-10, ua.getLength());
   }
 
 }

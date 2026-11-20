@@ -31,8 +31,8 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -43,7 +43,7 @@ public class IngestDownloadServiceRestTest {
   private IngestDownloadServiceEndpoint endpoint;
   private IngestDownloadService service;
 
-  @Before
+  @BeforeEach
   public void setUp() throws ServiceRegistryException {
     endpoint = new IngestDownloadServiceEndpoint();
     JobImpl job = new JobImpl();

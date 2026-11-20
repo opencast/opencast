@@ -30,9 +30,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   private MediaPackage mp;
   private Workspace workspace;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(this.getClass().getResourceAsStream("/archive_mediapackage.xml"));
@@ -85,8 +85,8 @@ public class ConfigureByDublinCoreTermWOHTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties.containsKey("newConfigProperty"));
-    Assert.assertEquals("true", properties.get("newConfigProperty"));
+    Assertions.assertTrue(properties.containsKey("newConfigProperty"));
+    Assertions.assertEquals("true", properties.get("newConfigProperty"));
   }
 
   @Test
@@ -100,8 +100,8 @@ public class ConfigureByDublinCoreTermWOHTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties.containsKey("oldConfigProperty"));
-    Assert.assertEquals("bar", properties.get("oldConfigProperty"));
+    Assertions.assertTrue(properties.containsKey("oldConfigProperty"));
+    Assertions.assertEquals("bar", properties.get("oldConfigProperty"));
   }
 
   @Test
@@ -117,8 +117,8 @@ public class ConfigureByDublinCoreTermWOHTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties.containsKey("newConfigProperty"));
-    Assert.assertEquals("true", properties.get("newConfigProperty"));
+    Assertions.assertTrue(properties.containsKey("newConfigProperty"));
+    Assertions.assertEquals("true", properties.get("newConfigProperty"));
   }
 
   @Test
@@ -134,7 +134,7 @@ public class ConfigureByDublinCoreTermWOHTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties == null);
+    Assertions.assertTrue(properties == null);
   }
 
   @Test
@@ -149,7 +149,7 @@ public class ConfigureByDublinCoreTermWOHTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties == null);
+    Assertions.assertTrue(properties == null);
   }
 
   @Test
@@ -163,6 +163,6 @@ public class ConfigureByDublinCoreTermWOHTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties == null);
+    Assertions.assertTrue(properties == null);
   }
 }

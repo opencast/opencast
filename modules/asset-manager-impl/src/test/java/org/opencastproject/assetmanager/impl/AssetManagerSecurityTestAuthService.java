@@ -20,7 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.Availability;
@@ -37,19 +37,15 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 
 import org.easymock.EasyMock;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Optional;
-
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 
 /**
  * Test class for authorization via authorizationService.hasPermission([...])
  *
  * Currently goes unused.
  */
-@RunWith(JUnitParamsRunner.class)
 public class AssetManagerSecurityTestAuthService extends AssetManagerTestBase {
   private SecurityService securityService;
 
@@ -77,7 +73,7 @@ public class AssetManagerSecurityTestAuthService extends AssetManagerTestBase {
   }
 
 //  @Test
-  @Parameters(method = "userAccessParameters")
+  @MethodSource("userAccessParameters")
   public void testGetMediaPackage(User currentUser, boolean allowed) throws Exception {
     final MediaPackage mp = mkMediaPackage(mkCatalog());
     am.takeSnapshot(OWNER, mp);
@@ -95,7 +91,7 @@ public class AssetManagerSecurityTestAuthService extends AssetManagerTestBase {
   }
 
 //  @Test
-  @Parameters(method = "userAccessParameters")
+  @MethodSource("userAccessParameters")
   public void testCreateSnapshot(User currentUser, boolean allowed) throws Exception {
     final MediaPackage mp = mkMediaPackage(mkCatalog());
 
@@ -112,7 +108,7 @@ public class AssetManagerSecurityTestAuthService extends AssetManagerTestBase {
   }
 
 //  @Test
-  @Parameters(method = "userAccessParameters")
+  @MethodSource("userAccessParameters")
   public void testSetAvailability(User currentUser, boolean allowed) throws Exception {
     final MediaPackage mp = mkMediaPackage(mkCatalog());
     Snapshot snapshot = am.takeSnapshot(OWNER, mp);
@@ -152,7 +148,7 @@ public class AssetManagerSecurityTestAuthService extends AssetManagerTestBase {
   }
 
 //  @Test
-  @Parameters(method = "userAccessParameters")
+  @MethodSource("userAccessParameters")
   public void testGetAsset(User currentUser, boolean allowed) throws Exception {
     final MediaPackage mp = mkMediaPackage(mkCatalog());
     Snapshot snapshot = am.takeSnapshot(OWNER, mp);

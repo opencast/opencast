@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -51,8 +51,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -81,7 +81,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
   private Job distJob;
   private Job distMergeJob;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     URI uriMP = PublishEngageWorkflowOperationHandlerTest.class.getResource("/mp_to_be_published.xml").toURI();

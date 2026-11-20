@@ -53,10 +53,10 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class DownloadDistributionServiceImplTest {
   private ServiceRegistry serviceRegistry = null;
   private DefaultOrganization defaultOrganization;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     final File mediaPackageRoot = new File(getClass().getResource("/mediapackage.xml").toURI()).getParentFile();
     mp = MediaPackageParser.getFromXml(IOUtils.toString(getClass().getResourceAsStream("/mediapackage.xml"), "UTF-8"));
@@ -172,7 +172,7 @@ public class DownloadDistributionServiceImplTest {
     service.activate(cc, new HashMap<>());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteDirectory(distributionRoot);
     ((ServiceRegistryInMemoryImpl) serviceRegistry).dispose();
@@ -189,17 +189,18 @@ public class DownloadDistributionServiceImplTest {
 
     File mpDir = new File(distributionRoot,
             Paths.get(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()).toString());
-    Assert.assertTrue(mpDir.exists());
+    Assertions.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "track-1");
     File metadataDir = new File(mpDir, "catalog-1");
     File attachmentsDir = new File(mpDir, "notes");
-    Assert.assertTrue(mediaDir.exists());
-    Assert.assertTrue(metadataDir.exists());
-    Assert.assertFalse(attachmentsDir.exists());
-    Assert.assertTrue(new File(mediaDir, "media.mov").exists()); // the filenames are changed to reflect the element ID
-    Assert.assertTrue(new File(metadataDir, "dublincore.xml").exists());
-    Assert.assertFalse(new File(metadataDir, "mpeg7.xml").exists());
-    Assert.assertFalse(new File(attachmentsDir, "attachment.txt").exists());
+    Assertions.assertTrue(mediaDir.exists());
+    Assertions.assertTrue(metadataDir.exists());
+    Assertions.assertFalse(attachmentsDir.exists());
+    // the filenames are changed to reflect the element ID
+    Assertions.assertTrue(new File(mediaDir, "media.mov").exists());
+    Assertions.assertTrue(new File(metadataDir, "dublincore.xml").exists());
+    Assertions.assertFalse(new File(metadataDir, "mpeg7.xml").exists());
+    Assertions.assertFalse(new File(attachmentsDir, "attachment.txt").exists());
   }
 
   @Test
@@ -226,14 +227,15 @@ public class DownloadDistributionServiceImplTest {
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
     File attachmentsDir = new File(mpDir, "notes");
-    Assert.assertTrue(mediaDir.exists());
-    Assert.assertTrue(metadata1Dir.exists());
-    Assert.assertTrue(metadata2Dir.exists());
-    Assert.assertTrue(attachmentsDir.exists());
-    Assert.assertTrue(new File(mediaDir, "media.mov").exists()); // the filenames are changed to reflect the element ID
-    Assert.assertTrue(new File(metadata1Dir, "dublincore.xml").exists());
-    Assert.assertTrue(new File(metadata2Dir, "mpeg7.xml").exists());
-    Assert.assertTrue(new File(attachmentsDir, "attachment.txt").exists());
+    Assertions.assertTrue(mediaDir.exists());
+    Assertions.assertTrue(metadata1Dir.exists());
+    Assertions.assertTrue(metadata2Dir.exists());
+    Assertions.assertTrue(attachmentsDir.exists());
+    // the filenames are changed to reflect the element ID
+    Assertions.assertTrue(new File(mediaDir, "media.mov").exists());
+    Assertions.assertTrue(new File(metadata1Dir, "dublincore.xml").exists());
+    Assertions.assertTrue(new File(metadata2Dir, "mpeg7.xml").exists());
+    Assertions.assertTrue(new File(attachmentsDir, "attachment.txt").exists());
 
     // Now retract the mediapackage and ensure that the distributed files have been removed
     Job job6 = service.retract("engage-player", mp, "track-1");
@@ -243,11 +245,11 @@ public class DownloadDistributionServiceImplTest {
     jobBarrier = new JobBarrier(null, serviceRegistry, 500, job6, job7, job8, job9);
     jobBarrier.waitForJobs();
 
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("track-1")).isFile());
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-1")).isFile());
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-2")).isFile());
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("notes")).isFile());
-    Assert.assertTrue(service.getDistributionFile("oai-pmh", mp, mp.getElementById("track-1")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("track-1")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-1")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-2")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("notes")).isFile());
+    Assertions.assertTrue(service.getDistributionFile("oai-pmh", mp, mp.getElementById("track-1")).isFile());
   }
 
   @Test
@@ -281,14 +283,15 @@ public class DownloadDistributionServiceImplTest {
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
     File attachmentsDir = new File(mpDir, "notes");
-    Assert.assertTrue(mediaDir.exists());
-    Assert.assertTrue(metadata1Dir.exists());
-    Assert.assertTrue(metadata2Dir.exists());
-    Assert.assertTrue(attachmentsDir.exists());
-    Assert.assertTrue(new File(mediaDir, "media.mov").exists()); // the filenames are changed to reflect the element ID
-    Assert.assertTrue(new File(metadata1Dir, "dublincore.xml").exists());
-    Assert.assertTrue(new File(metadata2Dir, "mpeg7.xml").exists());
-    Assert.assertTrue(new File(attachmentsDir, "attachment.txt").exists());
+    Assertions.assertTrue(mediaDir.exists());
+    Assertions.assertTrue(metadata1Dir.exists());
+    Assertions.assertTrue(metadata2Dir.exists());
+    Assertions.assertTrue(attachmentsDir.exists());
+    // the filenames are changed to reflect the element ID
+    Assertions.assertTrue(new File(mediaDir, "media.mov").exists());
+    Assertions.assertTrue(new File(metadata1Dir, "dublincore.xml").exists());
+    Assertions.assertTrue(new File(metadata2Dir, "mpeg7.xml").exists());
+    Assertions.assertTrue(new File(attachmentsDir, "attachment.txt").exists());
 
     // Now retract the mediapackage and ensure that the distributed files have been removed
     Job job6 = service.retract("engage-player", mp, job1Element.getIdentifier());
@@ -305,17 +308,17 @@ public class DownloadDistributionServiceImplTest {
     mp.remove(MediaPackageElementParser.getFromXml(job9.getPayload()));
 
     // +1 since the oai-pmh distribution has not been retracted
-    Assert.assertEquals(elementCount + 1, mp.getElements().length);
-    Assert.assertNotNull(mp.getElementById("track-1"));
-    Assert.assertNotNull(mp.getElementById("catalog-1"));
-    Assert.assertNotNull(mp.getElementById("catalog-2"));
-    Assert.assertNotNull(mp.getElementById("notes"));
+    Assertions.assertEquals(elementCount + 1, mp.getElements().length);
+    Assertions.assertNotNull(mp.getElementById("track-1"));
+    Assertions.assertNotNull(mp.getElementById("catalog-1"));
+    Assertions.assertNotNull(mp.getElementById("catalog-2"));
+    Assertions.assertNotNull(mp.getElementById("notes"));
 
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("track-1")).isFile());
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-1")).isFile());
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-2")).isFile());
-    Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("notes")).isFile());
-    Assert.assertTrue(service.getDistributionFile("oai-pmh", mp, mp.getElementById("notes")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("track-1")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-1")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("catalog-2")).isFile());
+    Assertions.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("notes")).isFile());
+    Assertions.assertTrue(service.getDistributionFile("oai-pmh", mp, mp.getElementById("notes")).isFile());
   }
 
   @Test
@@ -331,38 +334,40 @@ public class DownloadDistributionServiceImplTest {
 
     File mpDir = new File(distributionRoot,
             Paths.get(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()).toString());
-    Assert.assertTrue(mpDir.exists());
+    Assertions.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "master");
     File variantDir = new File(mpDir, "variant");
     File segmentDir = new File(mpDir, "segments");
     File metadataDir = new File(mpDir, "dublincore");
     File attachmentsDir = new File(mpDir, "mpeg7");
-    Assert.assertTrue(mediaDir.exists());
-    Assert.assertTrue(variantDir.exists());
-    Assert.assertTrue(segmentDir.exists());
-    Assert.assertTrue(metadataDir.exists());
-    Assert.assertTrue(attachmentsDir.exists());
-    Assert.assertTrue(new File(mediaDir, "master.m3u8").exists()); // the filenames are changed to reflect the element
+    Assertions.assertTrue(mediaDir.exists());
+    Assertions.assertTrue(variantDir.exists());
+    Assertions.assertTrue(segmentDir.exists());
+    Assertions.assertTrue(metadataDir.exists());
+    Assertions.assertTrue(attachmentsDir.exists());
+    // the filenames are changed to reflect the element
+    Assertions.assertTrue(new File(mediaDir, "master.m3u8").exists());
                                                                    // ID
-    Assert.assertTrue(new File(variantDir, "variant_0.m3u8").exists()); // the filenames are changed to reflect the
+    Assertions.assertTrue(new File(variantDir, "variant_0.m3u8").exists()); // the filenames are changed to reflect the
                                                                       // element ID
-    Assert.assertTrue(new File(segmentDir, "file_0.mp4").exists()); // the filenames are changed to reflect the element
+    // the filenames are changed to reflect the element
+    Assertions.assertTrue(new File(segmentDir, "file_0.mp4").exists());
                                                                     // ID
-    Assert.assertTrue(new File(metadataDir, "dublincore.xml").exists());
-    Assert.assertTrue(new File(attachmentsDir, "mpeg7.xml").exists()); // the filenames are changed to reflect the
+    Assertions.assertTrue(new File(metadataDir, "dublincore.xml").exists());
+    Assertions.assertTrue(new File(attachmentsDir, "mpeg7.xml").exists()); // the filenames are changed to reflect the
                                                                        // element ID
-    Assert.assertFalse(new File(metadataDir, "mpeg7.xml").exists());
-    Assert.assertFalse(new File(attachmentsDir, "attachment.txt").exists());
+    Assertions.assertFalse(new File(metadataDir, "mpeg7.xml").exists());
+    Assertions.assertFalse(new File(attachmentsDir, "attachment.txt").exists());
     File playlist = new File(mediaDir, "master.m3u8");
     logger.info("Reading playlist " + playlist);
     Optional<String> hasRelativeLink = Files.lines(playlist.toPath())
             .filter(s -> s.contains("../variant/variant_0.m3u8"))
             .findFirst();
-    Assert.assertTrue(hasRelativeLink.isPresent());
+    Assertions.assertTrue(hasRelativeLink.isPresent());
     playlist = new File(variantDir, "variant_0.m3u8");
     hasRelativeLink = Files.lines(playlist.toPath()).filter(s -> s.contains("../segments/file_0.mp4"))
             .findFirst();
-    Assert.assertTrue(hasRelativeLink.isPresent());
+    Assertions.assertTrue(hasRelativeLink.isPresent());
   }
 
   /**
@@ -380,7 +385,7 @@ public class DownloadDistributionServiceImplTest {
     File file = service.getDistributionFile("engage-player", mp, element);
     File expected = new File(distributionRoot,
             Paths.get(orgId, "engage-player", mpId, "track-1", "media.mov").toString());
-    Assert.assertEquals(expected, file);
+    Assertions.assertEquals(expected, file);
 
     // The element segment of the URI is not compared against the element identifier: a
     // distributed element is a copy of the original element whose publication URI references
@@ -389,7 +394,7 @@ public class DownloadDistributionServiceImplTest {
     // a renamed element must still find its file.
     MediaPackageElement renamedElement = trackElement("renamed-id",
             UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "engage-player", mpId, "track-1", "media.mov"));
-    Assert.assertEquals(expected, service.getDistributionFile("engage-player", mp, renamedElement));
+    Assertions.assertEquals(expected, service.getDistributionFile("engage-player", mp, renamedElement));
 
     // Legacy layout without channel level: .../{orgId}/{mpId}/{elementId}/{fileName}
     MediaPackageElement legacyElement = trackElement("track-1",
@@ -397,7 +402,7 @@ public class DownloadDistributionServiceImplTest {
     File legacyFile = service.getDistributionFile("engage-player", mp, legacyElement);
     File legacyExpected = new File(distributionRoot,
             Paths.get(orgId, mpId, "track-1", "media.mov").toString());
-    Assert.assertEquals(legacyExpected, legacyFile);
+    Assertions.assertEquals(legacyExpected, legacyFile);
   }
 
   /**
@@ -481,10 +486,10 @@ public class DownloadDistributionServiceImplTest {
             UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "engage-player", "victim-mp", "victim-element"));
     try {
       service.retractElement("internal", channelNamedMp, element);
-      Assert.fail("Expected the retraction of a directory to be rejected");
+      Assertions.fail("Expected the retraction of a directory to be rejected");
     } catch (DistributionException e) {
       // intended
-      Assert.assertTrue("The element of another media package must not be deleted", victimFile.isFile());
+      Assertions.assertTrue(victimFile.isFile(), "The element of another media package must not be deleted");
     } finally {
       FileUtils.deleteQuietly(victimFile.getParentFile().getParentFile());
     }
@@ -499,11 +504,11 @@ public class DownloadDistributionServiceImplTest {
   private static void assertIllegalState(ThrowingRunnable runnable, String description) {
     try {
       runnable.run();
-      Assert.fail(description + " must be rejected");
+      Assertions.fail(description + " must be rejected");
     } catch (IllegalStateException e) {
       // intended
     } catch (Exception e) {
-      Assert.fail(description + " was rejected with " + e + " instead of IllegalStateException");
+      Assertions.fail(description + " was rejected with " + e + " instead of IllegalStateException");
     }
   }
 

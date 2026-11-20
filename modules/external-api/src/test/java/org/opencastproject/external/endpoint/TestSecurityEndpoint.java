@@ -29,12 +29,12 @@ import static org.easymock.EasyMock.replay;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 
 import org.joda.time.DateTime;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import javax.ws.rs.Path;
 
 @Path("")
-@Ignore
+@Disabled
 public class TestSecurityEndpoint extends SecurityEndpoint {
 
   public TestSecurityEndpoint() throws Exception {

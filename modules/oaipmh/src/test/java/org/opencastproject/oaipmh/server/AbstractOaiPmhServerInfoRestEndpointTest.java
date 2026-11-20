@@ -27,9 +27,9 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class AbstractOaiPmhServerInfoRestEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestRestService.class);
@@ -56,12 +56,12 @@ public class AbstractOaiPmhServerInfoRestEndpointTest {
   }
 
   // CHECKSTYLE:OFF
-  @BeforeClass
+  @BeforeAll
   public static void setUp() {
     env.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {
     env.tearDownServer();
   }

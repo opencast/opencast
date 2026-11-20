@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.usersettings;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 
 import org.opencastproject.adminui.usersettings.persistence.UserSettingDto;
@@ -34,8 +34,8 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.easymock.Capture;
 import org.easymock.CaptureType;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -56,7 +56,7 @@ public class UserSettingsServiceTest {
   private SecurityService securityService;
   private UserDirectoryService userDirectoryService;
 
-  @Before
+  @BeforeEach
   public void before() {
     User user = EasyMock.createNiceMock(User.class);
     EasyMock.expect(user.getUsername()).andReturn(USER_NAME);

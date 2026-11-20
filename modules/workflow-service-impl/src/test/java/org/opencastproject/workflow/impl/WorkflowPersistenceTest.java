@@ -34,8 +34,8 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests persistence: storing, retrieving and removing.
@@ -49,7 +49,7 @@ public class WorkflowPersistenceTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);

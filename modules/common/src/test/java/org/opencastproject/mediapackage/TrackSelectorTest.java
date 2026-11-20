@@ -22,15 +22,15 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.mediapackage.MediaPackageElements.AUDIENCE_SOURCE;
 import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTATION_SOURCE;
 import static org.opencastproject.mediapackage.MediaPackageElements.PRESENTER_SOURCE;
 
 import org.opencastproject.mediapackage.selector.TrackSelector;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link TrackSelector}.
@@ -40,7 +40,7 @@ public class TrackSelectorTest extends SimpleElementSelectorTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     selector = new TrackSelector();
     selector.addFlavor(PRESENTATION_SOURCE);

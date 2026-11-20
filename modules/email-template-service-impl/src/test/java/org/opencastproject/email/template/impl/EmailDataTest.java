@@ -36,9 +36,9 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class EmailDataTest {
   private URI uriMP;
   private Map<String, String> orgProperties;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -134,67 +134,67 @@ public class EmailDataTest {
     Map<String, Object> map = emailData.toMap();
 
     Object catalogs = map.get("catalogs");
-    Assert.assertNotNull(catalogs);
-    Assert.assertTrue(catalogs instanceof HashMap);
+    Assertions.assertNotNull(catalogs);
+    Assertions.assertTrue(catalogs instanceof HashMap);
 
     Object catalogHash = ((HashMap) catalogs).get("episode");
-    Assert.assertNotNull(catalogHash);
-    Assert.assertTrue(catalogHash instanceof HashMap);
-    Assert.assertEquals("Test Media Package", ((HashMap) catalogHash).get("title"));
+    Assertions.assertNotNull(catalogHash);
+    Assertions.assertTrue(catalogHash instanceof HashMap);
+    Assertions.assertEquals("Test Media Package", ((HashMap) catalogHash).get("title"));
 
     catalogHash = ((HashMap) catalogs).get("series");
-    Assert.assertNotNull(catalogHash);
-    Assert.assertTrue(catalogHash instanceof HashMap);
-    Assert.assertEquals("20140119997", ((HashMap) catalogHash).get("identifier"));
+    Assertions.assertNotNull(catalogHash);
+    Assertions.assertTrue(catalogHash instanceof HashMap);
+    Assertions.assertEquals("20140119997", ((HashMap) catalogHash).get("identifier"));
 
     Object mp = map.get("mediaPackage");
-    Assert.assertNotNull(mp);
-    Assert.assertTrue(mp instanceof MediaPackage);
-    Assert.assertEquals("Test Media Package", ((MediaPackage) mp).getTitle());
+    Assertions.assertNotNull(mp);
+    Assertions.assertTrue(mp instanceof MediaPackage);
+    Assertions.assertEquals("Test Media Package", ((MediaPackage) mp).getTitle());
 
     Object wf = map.get("workflow");
-    Assert.assertNotNull(wf);
-    Assert.assertTrue(wf instanceof WorkflowInstance);
-    Assert.assertEquals(1, ((WorkflowInstance) wf).getId());
+    Assertions.assertNotNull(wf);
+    Assertions.assertTrue(wf instanceof WorkflowInstance);
+    Assertions.assertEquals(1, ((WorkflowInstance) wf).getId());
 
     Object wfConf = map.get("workflowConfig");
-    Assert.assertNotNull(wfConf);
-    Assert.assertTrue(wfConf instanceof Map);
-    Assert.assertEquals("user@domain.com", ((Map) wfConf).get("emailAddress"));
+    Assertions.assertNotNull(wfConf);
+    Assertions.assertTrue(wfConf instanceof Map);
+    Assertions.assertEquals("user@domain.com", ((Map) wfConf).get("emailAddress"));
 
     Object op = map.get("failedOperation");
-    Assert.assertNotNull(op);
-    Assert.assertTrue(op instanceof WorkflowOperationInstance);
-    Assert.assertEquals("operation1", ((WorkflowOperationInstance) op).getTemplate());
+    Assertions.assertNotNull(op);
+    Assertions.assertTrue(op instanceof WorkflowOperationInstance);
+    Assertions.assertEquals("operation1", ((WorkflowOperationInstance) op).getTemplate());
 
     Object inc = map.get("incident");
-    Assert.assertNotNull(inc);
-    Assert.assertTrue(inc instanceof List);
-    Assert.assertEquals(2, ((List) inc).size());
-    Assert.assertTrue(((List) inc).contains(incident1));
-    Assert.assertTrue(((List) inc).contains(incident2));
+    Assertions.assertNotNull(inc);
+    Assertions.assertTrue(inc instanceof List);
+    Assertions.assertEquals(2, ((List) inc).size());
+    Assertions.assertTrue(((List) inc).contains(incident1));
+    Assertions.assertTrue(((List) inc).contains(incident2));
 
     Object orgProp = map.get("organization");
-    Assert.assertNotNull(orgProp);
-    Assert.assertTrue(orgProp instanceof Map);
-    Assert.assertEquals("http://engage.my.edu", ((Map) orgProp).get("org.opencastproject.engage.ui.url"));
+    Assertions.assertNotNull(orgProp);
+    Assertions.assertTrue(orgProp instanceof Map);
+    Assertions.assertEquals("http://engage.my.edu", ((Map) orgProp).get("org.opencastproject.engage.ui.url"));
 
     Object customProp = map.get("emailAddress");
-    Assert.assertEquals("user@domain.com", customProp);
+    Assertions.assertEquals("user@domain.com", customProp);
 
     Object orgPropKey = map.get("org_org_opencastproject_engage_ui_url");
-    Assert.assertEquals("http://engage.my.edu", orgPropKey);
+    Assertions.assertEquals("http://engage.my.edu", orgPropKey);
 
     // The dotted form documented in the workflow configuration guide: ${org_org.opencastproject.engage.ui.url}
     Object nestedOrg = map.get("org_org");
-    Assert.assertTrue(nestedOrg instanceof Map);
+    Assertions.assertTrue(nestedOrg instanceof Map);
     Object nestedOpencastproject = ((Map) nestedOrg).get("opencastproject");
-    Assert.assertTrue(nestedOpencastproject instanceof Map);
+    Assertions.assertTrue(nestedOpencastproject instanceof Map);
     Object nestedEngage = ((Map) nestedOpencastproject).get("engage");
-    Assert.assertTrue(nestedEngage instanceof Map);
+    Assertions.assertTrue(nestedEngage instanceof Map);
     Object nestedUi = ((Map) nestedEngage).get("ui");
-    Assert.assertTrue(nestedUi instanceof Map);
-    Assert.assertEquals("http://engage.my.edu", ((Map) nestedUi).get("url"));
+    Assertions.assertTrue(nestedUi instanceof Map);
+    Assertions.assertEquals("http://engage.my.edu", ((Map) nestedUi).get("url"));
   }
 
   @Test
@@ -209,10 +209,10 @@ public class EmailDataTest {
     Map<String, Object> map = emailData.toMap();
 
     // The canonical data model entry takes precedence over the workflow property
-    Assert.assertTrue(map.get("mediaPackage") instanceof MediaPackage);
-    Assert.assertEquals(mp, map.get("mediaPackage"));
+    Assertions.assertTrue(map.get("mediaPackage") instanceof MediaPackage);
+    Assertions.assertEquals(mp, map.get("mediaPackage"));
     // The workflow property takes precedence over the organization property with the same name
-    Assert.assertEquals("wf-value", map.get("org_transcriber"));
+    Assertions.assertEquals("wf-value", map.get("org_transcriber"));
   }
 
 }

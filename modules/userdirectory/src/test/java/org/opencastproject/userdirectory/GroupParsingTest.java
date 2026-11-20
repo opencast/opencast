@@ -21,18 +21,20 @@
 
 package org.opencastproject.userdirectory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.util.XmlSafeParser;
 
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 import java.io.StringWriter;
 import java.util.HashSet;
@@ -51,7 +53,7 @@ public class GroupParsingTest {
 
   private JAXBContext jaxbContext;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     jaxbContext = JAXBContext.newInstance(JaxbGroup.class);
   }
@@ -76,10 +78,13 @@ public class GroupParsingTest {
             .unmarshal(XmlSafeParser.parse(getClass().getResourceAsStream(GROUP_XML_FILE)), JaxbGroup.class).getValue();
     jaxbContext.createMarshaller().marshal(groupFromFile, writer2);
 
-    Diff diff = new Diff(writer2.toString(), writer.toString());
     /* We don't care about ordering. */
-    diff.overrideElementQualifier(new ElementNameAndTextQualifier());
-    XMLAssert.assertXMLEqual(diff, true);
+    Diff diff = DiffBuilder.compare(writer2.toString())
+        .withTest(writer.toString())
+        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+        .checkForSimilar()
+        .build();
+    assertFalse(diff.hasDifferences(), diff.toString());
   }
 
   @Test

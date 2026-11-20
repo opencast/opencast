@@ -21,11 +21,12 @@
 
 package org.opencastproject.workflow.conditionparser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class WorkflowConditionInterpreterTest {
   @Test
@@ -113,23 +114,27 @@ public class WorkflowConditionInterpreterTest {
     assertTrue(WorkflowConditionInterpreter.interpret("5.0 == 5"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void interpretLowerCaseAndFails() {
-    WorkflowConditionInterpreter.interpret("true and false");
+    assertThrows(IllegalArgumentException.class, () ->
+        WorkflowConditionInterpreter.interpret("true and false"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void interpretLowerCaseOrFails() {
-    WorkflowConditionInterpreter.interpret("true or false");
+    assertThrows(IllegalArgumentException.class, () ->
+        WorkflowConditionInterpreter.interpret("true or false"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void interpretLowerCaseNotFails() {
-    WorkflowConditionInterpreter.interpret("not true");
+    assertThrows(IllegalArgumentException.class, () ->
+        WorkflowConditionInterpreter.interpret("not true"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void interpretTrailingGarbageFails() {
-    WorkflowConditionInterpreter.interpret("true true");
+    assertThrows(IllegalArgumentException.class, () ->
+        WorkflowConditionInterpreter.interpret("true true"));
   }
 }

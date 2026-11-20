@@ -25,11 +25,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,57 +37,59 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-@RunWith(Parameterized.class)
 public class MicrosoftAzureSpeechTranscriptionTest {
 
-  private final String testResourcePath;
+  private String testResourcePath;
   private Gson gson;
 
-  public MicrosoftAzureSpeechTranscriptionTest(String testResourcePath) {
+  public void initMicrosoftAzureSpeechTranscriptionTest(String testResourcePath) {
     this.testResourcePath = testResourcePath;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     gson = new GsonBuilder().create();
   }
 
-  @Parameterized.Parameters()
   public static List<String> data() {
     return Arrays.asList("/transcription1.json", "/transcription2.json", "/transcription3.json");
   }
 
-  @Test
-  public void deserialize() throws URISyntaxException, IOException {
+  @MethodSource("data")
+  @ParameterizedTest()
+  public void deserialize(String testResourcePath) throws URISyntaxException, IOException {
+    initMicrosoftAzureSpeechTranscriptionTest(testResourcePath);
     String transcriptionStr = FileUtils.readFileToString(new File(MicrosoftAzureSpeechTranscriptionTest.class
         .getResource(testResourcePath).toURI()), StandardCharsets.UTF_8);
     MicrosoftAzureSpeechTranscription transcription = gson.fromJson(transcriptionStr,
         MicrosoftAzureSpeechTranscription.class);
-    Assert.assertNotNull(transcription);
+    Assertions.assertNotNull(transcription);
   }
 
-  @Test
-  public void getID() {
+  @MethodSource("data")
+  @ParameterizedTest()
+  public void getID(String testResourcePath) {
+    initMicrosoftAzureSpeechTranscriptionTest(testResourcePath);
     MicrosoftAzureSpeechTranscription transcription = new MicrosoftAzureSpeechTranscription();
     transcription.self = "https://transcription.cognitiveservices.azure.com"
         + "/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df";
     String transcriptionId = transcription.getID();
-    Assert.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
+    Assertions.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
     transcription.self = "https://transcription.cognitiveservices.azure.com"
         + "/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df/";
     transcriptionId = transcription.getID();
-    Assert.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
+    Assertions.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
     transcription.self = "https://transcription.cognitiveservices.azure.com"
         + "/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df/foo";
     transcriptionId = transcription.getID();
-    Assert.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
+    Assertions.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
     transcription.self = "https://transcription.cognitiveservices.azure.com"
         + "/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df?foo";
     transcriptionId = transcription.getID();
-    Assert.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
+    Assertions.assertEquals("2b58923c-d0d5-4e77-9f9a-74bf80f173df", transcriptionId);
     transcription.self = "https://transcription.cognitiveservices.azure.com"
         + "/foo/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df";
     transcriptionId = transcription.getID();
-    Assert.assertNull(transcriptionId);
+    Assertions.assertNull(transcriptionId);
   }
 }

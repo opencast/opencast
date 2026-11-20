@@ -42,17 +42,17 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -77,15 +77,15 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
   private static final String VARIANT_TRACK_ID = "track-3";
   private static final String MASTER_TRACK_ID = "track-1";
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    File baseDir = testFolder.newFolder();
+    File baseDir = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
     new File(baseDir, ingestedDir);
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -158,24 +158,24 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
 
     // replaced
-    Assert.assertNull(mpNew.getTrack(MASTER_TRACK_ID));
-    Assert.assertNull(mpNew.getTrack(VARIANT_TRACK_ID));
+    Assertions.assertNull(mpNew.getTrack(MASTER_TRACK_ID));
+    Assertions.assertNull(mpNew.getTrack(VARIANT_TRACK_ID));
     // preserved
-    Assert.assertNotNull(mpNew.getTrack(SEGMENT_TRACK_ID));
+    Assertions.assertNotNull(mpNew.getTrack(SEGMENT_TRACK_ID));
 
     // check track metadata
     // Old Tags should be overriden
     for (Track track : mpNew.getTracks()) {
-      Assert.assertEquals("presenter/delivery", track.getFlavor().toString());
-      Assert.assertArrayEquals(targetTags.split("\\W"), track.getTags());
-      Assert.assertTrue(1300L == track.getDuration());
-      Assert.assertNotNull(track.getLogicalName());
-      Assert.assertNotNull(track.getURI());
+      Assertions.assertEquals("presenter/delivery", track.getFlavor().toString());
+      Assertions.assertArrayEquals(targetTags.split("\\W"), track.getTags());
+      Assertions.assertTrue(1300L == track.getDuration());
+      Assertions.assertNotNull(track.getLogicalName());
+      Assertions.assertNotNull(track.getURI());
     }
     List<Track> pls = Arrays.asList(mpNew.getTracks()).stream().filter(AdaptivePlaylist.isHLSTrackPred)
             .collect(Collectors.toList());
     for (Track track : pls) {
-      Assert.assertEquals(track.getMimeType(), MimeType.mimeType("application", "x-mpegURL"));
+      Assertions.assertEquals(track.getMimeType(), MimeType.mimeType("application", "x-mpegURL"));
     }
   }
 
@@ -195,14 +195,14 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
 
     // check track metadata
     for (Track track : mpNew.getTracks()) {
-      Assert.assertEquals("dessert/delivery", track.getFlavor().toString());
-      Assert.assertTrue(Arrays.asList(track.getTags()).contains("cupcake"));
+      Assertions.assertEquals("dessert/delivery", track.getFlavor().toString());
+      Assertions.assertTrue(Arrays.asList(track.getTags()).contains("cupcake"));
       if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
-        Assert.assertTrue(track.getTags().length == 1);
+        Assertions.assertTrue(track.getTags().length == 1);
       }
     }
     // Tag should not be overriden
-    Assert.assertTrue(Arrays.asList(mpNew.getTrack(SEGMENT_TRACK_ID).getTags()).contains("archive"));
+    Assertions.assertTrue(Arrays.asList(mpNew.getTrack(SEGMENT_TRACK_ID).getTags()).contains("archive"));
   }
 
   @Test
@@ -221,13 +221,13 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
 
     // check track metadata
     for (Track track : mpNew.getTracks()) {
-      Assert.assertEquals("dessert/delivery", track.getFlavor().toString());
+      Assertions.assertEquals("dessert/delivery", track.getFlavor().toString());
       if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
-        Assert.assertTrue(track.getTags().length == 0);
+        Assertions.assertTrue(track.getTags().length == 0);
       }
     }
-    Assert.assertEquals(mpNew.getTrack(SEGMENT_TRACK_ID).getTags().length, 3);
-    Assert.assertTrue(
+    Assertions.assertEquals(mpNew.getTrack(SEGMENT_TRACK_ID).getTags().length, 3);
+    Assertions.assertTrue(
             Arrays.asList(mpNew.getTrack(SEGMENT_TRACK_ID).getTags()).containsAll(Arrays.asList(expectedTags)));
   }
 
@@ -245,12 +245,12 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     // check track metadata
     for (Track track : mpNew.getTracks()) {
-      Assert.assertEquals("presentation/delivery", track.getFlavor().toString());
+      Assertions.assertEquals("presentation/delivery", track.getFlavor().toString());
       if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
-        Assert.assertTrue(track.getTags().length == 0);
+        Assertions.assertTrue(track.getTags().length == 0);
       }
     }
-    Assert.assertArrayEquals(mpNew.getTrack(SEGMENT_TRACK_ID).getTags(), expectedTags);
+    Assertions.assertArrayEquals(mpNew.getTrack(SEGMENT_TRACK_ID).getTags(), expectedTags);
   }
 
   @Test
@@ -265,12 +265,12 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     // check track metadata
     for (Track track : mpNew.getTracks()) {
-      Assert.assertEquals("presentation/source", track.getFlavor().toString());
+      Assertions.assertEquals("presentation/source", track.getFlavor().toString());
       if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
-        Assert.assertTrue(track.getTags().length == 0);
+        Assertions.assertTrue(track.getTags().length == 0);
       }
     }
-    Assert.assertTrue(
+    Assertions.assertTrue(
             Arrays.asList(mpNew.getTrack(SEGMENT_TRACK_ID).getTags()).containsAll(Arrays.asList(expectedTags)));
   }
 
@@ -282,7 +282,7 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
       // no encoding profile
       configurations.put("source-flavor", "presentation/source");
       getWorkflowOperationResult(mp, configurations);
-      Assert.fail("Since target flavor is not specified exception should be thrown");
+      Assertions.fail("Since target flavor is not specified exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
     }

@@ -21,9 +21,10 @@
 
 package org.opencastproject.authorization.xacml.manager.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
@@ -31,7 +32,7 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 
 import org.codehaus.jettison.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link AccessInformationUtil}
@@ -74,9 +75,10 @@ public class AccessInformationUtilTest {
   /**
    * Test method for {@link AccessInformationUtil#serializeManagedAcl(ManagedAcl)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testSerializeManagedAclWithNull() throws Exception {
-    AccessInformationUtil.serializeManagedAcl(null);
+    assertThrows(IllegalArgumentException.class, () ->
+        AccessInformationUtil.serializeManagedAcl(null));
   }
 
   /**
@@ -100,9 +102,10 @@ public class AccessInformationUtilTest {
   /**
    * Test method for {@link AccessInformationUtil#serializePrivilegesByRole(AccessControlList)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testSerializePrivilegesByRoleWithNull() throws Exception {
-    AccessInformationUtil.serializePrivilegesByRole(null);
+    assertThrows(IllegalArgumentException.class, () ->
+        AccessInformationUtil.serializePrivilegesByRole(null));
   }
 
 }

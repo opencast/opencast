@@ -21,7 +21,7 @@
 
 package org.opencastproject.kernel.security;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -33,7 +33,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,9 +87,9 @@ public class TrustedHttpClientResourceClosingTest {
     final TestHttpClient client = new TestHttpClient();
     final ClassicHttpResponse response;
     response = client.execute(new HttpGet("http://127.0.0.1:" + PORT));
-    assertEquals("Connection should be leased from the pool", 1, client.getLeasedConnections());
+    assertEquals(1, client.getLeasedConnections(), "Connection should be leased from the pool");
     client.close(response);
-    assertEquals("Connection should be returned to the pool", 0, client.getLeasedConnections());
+    assertEquals(0, client.getLeasedConnections(), "Connection should be returned to the pool");
   }
 
   private void startServer() throws Exception {

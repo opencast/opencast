@@ -33,16 +33,16 @@ import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CommentParserTest {
 
   private UserDirectoryService userDirectoryService;
   private JaxbUser testUser;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     testUser = new JaxbUser("test", "test", new DefaultOrganization());
@@ -55,44 +55,44 @@ public class CommentParserTest {
     String serializedCommentXml = IOUtils.toString(getClass().getResource("/comment.xml").toURI());
 
     EventComment comment = EventCommentParser.getCommentFromXml(serializedCommentXml, userDirectoryService);
-    Assert.assertNotNull(comment);
-    Assert.assertEquals(2L, comment.getId().get().longValue());
-    Assert.assertEquals("Test comment", comment.getText());
-    Assert.assertEquals("Test", comment.getReason());
-    Assert.assertTrue(comment.isResolvedStatus());
-    Assert.assertEquals(DateTimeSupport.fromUTC("2014-05-21T10:09:45Z"), comment.getCreationDate().getTime());
-    Assert.assertEquals(DateTimeSupport.fromUTC("2014-05-21T12:09:45Z"), comment.getModificationDate().getTime());
-    Assert.assertEquals(testUser, comment.getAuthor());
-    Assert.assertEquals(2, comment.getReplies().size());
+    Assertions.assertNotNull(comment);
+    Assertions.assertEquals(2L, comment.getId().get().longValue());
+    Assertions.assertEquals("Test comment", comment.getText());
+    Assertions.assertEquals("Test", comment.getReason());
+    Assertions.assertTrue(comment.isResolvedStatus());
+    Assertions.assertEquals(DateTimeSupport.fromUTC("2014-05-21T10:09:45Z"), comment.getCreationDate().getTime());
+    Assertions.assertEquals(DateTimeSupport.fromUTC("2014-05-21T12:09:45Z"), comment.getModificationDate().getTime());
+    Assertions.assertEquals(testUser, comment.getAuthor());
+    Assertions.assertEquals(2, comment.getReplies().size());
 
     // Reply 1
     EventCommentReply reply = comment.getReplies().get(0);
-    Assert.assertEquals(1L, reply.getId().get().longValue());
-    Assert.assertEquals("Test reply", reply.getText());
-    Assert.assertEquals(DateTimeSupport.fromUTC("2014-06-21T10:09:45Z"), reply.getCreationDate().getTime());
-    Assert.assertEquals(DateTimeSupport.fromUTC("2014-07-21T12:09:45Z"), reply.getModificationDate().getTime());
-    Assert.assertEquals(testUser, reply.getAuthor());
+    Assertions.assertEquals(1L, reply.getId().get().longValue());
+    Assertions.assertEquals("Test reply", reply.getText());
+    Assertions.assertEquals(DateTimeSupport.fromUTC("2014-06-21T10:09:45Z"), reply.getCreationDate().getTime());
+    Assertions.assertEquals(DateTimeSupport.fromUTC("2014-07-21T12:09:45Z"), reply.getModificationDate().getTime());
+    Assertions.assertEquals(testUser, reply.getAuthor());
 
     // Reply 2
     reply = comment.getReplies().get(1);
-    Assert.assertTrue(reply.getId().isEmpty());
-    Assert.assertEquals("Test reply 2", reply.getText());
-    Assert.assertEquals(DateTimeSupport.fromUTC("2014-08-21T10:09:45Z"), reply.getCreationDate().getTime());
-    Assert.assertEquals(DateTimeSupport.fromUTC("2014-09-21T12:09:45Z"), reply.getModificationDate().getTime());
-    Assert.assertEquals(testUser, reply.getAuthor());
+    Assertions.assertTrue(reply.getId().isEmpty());
+    Assertions.assertEquals("Test reply 2", reply.getText());
+    Assertions.assertEquals(DateTimeSupport.fromUTC("2014-08-21T10:09:45Z"), reply.getCreationDate().getTime());
+    Assertions.assertEquals(DateTimeSupport.fromUTC("2014-09-21T12:09:45Z"), reply.getModificationDate().getTime());
+    Assertions.assertEquals(testUser, reply.getAuthor());
 
     try {
       String serializedComment = EventCommentParser.getAsXml(comment);
       assertThat(the(serializedComment), similarTo(the(loadFileFromClassPathAsString("/comment.xml").get())));
     } catch (EventCommentException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     try {
       String serializedReply = EventCommentParser.getAsXml(comment.getReplies().get(0));
       assertThat(the(serializedReply), similarTo(the(loadFileFromClassPathAsString("/comment-reply.xml").get())));
     } catch (EventCommentException e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 

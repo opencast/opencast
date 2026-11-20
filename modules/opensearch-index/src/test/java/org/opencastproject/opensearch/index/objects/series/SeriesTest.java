@@ -21,8 +21,8 @@
 
 package org.opencastproject.opensearch.index.objects.series;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.util.DateTimeSupport;
 
@@ -31,8 +31,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ public class SeriesTest {
   private String seriesJson;
   private String seriesXml;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException, IllegalStateException, java.text.ParseException {
     createdDateTime = new Date(DateTimeSupport.fromUTC("2011-07-16T20:39:05Z"));
     // Setup presenter collection

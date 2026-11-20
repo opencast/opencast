@@ -20,12 +20,12 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.oaipmh.server.OaiPmhServer.repositoryId;
 
 import org.opencastproject.util.UrlSupport;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;

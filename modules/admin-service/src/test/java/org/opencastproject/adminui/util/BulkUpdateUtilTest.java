@@ -22,7 +22,8 @@
 package org.opencastproject.adminui.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.opensearch.index.objects.event.Event;
 
@@ -32,7 +33,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.easymock.EasyMock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -108,9 +109,11 @@ public class BulkUpdateUtilTest {
     assertEquals(expectedIds, firstGroup.getEventIds());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testBulkUpdateInstructionsParseError() {
-    new BulkUpdateUtil.BulkUpdateInstructions("hello");
+    assertThrows(IllegalArgumentException.class, () -> {
+      new BulkUpdateUtil.BulkUpdateInstructions("hello");
+    });
   }
 
   private void testAddSchedulingDates(final String filename, final Event event) {

@@ -23,6 +23,7 @@ package org.opencastproject.playlists;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -41,9 +42,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,7 +58,7 @@ public class PlaylistServiceTest {
   private Playlist playlist;
   private AccessControlList acl = new AccessControlList();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Playlist
     PlaylistEntry playlistEntry = new PlaylistEntry("1234", PlaylistEntryType.EVENT);
@@ -107,18 +108,18 @@ public class PlaylistServiceTest {
   public void testPlaylistManagement() throws Exception {
     playlist = service.update(playlist);
     Playlist playlistFromDb = service.getPlaylistById(playlist.getId());
-    Assert.assertNotNull(playlistFromDb);
-    Assert.assertEquals(playlist.getTitle(), playlistFromDb.getTitle());
+    Assertions.assertNotNull(playlistFromDb);
+    Assertions.assertEquals(playlist.getTitle(), playlistFromDb.getTitle());
 
     playlist.setTitle("different title");
     playlist = service.update(playlist);
     playlistFromDb = service.getPlaylistById(playlist.getId());
-    Assert.assertEquals(playlist.getTitle(), playlistFromDb.getTitle());
+    Assertions.assertEquals(playlist.getTitle(), playlistFromDb.getTitle());
 
     service.remove(playlist.getId());
     try {
       service.getPlaylistById(playlist.getId());
-      Assert.fail("Playlist should not be available after removal.");
+      Assertions.fail("Playlist should not be available after removal.");
     } catch (NotFoundException e) {
       // expected
     }
@@ -131,9 +132,9 @@ public class PlaylistServiceTest {
 
     boolean result = playlist.addEntry(playlistEntry);
 
-    Assert.assertTrue(result);
-    Assert.assertEquals(1, playlist.getEntries().size());
-    Assert.assertEquals(playlistEntry, playlist.getEntries().get(0));
+    Assertions.assertTrue(result);
+    Assertions.assertEquals(1, playlist.getEntries().size());
+    Assertions.assertEquals(playlistEntry, playlist.getEntries().get(0));
   }
 
   @Test
@@ -145,9 +146,9 @@ public class PlaylistServiceTest {
     PlaylistEntry newPlaylistEntry = new PlaylistEntry(1, "5678", PlaylistEntryType.EVENT);
     boolean result = playlist.addEntry(newPlaylistEntry);
 
-    Assert.assertTrue(result);
-    Assert.assertEquals(1, playlist.getEntries().size());
-    Assert.assertEquals(newPlaylistEntry, playlist.getEntries().get(0));
+    Assertions.assertTrue(result);
+    Assertions.assertEquals(1, playlist.getEntries().size());
+    Assertions.assertEquals(newPlaylistEntry, playlist.getEntries().get(0));
   }
 
   @Test
@@ -159,8 +160,8 @@ public class PlaylistServiceTest {
     PlaylistEntry newPlaylistEntry = new PlaylistEntry(0, "5678", PlaylistEntryType.EVENT);
     boolean result = playlist.addEntry(newPlaylistEntry);
 
-    Assert.assertTrue(result);
-    Assert.assertEquals(2, playlist.getEntries().size());
+    Assertions.assertTrue(result);
+    Assertions.assertEquals(2, playlist.getEntries().size());
   }
 
   @Test
@@ -172,13 +173,15 @@ public class PlaylistServiceTest {
     PlaylistEntry removePlaylistEntry = new PlaylistEntry(1, "1234", PlaylistEntryType.EVENT);
     boolean result = playlist.removeEntry(removePlaylistEntry);
 
-    Assert.assertTrue(result);
-    Assert.assertEquals(0, playlist.getEntries().size());
+    Assertions.assertTrue(result);
+    Assertions.assertEquals(0, playlist.getEntries().size());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void addEntryShouldThrowExceptionWhenEntryIsNull() throws Exception {
-    Playlist playlist = new Playlist();
-    playlist.addEntry(null);
+    assertThrows(IllegalArgumentException.class, () -> {
+      Playlist playlist = new Playlist();
+      playlist.addEntry(null);
+    });
   }
 }

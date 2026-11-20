@@ -20,7 +20,7 @@
  */
 package org.opencastproject.security.urlsigning.provider.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.SecurityService;
@@ -30,9 +30,9 @@ import org.opencastproject.urlsigning.common.Policy;
 
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public class WowzaUrlSigningProviderTest {
   private static WowzaUrlSigningProvider signer;
   private static Map<String, Object> properties;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws Exception {
     JaxbOrganization organization = EasyMock.createNiceMock(JaxbOrganization.class);
     EasyMock.expect(organization.getId()).andReturn(ORGANIZATION_ID).anyTimes();
@@ -62,7 +62,7 @@ public class WowzaUrlSigningProviderTest {
     properties = new HashMap<>();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     properties = new HashMap<>();
     signer.updated(properties);

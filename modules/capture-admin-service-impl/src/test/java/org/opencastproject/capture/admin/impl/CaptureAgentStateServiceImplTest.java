@@ -21,10 +21,10 @@
 
 package org.opencastproject.capture.admin.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.capture.admin.api.AgentState.CAPTURING;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 import static org.opencastproject.capture.admin.api.AgentState.OFFLINE;
@@ -44,9 +44,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -66,7 +66,7 @@ public class CaptureAgentStateServiceImplTest {
   private static BundleContext bundleContext;
   private static ComponentContext cc;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     setupService();
 
@@ -113,7 +113,7 @@ public class CaptureAgentStateServiceImplTest {
     service.setupAgentCache(1, TimeUnit.HOURS);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     service.deactivate();
   }

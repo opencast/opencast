@@ -23,9 +23,9 @@ package org.opencastproject.job.api;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.util.JobUtil.getNonFinished;
 import static org.opencastproject.util.JobUtil.getPayload;
 import static org.opencastproject.util.JobUtil.isReadyToDispatch;
@@ -50,8 +50,8 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -61,7 +61,7 @@ public class JobUtilTest {
 
   private ServiceRegistry serviceRegistry;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     serviceRegistry = createNiceMock(ServiceRegistry.class);
     JobImpl job = new JobImpl(20);
