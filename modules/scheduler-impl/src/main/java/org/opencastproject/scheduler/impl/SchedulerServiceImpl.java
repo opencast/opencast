@@ -816,7 +816,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private boolean isAdmin() {
-    return SecurityUtil.isAdmin(securityService.getUser(), securityService.getOrganization());
+    final User currentUser = securityService.getUser();
+    final Organization currentOrg = securityService.getOrganization();
+    // Only accept an organization admin role if the user actually belongs to the current organization
+    return SecurityUtil.isGlobalAdmin(currentUser)
+        || currentUser.getOrganization().getId().equals(currentOrg.getId())
+        && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg);
   }
 
   /**
@@ -828,18 +833,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *           if the current user may not remove the event
    */
   private void assertCanRemoveEvent(String mediaPackageId) throws UnauthorizedException {
-    // Note that hasPermission() already grants access to global and organization administrators.
+
+    if (isAdmin()) {
+      return;
+    }
+
     Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
     if (mediaPackage.isPresent()) {
       if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
         throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
       }
-      return;
     }
-
-    // The media package could not be read. If it exists nonetheless, the current user is not allowed to see it and
-    // must not be allowed to remove it either. If it does not exist, leave it to the regular not-found handling.
-    if (assetManager.snapshotExists(mediaPackageId, securityService.getOrganization().getId())) {
+    else {
+      // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
       throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
   }

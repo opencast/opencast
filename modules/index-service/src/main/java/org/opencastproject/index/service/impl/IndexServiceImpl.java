@@ -93,7 +93,9 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -1511,6 +1513,20 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
+  private boolean isAdmin() {
+    final User currentUser = securityService.getUser();
+
+    // Global admin
+    if (currentUser.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // Organization admin
+    final Organization currentOrg = securityService.getOrganization();
+    return currentUser.getOrganization().getId().equals(currentOrg.getId()) && currentUser.hasRole(
+        currentOrg.getAdminRole());
+  }
+
   /**
    * Ensure the current user is allowed to delete the given event.
    * <p>
@@ -1522,27 +1538,24 @@ public class IndexServiceImpl implements IndexService {
    *
    * @param id
    *          the media package identifier of the event to delete
-   * @throws NotFoundException
-   *           if no such event exists in the current organization
    * @throws UnauthorizedException
    *           if the current user may not delete the event
    */
-  private void assertCanDeleteEvent(String id) throws NotFoundException, UnauthorizedException {
-    // Note that hasPermission() already grants access to global and organization administrators.
+  private void assertCanDeleteEvent(String id) throws UnauthorizedException {
+
+    if (isAdmin()) {
+      return;
+    }
+
     Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(id);
     if (mediaPackage.isPresent()) {
       if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
         throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
       }
-      return;
-    }
-
-    // The media package could not be read. Only report it as missing if it really does not exist, so that a user
-    // without read access does not learn anything about events they may not see.
-    if (assetManager.snapshotExists(id, securityService.getOrganization().getId())) {
+    } else {
+      // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
       throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
-    throw new NotFoundException("Event id " + id + " not found.");
   }
 
   private void retractAndRemoveEvent(String id, String retractWorkflowId)
