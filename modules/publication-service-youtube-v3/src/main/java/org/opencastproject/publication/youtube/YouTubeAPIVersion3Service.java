@@ -117,6 +117,51 @@ public interface YouTubeAPIVersion3Service {
           throws IOException;
 
   /**
+   * Whether the underlying {@link com.google.api.services.youtube.YouTube} client has been configured with
+   * credentials via {@link #initialize(ClientCredentials)}.
+   * @return {@code true} once initialized.
+   */
+  boolean isInitialized();
+
+  /**
+   * Creates a YouTube playlist with an explicit privacy status and adds it to the authorized account.
+   * @param title may not be {@code null}
+   * @param description may not be {@code null}
+   * @param privacyStatus may not be {@code null}; one of "public", "unlisted" or "private"
+   * @return the newly created playlist, with non-null id.
+   * @throws IOException when transaction fails.
+   */
+  Playlist createPlaylistWithPrivacyStatus(String title, String description, String privacyStatus)
+          throws IOException;
+
+  /**
+   * Find a playlist by id.
+   * @param playlistId may not be {@code null}
+   * @return null when not found.
+   * @throws IOException when lookup fails.
+   */
+  Playlist getPlaylistById(String playlistId) throws IOException;
+
+  /**
+   * Update the title and/or description of an existing playlist.
+   * @param playlistId may not be {@code null}
+   * @param title new title, or {@code null} to leave unchanged
+   * @param description new description, or {@code null} to leave unchanged
+   * @return the updated playlist, or {@code null} when the playlist does not exist.
+   * @throws IOException when the update fails.
+   */
+  Playlist updatePlaylist(String playlistId, String title, String description) throws IOException;
+
+  /**
+   * Find the playlist item which links the given video to the given playlist.
+   * @param playlistId may not be {@code null}
+   * @param videoId may not be {@code null}
+   * @return null when the video is not (yet) part of the playlist.
+   * @throws IOException when lookup fails.
+   */
+  PlaylistItem findPlaylistItem(String playlistId, String videoId) throws IOException;
+
+  /**
    * Remove a previously uploaded video from YouTube.
    * @param videoId may not be {@code null}
    * @throws Exception when transaction fails.

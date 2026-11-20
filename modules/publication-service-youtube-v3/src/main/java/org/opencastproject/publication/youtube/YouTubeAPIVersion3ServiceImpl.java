@@ -48,6 +48,7 @@ import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -66,6 +67,11 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     final OAuth2CredentialFactory factory = new OAuth2CredentialFactoryImpl();
     final GoogleCredential credential = factory.getGoogleCredential(credentials);
     youTube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), credential).build();
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return youTube != null;
   }
 
   @Override
@@ -121,16 +127,63 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     if (tags.length > 0) {
       playlistSnippet.setTags(Arrays.asList(tags));
     }
+    return insertPlaylist(playlistSnippet, privacyStatus);
+  }
+
+  @Override
+  public Playlist createPlaylistWithPrivacyStatus(final String title, final String description,
+          final String privacyStatus) throws IOException {
+    final PlaylistSnippet playlistSnippet = new PlaylistSnippet();
+    playlistSnippet.setTitle(title);
+    playlistSnippet.setDescription(description);
+    return insertPlaylist(playlistSnippet, PrivacyStatus.valueOf(privacyStatus.toUpperCase()));
+  }
+
+  /**
+   * @param playlistSnippet may not be {@code null}
+   * @param privacyStatus may not be {@code null}
+   * @return the newly created playlist, with non-null id.
+   * @throws IOException when transaction fails.
+   */
+  private Playlist insertPlaylist(final PlaylistSnippet playlistSnippet, final PrivacyStatus privacyStatus)
+          throws IOException {
     final PlaylistStatus playlistStatus = new PlaylistStatus();
     playlistStatus.setPrivacyStatus(privacyStatus.name().toLowerCase());
 
-    // Create playlist with metadata and status.
     final Playlist youTubePlaylist = new Playlist();
     youTubePlaylist.setSnippet(playlistSnippet);
     youTubePlaylist.setStatus(playlistStatus);
 
     // The first argument tells the API what to return when a successful insert has been executed.
     final YouTube.Playlists.Insert command = youTube.playlists().insert("snippet,status", youTubePlaylist);
+    return execute(command);
+  }
+
+  @Override
+  public Playlist getPlaylistById(final String playlistId) throws IOException {
+    final YouTube.Playlists.List search = youTube.playlists().list("id,snippet");
+    search.setId(playlistId);
+    search.setFields("items(id,snippet),kind,nextPageToken,pageInfo,prevPageToken,tokenPagination");
+    final PlaylistListResponse response = execute(search);
+    return response.getItems().isEmpty() ? null : response.getItems().get(0);
+  }
+
+  @Override
+  public Playlist updatePlaylist(final String playlistId, final String title, final String description)
+          throws IOException {
+    final Playlist playlist = getPlaylistById(playlistId);
+    if (playlist == null) {
+      return null;
+    }
+    final PlaylistSnippet snippet = playlist.getSnippet();
+    if (StringUtils.isNotBlank(title)) {
+      snippet.setTitle(title);
+    }
+    if (description != null) {
+      snippet.setDescription(description);
+    }
+    playlist.setSnippet(snippet);
+    final YouTube.Playlists.Update command = youTube.playlists().update("snippet", playlist);
     return execute(command);
   }
 
@@ -231,13 +284,8 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     return execute(search);
   }
 
-  /**
-   * @param playlistId may not be {@code null}
-   * @param videoId may not be {@code null}
-   * @return null when not found.
-   * @throws IOException when transaction fails.
-   */
-  private PlaylistItem findPlaylistItem(final String playlistId, final String videoId) throws IOException {
+  @Override
+  public PlaylistItem findPlaylistItem(final String playlistId, final String videoId) throws IOException {
     final List<PlaylistItem> playlistItems = getAllPlaylistItems(playlistId);
     PlaylistItem playlistItem = null;
     for (final PlaylistItem next : playlistItems) {
