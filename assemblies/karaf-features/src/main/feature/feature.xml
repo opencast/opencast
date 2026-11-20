@@ -92,7 +92,7 @@
     <bundle>mvn:org.apache.mina/mina-core/2.1.13</bundle>
 
     <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
-    <bundle>wrap:mvn:com.google.crypto.tink/tink/1.16.0$Bundle-SymbolicName=com.google.crypto.tink;Bundle-Version=1.16.0</bundle>
+    <bundle>wrap:mvn:com.google.crypto.tink/tink/${tink.version}$Bundle-SymbolicName=com.google.crypto.tink&amp;Bundle-Version=${tink.version}</bundle>
   </feature>
 
   <feature name="opencast-core" version="${project.version}">
