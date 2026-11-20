@@ -64,10 +64,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,10 +86,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -102,15 +102,14 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Component(
     immediate = true,
-    service = { DistributionService.class,DownloadDistributionService.class,ManagedService.class },
+    service = { DistributionService.class, DownloadDistributionService.class },
     property = {
         "service.description=Distribution Service (Local)",
-        "service.pid=org.opencastproject.distribution.download.DownloadDistributionServiceImpl",
         "distribution.channel=download"
     }
 )
 public class DownloadDistributionServiceImpl extends AbstractDistributionService
-        implements DistributionService, DownloadDistributionService, ManagedService {
+        implements DistributionService, DownloadDistributionService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceImpl.class);
@@ -163,10 +162,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *
    * @param cc
    *          the OSGi component context
+   * @param properties
+   *          the configuration properties
+   * @throws ConfigurationException
+   *           if the configuration is invalid
    */
-  @Override
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc, Map<String, Object> properties) throws ConfigurationException {
     super.activate(cc);
     serviceUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
     if (serviceUrl == null) {
@@ -182,6 +184,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     logger.info("Download distribution directory is {}", distributionDirectory);
     this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
     systemUserName = cc.getBundleContext().getProperty(DIGEST_USER_PROPERTY);
+    updated(properties);
   }
 
   @Override
@@ -982,8 +985,8 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     return new URI(destinationURI);
   }
 
-  @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY,
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,

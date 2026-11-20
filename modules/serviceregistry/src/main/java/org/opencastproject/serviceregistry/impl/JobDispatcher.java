@@ -214,9 +214,10 @@ public class JobDispatcher {
   }
 
   /**
-   * {@inheritDoc}
+   * Applies the configuration of the job dispatcher, restarting the dispatch thread.
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * @param properties
+   *          the configuration properties
    */
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) {

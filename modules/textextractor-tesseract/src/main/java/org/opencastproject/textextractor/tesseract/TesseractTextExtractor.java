@@ -30,9 +30,10 @@ import org.opencastproject.textextractor.api.TextExtractorException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,20 +44,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Commandline wrapper around tesseract' <code>tesseract</code> command.
  */
 @Component(
     immediate = true,
-    service = { TextExtractor.class,ManagedService.class },
+    service = { TextExtractor.class },
     property = {
         "service.description=Tesseract Text Extractor"
     }
 )
-public class TesseractTextExtractor implements TextExtractor, ManagedService {
+public class TesseractTextExtractor implements TextExtractor {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TesseractTextExtractor.class);
@@ -202,8 +203,8 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     return args;
   }
 
-  @Override
-  public void updated(Dictionary properties) {
+  @Modified
+  public void updated(Map<String, Object> properties) {
     String path = (String) properties.get(TESSERACT_BINARY_CONFIG_KEY);
     if (path != null) {
       logger.info("Setting Tesseract path to {}", path);
@@ -217,7 +218,8 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     }
   }
 
-  public void activate(ComponentContext cc) {
+  @Activate
+  public void activate(ComponentContext cc, Map<String, Object> properties) {
     // Configure ffmpeg
     String path = cc.getBundleContext().getProperty(TESSERACT_BINARY_CONFIG_KEY);
     if (path == null) {
@@ -235,6 +237,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
       logger.info("No additional options for Tesseract");
       this.addOptions = "";
     }
+    updated(properties);
   }
 
 }

@@ -284,7 +284,7 @@ public class SchedulerServiceImplTest {
     schedSvc.setOrgDirectoryService(orgDirectoryService);
     schedSvc.setIndex(index);
 
-    schedSvc.activate(componentContext);
+    schedSvc.activate(componentContext, new HashMap<>());
   }
 
   @Before

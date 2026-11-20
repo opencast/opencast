@@ -39,8 +39,8 @@ import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GenericUrlSigningProviderTest {
   private static final Logger logger = LoggerFactory.getLogger(GenericUrlSigningProviderTest.class);
@@ -74,7 +74,7 @@ public class GenericUrlSigningProviderTest {
   private static GenericUrlSigningProvider signerA;
   private static GenericUrlSigningProvider signerB;
 
-  private static Dictionary<String, String> properties;
+  private static Map<String, Object> properties;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
@@ -99,7 +99,7 @@ public class GenericUrlSigningProviderTest {
     signerB = new GenericUrlSigningProvider();
     signerB.setSecurityService(securityServiceB);
 
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
 
     /* To indicate that specific tests are not supposed to test multi-tenant capabilities, we just set an alias */
     signer = signerA;
@@ -107,7 +107,7 @@ public class GenericUrlSigningProviderTest {
 
   @Before
   public void setUp() throws Exception {
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     signerA.updated(properties);
     signerB.updated(properties);
   }
@@ -119,7 +119,7 @@ public class GenericUrlSigningProviderTest {
     assertEquals(0, signer.getUris().size());
 
     // Incomplete entries (no secret configured)
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     properties.put(
         String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL),
         MATCHING_URI);
@@ -134,7 +134,7 @@ public class GenericUrlSigningProviderTest {
     assertEquals(0, signer.getUris().size());
 
     // Non-Matching secret
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     properties.put(
         String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL),
         NON_MATCHING_URI);
@@ -146,7 +146,7 @@ public class GenericUrlSigningProviderTest {
     assertEquals(1, signer.getUris().size());
 
     // Matching secret
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     properties.put(
         String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL),
         MATCHING_URI);
@@ -158,7 +158,7 @@ public class GenericUrlSigningProviderTest {
     assertEquals(1, signer.getUris().size());
 
     // Matching secret and Unrelated Key
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     properties.put(
         String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL),
         MATCHING_URI);
@@ -178,7 +178,7 @@ public class GenericUrlSigningProviderTest {
     assertEquals(2, signer.getUris().size());
 
     // Organization set to "any" organization works
-    properties = new Hashtable<>();
+    properties = new HashMap<>();
     properties.put(
         String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL),
         MATCHING_URI);

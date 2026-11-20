@@ -27,8 +27,9 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -37,19 +38,19 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Dictionary;
+import java.util.Map;
 
 /**
  * Implementation of a {@link MediaPackageSerializer} that will securely sign urls of a Mediapackage.
  */
 @Component(
     immediate = true,
-    service = { MediaPackageSerializer.class, ManagedService.class },
+    service = { MediaPackageSerializer.class },
     property = {
         "service.description=Signing Mediapackage Serializer"
     }
 )
-public class SigningMediaPackageSerializer implements MediaPackageSerializer, ManagedService {
+public class SigningMediaPackageSerializer implements MediaPackageSerializer {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SigningMediaPackageSerializer.class);
 
@@ -94,10 +95,10 @@ public class SigningMediaPackageSerializer implements MediaPackageSerializer, Ma
     }
   }
 
-  /** OSGi callback if properties file is present */
-  @SuppressWarnings("rawtypes")
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  /** OSGi callback on activation and if the configuration changes */
+  @Activate
+  @Modified
+  public void updated(Map<String, Object> properties) throws ConfigurationException {
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());

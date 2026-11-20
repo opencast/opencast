@@ -36,9 +36,7 @@ import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.io.IOException;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -102,7 +100,7 @@ public class UrlSigningFilterTest {
 
   @Test
   public void testURLMatching() throws Exception {
-    Dictionary<String, String> keys = new Hashtable<>();
+    Map<String, Object> keys = new HashMap<>();
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, key);
     UrlSigningVerifierImpl urlSigningVerifier = new UrlSigningVerifierImpl();
     urlSigningVerifier.updated(keys);

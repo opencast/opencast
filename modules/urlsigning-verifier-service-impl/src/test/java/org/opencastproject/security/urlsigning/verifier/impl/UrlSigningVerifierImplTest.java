@@ -30,8 +30,8 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UrlSigningVerifierImplTest {
   private static final String CLIENT_IP = "10.0.0.1";
@@ -52,7 +52,7 @@ public class UrlSigningVerifierImplTest {
 
     // Test no matching key
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    Dictionary<String, String> keys = new Hashtable<>();
+    Map<String, Object> keys = new HashMap<>();
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + "otherKey", "ThisIsTheOtherKey");
     urlSigningVerifierImpl.updated(keys);
     result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
@@ -60,7 +60,7 @@ public class UrlSigningVerifierImplTest {
 
     // Test only matching keys
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    keys = new Hashtable<>();
+    keys = new HashMap<>();
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, key);
     urlSigningVerifierImpl.updated(keys);
     result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
@@ -68,7 +68,7 @@ public class UrlSigningVerifierImplTest {
 
     // Test matching and non-matching keys
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    keys = new Hashtable<>();
+    keys = new HashMap<>();
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + "otherKey", "ThisIsTheOtherKey");
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, key);
     urlSigningVerifierImpl.updated(keys);
@@ -77,7 +77,7 @@ public class UrlSigningVerifierImplTest {
 
     // Test correct key id and wrong key
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    keys = new Hashtable<>();
+    keys = new HashMap<>();
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + "otherKey", "ThisIsTheOtherKey");
     keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, "The Wrong Key");
     urlSigningVerifierImpl.updated(keys);

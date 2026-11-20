@@ -79,6 +79,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -366,8 +367,12 @@ public class VideoEditorTest {
       }
     };
 
-    /* set up video editor */
-    veditor.activate(cc);
+    /* set up video editor, the activation needs a service registry to read the job load */
+    ServiceRegistry activationRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    EasyMock.expect(activationRegistry.getHostRegistrations()).andReturn(new ArrayList<>());
+    EasyMock.replay(activationRegistry);
+    veditor.setServiceRegistry(activationRegistry);
+    veditor.activate(cc, new HashMap<>());
     veditor.setWorkspace(workspace);
     veditor.setSecurityService(securityService);
     veditor.setUserDirectoryService(userDirectoryService);

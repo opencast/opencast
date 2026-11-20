@@ -47,9 +47,9 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test class for TimelinePreviewsServiceImpl.
@@ -80,7 +80,7 @@ public class TimelinePreviewsServiceImplTest {
    */
   @Test
   public void testUpdated() throws Exception {
-    Dictionary<String, String> properties = new Hashtable<>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put(TimelinePreviewsServiceImpl.OPT_RESOLUTION_X, "200");
     properties.put(TimelinePreviewsServiceImpl.OPT_RESOLUTION_Y, "90");
     properties.put(TimelinePreviewsServiceImpl.OPT_OUTPUT_FORMAT, ".jpg");
