@@ -89,6 +89,28 @@ public interface UserProvider {
   Iterator<User> findUsers(String query, int offset, int limit);
 
   /**
+   * Return the found users as an iterator, matching the query against the username, the name and the email address of
+   * each user, so that a user can be found by anything that is shown to identify them.
+   *
+   * Note that the default implementation only matches the username, same as {@link #findUsers(String, int, int)}.
+   * Providers that know about the name and email of their users should override this.
+   *
+   * @param query
+   *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
+   *          characters (including zero characters).
+   * @param offset
+   *          the offset
+   * @param limit
+   *          the limit. 0 means no limit
+   * @return an iterator of user's
+   * @throws IllegalArgumentException
+   *           if the query is <code>null</code>
+   */
+  default Iterator<User> findUsersByText(String query, int offset, int limit) {
+    return findUsers(query, offset, limit);
+  }
+
+  /**
    * Find a list of users by their user names
    *
    * Note that the default implementation of this might be slow, as it calls <code>loadUser</code> on every single user.
