@@ -33,6 +33,7 @@ Operation Example
 
 ```yaml
   - id: publish-engage-aws
+    retry-strategy: retry
     max-attempts: 2
     fail-on-error: true
     exception-handler-workflow: error
