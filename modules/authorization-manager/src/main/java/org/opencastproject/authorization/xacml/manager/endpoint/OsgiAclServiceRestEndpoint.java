@@ -53,8 +53,7 @@ import javax.ws.rs.Path;
     service = OsgiAclServiceRestEndpoint.class,
     property = {
         "service.description=ACL Manager REST endpoint",
-        "opencast.service.type=org.opencastproject.authorization.xacml.manager",
-        "opencast.service.path=/acl-manager"
+        "opencast.service.type=org.opencastproject.authorization.xacml.manager"
     }
 )
 @JaxrsResource
@@ -71,7 +70,7 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
     logger.info("Start ACL manager rest service");
-    final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 

@@ -46,8 +46,7 @@ import io.swagger.v3.oas.annotations.Hidden;
     service = WelcomeResources.class,
     property = {
         "service.description=Welcome Resources",
-        "opencast.service.type=org.opencastproject.welcome",
-        "opencast.service.path=/"
+        "opencast.service.type=org.opencastproject.welcome"
     }
 )
 @Hidden

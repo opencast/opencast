@@ -34,7 +34,6 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
@@ -52,6 +51,7 @@ import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -110,8 +110,7 @@ import javax.ws.rs.core.Response.Status;
 @Component(
     property = {
       "service.description=Service Registry REST Endpoint",
-      "opencast.service.type=org.opencastproject.serviceregistry",
-      "opencast.service.path=/services"
+      "opencast.service.type=org.opencastproject.serviceregistry"
     },
     immediate = true,
     service = { ServiceRegistryEndpoint.class }
@@ -150,7 +149,7 @@ public class ServiceRegistryEndpoint {
   @Activate
   public void activate(ComponentContext cc) {
     serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
-    servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+    servicePath = RestUtil.getServicePath(getClass());
   }
 
   @GET

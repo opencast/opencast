@@ -81,8 +81,7 @@ import javax.ws.rs.core.Response;
     service = { SecurityEndpoint.class },
     property = {
         "service.description=External API - Security Endpoint",
-        "opencast.service.type=org.opencastproject.external.security",
-        "opencast.service.path=/api/security"
+        "opencast.service.type=org.opencastproject.external.security"
     }
 )
 @JaxrsResource

@@ -73,7 +73,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Cover Image Service REST Endpoint",
         "opencast.service.type=org.opencastproject.coverimage",
-        "opencast.service.path=/cover-image",
         "opencast.service.jobproducer=true"
     }
 )

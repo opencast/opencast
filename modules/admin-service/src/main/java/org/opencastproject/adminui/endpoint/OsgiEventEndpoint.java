@@ -66,7 +66,6 @@ import java.util.Objects;
     property = {
         "service.description=Admin UI - Event facade Endpoint",
         "opencast.service.type=org.opencastproject.adminui.OsgiEventEndpoint",
-        "opencast.service.path=/admin-ng/event",
     }
 )
 @JaxrsResource

@@ -63,7 +63,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Waveform Service REST Endpoint",
         "opencast.service.type=org.opencastproject.waveform",
-        "opencast.service.path=/waveform",
         "opencast.service.jobproducer=true"
     }
 )

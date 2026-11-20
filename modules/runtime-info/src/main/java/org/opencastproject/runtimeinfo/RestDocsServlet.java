@@ -22,10 +22,10 @@
 package org.opencastproject.runtimeinfo;
 
 import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
-import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
 
 import org.opencastproject.runtimeinfo.rest.RestDocData;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
@@ -114,22 +114,39 @@ public class RestDocsServlet extends HttpServlet {
 
   private void writeServiceDocumentation(final String docPath, HttpServletResponse resp)
           throws IOException {
+    // Find the REST service whose @Path matches the requested path
     ServiceReference reference = null;
+    Object matchingService = null;
     for (ServiceReference ref : getRestEndpointServices()) {
-      String alias = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
-      if (docPath.equalsIgnoreCase(alias)) {
+      final Object service = bundleContext.getService(ref);
+      if (service == null) {
+        continue;
+      }
+      if (docPath.equalsIgnoreCase(getServicePath(service))) {
         reference = ref;
+        matchingService = service;
         break;
       }
+      bundleContext.ungetService(ref);
     }
 
+    try {
+      writeServiceDocumentation(docPath, matchingService, resp);
+    } finally {
+      if (reference != null) {
+        bundleContext.ungetService(reference);
+      }
+    }
+  }
+
+  private void writeServiceDocumentation(final String docPath, final Object restService, HttpServletResponse resp)
+          throws IOException {
     final StringBuilder docs = new StringBuilder();
 
-    if (reference == null) {
+    if (restService == null) {
       docs.append("REST docs unavailable for ");
       docs.append(StringEscapeUtils.escapeHtml4(docPath));
     } else {
-      final Object restService = bundleContext.getService(reference);
       findRestAnnotation(restService.getClass()).ifPresentOrElse(
           annotation -> {
             globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
@@ -174,6 +191,15 @@ public class RestDocsServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     resp.getWriter().write(docs.toString());
+  }
+
+  /** Get the path of a REST service from the @Path annotation of its class, or null if it has none. */
+  private static String getServicePath(Object service) {
+    try {
+      return RestUtil.getServicePath(service.getClass());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
   }
 
   private ServiceReference[] getRestEndpointServices() {

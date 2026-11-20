@@ -99,8 +99,7 @@ import javax.ws.rs.core.Response;
     name = "org.opencastproject.workingfilerepository.impl.WorkingFileRepository",
     property = {
       "service.description=Working File Repository REST Endpoint",
-      "opencast.service.type=org.opencastproject.files",
-      "opencast.service.path=/files"
+      "opencast.service.type=org.opencastproject.files"
     },
     immediate = true,
     service = {

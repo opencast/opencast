@@ -78,7 +78,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=AssetManager S3 REST Endpoint",
         "opencast.service.type=org.opencastproject.assetmanager.aws-s3",
-        "opencast.service.path=/assets/aws/s3",
     }
 )
 @JaxrsResource

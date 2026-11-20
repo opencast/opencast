@@ -67,8 +67,7 @@ import javax.ws.rs.core.Response;
         service = ListProviderEndpoint.class,
         property = {
                 "service.description=External API - List Providers Endpoint",
-                "opencast.service.type=org.opencastproject.external.listproviders",
-                "opencast.service.path=/api/listproviders"
+                "opencast.service.type=org.opencastproject.external.listproviders"
         }
 )
 @JaxrsResource

@@ -71,7 +71,6 @@ import io.prometheus.client.hotspot.DefaultExports;
     property = {
         "service.description=Metrics Endpoint",
         "opencast.service.type=org.opencastproject.metrics",
-        "opencast.service.path=/metrics",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

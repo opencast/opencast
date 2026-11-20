@@ -87,7 +87,6 @@ import javax.ws.rs.Path;
     property = {
         "service.description=Statistics Remote Service Proxy",
         "opencast.service.type=org.opencastproject.statistics",
-        "opencast.service.path=/statistics",
         "opencast.service.publish=false"
     }
 )

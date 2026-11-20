@@ -40,7 +40,6 @@ import org.opencastproject.playlists.PlaylistEntry;
 import org.opencastproject.playlists.PlaylistRestService;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
@@ -97,8 +96,7 @@ import javax.ws.rs.core.Response;
     service = PlaylistsEndpoint.class,
     property = {
         "service.description=External API - Playlists Endpoint",
-        "opencast.service.type=org.opencastproject.external.playlists",
-        "opencast.service.path=/api/playlists"
+        "opencast.service.type=org.opencastproject.external.playlists"
     }
 )
 @JaxrsResource
@@ -132,7 +130,7 @@ public class PlaylistsEndpoint {
     logger.info("Activating External API - Playlists Endpoint");
 
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
-        RestConstants.SERVICE_PATH_PROPERTY);
+            getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 

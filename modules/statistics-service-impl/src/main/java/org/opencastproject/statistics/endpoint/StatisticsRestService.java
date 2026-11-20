@@ -86,8 +86,7 @@ import javax.ws.rs.core.Response;
     service = StatisticsRestService.class,
     property = {
         "service.description=Statistics REST Endpoint",
-        "opencast.service.type=org.opencastproject.statistics",
-        "opencast.service.path=/statistics"
+        "opencast.service.type=org.opencastproject.statistics"
     }
 )
 @JaxrsResource

@@ -63,8 +63,7 @@ import javax.ws.rs.core.MediaType;
     service = VersionEndpoint.class,
     property = {
         "service.description=Admin UI - Latest Version Endpoint",
-        "opencast.service.type=org.opencastproject.adminui.endpoint.VersionEndpoint",
-        "opencast.service.path=/admin-ng/oc-version"
+        "opencast.service.type=org.opencastproject.adminui.endpoint.VersionEndpoint"
     }
 )
 @JaxrsResource

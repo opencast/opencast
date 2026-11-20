@@ -52,7 +52,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=No operation service REST endpoint",
         "opencast.service.type=org.opencastproject.nop",
-        "opencast.service.path=/nop",
         "opencast.service.jobproducer=true"
     }
 )

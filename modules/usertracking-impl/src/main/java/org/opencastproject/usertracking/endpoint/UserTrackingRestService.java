@@ -24,7 +24,6 @@ package org.opencastproject.usertracking.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.usertracking.api.UserSession;
@@ -34,6 +33,7 @@ import org.opencastproject.usertracking.impl.UserActionImpl;
 import org.opencastproject.usertracking.impl.UserActionListImpl;
 import org.opencastproject.usertracking.impl.UserSessionImpl;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -90,8 +90,7 @@ import javax.ws.rs.core.Response.Status;
     service = UserTrackingRestService.class,
     property = {
         "service.description=User Tracking REST Endpoint",
-        "opencast.service.type=org.opencastproject.usertracking",
-        "opencast.service.path=/usertracking"
+        "opencast.service.type=org.opencastproject.usertracking"
     }
 )
 @JaxrsResource
@@ -147,7 +146,7 @@ public class UserTrackingRestService {
       } else {
         serverUrl = ccServerUrl;
       }
-      serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      serviceUrl = RestUtil.getServicePath(getClass());
     }
   }
 

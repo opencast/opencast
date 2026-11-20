@@ -80,7 +80,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=VideoGrid Service REST Endpoint",
         "opencast.service.type=org.opencastproject.videogrid",
-        "opencast.service.path=/videogrid",
         "opencast.service.jobproducer=true"
     }
 )

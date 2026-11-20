@@ -100,7 +100,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=User REST endpoint",
         "opencast.service.type=org.opencastproject.userdirectory.endpoint.UserEndpoint",
-        "opencast.service.path=/user-utils",
         "opencast.service.jobproducer=false"
     },
     immediate = true,
@@ -133,7 +132,7 @@ public class UserEndpoint {
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
     logger.info("Start users endpoint");
-    final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 

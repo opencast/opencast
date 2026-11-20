@@ -23,13 +23,13 @@ package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.cleanup.RecursiveDirectoryCleaner;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -144,7 +144,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
 
     // working file repository 'facade' configuration
-    servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+    servicePath = RestUtil.getServicePath(getClass());
 
     // root directory
     rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty("org.opencastproject.file.repo.path"));

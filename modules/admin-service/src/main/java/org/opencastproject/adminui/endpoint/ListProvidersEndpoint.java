@@ -88,7 +88,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Admin UI - Resource List Provider Endpoint",
         "opencast.service.type=org.opencastproject.adminui.ListProvidersEndpoint",
-        "opencast.service.path=/admin-ng/resources",
     }
 )
 @JaxrsResource

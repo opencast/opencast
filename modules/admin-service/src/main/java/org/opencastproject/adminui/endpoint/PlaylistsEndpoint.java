@@ -48,7 +48,6 @@ import org.opencastproject.playlists.PlaylistAccessControlEntry;
 import org.opencastproject.playlists.PlaylistEntry;
 import org.opencastproject.playlists.PlaylistRestService;
 import org.opencastproject.playlists.PlaylistService;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
@@ -117,8 +116,7 @@ import javax.ws.rs.core.Response;
     service = PlaylistsEndpoint.class,
     property = {
         "service.description=Admin UI - Playlists Endpoint",
-        "opencast.service.type=org.opencastproject.adminui.PlaylistsEndpoint",
-        "opencast.service.path=/admin-ng/playlists"
+        "opencast.service.type=org.opencastproject.adminui.PlaylistsEndpoint"
     }
 )
 @JaxrsResource
@@ -170,8 +168,7 @@ public class PlaylistsEndpoint {
   void activate(ComponentContext cc) {
     logger.info("Activating Admin UI - Playlists Endpoint");
 
-    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.SERVER_URL_PROPERTY,
-        RestConstants.SERVICE_PATH_PROPERTY);
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.SERVER_URL_PROPERTY, getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 

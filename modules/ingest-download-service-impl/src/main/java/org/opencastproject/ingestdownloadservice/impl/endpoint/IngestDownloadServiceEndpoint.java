@@ -63,7 +63,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Ingest download service Endpoint",
         "opencast.service.type=org.opencastproject.ingestdownload",
-        "opencast.service.path=/ingestdownload",
         "opencast.service.jobproducer=true"
     }
 )

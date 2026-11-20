@@ -93,7 +93,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Admin UI - Statistics Endpoint",
         "opencast.service.type=org.opencastproject.adminui.StatisticsEndpoint",
-        "opencast.service.path=/admin-ng/statistics",
     }
 )
 @JaxrsResource

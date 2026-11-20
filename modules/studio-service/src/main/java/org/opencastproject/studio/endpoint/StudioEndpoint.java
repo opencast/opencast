@@ -76,8 +76,7 @@ import javax.ws.rs.core.Response;
     service = StudioEndpoint.class,
     property = {
         "service.description=Studio REST Endpoint",
-        "opencast.service.type=org.opencastproject.studio",
-        "opencast.service.path=/studio-api"
+        "opencast.service.type=org.opencastproject.studio"
     }
 )
 @JaxrsResource

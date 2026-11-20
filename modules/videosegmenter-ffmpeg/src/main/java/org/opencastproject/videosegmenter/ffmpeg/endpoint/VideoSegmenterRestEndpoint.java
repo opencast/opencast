@@ -76,7 +76,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Video Segmentation REST Endpoint",
         "opencast.service.type=org.opencastproject.videosegmenter",
-        "opencast.service.path=/analysis/videosegmenter",
         "opencast.service.jobproducer=true"
     }
 )

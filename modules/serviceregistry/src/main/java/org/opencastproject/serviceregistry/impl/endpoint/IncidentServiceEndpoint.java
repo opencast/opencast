@@ -42,7 +42,6 @@ import org.opencastproject.job.api.JaxbIncidentList;
 import org.opencastproject.job.api.JaxbIncidentTree;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
@@ -52,6 +51,7 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -114,8 +114,7 @@ import javax.ws.rs.core.Response.Status;
 @Component(
     property = {
       "service.description=Incident Service REST Endpoint",
-      "opencast.service.type=org.opencastproject.incident",
-      "opencast.service.path=/incidents"
+      "opencast.service.type=org.opencastproject.incident"
     },
     immediate = true,
     service = { IncidentServiceEndpoint.class }
@@ -161,7 +160,7 @@ public class IncidentServiceEndpoint {
       if (StringUtils.isNotBlank(ccServerUrl)) {
         serverUrl = ccServerUrl;
       }
-      serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      serviceUrl = RestUtil.getServicePath(getClass());
     }
   }
 

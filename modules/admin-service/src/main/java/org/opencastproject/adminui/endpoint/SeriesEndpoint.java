@@ -167,7 +167,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Admin UI - SeriesEndpoint Endpoint",
         "opencast.service.type=org.opencastproject.adminui.SeriesEndpoint",
-        "opencast.service.path=/admin-ng/series",
     }
 )
 @JaxrsResource

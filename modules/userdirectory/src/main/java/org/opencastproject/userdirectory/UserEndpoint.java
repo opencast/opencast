@@ -66,7 +66,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=User listing REST endpoint",
         "opencast.service.type=org.opencastproject.userdirectory.users",
-        "opencast.service.path=/users",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

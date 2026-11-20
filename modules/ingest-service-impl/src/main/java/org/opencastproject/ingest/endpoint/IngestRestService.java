@@ -142,7 +142,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Ingest REST Endpoint",
         "opencast.service.type=org.opencastproject.ingest",
-        "opencast.service.path=/ingest",
         "opencast.service.jobproducer=true"
     }
 )

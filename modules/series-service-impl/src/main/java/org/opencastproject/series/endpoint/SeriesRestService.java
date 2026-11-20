@@ -43,7 +43,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.SecurityService;
@@ -53,6 +52,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -126,8 +126,7 @@ import javax.ws.rs.core.Response;
     service = SeriesRestService.class,
     property = {
         "service.description=Series REST Endpoint",
-        "opencast.service.type=org.opencastproject.series",
-        "opencast.service.path=/series"
+        "opencast.service.type=org.opencastproject.series"
     }
 )
 @JaxrsResource
@@ -248,7 +247,7 @@ public class SeriesRestService {
         this.serverUrl = ccServerUrl;
       }
     }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+    serviceUrl = RestUtil.getServicePath(getClass());
   }
 
   public String getSeriesXmlUrl(String seriesId) {

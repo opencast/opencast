@@ -68,7 +68,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Adopter Statistics REST Endpoint",
         "opencast.service.type=org.opencastproject.adopter.registration.AdopterRegistrationRestService",
-        "opencast.service.path=/admin-ng/adopter",
         "opencast.service.jobproducer=false"
     }
 )

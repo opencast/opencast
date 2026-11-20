@@ -86,7 +86,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=AWS S3 Distribution REST Endpoint",
         "opencast.service.type=org.opencastproject.distribution.aws.s3",
-        "opencast.service.path=/distribution/s3",
         "opencast.service.jobproducer=true"
     }
 )

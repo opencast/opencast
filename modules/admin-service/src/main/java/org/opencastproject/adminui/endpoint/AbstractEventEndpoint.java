@@ -116,7 +116,6 @@ import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.rest.BulkOperationResult;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -310,7 +309,7 @@ public abstract class AbstractEventEndpoint {
         this.serverUrl = ccServerUrl;
       }
 
-      this.serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      this.serviceUrl = RestUtil.getServicePath(getClass());
 
       String ccDefaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext()
           .getProperty(WORKFLOW_DEFINITION_DEFAULT));

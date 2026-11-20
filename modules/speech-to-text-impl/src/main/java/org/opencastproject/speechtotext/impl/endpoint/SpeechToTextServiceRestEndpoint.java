@@ -71,7 +71,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Speech to Text Service REST Endpoint",
         "opencast.service.type=org.opencastproject.speechtotext",
-        "opencast.service.path=/speechtotext",
         "opencast.service.jobproducer=true"
     }
 )

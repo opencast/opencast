@@ -66,8 +66,7 @@ import javax.ws.rs.core.Response;
     service = TerminationStateRestServiceImpl.class,
     property = {
         "service.description=Termination State Rest Service",
-        "opencast.service.type=org.opencastproject.terminationstate.impl",
-        "opencast.service.path=/termination"
+        "opencast.service.type=org.opencastproject.terminationstate.impl"
     }
 )
 @JaxrsResource

@@ -90,8 +90,7 @@ import javax.ws.rs.core.Response;
     service = WorkflowDefinitionsEndpoint.class,
     property = {
         "service.description=External API - Workflow Definitions Endpoint",
-        "opencast.service.type=org.opencastproject.external.workflows.definitions",
-        "opencast.service.path=/api/workflow-definitions"
+        "opencast.service.type=org.opencastproject.external.workflows.definitions"
     }
 )
 @JaxrsResource

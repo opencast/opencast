@@ -76,7 +76,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Media Inspection REST Endpoint",
         "opencast.service.type=org.opencastproject.inspection",
-        "opencast.service.path=/inspection",
         "opencast.service.jobproducer=true"
     },
     immediate = true,
@@ -135,7 +134,6 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    */
   @Activate
   public void activate(ComponentContext cc) {
-    // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
   @GET
