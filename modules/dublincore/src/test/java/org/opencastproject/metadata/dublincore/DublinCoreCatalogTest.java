@@ -231,7 +231,7 @@ public class DublinCoreCatalogTest {
           try {
             // block until all threads are started
             gate.await();
-            logger.debug("Running with " + index + " in " + Thread.currentThread().getId());
+            logger.debug("Running with " + index + " in " + Thread.currentThread().threadId());
             DublinCoreCatalog cat = DublinCoreXmlFormat.read(catString);
             map.put(Integer.valueOf(index), cat);
           } catch (Exception e) {

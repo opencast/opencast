@@ -75,8 +75,7 @@ public class HealthCheckTest {
 
     // Test pass
     String json = runtimeInfo.getHealth(response);
-    JsonParser parser = new JsonParser();
-    JsonObject j = (JsonObject) parser.parse(json);
+    JsonObject j = (JsonObject) JsonParser.parseString(json);
     Assert.assertEquals("pass", j.get("status").getAsString());
   }
 
@@ -88,8 +87,7 @@ public class HealthCheckTest {
     // test warn service WARNING
     serviceReg1.setServiceState(ServiceState.WARNING);
     String json = runtimeInfo.getHealth(response);
-    JsonParser parser = new JsonParser();
-    JsonObject j = (JsonObject) parser.parse(json);
+    JsonObject j = (JsonObject) JsonParser.parseString(json);
     Assert.assertEquals("warn", j.get("status").getAsString());
     JsonObject checks = (JsonObject) j.get("checks");
     Assert.assertNotNull(checks);
@@ -101,7 +99,7 @@ public class HealthCheckTest {
     // test warn service ERROR
     serviceReg2.setServiceState(ServiceState.ERROR);
     json = runtimeInfo.getHealth(response);
-    j = (JsonObject) parser.parse(json);
+    j = (JsonObject) JsonParser.parseString(json);
     Assert.assertEquals("warn", j.get("status").getAsString());
     checks = (JsonObject) j.get("checks");
     Assert.assertNotNull(checks);
@@ -119,8 +117,7 @@ public class HealthCheckTest {
     // maintenance mode
     hostRegistration.setMaintenanceMode(true);
     String json = runtimeInfo.getHealth(response);
-    JsonParser parser = new JsonParser();
-    JsonObject j = (JsonObject) parser.parse(json);
+    JsonObject j = (JsonObject) JsonParser.parseString(json);
     Assert.assertEquals("fail", j.get("status").getAsString());
     JsonArray notes = (JsonArray) j.get("notes");
     Assert.assertNotNull(notes);
@@ -131,7 +128,7 @@ public class HealthCheckTest {
     // disabled
     hostRegistration.setActive(false);
     json = runtimeInfo.getHealth(response);
-    j = (JsonObject) parser.parse(json);
+    j = (JsonObject) JsonParser.parseString(json);
     Assert.assertEquals("fail", j.get("status").getAsString());
     notes = (JsonArray) j.get("notes");
     Assert.assertNotNull(notes);
