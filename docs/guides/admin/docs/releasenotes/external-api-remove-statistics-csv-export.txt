@@ -1,0 +1,3 @@
+The External API endpoint `POST /api/statistics/data/export.csv` has been removed. Statistics can still be queried via
+`POST /api/statistics/data/query`, and the admin interface continues to offer its own CSV export. Statistics providers
+no longer advertise the `detailLevel` parameter, which was only used by the removed endpoint.

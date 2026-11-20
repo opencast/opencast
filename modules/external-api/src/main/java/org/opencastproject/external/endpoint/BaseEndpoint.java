@@ -73,11 +73,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * supported API.
  */
 @Path("/api")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0})
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
 @Tag(
@@ -297,17 +293,6 @@ public class BaseEndpoint {
   @ApiResponse(responseCode = "200", description = "The default version is returned.")
   public Response getVersion() throws Exception {
     List<String> versions = new ArrayList<>();
-    versions.add(ApiVersion.VERSION_1_0_0.toString());
-    versions.add(ApiVersion.VERSION_1_1_0.toString());
-    versions.add(ApiVersion.VERSION_1_2_0.toString());
-    versions.add(ApiVersion.VERSION_1_3_0.toString());
-    versions.add(ApiVersion.VERSION_1_4_0.toString());
-    versions.add(ApiVersion.VERSION_1_5_0.toString());
-    versions.add(ApiVersion.VERSION_1_6_0.toString());
-    versions.add(ApiVersion.VERSION_1_7_0.toString());
-    versions.add(ApiVersion.VERSION_1_8_0.toString());
-    versions.add(ApiVersion.VERSION_1_9_0.toString());
-    versions.add(ApiVersion.VERSION_1_10_0.toString());
     versions.add(ApiVersion.VERSION_1_11_0.toString());
     versions.add(ApiVersion.VERSION_1_12_0.toString());
     JsonObject json = new JsonObject();

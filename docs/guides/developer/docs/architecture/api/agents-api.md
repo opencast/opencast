@@ -1,8 +1,6 @@
 [TOC]
 # General
 
-The Agents API is available since API version 1.1.0.
-
 ### GET /api/agents
 
 Returns a list of capture agents.

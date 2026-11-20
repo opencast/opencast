@@ -25,9 +25,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;
 import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
@@ -130,11 +127,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/api/series")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
 @RestService(
     name = "externalapiseries",
     title = "External API Series Service",
@@ -235,10 +228,6 @@ public class SeriesEndpoint {
           @QueryParam("limit") int limit, @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess,
           @QueryParam("withacl") Boolean withAcl) throws UnauthorizedException {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    if (requestedVersion.isSmallerThan(VERSION_1_5_0)) {
-      // withAcl was added for version 1.5.0 and should be ignored for smaller versions.
-      withAcl = false;
-    }
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
@@ -260,14 +249,7 @@ public class SeriesEndpoint {
             continue;
           }
           String name = filterTuple[0];
-
-          String value;
-          if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-            // MH-13038 - 1.1.0 and higher support semi-colons in values
-            value = f.substring(name.length() + 1);
-          } else {
-            value = filterTuple[1];
-          }
+          String value = filterTuple[1];
 
           if ("managedAcl".equals(name)) {
             query.withManagedAcl(value);
@@ -302,22 +284,19 @@ public class SeriesEndpoint {
             query.withSubject(value);
           } else if ("title".equals(name)) {
             query.withTitle(value);
-          } else if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-            // additional filters only available with Version 1.1.0 or higher
-            if ("identifier".equals(name)) {
-              query.withIdentifier(value);
-            } else if ("description".equals(name)) {
-              query.withDescription(value);
-            } else if ("creator".equals(name)) {
-              query.withCreator(value);
-            } else if ("publishers".equals(name)) {
-              query.withPublisher(value);
-            } else if ("rightsholder".equals(name)) {
-              query.withRightsHolder(value);
-            } else {
-              logger.warn("Unknown filter criteria {}", name);
-              return Response.status(SC_BAD_REQUEST).build();
-            }
+          } else if ("identifier".equals(name)) {
+            query.withIdentifier(value);
+          } else if ("description".equals(name)) {
+            query.withDescription(value);
+          } else if ("creator".equals(name)) {
+            query.withCreator(value);
+          } else if ("publishers".equals(name)) {
+            query.withPublisher(value);
+          } else if ("rightsholder".equals(name)) {
+            query.withRightsHolder(value);
+          } else {
+            logger.warn("Unknown filter criteria {}", name);
+            return Response.status(SC_BAD_REQUEST).build();
           }
         }
       }
@@ -388,16 +367,14 @@ public class SeriesEndpoint {
       seriesJson.add("organizers", collectionToJsonArray(s.getOrganizers()));
       seriesJson.add("publishers", collectionToJsonArray(s.getPublishers()));
 
-      if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-        seriesJson.addProperty("description", safeString(s.getDescription()));
-        seriesJson.addProperty("language", safeString(s.getLanguage()));
-        seriesJson.addProperty("license", safeString(s.getLicense()));
-        seriesJson.addProperty("rightsholder", safeString(s.getRightsHolder()));
+      seriesJson.addProperty("description", safeString(s.getDescription()));
+      seriesJson.addProperty("language", safeString(s.getLanguage()));
+      seriesJson.addProperty("license", safeString(s.getLicense()));
+      seriesJson.addProperty("rightsholder", safeString(s.getRightsHolder()));
 
-        if (includeAcl) {
-          AccessControlList acl = getAclFromSeries(s);
-          seriesJson.add("acl", AclUtils.serializeAclToJson(acl));
-        }
+      if (includeAcl) {
+        AccessControlList acl = getAclFromSeries(s);
+        seriesJson.add("acl", AclUtils.serializeAclToJson(acl));
       }
 
       seriesArray.add(seriesJson);
@@ -446,11 +423,6 @@ public class SeriesEndpoint {
                             @QueryParam("withacl") Boolean withAcl)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    if (requestedVersion.isSmallerThan(VERSION_1_5_0)) {
-      // withAcl was added for version 1.5.0 and should be ignored for smaller versions.
-      withAcl = false;
-    }
-
     Optional<Series> optSeries = opensearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
@@ -478,16 +450,14 @@ public class SeriesEndpoint {
       responseContent.addProperty("opt_out", false);
       responseContent.add("publishers", collectionToJsonArray(s.getPublishers()));
 
-      if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-        responseContent.addProperty("language", safeString(s.getLanguage()));
-        responseContent.addProperty("license", safeString(s.getLicense()));
-        responseContent.addProperty("rightsholder", safeString(s.getRightsHolder()));
+      responseContent.addProperty("language", safeString(s.getLanguage()));
+      responseContent.addProperty("license", safeString(s.getLicense()));
+      responseContent.addProperty("rightsholder", safeString(s.getRightsHolder()));
 
-        if (withAcl != null && withAcl) {
-          AccessControlList acl = getAclFromSeries(s);
-          JsonArray aclJsonArray = AclUtils.serializeAclToJson(acl);
-          responseContent.add("acl", aclJsonArray);
-        }
+      if (withAcl != null && withAcl) {
+        AccessControlList acl = getAclFromSeries(s);
+        JsonArray aclJsonArray = AclUtils.serializeAclToJson(acl);
+        responseContent.add("acl", aclJsonArray);
       }
 
       return ApiResponseBuilder.Json.ok(requestedVersion, responseContent);
@@ -1252,11 +1222,6 @@ public class SeriesEndpoint {
     }
 
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    if (requestedVersion.isSmallerThan(VERSION_1_2_0)) {
-      // override was added in version 1.2.0 and should be ignored for smaller versions
-      override = false;
-    }
-
     JsonArray acl;
     try {
       acl = GsonUtil.gson().fromJson(aclJson, JsonArray.class);
@@ -1277,7 +1242,7 @@ public class SeriesEndpoint {
         .collect(Collectors.toList());
 
     seriesService.updateAccessControl(seriesID, new AccessControlList(accessControlEntries), override);
-    return ApiResponseBuilder.Json.ok(acceptHeader, aclJson);
+    return ApiResponseBuilder.Json.ok(requestedVersion, aclJson);
   }
 
   @SuppressWarnings("unchecked")
@@ -1478,7 +1443,7 @@ public class SeriesEndpoint {
               rightsHolder, createdFrom, createdTo, language, license, subject, description, sort,
               offset, count, fuzzyMatch);
 
-      return queryResultToJson(items, false, ApiVersion.VERSION_1_7_0);
+      return queryResultToJson(items, false, ApiVersion.CURRENT_VERSION);
 
     } catch (UnauthorizedException e) {
       throw e;

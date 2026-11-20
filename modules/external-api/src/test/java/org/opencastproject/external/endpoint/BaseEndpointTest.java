@@ -21,6 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -124,20 +125,18 @@ public class BaseEndpointTest {
     JsonObject json = JsonParser.parseString(response).getAsJsonObject();
     JsonArray version = json.getAsJsonArray("versions");
     assertEquals("v1.12.0", json.get("default").getAsString());
-    assertTrue(version.contains(new JsonPrimitive("v1.0.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.1.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.2.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.3.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.4.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.5.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.6.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.7.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.8.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.9.0")));
-    assertTrue(version.contains(new JsonPrimitive("v1.10.0")));
     assertTrue(version.contains(new JsonPrimitive("v1.11.0")));
     assertTrue(version.contains(new JsonPrimitive("v1.12.0")));
-    assertEquals(13, version.size());
+    assertEquals(2, version.size());
+  }
+
+  /** Requests for removed API versions must be rejected */
+  @Test
+  public void testRemovedVersionNotAcceptable() throws Exception {
+    given().accept("application/v1.10.0+json").log().all().expect().statusCode(SC_NOT_ACCEPTABLE).when()
+        .get(env.host("/version"));
+    given().accept("application/v1.11.0+json").log().all().expect().statusCode(SC_OK).when()
+        .get(env.host("/version"));
   }
 
   /** Test case for {@link BaseEndpoint#getVersionDefault()} */

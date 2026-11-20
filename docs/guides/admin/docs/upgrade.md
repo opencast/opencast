@@ -32,6 +32,12 @@ rebuild](#index-rebuild).
 Note that the OpenSearch configuration keys in `etc/custom.properties` and the name of the index configuration file
 have changed as well. See the [configuration changes](#configuration-changes) below.
 
+## External API
+
+The External API versions 1.0.0 to 1.10.0 have been removed. Requests explicitly asking for one of these versions in
+their `Accept` header are now rejected with `406 Not Acceptable`. If you are running integrations that pin an old
+External API version, update them to use version 1.11.0 or later before upgrading.
+
 ## Configuration Changes
 
 Check for changes in the configuration and apply those relevant to your setup to your files. You can use the following
