@@ -48,12 +48,14 @@ public class TagByDublinCoreTermWOHTest {
   private WorkflowOperationInstance operation;
   private MediaPackage mp;
   private Workspace workspace;
+  private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
   @Before
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mp = builder.loadFromXml(this.getClass().getResourceAsStream("/archive_mediapackage.xml"));
     mp.getCatalog("catalog-1").setURI(this.getClass().getResource("/dublincore.xml").toURI());
+    mp.getCatalog("catalog-2").setURI(this.getClass().getResource("/dublincore_second.xml").toURI());
 
     // set up the handler
     operationHandler = new TagByDublinCoreTermWOH();
@@ -163,5 +165,99 @@ public class TagByDublinCoreTermWOHTest {
     Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
     Assert.assertEquals(1, catalog.getTags().length);
     Assert.assertEquals("archive", catalog.getTags()[0]);
+  }
+
+  @Test
+  public void testMatchCreatorEmailWithRegex() throws Exception {
+    operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(TagByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
+    operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+
+    Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
+    Assert.assertEquals(2, catalog.getTags().length);
+    Assert.assertEquals("tag1", catalog.getTags()[0]);
+    Assert.assertEquals("tag2", catalog.getTags()[1]);
+  }
+
+  @Test
+  public void testNoMatchCreatorEmailWhenRegexDisabled() throws Exception {
+    operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(TagByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "false");
+    operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
+    operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+
+    Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
+    Assert.assertEquals(1, catalog.getTags().length);
+    Assert.assertEquals("archive", catalog.getTags()[0]);
+  }
+
+  @Test
+  public void testNoMatchNonEmailDCTermWithEmailRegex() throws Exception {
+    // Publisher is "University of Opencast", which does not match an email regex
+    operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}publisher");
+    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(TagByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
+    operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+
+    Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
+    Assert.assertEquals(1, catalog.getTags().length);
+    Assert.assertEquals("archive", catalog.getTags()[0]);
+  }
+
+  @Test
+  public void testInvalidEmailRegexDoesNotCrash() throws Exception {
+    operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "^[a-zA-Z0-9._%+-]+@[unclosed");
+    operation.setConfiguration(TagByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
+    operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+
+    Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
+    Assert.assertEquals(1, catalog.getTags().length);
+    Assert.assertEquals("archive", catalog.getTags()[0]);
+  }
+
+  @Test
+  public void testMultiCatalogMatchPreservedWhenSecondCatalogDoesNotMatch() throws Exception {
+    // catalog-1 matches the email regex in creator, catalog-2 does not match
+    operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}creator");
+    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, EMAIL_REGEX);
+    operation.setConfiguration(TagByDublinCoreTermWOH.CHECK_REGEX_PROPERTY, "true");
+    operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
+    operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+
+    Catalog catalog = resultingMediapackage.getCatalog("catalog-1");
+    Assert.assertEquals(2, catalog.getTags().length);
+    Assert.assertEquals("tag1", catalog.getTags()[0]);
+    Assert.assertEquals("tag2", catalog.getTags()[1]);
   }
 }
