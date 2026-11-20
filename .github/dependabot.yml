@@ -16,7 +16,7 @@ updates:
   schedule:
     interval: monthly
   groups:
-    minor-and-patch:
+    lti-minor-and-patch:
       update-types:
         - minor
         - patch
