@@ -186,7 +186,7 @@ public class AdaptivePlaylistTest {
   @Test
   public void testSetDuration() {
     adaptiveplaylist.setDuration(null);
-    adaptiveplaylist.setDuration(new Long(10));
+    adaptiveplaylist.setDuration(Long.valueOf(10));
   }
 
   /**

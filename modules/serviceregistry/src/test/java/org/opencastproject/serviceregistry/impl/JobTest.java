@@ -141,7 +141,7 @@ public class JobTest {
 
     Job jobFromDb = serviceRegistry.getJob(job.getId());
     assertEquals(Status.INSTANTIATED, jobFromDb.getStatus());
-    assertEquals(new Float(4.0f), job.getJobLoad());
+    assertEquals(Float.valueOf(4.0f), job.getJobLoad());
 
     // Simulate starting the job
     job.setStatus(Status.RUNNING);

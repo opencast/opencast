@@ -72,7 +72,7 @@ public class UserActionListImplTest {
 
     Assert.assertEquals(1, ual1.getTotal());
     Assert.assertEquals(1, ual1.getUserActions().size());
-    Assert.assertEquals(new Long(4), ual1.getUserActions().get(0).getId());
+    Assert.assertEquals(Long.valueOf(4), ual1.getUserActions().get(0).getId());
     Assert.assertEquals(90, ual1.getUserActions().get(0).getInpoint());
     Assert.assertEquals(true, ual1.getUserActions().get(0).getIsPlaying());
     Assert.assertEquals("false", ual1.getUserActions().get(0).getMediapackageId());
@@ -89,7 +89,7 @@ public class UserActionListImplTest {
 
     Assert.assertEquals(1, ual2.getTotal());
     Assert.assertEquals(1, ual2.getUserActions().size());
-    Assert.assertEquals(new Long(6), ual2.getUserActions().get(0).getId());
+    Assert.assertEquals(Long.valueOf(6), ual2.getUserActions().get(0).getId());
     Assert.assertEquals(5, ual2.getUserActions().get(0).getInpoint());
     Assert.assertEquals(false, ual2.getUserActions().get(0).getIsPlaying());
     Assert.assertEquals("other", ual2.getUserActions().get(0).getMediapackageId());
@@ -144,7 +144,7 @@ public class UserActionListImplTest {
 
     Assert.assertEquals(2, ual.getTotal());
     Assert.assertEquals(2, ual.getUserActions().size());
-    Assert.assertEquals(new Long(4), ual.getUserActions().get(0).getId());
+    Assert.assertEquals(Long.valueOf(4), ual.getUserActions().get(0).getId());
     Assert.assertEquals(90, ual.getUserActions().get(0).getInpoint());
     Assert.assertEquals(true, ual.getUserActions().get(0).getIsPlaying());
     Assert.assertEquals("false", ual.getUserActions().get(0).getMediapackageId());
@@ -155,7 +155,7 @@ public class UserActionListImplTest {
     Assert.assertEquals("127.0.0.1", ual.getUserActions().get(0).getSession().getUserIp());
 
 
-    Assert.assertEquals(new Long(6), ual.getUserActions().get(1).getId());
+    Assert.assertEquals(Long.valueOf(6), ual.getUserActions().get(1).getId());
     Assert.assertEquals(5, ual.getUserActions().get(1).getInpoint());
     Assert.assertEquals(false, ual.getUserActions().get(1).getIsPlaying());
     Assert.assertEquals("other", ual.getUserActions().get(1).getMediapackageId());

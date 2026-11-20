@@ -277,7 +277,7 @@ public class SmilServiceImplTest {
     videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
     videoTrack.setURI(new URI("http://hostname/video.mp4"));
     videoTrack.addStream(new VideoStreamImpl());
-    videoTrack.setDuration(new Long(1000));
+    videoTrack.setDuration(Long.valueOf(1000));
 
     SmilResponse smilResponse = smilService.createNewSmil();
     smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 1000, 10);

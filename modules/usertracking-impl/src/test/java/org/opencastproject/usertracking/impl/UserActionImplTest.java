@@ -48,7 +48,7 @@ public class UserActionImplTest {
     ua.setSession(us);
     ua.setType("test");
 
-    Assert.assertEquals(new Long(4), ua.getId());
+    Assert.assertEquals(Long.valueOf(4), ua.getId());
     Assert.assertEquals(90, ua.getInpoint());
     Assert.assertEquals(true, ua.getIsPlaying());
     Assert.assertEquals("false", ua.getMediapackageId());
@@ -79,7 +79,7 @@ public class UserActionImplTest {
     ua.setSession(us);
     ua.setType("test");
 
-    Assert.assertEquals(new Long(4), ua.getId());
+    Assert.assertEquals(Long.valueOf(4), ua.getId());
     Assert.assertEquals(100, ua.getInpoint());
     Assert.assertEquals(true, ua.getIsPlaying());
     Assert.assertEquals("false", ua.getMediapackageId());

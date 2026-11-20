@@ -191,7 +191,7 @@ public class EncodingSchemeUtilsTest {
     assertEquals(d2, decodeDuration(encodeDuration(d2).getValue()));
     Long d3 = 234L;
     assertEquals(d3, decodeDuration(encodeDuration(d3).getValue()));
-    assertEquals(new Long(1 * 1000 * 60 * 60 + 10 * 1000 * 60 + 5 * 1000), decodeDuration("01:10:05"));
+    assertEquals(Long.valueOf(1 * 1000 * 60 * 60 + 10 * 1000 * 60 + 5 * 1000), decodeDuration("01:10:05"));
 
     assertEquals(Optional.of(DublinCore.ENC_SCHEME_ISO8601), encodeDuration(d3).getEncodingScheme());
 

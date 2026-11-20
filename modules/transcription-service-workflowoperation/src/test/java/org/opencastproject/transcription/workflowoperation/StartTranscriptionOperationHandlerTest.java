@@ -76,7 +76,7 @@ public class StartTranscriptionOperationHandlerTest {
     EasyMock.expect(job1.getStatus()).andReturn(Job.Status.FINISHED);
     EasyMock.expect(job1.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job1.getDateStarted()).andReturn(new Date());
-    EasyMock.expect(job1.getQueueTime()).andReturn(new Long(0));
+    EasyMock.expect(job1.getQueueTime()).andReturn(Long.valueOf(0));
     EasyMock.replay(job1);
 
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);

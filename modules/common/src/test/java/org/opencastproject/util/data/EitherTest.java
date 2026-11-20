@@ -38,7 +38,7 @@ public class EitherTest {
     Either<String, Integer> a = left("error");
     assertEquals("error", a.left().value());
     Either<String, Integer> b = right(1);
-    assertEquals(new Integer(1), b.right().value());
+    assertEquals(Integer.valueOf(1), b.right().value());
   }
 
   @Test(expected = java.lang.Error.class)
@@ -59,7 +59,7 @@ public class EitherTest {
     assertEquals("a", left("a").left().getOrElse("x"));
     Either<String, Integer> a = left("a");
     assertEquals("a", a.left().getOrElse("x"));
-    assertEquals(new Integer(10), a.right().getOrElse(10));
+    assertEquals(Integer.valueOf(10), a.right().getOrElse(10));
   }
 
   @Test

@@ -46,7 +46,7 @@ public class ValueTest {
   public void testGet() throws Exception {
     Assert.assertEquals("a value", Value.mk("a value").get(Value.STRING));
     assertThat(Value.mk(1511L).get(Value.LONG), Matchers.instanceOf(Long.class));
-    assertEquals(Value.mk(10L).get(), new Long(10L));
+    assertEquals(Value.mk(10L).get(), Long.valueOf(10L));
   }
 
   @Test(expected = java.lang.RuntimeException.class)
