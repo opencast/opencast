@@ -93,11 +93,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -265,7 +267,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
       Date modificationDate = persistence.getModificationDate(mediaPackageId);
       Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-      indexMediaPackage(mp, acl, modificationDate, deletionDate);
+      indexMediaPackage(mp, acl, modificationDate, deletionDate, new LinkedHashSet<>());
     } catch (RuntimeException e) {
       logSkippingElement(logger, "event", mediaPackageId, e);
     }
@@ -273,10 +275,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl)
           throws SearchException, SearchServiceDatabaseException {
-    indexMediaPackage(mediaPackage, acl, null, null);
+    indexMediaPackage(mediaPackage, acl, null, null, new LinkedHashSet<>());
   }
 
-  private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate)
+  private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate,
+      Set<String> processedSeriesIds)
           throws SearchException, SearchServiceDatabaseException {
     String mediaPackageId = mediaPackage.getIdentifier().toString();
     String orgId = securityService.getOrganization().getId();
@@ -289,20 +292,26 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     List<DublinCoreCatalog> seriesList = Collections.emptyList();
     if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF)) {
       //Find the series (if any), filter for those which exist to prevent linking non-existent series
-      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF).stream().map(DublinCoreValue::getValue).map(s -> {
-        try {
-          return seriesService.getSeries(s);
-        } catch (NotFoundException e) {
-          logger.warn("Series {} not found during index of event {}, omitting the link from the indexed data", s,
-              mediaPackageId);
-        } catch (UnauthorizedException e) {
-          logger.warn("Not authorized for series {} during index of event {}, omitting the link from the indexed data",
-              s, mediaPackageId);
-        } catch (SeriesException e) {
-          throw new SearchException(e);
-        }
-        return null;
-      }).filter(Objects::nonNull).collect(Collectors.toList());
+      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF)
+        .stream()
+        .map(DublinCoreValue::getValue)
+        .filter(Predicate.not(processedSeriesIds::contains))
+        .map(s -> {
+          try {
+            return seriesService.getSeries(s);
+          } catch (NotFoundException e) {
+            logger.warn("Series {} not found during index of event {}, omitting the link from the indexed data", s,
+                mediaPackageId);
+          } catch (UnauthorizedException e) {
+            logger.warn("Not authorized for series {} during index of event {}, omitting the link from the index",
+                s, mediaPackageId);
+          } catch (SeriesException e) {
+            throw new SearchException(e);
+          }
+          return null;
+        })
+        .filter(Objects::nonNull)
+        .toList();
     }
 
     // Add custom roles if enabled
@@ -338,6 +347,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         request.source(seriesData);
         esIndex.getClient().index(request, RequestOptions.DEFAULT);
         logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
+        processedSeriesIds.add(seriesId);
       } catch (IOException e) {
         throw new SearchException(e);
       }
@@ -518,53 +528,67 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = securityService.getUser();
 
+    int total;
     try {
-      int total = persistence.countMediaPackages();
-      int pageSize = 50;
-      int pageOffset = 0;
-      AtomicInteger current = new AtomicInteger(1);
-      logIndexRebuildBegin(logger, total, "search");
-      List<Tuple<MediaPackage, String>> page = null;
-
-      do {
-        page = persistence.getAllMediaPackages(pageSize, pageOffset).collect(Collectors.toList());
-        page.forEach(tuple -> {
-          try {
-            MediaPackage mediaPackage = tuple.getA();
-            Organization organization = organizationDirectory.getOrganization(tuple.getB());
-            final var systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
-            securityService.setUser(systemUser);
-            securityService.setOrganization(organization);
-
-            String mediaPackageId = mediaPackage.getIdentifier().toString();
-
-            AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-            Date modificationDate = persistence.getModificationDate(mediaPackageId);
-            Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-
-            current.getAndIncrement();
-
-            indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
-          } catch (SearchServiceDatabaseException e) {
-            logIndexRebuildError(logger, total, current.get(), e);
-            //NB: Runtime exception thrown to escape the functional interfacing
-            throw new RuntimeException("Internal Index Rebuild Failure", e);
-          } catch (RuntimeException | NotFoundException e) {
-            logSkippingElement(logger, "event", tuple.getA().getIdentifier().toString(), e);
-          }
-        });
-        //Current is the *page* index, so we remove one since each page only has pageSize entries
-        logIndexRebuildProgress(logger, total, current.get() - 1, pageSize);
-        pageOffset += 1;
-      } while (pageOffset * pageSize <= total);
-      //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
-    } catch (SearchServiceDatabaseException | RuntimeException e) {
-      logIndexRebuildError(logger, e);
+      total = persistence.countMediaPackages();
+    } catch (SearchServiceDatabaseException e) {
       throw new IndexRebuildException("Index Rebuild Failure", e);
-    } finally {
-      securityService.setUser(originalUser);
-      securityService.setOrganization(originalOrg);
     }
+    AtomicInteger current = new AtomicInteger(1);
+    logIndexRebuildBegin(logger, total, "search");
+
+    List<Organization> orgs = organizationDirectory.getOrganizations();
+    for (Organization org : orgs) {
+      Set<String> indexedSeries = new HashSet<>();
+
+      try {
+        int pageSize = 50;
+        int pageOffset = 0;
+        do {
+          List<Tuple<MediaPackage, String>> page = null;
+
+          page = persistence.getAllMediaPackages(org, pageSize, pageOffset).collect(Collectors.toList());
+          page.forEach(tuple -> {
+            try {
+              MediaPackage mediaPackage = tuple.getA();
+              Organization organization = organizationDirectory.getOrganization(tuple.getB());
+              final var systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+              securityService.setUser(systemUser);
+              securityService.setOrganization(organization);
+
+              String mediaPackageId = mediaPackage.getIdentifier().toString();
+
+              AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
+              Date modificationDate = persistence.getModificationDate(mediaPackageId);
+              Date deletionDate = persistence.getDeletionDate(mediaPackageId);
+
+              current.getAndIncrement();
+
+              indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, indexedSeries);
+            } catch (SearchServiceDatabaseException e) {
+              logIndexRebuildError(logger, total, current.get(), e);
+              //NB: Runtime exception thrown to escape the functional interfacing
+              throw new RuntimeException("Internal Index Rebuild Failure", e);
+            } catch (RuntimeException | NotFoundException e) {
+              logSkippingElement(logger, "event", tuple.getA().getIdentifier().toString(), e);
+            }
+          });
+          //Current is the *page* index, so we remove one since each page only has pageSize entries
+          logIndexRebuildProgress(logger, total, current.get() - 1, pageSize);
+          pageOffset += 1;
+        } while (pageOffset * pageSize <= total);
+        //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
+      } catch (SearchServiceDatabaseException | RuntimeException e) {
+        logIndexRebuildError(logger, e);
+        throw new IndexRebuildException("Index Rebuild Failure", e);
+      } finally {
+        securityService.setUser(originalUser);
+        securityService.setOrganization(originalOrg);
+      }
+      // We keep track of series based on the org, so we clear the list at this point
+      indexedSeries.clear();
+    }
+
   }
 
   @Reference
