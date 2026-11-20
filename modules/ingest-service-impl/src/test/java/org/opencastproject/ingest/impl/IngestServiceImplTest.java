@@ -343,6 +343,7 @@ public class IngestServiceImplTest {
     serviceRegistry.registerService(service);
     Dictionary<String, String> p = new Hashtable<>();
     p.put(IngestServiceImpl.DOWNLOAD_SOURCE, "http://localhost.*|http://www.test.com/.*");
+    p.put(IngestServiceImpl.ZIP_INGEST_ENABLED_KEY, "true");
     service.updated(p);
     service.testMode = true;
   }
@@ -391,6 +392,19 @@ public class IngestServiceImplTest {
       IOUtils.closeQuietly(packageStream);
     }
 
+  }
+
+  @Test
+  public void testZipIngestDisabledByDefault() throws Exception {
+    service.updated(new Hashtable<>());
+    Assert.assertFalse(service.isZipIngestEnabled());
+    try (InputStream packageStream = urlPackage.toURL().openStream()) {
+      service.addZippedMediaPackage(packageStream);
+      Assert.fail("The ingest of a zipped media package should have been rejected");
+    } catch (IngestException e) {
+      // expected
+    }
+    Assert.assertTrue(failedJobReasons.isEmpty());
   }
 
   @Test

@@ -222,11 +222,28 @@ public class IngestRestServiceTest {
   }
 
   @Test
+  public void testZipIngestDisabled() throws Exception {
+    // Strict mock: any call to addZippedMediaPackage fails the test
+    IngestService ingestService = EasyMock.createMock(IngestService.class);
+    EasyMock.expect(ingestService.isZipIngestEnabled()).andReturn(false).anyTimes();
+    EasyMock.replay(ingestService);
+    restService.setIngestService(ingestService);
+
+    HttpServletRequest request = EasyMock.createNiceMock(HttpServletRequest.class);
+    EasyMock.replay(request);
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), restService.addZippedMediaPackage(request).getStatus());
+    Assert.assertEquals(Status.FORBIDDEN.getStatusCode(),
+        restService.addZippedMediaPackage(request, "test", null).getStatus());
+    EasyMock.verify(ingestService);
+  }
+
+  @Test
   public void testLegacyMediaPackageIdPropertyUsingZippedIngest() throws Exception {
     // Create a mock ingest service
     Capture<Map<String, String>> workflowConfigCapture = EasyMock.newCapture();
 
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
+    EasyMock.expect(ingestService.isZipIngestEnabled()).andReturn(true).anyTimes();
     EasyMock.expect(ingestService.addZippedMediaPackage(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
             EasyMock.capture(workflowConfigCapture))).andReturn(new WorkflowInstance());
     EasyMock.replay(ingestService);
@@ -394,6 +411,7 @@ public class IngestRestServiceTest {
   private IngestService setupAddZippedMediaPackageIngestService() {
     // Create a mock ingest service
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
+    EasyMock.expect(ingestService.isZipIngestEnabled()).andReturn(true).anyTimes();
     try {
       EasyMock.expect(ingestService.addZippedMediaPackage(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
               EasyMock.anyObject(Map.class), EasyMock.anyLong()))

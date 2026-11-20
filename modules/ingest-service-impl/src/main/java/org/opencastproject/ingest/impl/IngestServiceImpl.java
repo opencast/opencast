@@ -214,6 +214,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
+  /** The key to look for in the service configuration file to enable the ingest of zipped media packages */
+  public static final String ZIP_INGEST_ENABLED_KEY = "zip.ingest.enabled";
+
+  /** By default, the ingest of zipped media packages is disabled */
+  public static final boolean DEFAULT_ZIP_INGEST_ENABLED = false;
+
   /** The source to download from  */
   public static final String DOWNLOAD_SOURCE = "org.opencastproject.download.source";
 
@@ -270,6 +276,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** The approximate load placed on the system by ingesting a zip file */
   private float ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
+
+  /** Whether the ingest of zipped media packages is enabled */
+  private boolean zipIngestEnabled = DEFAULT_ZIP_INGEST_ENABLED;
 
   /** The user for download from external sources */
   private static String downloadUser = DOWNLOAD_USER;
@@ -415,6 +424,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD,
             serviceRegistry);
 
+    zipIngestEnabled = BooleanUtils.toBoolean(Objects.toString(properties.get(ZIP_INGEST_ENABLED_KEY),
+            BooleanUtils.toStringTrueFalse(DEFAULT_ZIP_INGEST_ENABLED)));
+    if (zipIngestEnabled) {
+      logger.warn("The ingest of zipped media packages is enabled. This feature is deprecated and may be removed. "
+          + "If you rely on it, please let the Opencast community know.");
+    }
+
     isAllowModifySeries = BooleanUtils.toBoolean(Objects.toString(properties.get(MODIFY_OPENCAST_SERIES_KEY),
               BooleanUtils.toStringTrueFalse(DEFAULT_ALLOW_SERIES_MODIFICATIONS)));
     isAddOnlyNew = BooleanUtils.toBoolean(Objects.toString(properties.get(ADD_ONLY_NEW_FLAVORS_KEY),
@@ -457,6 +473,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     this.mediaInspectionService = mediaInspectionService;
   }
 
+  @Override
+  public boolean isZipIngestEnabled() {
+    return zipIngestEnabled;
+  }
+
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream)
           throws IngestException, IOException, MediaPackageException {
     try {
@@ -486,6 +507,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String workflowDefinitionId,
           Map<String, String> workflowConfig, Long workflowInstanceId)
           throws MediaPackageException, IOException, IngestException, NotFoundException, UnauthorizedException {
+    if (!zipIngestEnabled) {
+      throw new IngestException("The ingest of zipped media packages is disabled. Set " + ZIP_INGEST_ENABLED_KEY
+          + " in org.opencastproject.ingest.impl.IngestServiceImpl.cfg to enable it.");
+    }
+
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 

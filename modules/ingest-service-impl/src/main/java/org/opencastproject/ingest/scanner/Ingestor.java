@@ -176,6 +176,13 @@ public class Ingestor implements Runnable {
           failed = false;
           ++retryCount;
           if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
+            if (!ingestService.isZipIngestEnabled()) {
+              // Retrying makes no sense and the file is kept in the inbox
+              logger.error("Not ingesting inbox file {} since the ingest of zipped media packages is disabled. "
+                  + "Set zip.ingest.enabled in org.opencastproject.ingest.impl.IngestServiceImpl.cfg to enable it.",
+                  artifact.getName());
+              return RetriableIngestJob.this;
+            }
             logger.info("Start ingest inbox file {} as a zipped mediapackage", artifact.getName());
             WorkflowInstance workflowInstance = ingestService.addZippedMediaPackage(in, workflowDefinition,
                 workflowConfig);
