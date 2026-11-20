@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Date;
@@ -60,8 +58,6 @@ public class WorkflowOperationInstance implements Configurable {
   public enum OperationState {
     INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED, RETRY
   }
-
-  private static final Logger logger = LoggerFactory.getLogger(WorkflowOperationInstance.class);
 
   @Id
   @GeneratedValue
@@ -170,13 +166,11 @@ public class WorkflowOperationInstance implements Configurable {
       }
     }
 
-    if ((retryStrategy == RetryStrategy.RETRY || retryStrategy == RetryStrategy.HOLD) && maxAttempts < 2) {
+    if (retryStrategy == RetryStrategy.NONE && maxAttempts > 1) {
+      // max-attempts without a retry-strategy implies automatic retries
+      retryStrategy = RetryStrategy.RETRY;
+    } else if ((retryStrategy == RetryStrategy.RETRY || retryStrategy == RetryStrategy.HOLD) && maxAttempts < 2) {
       maxAttempts = 2;
-    } else if (retryStrategy != RetryStrategy.RETRY && retryStrategy != RetryStrategy.HOLD && maxAttempts != 1) {
-      logger.warn(
-          "Operation '{}' sets max-attempts to {} but no retry-strategy, so it will never be retried. "
-              + "Add a retry-strategy of 'retry' or 'hold' for max-attempts to take effect.",
-          getTemplate(), maxAttempts);
     }
   }
 

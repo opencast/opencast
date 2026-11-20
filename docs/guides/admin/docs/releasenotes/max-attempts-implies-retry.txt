@@ -1,0 +1,10 @@
+Workflow operations no longer need a `retry-strategy` for `max-attempts` to take effect. If an operation sets
+`max-attempts` to more than `1` without a `retry-strategy`, or with the strategy `none`, it is now retried
+automatically, as if `retry-strategy: retry` was set. Before, such an operation was never retried, and Opencast
+logged a warning about it on every workflow run.
+
+This changes the behavior of existing workflows that use this combination, including `publish-engage` in the
+default workflows `fast` and `partial-publish`, which is now attempted twice. Operations without `max-attempts`,
+or with an explicit `retry-strategy` of `retry` or `hold`, behave as before.
+
+There are no database schema or search index changes.
