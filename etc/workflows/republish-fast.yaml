@@ -1,0 +1,174 @@
+id: republish-fast
+title: Republish changes
+tags:
+  - archive
+  - editor
+displayOrder: 900
+description: |-
+  Updates the publications with the latest metadata, thumbnails, subtitles and chapters,
+  without processing the video again.
+state-mappings:
+  - state: running
+    value: EVENTS.EVENTS.STATE_MAPPING.PUBLISHING
+  - state: failing
+    value: EVENTS.EVENTS.STATE_MAPPING.PUBLISHING
+operations:
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Create thumbnails
+
+  # Thumbnails uploaded in the editor are already part of the media package.
+  # Thumbnails selected from a point in the video are created here, from the same timestamps
+  # that the partial-publish workflow uses, so that the result does not depend on which workflow ran last.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: image
+    if: ${presentation_thumbnail_time_set}
+    exception-handler-workflow: partial-error
+    description: Creating player preview image for presentation video from editor timestamp
+    configurations:
+      - source-flavor: ${presentation_thumbnail_time_flavor}
+      - target-flavor: presentation/player+preview
+      - target-tags: engage-download
+      - encoding-profile: player-preview.http
+      - time: ${presentation_thumbnail_time_time}
+
+  - id: image
+    if: ${presenter_thumbnail_time_set}
+    exception-handler-workflow: partial-error
+    description: Creating player preview image for presenter video from editor timestamp
+    configurations:
+      - source-flavor: ${presenter_thumbnail_time_flavor}
+      - target-flavor: presenter/player+preview
+      - target-tags: engage-download
+      - encoding-profile: player-preview.http
+      - time: ${presenter_thumbnail_time_time}
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Prepare subtitles and chapters
+
+  # Subtitles and chapters are text files, so cutting them is quick.
+  # This does the same as the partial-publish and partial-theming workflows do for them:
+  # Cut them according to the cutting information, shift them by the length of the bumper
+  # if the theme of the series has one, and mark them for publication.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: analyze-mediapackage
+    exception-handler-workflow: partial-error
+    description: Check for subtitles and chapters
+    configurations:
+      - source-flavors: captions/source,chapters/source
+
+  # The bumper is only needed to find out by how much subtitles need to be shifted.
+  # It gets a flavor of its own, so that it cannot be mistaken for a bumper that is already part of the
+  # media package. Otherwise, the bumper would be counted twice and the subtitles would be shifted too far.
+  # Note that this is the theme the series has now, which may differ from the one used when the video was published.
+  # The theme operation also needs the watermark settings, in case the theme has a watermark.
+  - id: theme
+    if: ${captions_source_exists} OR ${chapters_source_exists}
+    exception-handler-workflow: partial-error
+    description: Load the theme to find out the length of the bumper
+    configurations:
+      - bumper-flavor: branding/republish-bumper
+      - watermark-layout: theme_watermark_layout
+      - watermark-layout-variable: theme_watermark_layout_variable
+
+  - id: inspect
+    if: ${theme_bumper_active}
+    exception-handler-workflow: partial-error
+    description: Inspecting the bumper
+    configurations:
+      - overwrite: false
+      - accept-no-media: false
+
+  # The cutting is performed on a disposable copy, see partial-publish
+  - id: clone
+    if: ${captions_source_exists} OR ${chapters_source_exists}
+    exception-handler-workflow: partial-error
+    description: Creating working copy of the cutting information
+    configurations:
+      - source-flavor: smil/cutting
+      - target-flavor: smil/tmp
+
+  - id: editor
+    if: ${captions_source_exists} OR ${chapters_source_exists}
+    exception-handler-workflow: partial-error
+    description: Cutting subtitles and chapters according to the edit decision list
+    configurations:
+      - source-flavors: captions/source,chapters/source
+      - smil-flavors: smil/tmp
+      - target-smil-flavor: smil/tmp
+      - target-flavor-subtype: trimmed
+      - interactive: false
+
+  - id: subtitle-timeshift
+    if: ${theme_bumper_active} AND ${captions_source_exists}
+    exception-handler-workflow: partial-error
+    description: Create new captions with time offset
+    configurations:
+      - subtitle-source-flavor: captions/trimmed
+      - target-flavor: captions/shifted
+      - video-source-flavors: branding/republish-bumper
+
+  - id: tag
+    if: (NOT ${theme_bumper_active}) AND ${captions_source_exists}
+    description: If no shifting was necessary, mark the trimmed captions as shifted
+    configurations:
+      - source-flavors: captions/trimmed
+      - target-flavor: captions/shifted
+
+  - id: subtitle-timeshift
+    if: ${theme_bumper_active} AND ${chapters_source_exists}
+    exception-handler-workflow: partial-error
+    description: Create new chapters with time offset
+    configurations:
+      - subtitle-source-flavor: chapters/trimmed
+      - target-flavor: chapters/shifted
+      - video-source-flavors: branding/republish-bumper
+
+  - id: tag
+    if: (NOT ${theme_bumper_active}) AND ${chapters_source_exists}
+    description: If no shifting was necessary, mark the trimmed chapters as shifted
+    configurations:
+      - source-flavors: chapters/trimmed
+      - target-flavor: chapters/shifted
+
+  - id: tag
+    description: Mark captions for publication
+    configurations:
+      - source-flavors: captions/shifted
+      - target-flavor: captions/delivery
+      - target-tags: +engage-download
+
+  - id: tag
+    description: Mark chapters for publication
+    configurations:
+      - source-flavors: chapters/shifted
+      - target-flavor: chapters/delivery
+      - target-tags: +engage-download
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish to publication channels
+
+  # Update the recording metadata, thumbnails, subtitles and chapters in the publication channels.
+  # Everything else that is published stays as it is.
+  #
+  # Subtitles and chapters are always prepared above, so merge-force-flavors can remove them from the publication
+  # when they were deleted in the editor. Otherwise, deleted subtitles would stay published.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish to engage player
+  - id: publish-engage
+    exception-handler-workflow: partial-error
+    description: Update recording in Opencast Media Module
+    configurations:
+      - download-source-flavors: dublincore/*,security/*,*/player+preview,captions/delivery,chapters/delivery
+      - strategy: merge
+      - merge-force-flavors: dublincore/*,security/*,captions/delivery,chapters/delivery
+      - check-availability: false
+
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      # On systems with shared workspace or working file repository
+      # you want to set this option to false.
+      - delete-external: true
+      # ACLs are required again when working through ActiveMQ messages
+      - preserve-flavors: security/*
