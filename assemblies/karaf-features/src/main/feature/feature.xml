@@ -91,7 +91,7 @@
     <!-- spring-security-ldap has a mandatory import of org.apache.mina.transport.socket. -->
     <bundle>mvn:org.apache.mina/mina-core/2.1.13</bundle>
 
-    <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
+    <bundle>mvn:com.nimbusds/nimbus-jose-jwt/${nimbus-jose-jwt.version}</bundle>
     <bundle>wrap:mvn:com.google.crypto.tink/tink/${tink.version}$Bundle-SymbolicName=com.google.crypto.tink&amp;Bundle-Version=${tink.version}</bundle>
   </feature>
 

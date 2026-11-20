@@ -74,6 +74,7 @@
          sync; the suffixed version is the ServiceMix rebuild of the same upstream release. -->
     <spring-security-ldap.version>5.8.6</spring-security-ldap.version>
     <spring-security-ldap-servicemix.version>5.8.6_1</spring-security-ldap-servicemix.version>
+    <nimbus-jose-jwt.version>10.10</nimbus-jose-jwt.version>
     <tink.version>1.24.0</tink.version>
   </properties>
   <modules>
@@ -1436,7 +1437,7 @@
       <dependency>
         <groupId>com.nimbusds</groupId>
         <artifactId>nimbus-jose-jwt</artifactId>
-        <version>10.10</version>
+        <version>${nimbus-jose-jwt.version}</version>
       </dependency>
       <!-- Required by nimbus-jose-jwt for Ed25519 -->
       <dependency>
