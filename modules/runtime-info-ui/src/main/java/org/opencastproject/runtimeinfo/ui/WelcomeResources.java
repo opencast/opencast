@@ -66,7 +66,7 @@ public class WelcomeResources {
 
 
   @GET
-  @Path("{path: .*}")
+  @Path("{path:.*}")
   public Response img(@PathParam("path") String path) {
     if ("".equals(path)) {
       path = "index.html";
@@ -78,7 +78,7 @@ public class WelcomeResources {
   }
 
   @GET
-  @Path("{path: (img|scripts|styles)/.*}")
+  @Path("{path:(img|scripts|styles)/.*}")
   public Response staticResources(@PathParam("path") final String path) {
     InputStream resource = getClass().getClassLoader().getResourceAsStream("ui/" + path);
 
