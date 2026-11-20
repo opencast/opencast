@@ -32,18 +32,7 @@ jobs:
           git config --global user.name 'Update Bot'
 
       # Use the same Node.js version the Maven build uses
-      - name: determine node.js version
-        id: node
-        run: |
-          set -eu
-          version="$(sed -n 's/.*<node\.version>v\([0-9.]*\)<.*/\1/p' pom.xml | head -n1)"
-          test -n "${version}"
-          echo "version=${version}" >> "${GITHUB_OUTPUT}"
-
-      - name: use node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ steps.node.outputs.version }}
+      - uses: ./.github/actions/setup-node-from-pom
 
       # The shared ESLint configuration is pulled into the modules below as a `file:` dependency.
       # Its dependencies are the actual linter toolchain, so update them first.
