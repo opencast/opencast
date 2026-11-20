@@ -27,13 +27,16 @@ import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchMetadata;
 import org.opencastproject.opensearch.api.SearchResult;
 import org.opencastproject.opensearch.impl.AbstractOpenSearchIndex;
+import org.opencastproject.opensearch.impl.AbstractOpenSearchQueryBuilder;
 import org.opencastproject.opensearch.impl.OpenSearchDocument;
 import org.opencastproject.opensearch.impl.SearchMetadataCollection;
 import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventIndexUtils;
 import org.opencastproject.opensearch.index.objects.event.EventQueryBuilder;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.SeriesIndexUtils;
 import org.opencastproject.opensearch.index.objects.series.SeriesQueryBuilder;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -59,12 +62,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.Unmarshaller;
 
@@ -96,6 +108,19 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
   private int retryWaitingPeriodUpdate;
   private static final String RETRY_WAITING_PERIOD_UPDATE_PROPERTY = "retry.waiting.period.update";
   private static final int DEFAULT_RETRY_WAITING_PERIOD_UPDATE = 1000;
+
+  /** Score boosts of fields when searching events or series by text, by field name */
+  private volatile Map<String, Float> eventFieldBoosts = AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS;
+  private static final String EVENT_BOOST_PROPERTY = "search.boost.event";
+
+  private volatile Map<String, Float> seriesFieldBoosts = AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS;
+  private static final String SERIES_BOOST_PROPERTY = "search.boost.series";
+
+  /** Prefix of the fields of extended metadata, which depend on the configuration */
+  private static final String EXTENDED_METADATA_PREFIX = "extended_metadata_";
+
+  /** Matches an entry of the boost configuration: field^boost */
+  private static final Pattern BOOST_ENTRY = Pattern.compile("([\\w./-]+)\\s*\\^\\s*(.+)");
 
   /** The required index version */
   private static final int INDEX_VERSION = 1;
@@ -169,11 +194,72 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
     logger.info("Max retry attempts for update requests set to {}, timeout set to {} ms.", maxRetryAttemptsUpdate,
             retryWaitingPeriodUpdate);
 
+    eventFieldBoosts = parseFieldBoosts(properties.get(EVENT_BOOST_PROPERTY), EVENT_BOOST_PROPERTY,
+            schemaFields(EventIndexSchema.class));
+    seriesFieldBoosts = parseFieldBoosts(properties.get(SERIES_BOOST_PROPERTY), SERIES_BOOST_PROPERTY,
+            schemaFields(SeriesIndexSchema.class));
+    logger.info("Field boosts for text searches set to {} for events and {} for series.", eventFieldBoosts,
+            seriesFieldBoosts);
+
     if (maxRetryAttemptsGet < 0 || maxRetryAttemptsUpdate < 0 || retryWaitingPeriodGet < 0
             || retryWaitingPeriodUpdate < 0) {
       logger.warn("You have configured negative values for max attempts or retry periods. Is this intended? This is "
               + "equivalent to setting those values to 0.");
     }
+  }
+
+  /**
+   * Reads a comma separated list of <code>field^boost</code> entries. Invalid entries are logged and ignored, unknown
+   * fields are logged but kept, as the extended metadata fields depend on the configuration. Returns the default if
+   * the value is not set, and no boosts if it is empty.
+   */
+  static Map<String, Float> parseFieldBoosts(Object value, String property, Set<String> knownFields) {
+    if (value == null) {
+      return AbstractOpenSearchQueryBuilder.DEFAULT_FIELD_BOOSTS;
+    }
+
+    Map<String, Float> boosts = new LinkedHashMap<>();
+    for (String listed : value.toString().split(",")) {
+      String entry = listed.trim();
+      if (entry.isEmpty()) {
+        continue;
+      }
+      Matcher matcher = BOOST_ENTRY.matcher(entry);
+      float boost = Float.NaN;
+      if (matcher.matches()) {
+        boost = NumberUtils.toFloat(matcher.group(2).trim(), Float.NaN);
+      }
+      if (Float.isNaN(boost) || Float.isInfinite(boost) || boost <= 0) {
+        logger.warn("Ignoring invalid entry '{}' of {}, it has to be of the form field^boost with a boost greater "
+                + "than 0, e.g. title^3.0.", entry, property);
+        continue;
+      }
+      String field = matcher.group(1);
+      if (!knownFields.contains(field) && !field.startsWith(EXTENDED_METADATA_PREFIX)) {
+        logger.warn("The field '{}' of {} is not a field of the index, the boost has no effect if no such field "
+                + "exists. Known fields are: {}.", field, property, new TreeSet<>(knownFields));
+      }
+      if (boosts.put(field, boost) != null) {
+        logger.warn("The field '{}' is listed more than once in {}, using the last boost of {}.", field, property,
+                boost);
+      }
+    }
+    return Collections.unmodifiableMap(boosts);
+  }
+
+  /** Returns the names of the fields defined by an index schema. */
+  static Set<String> schemaFields(Class<?> schema) {
+    Set<String> fields = new HashSet<>();
+    for (Field field : schema.getFields()) {
+      if (field.getType() == String.class && Modifier.isStatic(field.getModifiers())) {
+        try {
+          fields.add((String) field.get(null));
+        } catch (IllegalAccessException e) {
+          logger.debug("Could not read the field name from {}", field, e);
+        }
+      }
+    }
+    return fields;
   }
 
   /**
@@ -589,7 +675,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
           throws SearchIndexException {
     logger.debug("Searching index using event query '{}'", query);
     // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new EventQueryBuilder(query));
+    final SearchRequest searchRequest = getSearchRequest(query, new EventQueryBuilder(query, eventFieldBoosts));
 
     try {
       final Unmarshaller unmarshaller = Event.createUnmarshaller();
@@ -635,7 +721,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
           throws SearchIndexException {
     logger.debug("Searching index using series query '{}'", query);
     // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new SeriesQueryBuilder(query));
+    final SearchRequest searchRequest = getSearchRequest(query, new SeriesQueryBuilder(query, seriesFieldBoosts));
     try {
       final Unmarshaller unmarshaller = Series.createUnmarshaller();
       return executeQuery(query, searchRequest, metadata -> {
