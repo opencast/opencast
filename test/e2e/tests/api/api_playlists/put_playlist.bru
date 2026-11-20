@@ -1,0 +1,37 @@
+meta {
+  name: put_playlist
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/api/playlists/:playlistId
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  playlistId: {{playlistID}}
+}
+
+body:form-urlencoded {
+  playlist: {"title":"Opencast Playlist - Edited","description":"This is an edited playlist about Opencast","entries":[]}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Update playlist response should have correct types", function() {
+    const body = res.getBody();
+    const pl = body.playlist || body;
+    expect(pl).to.be.an('object');
+    expect(pl.title).to.be.a('string');
+    expect(pl.description).to.be.a('string');
+    if (pl.organization !== undefined) expect(pl.organization).to.be.a('string');
+    if (pl.creator !== undefined) expect(pl.creator).to.be.a('string');
+    expect(pl.updated).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+    expect(pl.entries).to.be.an('array');
+  });
+}

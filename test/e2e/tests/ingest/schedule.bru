@@ -1,0 +1,26 @@
+meta {
+  name: schedule
+  type: http
+  seq: 25
+}
+
+post {
+  url: {{baseUrl}}/ingest/schedule
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  mediaPackage: {{mediaPackage_D}}
+}
+
+assert {
+  res.status: in [200, 201]
+}
+
+tests {
+  test("Schedule media package should succeed", function() {
+    // Assert status code is 201 Created (or 200)
+    expect(res.status).to.be.oneOf([200, 201]);
+  });
+}

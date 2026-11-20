@@ -1,0 +1,19 @@
+meta {
+  name: delete_series
+  type: http
+  seq: 15
+}
+
+delete {
+  url: {{baseUrl}}/api/series/:seriesId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+assert {
+  res.status: eq 204
+}

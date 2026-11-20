@@ -1,0 +1,35 @@
+meta {
+  name: get_series_json
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/series/series.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Series JSON properties should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      if (body.length > 0) {
+        const item = body[0];
+        expect(item.identifier).to.be.a('string');
+        expect(item.creator).to.be.a('string');
+        expect(item.created).to.be.a('string');
+        expect(item.title).to.be.a('string');
+        expect(item.contributors).to.be.an('array');
+        expect(item.publishers).to.be.an('array');
+        expect(item.subjects).to.be.an('array');
+        expect(item.organizers).to.be.an('array');
+      }
+    }
+  });
+}

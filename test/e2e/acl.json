@@ -1,0 +1,33 @@
+[
+ {
+          "allow": true,
+          "role": "ROLE_ANONYMOUS",
+          "action": "read"
+        },
+        {
+          "allow": true,
+          "role": "ROLE_USER_admin",
+          "action": "read"
+        },
+        {
+          "allow": true,
+          "role": "ROLE_USER_admin",
+          "action": "write"
+        },
+        {
+          "allow": true,
+          "role": "ROLE_OAUTH_USER",
+          "action": "read"
+        },
+        {
+          "allow": true,
+          "role": "ROLE_OAUTH_USER",
+          "action": "write"
+        },
+        {
+          "allow": true,
+          "role": "ROLE_ANONYMOUS",
+          "action": "read"
+        }
+  
+]
