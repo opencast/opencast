@@ -40,6 +40,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,8 +115,9 @@ public class JSONUtilsTest {
    */
   @Test
   public void testFiltersToJSON() throws Exception {
-    String expectedJSON = IOUtils.toString(getClass().getResource("/filters.json"));
-    String expectedJSONreduced = IOUtils.toString(getClass().getResource("/filters_reduced.json"));
+    String expectedJSON = IOUtils.toString(getClass().getResource("/filters.json"), StandardCharsets.UTF_8);
+    String expectedJSONreduced = IOUtils.toString(getClass().getResource("/filters_reduced.json"),
+        StandardCharsets.UTF_8);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     Organization organization = EasyMock.createNiceMock(Organization.class);

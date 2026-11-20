@@ -38,6 +38,7 @@ import org.xmlmatchers.namespace.SimpleNamespaceContext;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Result;
@@ -131,7 +132,7 @@ public class CoverImageServiceTest {
     InputSource xmlSource = new InputSource(isXml);
 
     InputStream isXsl = CoverImageServiceTest.class.getResourceAsStream("/metadata2svg.xsl");
-    Document xslDoc = AbstractCoverImageService.parseXsl(IOUtils.toString(isXsl));
+    Document xslDoc = AbstractCoverImageService.parseXsl(IOUtils.toString(isXsl, StandardCharsets.UTF_8));
 
     AbstractCoverImageService.transformSvg(svg, xmlSource, xslDoc, 1600, 900, null);
 

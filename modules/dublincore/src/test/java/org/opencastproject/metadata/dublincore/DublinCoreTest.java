@@ -75,6 +75,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
@@ -202,7 +203,7 @@ public class DublinCoreTest {
     JsonArray subjectArray = dcTerms.getAsJsonArray("subject");
     assertEquals("The subject should be present", 1, subjectArray.size());
 
-    DublinCoreCatalog fromJson = DublinCores.read(IOUtils.toInputStream(jsonString));
+    DublinCoreCatalog fromJson = DublinCores.read(IOUtils.toInputStream(jsonString, StandardCharsets.UTF_8));
     assertEquals(3, fromJson.getLanguages(PROPERTY_TITLE).size());
     assertEquals("video/x-dv", fromJson.getFirst(PROPERTY_FORMAT));
     assertEquals("eng", fromJson.getFirst(PROPERTY_LANGUAGE));

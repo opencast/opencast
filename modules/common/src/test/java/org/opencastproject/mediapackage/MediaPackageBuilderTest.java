@@ -37,6 +37,7 @@ import org.w3c.dom.Document;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -96,7 +97,7 @@ public class MediaPackageBuilderTest extends AbstractMediaPackageTest {
 
     File baseDir = new File(MediaPackageBuilderTest.class.getResource("/").toURI());
     File xmlFile = new File(baseDir, fileName);
-    String xml = IOUtils.toString(new FileInputStream(xmlFile));
+    String xml = IOUtils.toString(new FileInputStream(xmlFile), StandardCharsets.UTF_8);
     Publication pubElement = (Publication) MediaPackageElementParser.getFromXml(xml);
     assertNotNull(pubElement);
 

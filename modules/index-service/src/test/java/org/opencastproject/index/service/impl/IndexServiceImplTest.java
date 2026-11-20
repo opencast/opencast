@@ -108,6 +108,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
@@ -331,7 +332,8 @@ public class IndexServiceImplTest {
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-source.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -344,7 +346,8 @@ public class IndexServiceImplTest {
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-processing.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -357,7 +360,8 @@ public class IndexServiceImplTest {
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-metadata.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -373,7 +377,8 @@ public class IndexServiceImplTest {
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event-no-workflow-configuration.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -452,7 +457,8 @@ public class IndexServiceImplTest {
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -538,7 +544,8 @@ public class IndexServiceImplTest {
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-scheduled-event.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -680,7 +687,8 @@ public class IndexServiceImplTest {
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-recurring-event.json";
     JsonObject metadataJson = JsonParser.parseString(
-        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+            StandardCharsets.UTF_8)).getAsJsonObject();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
     Capture<String> filenameResult = EasyMock.newCapture();
@@ -805,7 +813,8 @@ public class IndexServiceImplTest {
     String org = "org1";
     String testResourceLocation = "/events/update-event.json";
     String eventId = "event-1";
-    String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation));
+    String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
+        StandardCharsets.UTF_8);
 
     SearchQuery query = EasyMock.createMock(SearchQuery.class);
     EasyMock.expect(query.getLimit()).andReturn(100);

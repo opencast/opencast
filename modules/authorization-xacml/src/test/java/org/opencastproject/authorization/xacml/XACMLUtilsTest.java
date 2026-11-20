@@ -36,6 +36,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Unit tests for class {@link XACMLUtils}
  */
@@ -49,7 +51,7 @@ public class XACMLUtilsTest {
 
   @Before
   public void setUp() throws Exception {
-    xacml = IOUtils.toString(this.getClass().getResourceAsStream("/xacml.xml"));
+    xacml = IOUtils.toString(this.getClass().getResourceAsStream("/xacml.xml"), StandardCharsets.UTF_8);
     acl = AccessControlParser.parseAcl(this.getClass().getResourceAsStream("/acl.xml"));
     mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl(MP_IDENTIFIER));
   }
