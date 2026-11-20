@@ -12,7 +12,7 @@ Query String Parameter |Type                         | Description
 :----------------------|:----------------------------|:-----------
 `filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters
 `sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
-`limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination))
+`limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination). If no limit is given, 100 results are returned. Version 1.13.0 and newer reject limits larger than 10000.
 `offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
 
 The following filters are available:
