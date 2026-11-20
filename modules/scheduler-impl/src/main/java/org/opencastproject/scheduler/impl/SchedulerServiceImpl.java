@@ -842,19 +842,20 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *           if the current user may not remove the event
    */
   private void assertCanRemoveEvent(String mediaPackageId) throws UnauthorizedException {
-    Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
-    if (mediaPackage.isPresent()) {
-      if (!isAdmin() && !authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
-        throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
-      }
+
+    if (isAdmin()) {
       return;
     }
 
-    // The media package could not be read. If it exists nonetheless, the current user is not allowed to see it and
-    // must not be allowed to remove it either, unless they're an admin. If it does not exist, leave it to the regular
-    // not-found handling.
-    if (!isAdmin() && assetManager.snapshotExists(mediaPackageId, securityService.getOrganization().getId())) {
-      throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
+    Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
+    if (mediaPackage.isPresent()) {
+      if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
+        throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
+      }
+      else {
+        // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
+        throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
+      }
     }
   }
 

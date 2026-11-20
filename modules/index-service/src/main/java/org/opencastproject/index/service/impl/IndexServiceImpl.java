@@ -1508,27 +1508,24 @@ public class IndexServiceImpl implements IndexService {
    *
    * @param id
    *          the media package identifier of the event to delete
-   * @throws NotFoundException
-   *           if no such event exists in the current organization
    * @throws UnauthorizedException
    *           if the current user may not delete the event
    */
-  private void assertCanDeleteEvent(String id) throws NotFoundException, UnauthorizedException {
+  private void assertCanDeleteEvent(String id) throws UnauthorizedException {
 
-    Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(id);
-    if (mediaPackage.isPresent()) {
-      if (!isAdmin() && !authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
-        throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
-      }
+    if (isAdmin()) {
       return;
     }
 
-    // The media package could not be read. Only report it as missing if it really does not exist, so that a user
-    // without read access does not learn anything about events they may not see. Admins are exempt from this.
-    if (!isAdmin() && assetManager.snapshotExists(id, securityService.getOrganization().getId())) {
+    Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(id);
+    if (mediaPackage.isPresent()) {
+      if (!authorizationService.hasPermission(mediaPackage.get(), Permissions.Action.WRITE.toString())) {
+        throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
+      }
+    } else {
+      // don't tell non-admin if they just don't have access or mp doesn't exist to prevent information leakage
       throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
-    throw new NotFoundException("Event id " + id + " not found.");
   }
 
   private void retractAndRemoveEvent(String id, String retractWorkflowId)
