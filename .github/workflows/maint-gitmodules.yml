@@ -5,6 +5,11 @@ on:
     paths:
       - '.gitmodules'
   push:
+    # Only check branches the submodules are supposed to track. Other branches pushed to this repository (e.g. by
+    # Dependabot) would be compared against their own name and always fail.
+    branches:
+      - develop
+      - 'r/*'
     paths:
       - '.gitmodules'
 
