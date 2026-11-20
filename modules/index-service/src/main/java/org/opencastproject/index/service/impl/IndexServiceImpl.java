@@ -1524,8 +1524,8 @@ public class IndexServiceImpl implements IndexService {
     }
 
     // The media package could not be read. Only report it as missing if it really does not exist, so that a user
-    // without read access does not learn anything about events they may not see.
-    if (assetManager.snapshotExists(id, securityService.getOrganization().getId())) {
+    // without read access does not learn anything about events they may not see. Admins are exempt from this.
+    if (!isAdmin() && assetManager.snapshotExists(id, securityService.getOrganization().getId())) {
       throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
     throw new NotFoundException("Event id " + id + " not found.");

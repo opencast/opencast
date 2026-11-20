@@ -852,8 +852,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     // The media package could not be read. If it exists nonetheless, the current user is not allowed to see it and
-    // must not be allowed to remove it either. If it does not exist, leave it to the regular not-found handling.
-    if (assetManager.snapshotExists(mediaPackageId, securityService.getOrganization().getId())) {
+    // must not be allowed to remove it either, unless they're an admin. If it does not exist, leave it to the regular
+    // not-found handling.
+    if (!isAdmin() && assetManager.snapshotExists(mediaPackageId, securityService.getOrganization().getId())) {
       throw new UnauthorizedException(securityService.getUser(), Permissions.Action.WRITE.toString());
     }
   }
