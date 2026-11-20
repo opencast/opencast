@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.impl.StdSchedulerFactory;
@@ -94,9 +95,10 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner {
       quartz = new StdSchedulerFactory().getScheduler();
       quartz.start();
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(getJobName(), getJobGroup(), Runner.class);
-      job.setDurability(false);
-      job.setVolatility(true);
+      final JobDetail job = JobBuilder.newJob(Runner.class)
+          .withIdentity(getJobName(), getJobGroup())
+          .storeDurably()
+          .build();
       job.getJobDataMap().put(JOB_PARAM_PARENT, this);
       quartz.addJob(job, true);
     } catch (org.quartz.SchedulerException e) {
