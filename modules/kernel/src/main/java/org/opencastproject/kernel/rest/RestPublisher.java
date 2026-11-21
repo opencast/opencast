@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.openapi.OpenApiCustomizer;
 import org.apache.cxf.jaxrs.openapi.OpenApiFeature;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.http.HttpStatus;
 import org.codehaus.jettison.mapped.Configuration;
@@ -286,6 +287,8 @@ public class RestPublisher implements RestConstants {
 
 
     sf.setProperties(new HashMap<>());
+    // Log faults with the actual request instead of CXF's arbitrary service name
+    sf.getProperties().put(FaultListener.class.getName(), new RestFaultListener());
     BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
     JAXRSBindingFactory factory = new JAXRSBindingFactory();
     factory.setBus(bus);
