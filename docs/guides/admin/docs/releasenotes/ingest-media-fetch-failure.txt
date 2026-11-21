@@ -1,0 +1,12 @@
+If the ingest service cannot fetch content from a URL a client specified (e.g. the `mediaUri` of
+`/ingest/addMediaPackage`, or the `url` of `/ingest/addTrack`, `/ingest/addPartialTrack`,
+`/ingest/addCatalog` and `/ingest/addAttachment`), the request now fails with HTTP 400 instead of
+HTTP 500. This covers unreachable hosts, error responses of the remote server, downloads which
+break off and URLs without a file name extension. The response body names the URL (without user
+information or query) and the reason. Opencast logs a single warning instead of a stack trace.
+
+Such a failure is now considered a problem of the request. It no longer puts the ingest service
+into the `WARNING` state, or into the `ERROR` state if `max.attempts` is configured. Failures to
+store the downloaded content, e.g. because the disk is full, still affect the service state.
+
+There are no database schema or search index changes.

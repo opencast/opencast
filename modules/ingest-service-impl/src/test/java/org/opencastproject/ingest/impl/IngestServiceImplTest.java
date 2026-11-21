@@ -23,6 +23,7 @@ package org.opencastproject.ingest.impl;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
+import org.opencastproject.ingest.api.MediaFetchException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -51,6 +52,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
@@ -96,10 +98,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.NoRouteToHostException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -832,6 +836,114 @@ public class IngestServiceImplTest {
       // expected
     }
     Assert.assertEquals(List.of(Job.FailureReason.NONE), failedJobReasons);
+  }
+
+  @Test
+  public void testUnreachableMediaUriIsDataFailure() throws Exception {
+    EasyMock.reset(httpClient);
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class)))
+            .andThrow(new TrustedHttpClientException(new NoRouteToHostException("No route to host"))).anyTimes();
+    EasyMock.replay(httpClient);
+
+    try {
+      service.addTrack(URI.create("https://user:secret@example.org/media/track.mp4?token=secret"),
+              MediaPackageElements.PRESENTATION_SOURCE, null, service.createMediaPackage());
+      Assert.fail("Adding a track from an unreachable host should have failed");
+    } catch (MediaFetchException e) {
+      Assert.assertEquals("https://example.org/media/track.mp4", e.getSource());
+      Assert.assertFalse(e.getMessage().contains("secret"));
+      Assert.assertTrue(e.getMessage().contains("No route to host"));
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testMediaUriWithErrorResponseIsDataFailureForAllUrlMethods() throws Exception {
+    respondWith(404, null);
+
+    final MediaPackageElementFlavor flavor = MediaPackageElements.PRESENTATION_SOURCE;
+    final URI uri = URI.create("https://example.org/missing.mp4");
+    final List<ThrowingUpload> downloads = List.of(
+            () -> service.addTrack(uri, flavor, null, service.createMediaPackage()),
+            () -> service.addPartialTrack(uri, flavor, 0L, service.createMediaPackage()),
+            () -> service.addCatalog(uri, flavor, null, service.createMediaPackage()),
+            () -> service.addAttachment(uri, flavor, null, service.createMediaPackage()));
+    for (ThrowingUpload download : downloads) {
+      try {
+        download.run();
+        Assert.fail("Adding content which cannot be fetched should have failed");
+      } catch (MediaFetchException e) {
+        Assert.assertTrue(e.getMessage().contains("404"));
+      }
+    }
+    Assert.assertEquals(Collections.nCopies(4, Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testInterruptedDownloadIsDataFailure() throws Exception {
+    useWorkingFileRepositoryReadingUploads();
+    respondWith(200, brokenUpload());
+
+    try {
+      service.addTrack(URI.create("https://example.org/track.mp4"), MediaPackageElements.PRESENTATION_SOURCE, null,
+              service.createMediaPackage());
+      Assert.fail("The interrupted download should have failed");
+    } catch (MediaFetchException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  @Test
+  public void testStorageFailureOfDownloadIsNoDataFailure() throws Exception {
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        IOUtils.toByteArray(in);
+        throw new IOException("No space left on device");
+      }
+    });
+    respondWith(200, new ByteArrayInputStream("data".getBytes()));
+
+    try {
+      service.addTrack(URI.create("https://example.org/track.mp4"), MediaPackageElements.PRESENTATION_SOURCE, null,
+              service.createMediaPackage());
+      Assert.fail("The failing storage should have failed the ingest");
+    } catch (IOException e) {
+      Assert.assertFalse(e instanceof MediaFetchException);
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.NONE), failedJobReasons);
+  }
+
+  @Test
+  public void testMediaUriWithoutFilenameIsDataFailure() throws Exception {
+    respondWith(200, new ByteArrayInputStream("data".getBytes()));
+
+    try {
+      service.addTrack(URI.create("https://example.org/track"), MediaPackageElements.PRESENTATION_SOURCE, null,
+              service.createMediaPackage());
+      Assert.fail("Adding content without filename should have failed");
+    } catch (MediaFetchException e) {
+      // expected
+    }
+    Assert.assertEquals(List.of(Job.FailureReason.DATA), failedJobReasons);
+  }
+
+  /** Makes the default HTTP client answer every request with the given status code and content */
+  private void respondWith(int statusCode, InputStream content) throws Exception {
+    StatusLine statusLine = EasyMock.createMock(StatusLine.class);
+    EasyMock.expect(statusLine.getStatusCode()).andReturn(statusCode).anyTimes();
+    HttpEntity entity = EasyMock.createMock(HttpEntity.class);
+    EasyMock.expect(entity.getContent()).andReturn(content).anyTimes();
+    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
+    EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
+    EasyMock.expect(response.getEntity()).andReturn(entity).anyTimes();
+    EasyMock.replay(statusLine, entity, response);
+
+    EasyMock.reset(httpClient);
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class))).andReturn(response).anyTimes();
+    EasyMock.replay(httpClient);
   }
 
   /** Makes the working file repository read all of an upload, like the real one does */
