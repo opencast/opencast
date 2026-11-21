@@ -102,37 +102,6 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
   public abstract AssetManager getAssetManager();
 
-  /**
-   * @deprecated use {@link #snapshot} instead
-   */
-  @POST
-  @Path("add")
-  @RestQuery(
-      name = "add",
-      description = "Adds a media package to the asset manager. This method is deprecated in "
-          + "favor of method POST 'snapshot'.",
-      restParameters = {
-          @RestParameter(
-              name = "mediapackage",
-              isRequired = true,
-              type = Type.TEXT,
-              description = "The media package to add to the search index.")},
-      responses = {
-          @RestResponse(
-              description = "The media package was added, no content to return.",
-              responseCode = SC_NO_CONTENT),
-          @RestResponse(
-              description = "Not allowed to add a media package.",
-              responseCode = SC_FORBIDDEN),
-          @RestResponse(
-              description = "There has been an internal error and the media package could not be added",
-              responseCode = SC_INTERNAL_SERVER_ERROR)},
-      returnDescription = "No content is returned.")
-  @Deprecated
-  public Response add(@FormParam("mediapackage") final MediaPackageImpl mediaPackage) {
-    return snapshot(mediaPackage);
-  }
-
   @POST
   @Path("snapshot")
   @RestQuery(name = "snapshot", description = "Take a versioned snapshot of a media package.",
