@@ -8,6 +8,29 @@ TODO
 
 ## Configuration Changes
 
+Check for changes in the configuration and apply those relevant to your setup to your files. You can use the following
+command to list all changes:
+```
+git diff origin/r/{{ opencast_major_version() | int - 1 }}.x origin/r/{{ opencast_major_version() }}.x -- etc/
+```
+
+### Changes Requiring Action
+
+The following changes affect most installations. If you keep your old configuration files, Opencast may ignore your
+settings or fail to work properly.
+
+- **OpenSearch**
+    - `etc/custom.properties`: The options `org.opencastproject.opensearch.server.hostname`,
+      `org.opencastproject.opensearch.server.scheme` and `org.opencastproject.opensearch.server.port` have been
+      replaced by `org.opencastproject.opensearch.server.url`. If you have set any of the old options, combine them into
+      a URL, e.g. `https://opensearch.example.com:9200`, and remove the old options. Opencast's OpenSearch index does
+      not start while they are still set. You can now also list multiple nodes of an OpenSearch cluster, separated by
+      commas.
+    - `etc/org.opencastproject.opensearch.index.OpenSearchIndex.cfg`: The options `max.retry.attempts.get`,
+      `max.retry.attempts.update`, `retry.waiting.period.get` and `retry.waiting.period.update` have been replaced by
+      `max.retry.attempts` and `retry.waiting.period`, which apply to all requests. If you have set any of the old
+      options, set the new ones instead and remove the old ones. The configuration is rejected while they are still
+      set.
 - The External API (API version 1.13.0 and newer) now returns at most 100 events from `/api/events` if the request does
   not specify a limit, and rejects limits larger than 10000 for `/api/events` and `/api/series` with
   `400 Bad Request`. Clients which do not request a specific API version get this behavior. Check integrations (for
