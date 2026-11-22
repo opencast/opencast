@@ -508,12 +508,18 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    *          the series
    * @throws SearchException
    */
+  Map<String, Object> buildSeriesDeletionMap(Instant deletionInstant) {
+    String deletionString = DateTimeFormatter.ISO_INSTANT.format(deletionInstant);
+    return Map.of(
+        SearchResult.DELETED_DATE, deletionString,
+        SearchResult.MODIFIED_DATE, deletionString);
+  }
+
   public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
     try {
       logger.info("Marking {} as deleted in the search index", seriesId);
-      JsonElement json = gson.toJsonTree(Map.of(
-          "deleted", Instant.now().getEpochSecond(),
-          "modified", Instant.now().toString()));
+      Map<String, Object> deletionMap = buildSeriesDeletionMap(Instant.now());
+      JsonElement json = gson.toJsonTree(deletionMap);
       var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
       try {
         UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
