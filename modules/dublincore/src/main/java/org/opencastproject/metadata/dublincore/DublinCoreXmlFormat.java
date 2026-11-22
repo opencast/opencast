@@ -149,6 +149,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     try {
       return Optional.of(read(xml));
     } catch (Exception e) {
+      logger.debug("Unable to parse DublinCore catalog", e);
       return Optional.empty();
     }
   }
@@ -288,21 +289,24 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     }
   }
 
+  // Parse problems are logged at debug level only. Fatal errors are rethrown, leaving it to the caller to decide how
+  // to report them with the context the parser does not have.
+
   @Override
   public void error(SAXParseException e) throws SAXException {
-    logger.warn("Error parsing DublinCore catalog: " + e.getMessage());
+    logger.debug("Error parsing DublinCore catalog", e);
     super.error(e);
   }
 
   @Override
   public void fatalError(SAXParseException e) throws SAXException {
-    logger.warn("Fatal error parsing DublinCore catalog: " + e.getMessage());
+    logger.debug("Fatal error parsing DublinCore catalog", e);
     super.fatalError(e);
   }
 
   @Override
   public void warning(SAXParseException e) throws SAXException {
-    logger.warn("Warning parsing DublinCore catalog: " + e.getMessage());
+    logger.debug("Warning parsing DublinCore catalog", e);
     super.warning(e);
   }
 }
