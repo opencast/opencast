@@ -430,7 +430,7 @@ public class PlaylistService {
           SearchResult<Event> result = opensearchIndex.getByQuery(
               new EventSearchQuery(org, user).withIdentifier(contentId));
           if (result.getPageSize() != 0) {
-            Event event = result.getItems()[0].getSource();
+            Event event = result.getItems().get(0);
             entry.setPublications(event.getPublications());
           } else {
             entry.setType(PlaylistEntryType.INACCESSIBLE);

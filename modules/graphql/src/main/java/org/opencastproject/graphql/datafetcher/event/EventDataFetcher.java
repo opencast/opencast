@@ -62,12 +62,12 @@ public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
           new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
               .withIdentifier(eventId)
       );
-      if (result.getDocumentCount() == 0) {
+      if (result.getPageSize() == 0) {
         return null;
-      } else if (result.getDocumentCount() == 1) {
-        Event event = result.getItems()[0].getSource();
+      } else if (result.getPageSize() == 1) {
+        Event event = result.getItems().get(0);
         event.updatePreview(config.eventPreviewSubtype());
-        return new GqlEvent(result.getItems()[0].getSource());
+        return new GqlEvent(result.getItems().get(0));
       }
       throw new GraphQLRuntimeException(
           "Multiple events found with the same identifier",

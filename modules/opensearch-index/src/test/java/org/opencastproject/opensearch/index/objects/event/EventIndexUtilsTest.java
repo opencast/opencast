@@ -23,7 +23,6 @@ package org.opencastproject.opensearch.index.objects.event;
 
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -37,7 +36,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class EventIndexUtilsTest {
 
@@ -57,9 +56,7 @@ public class EventIndexUtilsTest {
     String eventId = "my_event";
 
     // Mocks
-    @SuppressWarnings("unchecked")
-    SearchResult<Series> emptyResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(emptyResult.getHitCount()).andReturn(0L).anyTimes();
+    SearchResult<Series> emptyResult = SearchResult.empty();
 
     Event event = EasyMock.createMock(Event.class);
     EasyMock.expect(event.getSeriesId()).andReturn(seriesId).anyTimes();
@@ -71,7 +68,7 @@ public class EventIndexUtilsTest {
     EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(emptyResult);
     EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(emptyResult);
 
-    EasyMock.replay(emptyResult, event, searchIndex);
+    EasyMock.replay(event, searchIndex);
     // Run test
     EventIndexUtils.updateSeriesName(event, defaultOrganization.getId(), user, searchIndex, 3, 50L);
   }
@@ -86,16 +83,8 @@ public class EventIndexUtilsTest {
     // Mocks
     Series series = EasyMock.createMock(Series.class);
     EasyMock.expect(series.getTitle()).andReturn(seriesId);
-    SearchResultItem<Series> seriesResult = EasyMock.createMock(SearchResultItem.class);
-    EasyMock.expect(seriesResult.getSource()).andReturn(series);
-    ArrayList<SearchResultItem<Series>> seriesCollection = new ArrayList<SearchResultItem<Series>>();
-    seriesCollection.add(seriesResult);
-
-    SearchResult<Series> eventuallyResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(eventuallyResult.getHitCount()).andReturn(0L);
-    EasyMock.expect(eventuallyResult.getHitCount()).andReturn(0L);
-    EasyMock.expect(eventuallyResult.getHitCount()).andReturn(1L);
-    EasyMock.expect(eventuallyResult.getItems()).andReturn(seriesCollection.toArray(new SearchResultItem[1]));
+    SearchResult<Series> emptyResult = SearchResult.empty();
+    SearchResult<Series> seriesResult = new SearchResult<>(List.of(series), 1, 0, 0);
 
     Event event = EasyMock.createMock(Event.class);
     EasyMock.expect(event.getSeriesId()).andReturn(seriesId).anyTimes();
@@ -105,11 +94,11 @@ public class EventIndexUtilsTest {
     EasyMock.expectLastCall();
 
     OpenSearchIndex searchIndex = EasyMock.createMock(OpenSearchIndex.class);
-    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(eventuallyResult);
-    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(eventuallyResult);
-    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(eventuallyResult);
+    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(emptyResult);
+    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(emptyResult);
+    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(SeriesSearchQuery.class))).andReturn(seriesResult);
 
-    EasyMock.replay(eventuallyResult, event, searchIndex, series, seriesResult);
+    EasyMock.replay(event, searchIndex, series);
     // Run test
     EventIndexUtils.updateSeriesName(event, defaultOrganization.getId(), user, searchIndex, 3, 50L);
   }

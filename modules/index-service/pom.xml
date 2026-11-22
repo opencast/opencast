@@ -122,11 +122,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-opensearch-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-ingest-service-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>

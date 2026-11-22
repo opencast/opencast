@@ -235,12 +235,12 @@ public class WorkflowServiceImplAuthzTest {
     service.setPersistence(workflowDb);
 
     // Search Index
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    SearchResult result = SearchResult.empty();
 
     final OpenSearchIndex index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.replay(result, index);
+    EasyMock.replay(index);
 
     service.setIndex(index);
 

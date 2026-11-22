@@ -208,6 +208,8 @@
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-reactive</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>io.projectreactor:reactor-core</ignoredUnusedDeclaredDependency>
+            <!-- embedded, needed at runtime by the high-level REST client -->
+            <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-common</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

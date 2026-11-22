@@ -235,10 +235,10 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
         .withoutActions()
         .withIdentifier(mediaPackageId);
     SearchResult<Event> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
-    if (searchResult.getDocumentCount() == 0) {
+    if (searchResult.getPageSize() == 0) {
       return Optional.empty();
-    } else if (searchResult.getDocumentCount() == 1) {
-      return Optional.of(searchResult.getItems()[0].getSource());
+    } else if (searchResult.getPageSize() == 1) {
+      return Optional.of(searchResult.getItems().get(0));
     } else {
       throw new IllegalStateException(
               "Multiple events with identifier " + mediaPackageId + " found in search index");
@@ -292,10 +292,10 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
         .withoutActions()
         .withIdentifier(seriesId);
     SearchResult<Series> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
-    if (searchResult.getDocumentCount() == 0) {
+    if (searchResult.getPageSize() == 0) {
       return Optional.empty();
-    } else if (searchResult.getDocumentCount() == 1) {
-      return Optional.of(searchResult.getItems()[0].getSource());
+    } else if (searchResult.getPageSize() == 1) {
+      return Optional.of(searchResult.getItems().get(0));
     } else {
       throw new IllegalStateException("Multiple series with identifier " + seriesId + " found in search index");
     }

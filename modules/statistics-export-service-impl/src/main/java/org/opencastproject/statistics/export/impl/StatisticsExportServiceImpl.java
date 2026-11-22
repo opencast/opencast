@@ -31,7 +31,6 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchQuery;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -376,15 +375,15 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
 
     final SearchResult<Event> result = index.getByQuery(query);
     boolean first = offset == 0;
-    for (SearchResultItem<Event> currentEvent : result.getItems()) {
+    for (Event currentEvent : result.getItems()) {
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(eventProvider,
-          currentEvent.getSource().getIdentifier(), from, to, dataResolution, zoneId);
+          currentEvent.getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
         this.printFullEventData(printer, dataEvent, dataResolution,
-            currentEvent.getSource().getIdentifier(), zoneId, first);
+            currentEvent.getIdentifier(), zoneId, first);
       } else {
-        printData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(),
-                currentEvent.getSource().getTitle(), zoneId, first);
+        printData(printer, dataEvent, dataResolution, currentEvent.getIdentifier(),
+                currentEvent.getTitle(), zoneId, first);
       }
       first = false;
     }
@@ -444,15 +443,15 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
     }
     final SearchResult<Event> result = index.getByQuery(query);
     boolean first = offset == 0;
-    for (SearchResultItem<Event> currentEvent : result.getItems()) {
+    for (Event currentEvent : result.getItems()) {
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(eventProvider,
-              currentEvent.getSource().getIdentifier(), from, to, dataResolution, zoneId);
+              currentEvent.getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
         this.printFullEventData(printer, dataEvent, dataResolution,
-            currentEvent.getSource().getIdentifier(), zoneId, first);
+            currentEvent.getIdentifier(), zoneId, first);
       } else {
-        printData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(),
-                currentEvent.getSource().getTitle(), zoneId, first);
+        printData(printer, dataEvent, dataResolution, currentEvent.getIdentifier(),
+                currentEvent.getTitle(), zoneId, first);
       }
       first = false;
     }
@@ -491,15 +490,15 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
     }
     final SearchResult<Series> result = index.getByQuery(query);
     boolean first = offset == 0;
-    for (SearchResultItem<Series> currentSeries : result.getItems()) {
+    for (Series currentSeries : result.getItems()) {
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(seriesProvider,
-              currentSeries.getSource().getIdentifier(), from, to, dataResolution, zoneId);
+              currentSeries.getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
         this.printFullSeriesData(printer, dataEvent, dataResolution,
-            currentSeries.getSource().getIdentifier(), zoneId, first);
+            currentSeries.getIdentifier(), zoneId, first);
       } else {
-        printData(printer, dataEvent, dataResolution, currentSeries.getSource().getIdentifier(),
-                currentSeries.getSource().getTitle(), zoneId, first);
+        printData(printer, dataEvent, dataResolution, currentSeries.getIdentifier(),
+                currentSeries.getTitle(), zoneId, first);
       }
       first = false;
     }

@@ -24,10 +24,8 @@ package org.opencastproject.graphql.event;
 
 import org.opencastproject.graphql.type.output.OffsetPageInfo;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.objects.event.Event;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,8 +62,7 @@ public class GqlEventList {
   @GraphQLField
   @GraphQLNonNull
   public List<GqlEvent> nodes() {
-    return Arrays.stream(searchResult.getItems())
-        .map(SearchResultItem::getSource)
+    return searchResult.getItems().stream()
         .map(GqlEvent::new)
         .collect(Collectors.toList());
   }

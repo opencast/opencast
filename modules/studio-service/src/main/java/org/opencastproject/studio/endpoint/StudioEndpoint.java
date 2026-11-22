@@ -24,7 +24,6 @@ package org.opencastproject.studio.endpoint;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Permissions;
@@ -44,7 +43,6 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -149,8 +147,7 @@ public class StudioEndpoint {
     }
 
     try {
-      var items = Arrays.stream(opensearchIndex.getByQuery(query).getItems())
-              .map(SearchResultItem::getSource)
+      var items = opensearchIndex.getByQuery(query).getItems().stream()
               .map(SeriesDto::create)
               .collect(Collectors.toList());
       return Response.ok(gson.toJson(items)).build();

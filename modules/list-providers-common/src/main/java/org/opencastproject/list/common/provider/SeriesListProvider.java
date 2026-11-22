@@ -28,7 +28,6 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.common.query.SeriesListQuery;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
@@ -47,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -140,11 +138,10 @@ public class SeriesListProvider implements ResourceListProvider {
         SearchResult<Series> searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
         //We might have duplicate series names, so let's count them and see
-        Map<String, Long> duplicates = Arrays.stream(searchResult.getItems())
-            .map(series -> series.getSource().getTitle())
+        Map<String, Long> duplicates = searchResult.getItems().stream()
+            .map(Series::getTitle)
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-        for (SearchResultItem<Series> item : searchResult.getItems()) {
-          Series s = item.getSource();
+        for (Series s : searchResult.getItems()) {
           if (TITLE_EXTENDED.equals(listName)) {
             Date created = s.getCreatedDateTime();
             List<String> organizers = s.getOrganizers();

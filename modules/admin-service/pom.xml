@@ -135,11 +135,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-opensearch-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -324,7 +319,6 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredNonTestScopedDependencies>
-            <ignoredNonTestScopedDependency>org.opencastproject:opencast-opensearch-impl</ignoredNonTestScopedDependency>
             <ignoredNonTestScopedDependency>joda-time:joda-time</ignoredNonTestScopedDependency>
           </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>

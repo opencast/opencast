@@ -46,7 +46,6 @@ import org.opencastproject.metadata.api.MetadataService;
 import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -2333,15 +2332,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       return;
     }
 
-    if (results.getItems().length == 0) {
+    if (results.getItems().isEmpty()) {
       logger.warn("No events for workflow instance {} found in the {} index.", workflowInstanceId,
               index.getIndexName());
       return;
     }
 
     // should be only one event, but better safe than sorry
-    for (SearchResultItem<Event> item: results.getItems()) {
-      String eventId = item.getSource().getIdentifier();
+    for (Event item : results.getItems()) {
+      String eventId = item.getIdentifier();
       logger.debug("Removing workflow instance {} of event {} from the {} index.", workflowInstanceId, eventId,
               index.getIndexName());
 

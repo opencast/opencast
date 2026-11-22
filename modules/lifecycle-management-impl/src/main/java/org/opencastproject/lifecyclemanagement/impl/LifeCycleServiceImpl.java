@@ -39,7 +39,6 @@ import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
@@ -530,8 +529,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       // Run query
       results = index.getByQuery(query);
 
-      for (SearchResultItem<Event> item : results.getItems()) {
-        Event source = item.getSource();
+      for (Event source : results.getItems()) {
         eventsList.add(source);
       }
 
@@ -665,8 +663,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     // Run query
     SearchResult<Series> results = index.getByQuery(query);
 
-    for (SearchResultItem<Series> item : results.getItems()) {
-      Series source = item.getSource();
+    for (Series source : results.getItems()) {
       seriesList.add(source);
     }
 

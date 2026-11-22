@@ -577,7 +577,7 @@ public final class EventIndexUtils {
         SearchResult<Series> result = searchIndex.getByQuery(
                 new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(event.getSeriesId()));
         if (result.getHitCount() > 0) {
-          event.setSeriesName(result.getItems()[0].getSource().getTitle());
+          event.setSeriesName(result.getItems().get(0).getTitle());
           break;
         } else {
           Integer triesLeft = tries - i;

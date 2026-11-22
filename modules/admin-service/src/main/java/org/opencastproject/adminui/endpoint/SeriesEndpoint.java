@@ -73,7 +73,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -920,13 +919,12 @@ public class SeriesEndpoint {
 
       SearchResult<Series> result = searchIndex.getByQuery(query);
       if (logger.isDebugEnabled()) {
-        logger.debug("Found {} results in {} ms", result.getDocumentCount(), result.getSearchTime());
+        logger.debug("Found {} results", result.getPageSize());
       }
 
       List<JsonObject> series = new ArrayList<>();
-      for (SearchResultItem<Series> item : result.getItems()) {
+      for (Series s : result.getItems()) {
         JsonObject sJson = new JsonObject();
-        Series s = item.getSource();
 
         sJson.addProperty("id", s.getIdentifier());
         sJson.addProperty("title", safeString(s.getTitle()));

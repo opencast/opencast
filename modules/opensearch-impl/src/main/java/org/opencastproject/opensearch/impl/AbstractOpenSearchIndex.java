@@ -29,7 +29,6 @@ import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchMetadata;
 import org.opencastproject.opensearch.api.SearchQuery;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.io.IOUtils;
@@ -795,13 +794,8 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
       }
     } while (searchResponse == null);
 
-    // Create and configure the query result
-    long hits = getTotalHits(searchResponse.getHits());
-    long size = searchResponse.getHits().getHits().length;
-    SearchResultImpl<T> result = new SearchResultImpl<>(query, hits, size);
-    result.setSearchTime(searchResponse.getTook().millis());
-
     // Walk through response and create new items with title, creator, etc:
+    final List<T> items = new ArrayList<>();
     for (SearchHit doc : searchResponse.getHits()) {
 
       // Wrap the search resulting metadata
@@ -826,25 +820,15 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
         metadata.add(m);
       }
 
-      // Get the score for this item
-      float score = doc.getScore();
-
-      // Have the serializer in charge create a type-specific search result
-      // item
+      // Have the serializer in charge create a type-specific search result item
       try {
-        T document = toSearchResult.apply(metadata);
-        SearchResultItem<T> item = new SearchResultItemImpl<>(score, document);
-        result.addResultItem(item);
+        items.add(toSearchResult.apply(metadata));
       } catch (Throwable t) {
         logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
-        size--;
       }
     }
 
-    // Set the number of resulting documents
-    result.setDocumentCount(size);
-
-    return result;
+    return new SearchResult<>(items, getTotalHits(searchResponse.getHits()), query.getOffset(), query.getLimit());
   }
 
   /**

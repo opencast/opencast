@@ -521,7 +521,7 @@ public class PlaylistsEndpoint {
         SearchResult<Event> result = opensearchIndex.getByQuery(
             new EventSearchQuery(org, user).withIdentifier(contentId));
         if (result.getPageSize() != 0) {
-          eventMap.put(contentId, result.getItems()[0].getSource());
+          eventMap.put(contentId, result.getItems().get(0));
         }
       } catch (SearchIndexException e) {
         logger.warn("Could not look up event '{}': {}", contentId, e.getMessage());

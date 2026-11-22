@@ -37,7 +37,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -314,8 +313,7 @@ public class ThemesEndpoint {
         return RestUtil.R.serverError();
       }
       JsonArray seriesValues = new JsonArray();
-      for (SearchResultItem<Series> item : results.getItems()) {
-        Series series = item.getSource();
+      for (Series series : results.getItems()) {
         JsonObject seriesJson = new JsonObject();
         seriesJson.addProperty("id", series.getIdentifier());
         seriesJson.addProperty("title", series.getTitle());
@@ -616,8 +614,8 @@ public class ThemesEndpoint {
       logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId, e);
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
-    for (SearchResultItem<Series> item : results.getItems()) {
-      String seriesId = item.getSource().getIdentifier();
+    for (Series item : results.getItems()) {
+      String seriesId = item.getIdentifier();
       try {
         seriesService.deleteSeriesProperty(seriesId, SeriesEndpoint.THEME_KEY);
       } catch (NotFoundException e) {

@@ -25,8 +25,6 @@ import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
-import org.opencastproject.opensearch.impl.SearchResultImpl;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -53,6 +51,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Optional;
 
 import javax.ws.rs.Path;
@@ -151,26 +150,19 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   private SearchResult<Series> createSeriesCaptureResult(Capture<SeriesSearchQuery> myCapture) {
-    SearchResultImpl<Series> searchResults = new SearchResultImpl<Series>(myCapture.getValue(), 0, 0);
-    if (myCapture.hasCaptured()) {
-      SearchResultItem<Series> searchResultItem1 = getSeriesSearchResultItem("Series1Id", "Series 1 Title");
-      searchResults.addResultItem(searchResultItem1);
-      SearchResultItem<Series> searchResultItem2 = getSeriesSearchResultItem("Series2Id", "Series 2 Title");
-      searchResults.addResultItem(searchResultItem2);
-      SearchResultItem<Series> searchResultItem3 = getSeriesSearchResultItem("Series3Id", "Series 3 Title");
-      searchResults.addResultItem(searchResultItem3);
+    if (!myCapture.hasCaptured()) {
+      return SearchResult.empty();
     }
-    return searchResults;
+    return new SearchResult<>(List.of(
+        createSeries("Series1Id", "Series 1 Title"),
+        createSeries("Series2Id", "Series 2 Title"),
+        createSeries("Series3Id", "Series 3 Title")), 3, 0, 0);
   }
 
-  private SearchResultItem<Series> getSeriesSearchResultItem(String seriesId, String title) {
+  private Series createSeries(String seriesId, String title) {
     Series series = new Series(seriesId, defaultOrg.getId());
     series.setTitle(title);
-    SearchResultItem<Series> searchResultItem = EasyMock.createNiceMock(SearchResultItem.class);
-    EasyMock.expect(searchResultItem.getSource()).andReturn(series);
-    EasyMock.expect(searchResultItem.compareTo(EasyMock.anyObject(SearchResultItem.class))).andReturn(1);
-    EasyMock.replay(searchResultItem);
-    return searchResultItem;
+    return series;
   }
 
 }

@@ -37,8 +37,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchResultItem;
-import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.api.SearchResult;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -94,10 +93,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     securityService = testSecurityService;
     workspace = newWorkspace();
 
-    SearchResultImpl<Event> eventSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
-    EasyMock.expect(eventSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
-    SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
-    EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
+    SearchResult<Event> eventSearchResult = SearchResult.empty();
+    SearchResult<Series> seriesSearchResult = SearchResult.empty();
 
     index = EasyMock.createNiceMock(OpenSearchIndex.class);
 
@@ -110,7 +107,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
       // should never happen
     }
 
-    EasyMock.replay(index, eventSearchResult, seriesSearchResult);
+    EasyMock.replay(index);
 
     aclServiceFactory = new AclServiceFactory() {
       @Override

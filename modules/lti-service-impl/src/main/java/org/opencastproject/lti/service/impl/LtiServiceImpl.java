@@ -47,7 +47,6 @@ import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -91,7 +90,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -255,8 +253,7 @@ public class LtiServiceImpl implements LtiService {
     try {
       SearchResult<Event> results = this.searchIndex.getByQuery(query);
       ZonedDateTime startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
-      return Arrays.stream(results.getItems())
-              .map(SearchResultItem::getSource)
+      return results.getItems().stream()
               .filter(e -> ZonedDateTime.parse(e.getCreated()).compareTo(startOfDay) > 0)
               .map(e -> new LtiJob(e.getTitle(), e.getDisplayableStatus(workflowService.getWorkflowStateMappings())))
               .collect(Collectors.toList());
