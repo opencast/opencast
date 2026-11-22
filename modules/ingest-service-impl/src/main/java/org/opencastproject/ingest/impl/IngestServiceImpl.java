@@ -388,8 +388,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     downloadAuthMethod = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_AUTH_METHOD));
-    if (!"Digest".equals(downloadAuthMethod) && !"Basic".equals(downloadAuthMethod)) {
-      logger.warn("Download authentication method is neither Digest nor Basic; setting to Digest");
+    if(StringUtils.isBlank(downloadAuthMethod)){
+      downloadAuthMethod="Digest";
+    } else if (!"Digest".equals(downloadAuthMethod) && !"Basic".equals(downloadAuthMethod)) {
+      logger.warn("Download authentication method '{}' is neither Digest nor Basic; setting to Digest",
+              downloadAuthMethod);
       downloadAuthMethod = "Digest";
     }
     downloadAuthForceBasic = BooleanUtils.toBoolean(Objects.toString(properties.get(DOWNLOAD_AUTH_FORCE_BASIC),
