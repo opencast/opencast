@@ -28,8 +28,10 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.search.api.SearchException;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.api.SearchServiceQuery;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
 import org.opencastproject.security.api.Organization;
@@ -51,8 +53,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -61,6 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -236,9 +237,14 @@ public class SearchServiceImpl extends AbstractJobProducer implements SearchServ
     }
   }
 
-  public SearchResultList search(SearchSourceBuilder searchSource) throws SearchException {
-    SearchResponse idxResp = this.index.search(searchSource);
-    return new SearchResultList(idxResp.getHits());
+  @Override
+  public SearchResultList search(SearchServiceQuery query) throws SearchException {
+    final SearchServiceIndex.Hits hits = this.index.search(query);
+    final List<SearchResult> results = new ArrayList<>();
+    for (Map<String, Object> document : hits.documents()) {
+      results.add(SearchResult.rehydrate(document));
+    }
+    return new SearchResultList(results, hits.total());
   }
 
 

@@ -42,6 +42,7 @@ import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.api.SearchServiceQuery;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -58,6 +59,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
@@ -75,9 +77,16 @@ import org.opensearch.action.update.UpdateRequest;
 import org.opensearch.action.update.UpdateResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.common.unit.Fuzziness;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.rest.RestStatus;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.MultiMatchQueryBuilder;
+import org.opensearch.index.query.Operator;
+import org.opensearch.index.query.QueryBuilders;
+import org.opensearch.search.SearchHit;
 import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.sort.SortOrder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -91,6 +100,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -124,6 +134,18 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceIndex.class);
 
   public static final String INDEX_NAME = "opencast_search";
+
+  private static final String INDEX_ACL_READ = SearchResult.INDEX_ACL + ".read";
+  private static final String DC_TITLE = SearchResult.DUBLINCORE + ".title";
+  private static final String DC_IS_PART_OF = SearchResult.DUBLINCORE + ".isPartOf";
+
+  /** Fields searched by free text queries */
+  private static final List<String> TEXT_FIELDS = List.of(
+      SearchResult.DUBLINCORE + ".*.search",
+      SearchResult.DUBLINCORE + ".*.search._2gram",
+      SearchResult.DUBLINCORE + ".*.search._3gram",
+      SearchResult.DUBLINCORE + ".*.search._4gram");
+  private static final float TEXT_BOOST = 1.2f;
 
   private final Gson gson = new Gson();
 
@@ -220,15 +242,98 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
     createIndex();
   }
 
-  public SearchResponse search(SearchSourceBuilder searchSource) throws SearchException {
-    SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
+  /**
+   * Documents found by a search and the total number of matching documents.
+   *
+   * @param documents
+   *          the source documents of the hits on the requested page
+   * @param total
+   *          the total number of matching documents
+   */
+  public record Hits(List<Map<String, Object>> documents, long total) {
+  }
+
+  /**
+   * Searches the index.
+   *
+   * @param query
+   *          the query to run
+   * @return the matching documents
+   * @throws SearchException
+   *          if querying the index fails
+   */
+  public Hits search(SearchServiceQuery query) throws SearchException {
+    final SearchSourceBuilder searchSource = toSearchSource(query);
     logger.debug("Sending for query: {}", searchSource.query());
-    searchRequest.source(searchSource);
     try {
-      return esIndex.getClient().search(searchRequest, RequestOptions.DEFAULT);
+      final SearchResponse response = esIndex.getClient()
+          .search(new SearchRequest(INDEX_NAME).source(searchSource), RequestOptions.DEFAULT);
+      final List<Map<String, Object>> documents = Arrays.stream(response.getHits().getHits())
+          .map(SearchHit::getSourceAsMap)
+          .collect(Collectors.toList());
+      return new Hits(documents, response.getHits().getTotalHits().value());
     } catch (IOException e) {
       throw new SearchException(e);
     }
+  }
+
+  /**
+   * Renders the body of the search request for a query as JSON. Only meant for testing.
+   */
+  static String searchRequestBody(SearchServiceQuery query) {
+    return toSearchSource(query).toString();
+  }
+
+  private static SearchSourceBuilder toSearchSource(SearchServiceQuery query) {
+    final BoolQueryBuilder bool = QueryBuilders.boolQuery()
+        .filter(QueryBuilders.termQuery(SearchResult.ORG, query.getOrganization()))
+        .filter(QueryBuilders.termQuery(SearchResult.TYPE, query.getType().name()));
+    if (!query.isIncludeDeleted()) {
+      bool.filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+    }
+    query.getReadRoles().ifPresent(roles -> bool.filter(QueryBuilders.termsQuery(INDEX_ACL_READ, roles)));
+    query.getModifiedSince().ifPresent(since -> bool.filter(
+        QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime())));
+    query.getId().ifPresent(id -> bool.must(QueryBuilders.idsQuery().addIds(id)));
+    query.getSeriesTitle().ifPresent(title -> bool.must(QueryBuilders.termQuery(DC_TITLE, title)));
+
+    final List<String> seriesIds = query.getSeriesIds();
+    if (seriesIds.size() == 1) {
+      bool.must(QueryBuilders.termQuery(DC_IS_PART_OF, seriesIds.get(0)));
+    } else if (seriesIds.size() > 1) {
+      final BoolQueryBuilder seriesQuery = QueryBuilders.boolQuery();
+      seriesIds.forEach(id -> seriesQuery.should(QueryBuilders.termQuery(DC_IS_PART_OF, id)));
+      bool.must(seriesQuery);
+    }
+
+    query.getLive().ifPresent(live -> bool.must(QueryBuilders.termQuery(SearchResult.LIVE, live)));
+
+    query.getText().ifPresent(text -> {
+      final MultiMatchQueryBuilder multiMatch = QueryBuilders.multiMatchQuery(text)
+          .type(MultiMatchQueryBuilder.Type.BOOL_PREFIX)
+          .operator(Operator.AND)
+          .fuzziness(Fuzziness.AUTO)
+          .fuzzyTranspositions(true);
+      // Search-as-you-type generates useful subfields for autocompletion, we should use it
+      // https://docs.opensearch.org/latest/field-types/supported-field-types/search-as-you-type/
+      TEXT_FIELDS.forEach(field -> multiMatch.field(field, TEXT_BOOST));
+      bool.minimumShouldMatch(1);
+      bool.should(multiMatch);
+    });
+
+    final SearchSourceBuilder searchSource = new SearchSourceBuilder().query(bool);
+    if (query.getOffset() >= 0) {
+      searchSource.from(query.getOffset());
+    }
+    if (query.getLimit() >= 0) {
+      searchSource.size(query.getLimit());
+    }
+    query.getSortOrders().forEach((field, order) -> searchSource.sort(field,
+        order == SortCriterion.Order.Descending ? SortOrder.DESC : SortOrder.ASC));
+    searchSource.sort("_score", SortOrder.DESC);
+    // Used to stabilize the sort order of results with the same score.
+    searchSource.sort("_doc", SortOrder.ASC);
+    return searchSource;
   }
 
   /**

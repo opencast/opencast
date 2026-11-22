@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.search.endpoint;
+package org.opencastproject.search.impl;
 
 import static org.junit.Assert.assertEquals;
 

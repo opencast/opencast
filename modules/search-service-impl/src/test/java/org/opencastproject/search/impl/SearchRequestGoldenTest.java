@@ -19,27 +19,24 @@
  *
  */
 
-package org.opencastproject.search.endpoint;
+package org.opencastproject.search.impl;
 
-import static org.opencastproject.search.endpoint.QueryJson.assertMatchesGolden;
+import static org.opencastproject.search.impl.QueryJson.assertMatchesGolden;
 
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
-import org.opencastproject.search.impl.SearchServiceImpl;
-import org.opencastproject.search.impl.SearchServiceIndex;
+import org.opencastproject.search.api.SearchServiceQuery;
+import org.opencastproject.search.endpoint.SearchRestService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.opensearch.index.query.QueryBuilders;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.SortOrder;
 
 import java.util.Date;
 
@@ -60,7 +57,7 @@ public class SearchRequestGoldenTest {
   private static final class Captured extends RuntimeException {
   }
 
-  private final Capture<SearchSourceBuilder> capture = Capture.newInstance();
+  private final Capture<SearchServiceQuery> capture = Capture.newInstance();
 
   private SearchRestService endpoint(User user) throws Exception {
     final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -91,7 +88,7 @@ public class SearchRequestGoldenTest {
     try {
       request.run();
     } catch (Captured e) {
-      return capture.getValue().toString();
+      return SearchServiceIndex.searchRequestBody(capture.getValue());
     }
     throw new AssertionError("No search request was sent");
   }
@@ -149,26 +146,18 @@ public class SearchRequestGoldenTest {
   /** The query the Tobira harvest API sends (see {@code org.opencastproject.tobira.impl.Harvest}). */
   @Test
   public void tobiraHarvest() throws Exception {
-    final Date since = new Date(1700000000000L);
-    final int preferredAmount = 50;
-    final SearchSourceBuilder query = new SearchSourceBuilder().query(
-            QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery(SearchResult.ORG, ORG.getId()))
-                .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
-                .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
-        .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
-        .size(preferredAmount + 1);
-    assertMatchesGolden("tobira-harvest", query.toString());
+    final SearchServiceQuery query = new SearchServiceQuery(ORG.getId(), SearchService.IndexEntryType.Episode)
+        .withDeleted()
+        .withModifiedSince(new Date(1700000000000L))
+        .sortBy(SearchServiceQuery.SORT_MODIFIED, Order.Ascending)
+        .withLimit(51);
+    assertMatchesGolden("tobira-harvest", SearchServiceIndex.searchRequestBody(query));
   }
 
   /** The query the adopter registration sends (see {@code AdopterRegistrationServiceImpl}). */
   @Test
   public void adopterStatistics() throws Exception {
-    final SearchSourceBuilder query = new SearchSourceBuilder().query(
-        QueryBuilders.boolQuery()
-            .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode))
-            .must(QueryBuilders.termQuery(SearchResult.ORG, ORG.getId()))
-            .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
-    assertMatchesGolden("adopter-statistics", query.toString());
+    final SearchServiceQuery query = new SearchServiceQuery(ORG.getId(), SearchService.IndexEntryType.Episode);
+    assertMatchesGolden("adopter-statistics", SearchServiceIndex.searchRequestBody(query));
   }
 }

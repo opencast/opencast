@@ -1,7 +1,7 @@
 {
   "query": {
     "bool": {
-      "must": [
+      "filter": [
         {
           "range": {
             "modified": {
@@ -30,6 +30,16 @@
   "sort": [
     {
       "modified": {
+        "order": "asc"
+      }
+    },
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
         "order": "asc"
       }
     }

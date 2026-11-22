@@ -35,11 +35,16 @@ import org.opencastproject.security.api.AccessControlList;
 
 import com.google.gson.Gson;
 
-import org.opensearch.index.mapper.DateFieldMapper;
-
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +68,52 @@ public class SearchResult {
   public static final String LIVE = "live";
 
   private static final Gson gson = new Gson();
+
+  /**
+   * Parser for dates in the default format of OpenSearch date fields ({@code strict_date_optional_time}): a year with
+   * optional month and day, optionally followed by a time with optional minutes, seconds and fractions, and an optional
+   * offset. Missing parts default to the first month or day, midnight and UTC.
+   */
+  private static final DateTimeFormatter DATE_OPTIONAL_TIME = new DateTimeFormatterBuilder()
+      .appendValue(ChronoField.YEAR, 4)
+      .optionalStart()
+      .appendLiteral('-')
+      .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+      .optionalStart()
+      .appendLiteral('-')
+      .appendValue(ChronoField.DAY_OF_MONTH, 2)
+      .optionalStart()
+      .appendLiteral('T')
+      .appendValue(ChronoField.HOUR_OF_DAY, 2)
+      .optionalStart()
+      .appendLiteral(':')
+      .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+      .optionalStart()
+      .appendLiteral(':')
+      .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+      .optionalStart()
+      .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+      .optionalEnd()
+      .optionalEnd()
+      .optionalEnd()
+      .optionalStart()
+      .appendOffset("+HH:MM", "Z")
+      .optionalEnd()
+      .optionalStart()
+      .appendOffset("+HHMM", "Z")
+      .optionalEnd()
+      .optionalEnd()
+      .optionalEnd()
+      .optionalEnd()
+      .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+      .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+      .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+      .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+      .toFormatter();
+
+  /** Format in which dates are written to the index: UTC with millisecond precision */
+  private static final DateTimeFormatter INDEX_DATE = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'")
+      .withZone(ZoneOffset.UTC);
 
   private SearchService.IndexEntryType type;
 
@@ -159,8 +210,7 @@ public class SearchResult {
               .map(val -> {
                 // Normalize `created` field: we want it to be in ISO 8601 format in UTC.
                 if (entry.getKey().equals(DublinCore.PROPERTY_CREATED)) {
-                  var date = DateFieldMapper.DEFAULT_DATE_TIME_FORMATTER.parse(val);
-                  return DateFieldMapper.DEFAULT_DATE_TIME_FORMATTER.withZone(ZoneOffset.UTC).format(date);
+                  return INDEX_DATE.format(parseDate(val));
                 } else {
                   return val;
                 }
@@ -300,8 +350,33 @@ public class SearchResult {
   }
 
   public Instant getCreatedDate() {
-    var acc = DateFieldMapper.DEFAULT_DATE_TIME_FORMATTER.parse(this.dublinCore.getFirst(DublinCore.PROPERTY_CREATED));
-    return Instant.from(acc);
+    return parseDate(this.dublinCore.getFirst(DublinCore.PROPERTY_CREATED));
+  }
+
+  /**
+   * Parses a date the way OpenSearch parses date fields by default ({@code strict_date_optional_time||epoch_millis}).
+   *
+   * @param value
+   *          the date as string
+   * @return the parsed date
+   * @throws java.time.format.DateTimeParseException
+   *          if the value cannot be parsed
+   */
+  static Instant parseDate(String value) {
+    final TemporalAccessor parsed;
+    try {
+      parsed = DATE_OPTIONAL_TIME.parse(value);
+    } catch (DateTimeParseException e) {
+      // Like OpenSearch, fall back to milliseconds since the epoch if the value is no date
+      if (value.matches("\\d+")) {
+        return Instant.ofEpochMilli(Long.parseLong(value));
+      }
+      throw e;
+    }
+    final ZoneOffset offset = parsed.isSupported(ChronoField.OFFSET_SECONDS)
+        ? ZoneOffset.from(parsed)
+        : ZoneOffset.UTC;
+    return OffsetDateTime.of(LocalDate.from(parsed), LocalTime.from(parsed), offset).toInstant();
   }
 
   public String getOrgId() {

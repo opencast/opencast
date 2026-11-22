@@ -1,7 +1,18 @@
 {
   "query": {
     "bool": {
-      "must": [
+      "filter": [
+        {
+          "bool": {
+            "must_not": [
+              {
+                "exists": {
+                  "field": "deleted"
+                }
+              }
+            ]
+          }
+        },
         {
           "term": {
             "org": {
@@ -16,14 +27,19 @@
             }
           }
         }
-      ],
-      "must_not": [
-        {
-          "exists": {
-            "field": "deleted"
-          }
-        }
       ]
     }
-  }
+  },
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ]
 }

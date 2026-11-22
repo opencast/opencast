@@ -33,9 +33,9 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.api.SearchServiceQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -51,8 +51,6 @@ import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
 import com.google.gson.Gson;
 
-import org.opensearch.index.query.QueryBuilders;
-import org.opensearch.search.builder.SearchSourceBuilder;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
@@ -412,11 +410,7 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
         int orgCAs = caStateService.getKnownAgents().size();
         statisticData.setCACount(current + orgCAs);
 
-        final SearchSourceBuilder q = new SearchSourceBuilder().query(
-                QueryBuilders.boolQuery()
-                    .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode))
-                    .must(QueryBuilders.termQuery(SearchResult.ORG, org.getId()))
-                    .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+        final SearchServiceQuery q = new SearchServiceQuery(org.getId(), SearchService.IndexEntryType.Episode);
         final SearchResultList results = searchService.search(q);
         long orgMilis = results.getHits().stream().map(
                 result -> EncodingSchemeUtils.decodeDuration(Objects.toString(

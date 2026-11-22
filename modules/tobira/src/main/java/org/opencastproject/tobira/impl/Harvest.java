@@ -22,23 +22,21 @@
 package org.opencastproject.tobira.impl;
 
 import org.opencastproject.playlists.PlaylistService;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.api.SearchServiceQuery;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.opensearch.index.query.QueryBuilders;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,13 +98,11 @@ final class Harvest {
     // `hasMore` and `includesItemsUntil` more precisely.
 
     // Retrieve episodes from index.
-    final SearchSourceBuilder q = new SearchSourceBuilder().query(
-            QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery(SearchResult.ORG, org))
-                .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
-                .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
-        .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
-        .size(preferredAmount + 1);
+    final SearchServiceQuery q = new SearchServiceQuery(org, SearchService.IndexEntryType.Episode)
+        .withDeleted()
+        .withModifiedSince(since)
+        .sortBy(SearchServiceQuery.SORT_MODIFIED, Order.Ascending)
+        .withLimit(preferredAmount + 1);
     final SearchResultList results = searchService.search(q);
     final var hasMoreEvents = results.getHits().size() >= preferredAmount + 1;
 
