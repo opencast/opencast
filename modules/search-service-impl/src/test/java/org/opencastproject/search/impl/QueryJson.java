@@ -107,6 +107,12 @@ public final class QueryJson {
   public static String normalize(String json) {
     final JsonObject root = JsonParser.parseString(json).getAsJsonObject();
     IGNORED_TOP_LEVEL.forEach(root::remove);
+    // Tracking all hits can be requested as "true" or with the maximum number of hits to track
+    final JsonElement trackTotalHits = root.get("track_total_hits");
+    if (trackTotalHits != null && trackTotalHits.isJsonPrimitive() && trackTotalHits.getAsJsonPrimitive().isBoolean()
+        && trackTotalHits.getAsBoolean()) {
+      root.addProperty("track_total_hits", Integer.MAX_VALUE);
+    }
     return new GsonBuilder().setPrettyPrinting().create().toJson(normalize(null, root)) + "\n";
   }
 
@@ -211,14 +217,17 @@ public final class QueryJson {
     return wildcard;
   }
 
-  /** Field boosts of 1.0 are implicit, enum values are case-insensitive. */
+  /** Field boosts of 1.0 are implicit, the order of fields is irrelevant, enum values are case-insensitive. */
   private static JsonObject normalizeMultiMatch(JsonObject multiMatch) {
     final JsonObject result = multiMatch.deepCopy();
     if (result.has("fields")) {
-      final JsonArray fields = new JsonArray();
+      final List<String> names = new ArrayList<>();
       for (JsonElement field : result.getAsJsonArray("fields")) {
-        fields.add(field.getAsString().replaceAll("\\^1\\.0$", ""));
+        names.add(field.getAsString().replaceAll("\\^1\\.0$", ""));
       }
+      names.sort(null);
+      final JsonArray fields = new JsonArray();
+      names.forEach(fields::add);
       result.add("fields", fields);
     }
     for (String name : new String[] { "type", "operator" }) {

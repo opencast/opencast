@@ -363,7 +363,7 @@ public class SeriesEndpoint {
         query.withAction(Permissions.Action.WRITE);
       }
 
-      logger.trace("Using Query: " + query.toString());
+      logger.trace("Using Query: {}", query);
 
       SearchResult<Series> result = opensearchIndex.getByQuery(query);
       final boolean includeAcl = (withAcl != null && withAcl);
@@ -1546,9 +1546,6 @@ public class SeriesEndpoint {
     SeriesSearchQuery q = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
     q.withLimit(count);
     q.withOffset(offset);
-    if (edit != null) {
-      q.withEdit(edit);
-    }
     if (StringUtils.isNotEmpty(text)) {
       q.withText(fuzzyMatch.booleanValue(), text);
     }

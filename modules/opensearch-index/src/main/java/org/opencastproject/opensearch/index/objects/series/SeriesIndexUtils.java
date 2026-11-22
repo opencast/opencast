@@ -21,8 +21,7 @@
 
 package org.opencastproject.opensearch.index.objects.series;
 
-import org.opencastproject.opensearch.api.SearchMetadata;
-import org.opencastproject.opensearch.impl.SearchMetadataCollection;
+import org.opencastproject.opensearch.index.objects.IndexDocument;
 import org.opencastproject.opensearch.index.rebuild.DenyAclCollector;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -61,16 +60,15 @@ public final class SeriesIndexUtils {
   /**
    * Creates a search result item based on the data returned from the search index.
    *
-   * @param metadata
-   *          the search metadata
+   * @param source
+   *          the document source returned by the search index
    * @param unmarshaller the unmarshaller to use
    * @return the search result item
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Series toSeries(SearchMetadataCollection metadata, Unmarshaller unmarshaller) throws IOException {
-    Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
-    String seriesXml = (String) metadataMap.get(SeriesIndexSchema.OBJECT).getValue();
+  public static Series toSeries(Map<String, Object> source, Unmarshaller unmarshaller) throws IOException {
+    String seriesXml = IndexDocument.getObject(source);
     return Series.valueOf(IOUtils.toInputStream(seriesXml, Charset.defaultCharset()), unmarshaller);
   }
 
@@ -79,11 +77,10 @@ public final class SeriesIndexUtils {
    *
    * @param series
    *          the series
-   * @return the set of metadata
+   * @return the document to store in the index
    */
-  public static SearchMetadataCollection toSearchMetadata(Series series) {
-    SearchMetadataCollection metadata = new SearchMetadataCollection(
-            series.getIdentifier().concat(series.getOrganization()), Series.DOCUMENT_TYPE);
+  public static IndexDocument toDocument(Series series) {
+    IndexDocument metadata = new IndexDocument();
     metadata.addField(SeriesIndexSchema.UID, series.getIdentifier());
     metadata.addField(SeriesIndexSchema.ORGANIZATION, series.getOrganization());
     metadata.addField(SeriesIndexSchema.OBJECT, series.toXML());
@@ -145,7 +142,7 @@ public final class SeriesIndexUtils {
    * @param extendedMetadata
    *          the extended metadata map
    */
-  private static void addExtendedMetadata(SearchMetadataCollection doc, Map<String, Map<String,
+  private static void addExtendedMetadata(IndexDocument doc, Map<String, Map<String,
           List<String>>> extendedMetadata) {
     for (String type: extendedMetadata.keySet()) {
       Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(type);
@@ -167,7 +164,7 @@ public final class SeriesIndexUtils {
    * @param seriesId
    *          the identifier of the series being indexed
    */
-  private static void addAuthorization(SearchMetadataCollection doc, String aclString, String seriesId) {
+  private static void addAuthorization(IndexDocument doc, String aclString, String seriesId) {
     Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions

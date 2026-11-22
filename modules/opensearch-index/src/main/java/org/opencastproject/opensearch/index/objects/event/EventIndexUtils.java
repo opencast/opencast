@@ -37,10 +37,9 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchMetadata;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.impl.SearchMetadataCollection;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.IndexDocument;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -93,17 +92,16 @@ public final class EventIndexUtils {
   /**
    * Creates a search result item based on the data returned from the search index.
    *
-   * @param metadata
-   *          the search metadata
+   * @param source
+   *          the document source returned by the search index
    * @param unmarshaller the unmarshaller to use
    * @return the search result item
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Event toRecordingEvent(SearchMetadataCollection metadata, Unmarshaller unmarshaller)
+  public static Event toRecordingEvent(Map<String, Object> source, Unmarshaller unmarshaller)
           throws IOException {
-    Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
-    String eventJson = (String) metadataMap.get(EventIndexSchema.OBJECT).getValue();
+    String eventJson = IndexDocument.getObject(source);
     return Event.valueOf(IOUtils.toInputStream(eventJson, Charset.defaultCharset()), unmarshaller);
   }
 
@@ -112,11 +110,10 @@ public final class EventIndexUtils {
    *
    * @param event
    *          the recording event
-   * @return the set of metadata
+   * @return the document to store in the index
    */
-  public static SearchMetadataCollection toSearchMetadata(Event event, Map<String, String> additionalActions) {
-    SearchMetadataCollection metadata = new SearchMetadataCollection(
-            event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
+  public static IndexDocument toDocument(Event event, Map<String, String> additionalActions) {
+    IndexDocument metadata = new IndexDocument();
     metadata.addField(EventIndexSchema.UID, event.getIdentifier());
     metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization());
     metadata.addField(EventIndexSchema.OBJECT, event.toXML());
@@ -350,7 +347,7 @@ public final class EventIndexUtils {
    * @param extendedMetadata
    *          the extended metadata map
    */
-  private static void addExtendedMetadata(SearchMetadataCollection doc, Map<String, Map<String,
+  private static void addExtendedMetadata(IndexDocument doc, Map<String, Map<String,
           List<String>>> extendedMetadata) {
     for (String type: extendedMetadata.keySet()) {
       Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(type);
@@ -370,7 +367,7 @@ public final class EventIndexUtils {
    * @param aclString
    *          the access control list string
    */
-  private static void addAuthorization(SearchMetadataCollection doc, String aclString,
+  private static void addAuthorization(IndexDocument doc, String aclString,
       String eventId, Map<String, String> additionalActions) {
     Map<String, List<String>> permissions = new HashMap<>();
 

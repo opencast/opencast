@@ -915,7 +915,7 @@ public class SeriesEndpoint {
         query.withAction(Permissions.Action.READ);
       }
 
-      logger.trace("Using Query: " + query.toString());
+      logger.trace("Using Query: {}", query);
 
       SearchResult<Series> result = searchIndex.getByQuery(query);
       if (logger.isDebugEnabled()) {

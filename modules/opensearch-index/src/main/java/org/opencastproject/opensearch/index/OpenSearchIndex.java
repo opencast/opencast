@@ -24,18 +24,14 @@ package org.opencastproject.opensearch.index;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchMetadata;
 import org.opencastproject.opensearch.api.SearchResult;
 import org.opencastproject.opensearch.impl.AbstractOpenSearchIndex;
-import org.opencastproject.opensearch.impl.OpenSearchDocument;
-import org.opencastproject.opensearch.impl.SearchMetadataCollection;
+import org.opencastproject.opensearch.index.objects.IndexDocument;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventIndexUtils;
-import org.opencastproject.opensearch.index.objects.event.EventQueryBuilder;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesIndexUtils;
-import org.opencastproject.opensearch.index.objects.series.SeriesQueryBuilder;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
@@ -43,10 +39,7 @@ import org.opencastproject.security.util.SecurityUtil;
 
 import com.google.common.util.concurrent.Striped;
 
-import org.opensearch.OpenSearchStatusException;
-import org.opensearch.action.search.SearchRequest;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.core.rest.RestStatus;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.osgi.service.component.annotations.Activate;
@@ -57,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -266,16 +259,9 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
 
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(
-        event,
-        SecurityUtil.additionalAclActions(organization)
-    );
-    List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-    OpenSearchDocument doc = new OpenSearchDocument(inputDocument.getIdentifier(),
-            inputDocument.getDocumentType(), resourceMetadata);
-
+    final IndexDocument doc = EventIndexUtils.toDocument(event, SecurityUtil.additionalAclActions(organization));
     try {
-      update(doc);
+      update(Event.DOCUMENT_TYPE, event.getIdentifier().concat(event.getOrganization()), doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write event " + event + " to index", t);
     }
@@ -291,20 +277,14 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    *          If the events cannot be added or updated
    */
   public void bulkEventUpdate(List<Event> eventList, Organization organization) throws SearchIndexException {
-    List<OpenSearchDocument> docs = new ArrayList<>();
+    final Map<String, IndexDocument> docs = new LinkedHashMap<>();
     for (Event event: eventList) {
       logger.debug("Adding event {} to search index", event.getIdentifier());
-      // Add the resource to the index
-      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(
-          event,
-          SecurityUtil.additionalAclActions(organization)
-      );
-      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-      docs.add(new OpenSearchDocument(inputDocument.getIdentifier(),
-              inputDocument.getDocumentType(), resourceMetadata));
+      docs.put(event.getIdentifier().concat(event.getOrganization()),
+          EventIndexUtils.toDocument(event, SecurityUtil.additionalAclActions(organization)));
     }
     try {
-      bulkUpdate(docs);
+      bulkUpdate(Event.DOCUMENT_TYPE, docs);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write events " + eventList + " to index", t);
     }
@@ -357,13 +337,9 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
     logger.debug("Adding series {} to search index", series.getIdentifier());
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = SeriesIndexUtils.toSearchMetadata(series);
-    List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-    OpenSearchDocument doc = new OpenSearchDocument(inputDocument.getIdentifier(),
-            inputDocument.getDocumentType(), resourceMetadata);
-
     try {
-      update(doc);
+      update(Series.DOCUMENT_TYPE, series.getIdentifier().concat(series.getOrganization()),
+          SeriesIndexUtils.toDocument(series));
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write series " + series + " to index", t);
     }
@@ -379,17 +355,13 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    *          If the series cannot be added or updated
    */
   public void bulkSeriesUpdate(List<Series> seriesList) throws SearchIndexException {
-    List<OpenSearchDocument> docs = new ArrayList<>();
+    final Map<String, IndexDocument> docs = new LinkedHashMap<>();
     for (Series series: seriesList) {
       logger.debug("Adding series {} to search index", series.getIdentifier());
-      // Add the resource to the index
-      SearchMetadataCollection inputDocument = SeriesIndexUtils.toSearchMetadata(series);
-      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-      docs.add(new OpenSearchDocument(inputDocument.getIdentifier(),
-              inputDocument.getDocumentType(), resourceMetadata));
+      docs.put(series.getIdentifier().concat(series.getOrganization()), SeriesIndexUtils.toDocument(series));
     }
     try {
-      bulkUpdate(docs);
+      bulkUpdate(Series.DOCUMENT_TYPE, docs);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write series " + seriesList + " to index", t);
     }
@@ -481,18 +453,15 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    */
   public SearchResult<Event> getByQuery(EventSearchQuery query) throws SearchIndexException {
     logger.debug("Searching index using event query '{}'", query);
-    // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new EventQueryBuilder(query));
-
     try {
       final Unmarshaller unmarshaller = Event.createUnmarshaller();
-      return executeQuery(query, searchRequest, metadata -> {
+      return search(query.toSearchRequest(getSubIndexIdentifier(Event.DOCUMENT_TYPE)), source -> {
         try {
-          return EventIndexUtils.toRecordingEvent(metadata, unmarshaller);
+          return EventIndexUtils.toRecordingEvent(source, unmarshaller);
         } catch (IOException e) {
           return chuck(e);
         }
-      });
+      }, query.getOffset(), query.getLimit());
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying event index", t, isBadRequest(t));
     }
@@ -509,17 +478,15 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    */
   public SearchResult<Series> getByQuery(SeriesSearchQuery query) throws SearchIndexException {
     logger.debug("Searching index using series query '{}'", query);
-    // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new SeriesQueryBuilder(query));
     try {
       final Unmarshaller unmarshaller = Series.createUnmarshaller();
-      return executeQuery(query, searchRequest, metadata -> {
+      return search(query.toSearchRequest(getSubIndexIdentifier(Series.DOCUMENT_TYPE)), source -> {
         try {
-          return SeriesIndexUtils.toSeries(metadata, unmarshaller);
+          return SeriesIndexUtils.toSeries(source, unmarshaller);
         } catch (IOException e) {
           return chuck(e);
         }
-      });
+      }, query.getOffset(), query.getLimit());
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying series index", t, isBadRequest(t));
     }
@@ -529,14 +496,14 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    * Renders the body of the search request for an event query as JSON. Only meant for testing.
    */
   String searchRequestBody(EventSearchQuery query) {
-    return getSearchRequest(query, new EventQueryBuilder(query)).source().toString();
+    return query.toSearchRequest(getSubIndexIdentifier(Event.DOCUMENT_TYPE)).toJsonString();
   }
 
   /**
    * Renders the body of the search request for a series query as JSON. Only meant for testing.
    */
   String searchRequestBody(SeriesSearchQuery query) {
-    return getSearchRequest(query, new SeriesQueryBuilder(query)).source().toString();
+    return query.toSearchRequest(getSubIndexIdentifier(Series.DOCUMENT_TYPE)).toJsonString();
   }
 
   /**
@@ -544,7 +511,6 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    * operational problem such as a missing index or an unreachable search service.
    */
   private static boolean isBadRequest(Throwable t) {
-    return t instanceof OpenSearchStatusException e && e.status() == RestStatus.BAD_REQUEST
-        || t instanceof OpenSearchException e2 && e2.status() == 400;
+    return t instanceof OpenSearchException e && e.status() == 400;
   }
 }

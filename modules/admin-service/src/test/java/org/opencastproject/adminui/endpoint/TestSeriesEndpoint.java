@@ -48,8 +48,10 @@ import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -326,38 +328,39 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
               @Override
               public SearchResult<Series> answer() throws Throwable {
+                final SeriesSearchQuery q = captureSeriesSearchQuery.getValue();
                 if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getIdentifier().length == 1) {
-                  if ("1".equals(captureSeriesSearchQuery.getValue().getIdentifier()[0])) {
+                        && q.getFilterValues(SeriesIndexSchema.UID).size() == 1) {
+                  if ("1".equals(q.getFilterValues(SeriesIndexSchema.UID).iterator().next())) {
                     return oneSearchResult;
-                  } else if ("2".equals(captureSeriesSearchQuery.getValue().getIdentifier()[0])) {
+                  } else if ("2".equals(q.getFilterValues(SeriesIndexSchema.UID).iterator().next())) {
                     return twoSearchResult;
                   } else {
                     return emptySearchResult;
                   }
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesContributorsSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.CONTRIBUTORS) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesContributorsSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.CONTRIBUTORS) == Order.Descending) {
                   return descSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesDateSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.CREATED_DATE_TIME) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesDateSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.CREATED_DATE_TIME) == Order.Descending) {
                   return descSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesOrganizersSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.ORGANIZERS) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesOrganizersSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.ORGANIZERS) == Order.Descending) {
                   return descSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesTitleSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.TITLE) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesTitleSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.TITLE) == Order.Descending) {
 
                   return descSeriesSearchResult;
                 } else {
@@ -372,48 +375,49 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
               @Override
               public SearchResult<Event> answer() throws Throwable {
+                final EventSearchQuery q = captureEventSearchQuery.getValue();
                 List<Event> events = List.of();
                 if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && !("RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState()))
-                        && !("INSTANTIATED".equals(captureEventSearchQuery.getValue().getWorkflowState()))) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "1".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && !(q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING"))
+                        && !(q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("INSTANTIATED"))) {
                   // Setup events search results
                   events = eventItems1;
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && "INSTANTIATED".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "1".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("INSTANTIATED")) {
                   // Setup events search results
                   events = eventItems2;
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && "RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "1".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING")) {
                   // Setup events search results
                   events = eventItems2;
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && !("RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState()))) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "2".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && !(q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING"))) {
                   // Setup events search results
                   events = eventItems2;
                 } else if (captureEventSearchQuery.hasCaptured()
-                    && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "3".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())) {
+                    && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "3".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())) {
                   // Setup events search results
                   events = eventItems3;
                 } else if (captureEventSearchQuery.hasCaptured()
-                    && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && "RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
+                    && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "2".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING")) {
                   // Setup events search results
                   events = eventItems3;
                 } else {
                   if (!captureEventSearchQuery.hasCaptured()) {
                     Assert.fail("Haven't captured an event search query yet.");
                   } else {
-                    logger.info("IDs for search query" + captureEventSearchQuery.getValue().getSeriesId());
+                    logger.info("IDs for search query" + q.getFilterValues(EventIndexSchema.SERIES_ID));
                     Assert.fail("Tried to get an event collection that doesn't exist.");
                   }
                 }

@@ -234,6 +234,9 @@
             <ignoredUnusedDeclaredDependency>jakarta.json:jakarta.json-api</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.fasterxml.jackson.core:jackson-databind</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-x-content</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opensearch:opensearch</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-core</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

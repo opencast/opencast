@@ -23,6 +23,7 @@ package org.opencastproject.opensearch.index;
 
 import static org.opencastproject.opensearch.index.QueryJson.assertMatchesGolden;
 
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventQueryType;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -113,7 +114,7 @@ public class SearchRequestGoldenTest {
         .withStartTo(TO)
         .withTechnicalStartFrom(FROM)
         .withTechnicalStartTo(TO)
-        .withStartDate("2024-02-01T00:00:00Z");
+        .withField(EventIndexSchema.START_DATE, "2024-02-01T00:00:00Z", EventQueryType.SEARCH, true);
     query.withOffset(10);
     query.withLimit(20);
     assertMatchesGolden("event-filters", index.searchRequestBody(query));
@@ -140,14 +141,14 @@ public class SearchRequestGoldenTest {
   @Test
   public void eventLifecycleFilters() throws Exception {
     final EventSearchQuery query = new EventSearchQuery(ORG.getId(), ADMIN)
-        .withTitle("Lecture*", EventQueryType.WILDCARD, true)
-        .withPresenter("Guest*", EventQueryType.WILDCARD, false)
-        .withSeriesId("series-1", EventQueryType.SEARCH, false)
-        .withSeriesId("series-2", EventQueryType.SEARCH, true)
-        .withLanguage("de", EventQueryType.SEARCH, false)
-        .withCreated("2020-01-01T00:00:00Z", EventQueryType.GREATER_THAN, true)
-        .withStartDate("2021-01-01T00:00:00Z", EventQueryType.GREATER_THAN)
-        .withEndDate("2022-01-01T00:00:00Z", EventQueryType.LESS_THAN);
+        .withField(EventIndexSchema.TITLE, "Lecture*", EventQueryType.WILDCARD, true)
+        .withField(EventIndexSchema.PRESENTER, "Guest*", EventQueryType.WILDCARD, false)
+        .withField(EventIndexSchema.SERIES_ID, "series-1", EventQueryType.SEARCH, false)
+        .withField(EventIndexSchema.SERIES_ID, "series-2", EventQueryType.SEARCH, true)
+        .withField(EventIndexSchema.LANGUAGE, "de", EventQueryType.SEARCH, false)
+        .withField(EventIndexSchema.CREATED, "2020-01-01T00:00:00Z", EventQueryType.GREATER_THAN, true)
+        .withField(EventIndexSchema.START_DATE, "2021-01-01T00:00:00Z", EventQueryType.GREATER_THAN, true)
+        .withField(EventIndexSchema.END_DATE, "2022-01-01T00:00:00Z", EventQueryType.LESS_THAN, true);
     assertMatchesGolden("event-lifecycle", index.searchRequestBody(query));
   }
 
@@ -155,10 +156,10 @@ public class SearchRequestGoldenTest {
   @Test
   public void eventLifecycleFiltersWithPeriod() throws Exception {
     final EventSearchQuery query = new EventSearchQuery(ORG.getId(), ADMIN)
-        .withStartDate("2021-01-01T00:00:00Z", EventQueryType.GREATER_THAN)
+        .withField(EventIndexSchema.START_DATE, "2021-01-01T00:00:00Z", EventQueryType.GREATER_THAN, true)
         .withStartFrom(FROM)
         .withStartTo(TO)
-        .withStartDate("2025-01-01T00:00:00Z", EventQueryType.LESS_THAN);
+        .withField(EventIndexSchema.START_DATE, "2025-01-01T00:00:00Z", EventQueryType.LESS_THAN, true);
     assertMatchesGolden("event-lifecycle-period", index.searchRequestBody(query));
   }
 

@@ -24,12 +24,8 @@ package org.opencastproject.opensearch.impl;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.opensearch.api.SearchIndex;
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchMetadata;
-import org.opencastproject.opensearch.api.SearchQuery;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,11 +35,6 @@ import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.HttpHost;
-import org.opensearch.OpenSearchStatusException;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.action.search.SearchType;
-import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
@@ -53,27 +44,20 @@ import org.opensearch.client.opensearch._types.HealthStatus;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Refresh;
 import org.opensearch.client.opensearch._types.Result;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch.cluster.HealthResponse;
 import org.opensearch.client.opensearch.core.BulkResponse;
 import org.opensearch.client.opensearch.core.GetResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.opensearch.core.search.TotalHits;
 import org.opensearch.client.opensearch.generic.Body;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
-import org.opensearch.common.document.DocumentField;
-import org.opensearch.core.rest.RestStatus;
-import org.opensearch.index.query.QueryBuilder;
-import org.opensearch.script.Script;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.SearchHits;
-import org.opensearch.search.aggregations.AggregationBuilder;
-import org.opensearch.search.aggregations.AggregationBuilders;
-import org.opensearch.search.aggregations.bucket.terms.Terms;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.ScriptSortBuilder;
-import org.opensearch.search.sort.SortBuilders;
-import org.opensearch.search.sort.SortOrder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
@@ -85,22 +69,17 @@ import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
 /**
  * A search index implementation based on OpenSearch.
  */
-public abstract class AbstractOpenSearchIndex implements SearchIndex {
+public abstract class AbstractOpenSearchIndex {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractOpenSearchIndex.class);
-
-  /** The OpenSearch maximum results window size */
-  private static final int OPENSEARCH_INDEX_MAX_RESULT_WINDOW = Integer.MAX_VALUE;
 
   /** The OpenSearch term aggregation size */
   private static final int OPENSEARCH_TERM_AGGREGATION_SIZE = 10000;
@@ -142,7 +121,7 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   /** The document types */
   protected static final String VERSION_DOCUMENT_TYPE = "version";
 
-  /** The legacy high level client, still used for search requests */
+  /** The legacy high level client, still used for search requests of the search service */
   private RestHighLevelClient legacyClient = null;
 
   /** The OpenSearch client */
@@ -304,12 +283,12 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
     }
   }
 
-  @Override
-  public int getIndexVersion() {
-    return indexVersion;
-  }
-
-  @Override
+  /**
+   * Deletes all data from the index and creates it anew.
+   *
+   * @throws IOException
+   *          if the request to OpenSearch fails
+   */
   public void clear() throws IOException {
     try {
       final List<String> indices = Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toList();
@@ -330,18 +309,23 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   /**
    * Adds or replaces a document in the search index.
    *
+   * @param type
+   *          The document type
+   * @param id
+   *          The document identifier
    * @param document
-   *          The OpenSearch document
+   *          The document
    *
    * @throws IOException
    *         If updating the index fails
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected void update(OpenSearchDocument document) throws IOException, InterruptedException {
+  protected void update(String type, String id, Map<String, Object> document)
+          throws IOException, InterruptedException {
     withRetries(c -> c.index(i -> i
-        .index(getSubIndexIdentifier(document.getType()))
-        .id(document.getUID())
+        .index(getSubIndexIdentifier(type))
+        .id(id)
         .document(document)
         .refresh(Refresh.True)));
   }
@@ -349,20 +333,23 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   /**
    * Adds or replaces documents in the search index.
    *
+   * @param type
+   *          The document type
    * @param documents
-   *          The OpenSearch documents
+   *          The documents by their identifiers
    *
    * @throws IOException
    *         If updating the index fails
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected void bulkUpdate(List<OpenSearchDocument> documents) throws IOException, InterruptedException {
-    final List<BulkOperation> operations = documents.stream()
+  protected void bulkUpdate(String type, Map<String, ? extends Map<String, Object>> documents)
+          throws IOException, InterruptedException {
+    final List<BulkOperation> operations = documents.entrySet().stream()
         .map(document -> BulkOperation.of(o -> o.index(i -> i
-            .index(getSubIndexIdentifier(document.getType()))
-            .id(document.getUID())
-            .document(document))))
+            .index(getSubIndexIdentifier(type))
+            .id(document.getKey())
+            .document(document.getValue()))))
         .toList();
     final BulkResponse response = withRetries(c -> c.bulk(b -> b.operations(operations).refresh(Refresh.True)));
     if (response.errors()) {
@@ -616,100 +603,12 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   }
 
   /**
-   * Creates a request for a search query based on the properties known by the search query.
-   * <p>
-   * Once this query builder has been created, support for ordering needs to be configured as needed.
-   *
-   * @param query
-   *          the search query
-   * @return the request builder
-   */
-  protected SearchRequest getSearchRequest(SearchQuery query, QueryBuilder queryBuilder) {
-
-    final SearchSourceBuilder searchSource = new SearchSourceBuilder()
-        .query(queryBuilder)
-        .trackTotalHits(true);
-
-    // Create the actual search query
-    logger.debug("Searching for {}", searchSource);
-
-    // Make sure all fields are being returned
-    if (query.getFields().length > 0) {
-      searchSource.storedFields(Arrays.asList(query.getFields()));
-    } else {
-      searchSource.storedFields(Collections.singletonList("*"));
-    }
-
-    // Pagination
-    if (query.getOffset() >= 0) {
-      searchSource.from(query.getOffset());
-    }
-
-    int limit = OPENSEARCH_INDEX_MAX_RESULT_WINDOW;
-    if (query.getLimit() > 0) {
-      if (query.getOffset() > 0
-              && (long) query.getOffset() + (long) query.getLimit() > OPENSEARCH_INDEX_MAX_RESULT_WINDOW) {
-        limit = OPENSEARCH_INDEX_MAX_RESULT_WINDOW - query.getOffset();
-      } else {
-        limit = query.getLimit();
-      }
-    }
-    searchSource.size(limit);
-
-    // Sort orders
-    final Map<String, SortCriterion.Order> sortCriteria = query.getSortOrders();
-    for (Entry<String, SortCriterion.Order> sortCriterion : sortCriteria.entrySet()) {
-      ScriptSortBuilder sortBuilder = null;
-      logger.debug("Event sort criteria: {}", sortCriterion.getKey());
-      if ("publication".equals(sortCriterion.getKey())) {
-        sortBuilder = SortBuilders.scriptSort(
-            new Script("params._source.publication.length"),
-            ScriptSortBuilder.ScriptSortType.NUMBER);
-      }
-      switch (sortCriterion.getValue()) {
-        case Ascending:
-          if (sortBuilder != null) {
-            sortBuilder.order(SortOrder.ASC);
-            searchSource.sort(sortBuilder);
-          } else {
-            searchSource.sort(sortCriterion.getKey(), SortOrder.ASC);
-          }
-          break;
-        case Descending:
-          if (sortBuilder != null) {
-            sortBuilder.order(SortOrder.DESC);
-            searchSource.sort(sortBuilder);
-          } else {
-            searchSource.sort(sortCriterion.getKey(), SortOrder.DESC);
-          }
-          break;
-        default:
-          break;
-      }
-    }
-    searchSource.sort("_score", SortOrder.DESC);
-    // Used to stabilize the sort order of results with the same score.
-    searchSource.sort("_doc", SortOrder.ASC);
-    return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new))
-            .searchType(SearchType.QUERY_THEN_FETCH).preference("_local").source(searchSource);
-  }
-
-  /**
    * Returns the name of this index.
    *
    * @return the index name
    */
   public String getIndexName() {
     return indexName;
-  }
-
-  /*
-   * This method is a workaround to avoid accessing org.apache.lucene.search.TotalHits outside this bundle.
-   * Doing so would cause OSGi dependency problems. It seems to be a bug anyway that ES exposes this
-   * class.
-   */
-  protected long getTotalHits(SearchHits hits) {
-    return hits.getTotalHits().value();
   }
 
   /**
@@ -724,19 +623,6 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   }
 
   /**
-   * Returns the document type for the given sub index name, reversing {@link #getSubIndexIdentifier(String)}.
-   * OpenSearch no longer exposes a per-document mapping type (removed in OpenSearch 2.0), so the type has to be
-   * recovered from the physical index a hit was found in.
-   *
-   * @param subIndexIdentifier
-   *          The sub index name to get the type for.
-   * @return the document type
-   */
-  private String getTypeFromSubIndexIdentifier(String subIndexIdentifier) {
-    return subIndexIdentifier.substring(this.indexIdentifier.length() + 1);
-  }
-
-  /**
    * Returns the OpenSearch client.
    *
    * @return the client
@@ -746,7 +632,7 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   }
 
   /**
-   * Returns the deprecated high level client, still used for search requests.
+   * Returns the deprecated high level client, still used for search requests of the search service.
    *
    * @return the legacy client
    */
@@ -755,87 +641,47 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   }
 
   /**
-   * Execute a query on the index.
+   * Executes a search request.
    *
-   * @param query
-   *          The query to use to find the results
    * @param request
-   *          The builder to use to create the query.
-   * @param toSearchResult
-   *          The function to convert the results to a {@link SearchResult}
-   * @return A {@link SearchResult} containing the relevant objects.
+   *          The search request
+   * @param toItem
+   *          The function to convert the source of the found documents to result items
+   * @param offset
+   *          The offset of the query, to be returned with the result
+   * @param limit
+   *          The limit of the query, to be returned with the result
+   * @return The search result.
    *
    * @throws IOException
    *         If querying the index fails
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected <T> SearchResult<T> executeQuery(SearchQuery query, SearchRequest request,
-          Function<SearchMetadataCollection, T> toSearchResult) throws IOException, InterruptedException {
-    // Execute the query and try to get hold of a query response
-    SearchResponse searchResponse = null;
-    int retryAttempts = 0;
-    do {
-      try {
-        searchResponse = legacyClient.search(request, RequestOptions.DEFAULT);
-      } catch (OpenSearchStatusException e) {
-        if (e.status() == RestStatus.BAD_REQUEST) {
-          logger.warn("Could not query documents from index {} because of a bad request: {}", getIndexName(),
-                  e.getMessage());
-          throw e;
-        }
-
-        retryAttempts++;
-
-        if (retryAttempts <= maxRetryAttempts) {
-          logger.warn("Could not query documents from index {} because of {}, retrying in {} ms.", getIndexName(),
-                  e.getMessage(), retryWaitingPeriod);
-          if (retryWaitingPeriod > 0) {
-            Thread.sleep(retryWaitingPeriod);
-          }
-        } else {
-          logger.error("Could not query documents from index {}, not retrying.", getIndexName(),
-                  e);
-          throw e;
-        }
+  @SuppressWarnings("unchecked")
+  protected <T> SearchResult<T> search(SearchRequest request, Function<Map<String, Object>, T> toItem, int offset,
+          int limit) throws IOException, InterruptedException {
+    final SearchResponse<Map> response;
+    try {
+      response = withRetries(c -> c.search(request, Map.class));
+    } catch (OpenSearchException e) {
+      if (e.status() == 400) {
+        logger.warn("Could not query documents from index {} because of a bad request: {}", getIndexName(),
+            e.getMessage());
       }
-    } while (searchResponse == null);
+      throw e;
+    }
 
-    // Walk through response and create new items with title, creator, etc:
     final List<T> items = new ArrayList<>();
-    for (SearchHit doc : searchResponse.getHits()) {
-
-      // Wrap the search resulting metadata
-      SearchMetadataCollection metadata = new SearchMetadataCollection(getTypeFromSubIndexIdentifier(doc.getIndex()));
-      metadata.setIdentifier(doc.getId());
-
-      for (DocumentField field : doc.getFields().values()) {
-        String name = field.getName();
-        SearchMetadata<Object> m = new SearchMetadataImpl<>(name);
-        // TODO: Add values with more care (localized, correct type etc.)
-
-        // Add the field values
-        if (field.getValues().size() > 1) {
-          for (Object v : field.getValues()) {
-            m.addValue(v);
-          }
-        } else {
-          m.addValue(field.getValue());
-        }
-
-        // Add the metadata
-        metadata.add(m);
-      }
-
-      // Have the serializer in charge create a type-specific search result item
+    for (Hit<Map> hit : response.hits().hits()) {
       try {
-        items.add(toSearchResult.apply(metadata));
+        items.add(toItem.apply((Map<String, Object>) hit.source()));
       } catch (Throwable t) {
         logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());
       }
     }
-
-    return new SearchResult<>(items, getTotalHits(searchResponse.getHits()), query.getOffset(), query.getLimit());
+    final TotalHits total = response.hits().total();
+    return new SearchResult<>(items, total != null ? total.value() : items.size(), offset, limit);
   }
 
   /**
@@ -857,27 +703,30 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
    * @return the list of terms
    */
   public List<String> getTermsForField(String field, String type) {
-    final String facetName = "terms";
+    final String name = "terms";
     // Add size to aggregation to return all values (the default is the top ten terms with the most documents).
     // We set it to 10,000, which should be enough (the maximum is 'search.max_buckets', which defaults to 65,536).
-    final AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field)
-            .size(OPENSEARCH_TERM_AGGREGATION_SIZE);
-    final SearchSourceBuilder searchSource = new SearchSourceBuilder().aggregation(aggBuilder);
-    final SearchRequest searchRequest = new SearchRequest(this.getSubIndexIdentifier(type)).source(searchSource);
     try {
-      final SearchResponse response = legacyClient.search(searchRequest, RequestOptions.DEFAULT);
-
-      final List<String> terms = new ArrayList<>();
-      final Terms aggs = response.getAggregations().get(facetName);
-
-      for (Terms.Bucket bucket : aggs.getBuckets()) {
-        terms.add(bucket.getKey().toString());
+      final SearchResponse<Void> response = withRetries(c -> c.search(s -> s
+          .index(getSubIndexIdentifier(type))
+          .size(0)
+          .aggregations(name, a -> a.terms(t -> t.field(field).size(OPENSEARCH_TERM_AGGREGATION_SIZE))),
+          Void.class));
+      final Aggregate terms = response.aggregations().get(name);
+      if (terms.isSterms()) {
+        return terms.sterms().buckets().array().stream().map(StringTermsBucket::key).toList();
+      } else if (terms.isLterms()) {
+        return terms.lterms().buckets().array().stream()
+            .map(bucket -> bucket.keyAsString() != null ? bucket.keyAsString() : String.valueOf(bucket.key()))
+            .toList();
+      } else if (terms.isDterms()) {
+        return terms.dterms().buckets().array().stream()
+            .map(bucket -> bucket.keyAsString() != null ? bucket.keyAsString() : Double.toString(bucket.key()))
+            .toList();
       }
-
-      return terms;
-    } catch (IOException e) {
+      return List.of();
+    } catch (IOException | InterruptedException e) {
       return chuck(e);
     }
   }
-
 }
