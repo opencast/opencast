@@ -30,14 +30,13 @@ import org.opencastproject.opensearch.api.SearchResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.hc.client5.http.ConnectTimeoutException;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.HttpHost;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.RestClientBuilder;
-import org.opensearch.client.RestHighLevelClient;
+import org.apache.hc.core5.http.NoHttpResponseException;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.HealthStatus;
@@ -57,7 +56,8 @@ import org.opensearch.client.opensearch.core.search.TotalHits;
 import org.opensearch.client.opensearch.generic.Body;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.generic.Response;
-import org.opensearch.client.transport.rest_client.RestClientTransport;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
+import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
@@ -65,13 +65,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A search index implementation based on OpenSearch.
@@ -84,14 +87,21 @@ public abstract class AbstractOpenSearchIndex {
   /** The OpenSearch term aggregation size */
   private static final int OPENSEARCH_TERM_AGGREGATION_SIZE = 10000;
 
-  /** Configuration key defining the hostname of an external OpenSearch server */
-  public static final String OPENSEARCH_SERVER_HOSTNAME_KEY = "org.opencastproject.opensearch.server.hostname";
+  /**
+   * Configuration key defining the URLs of the OpenSearch nodes to connect to, separated by commas. All nodes have to
+   * belong to the same cluster. Requests are distributed over the nodes, and a node which cannot be reached is skipped
+   * until it is back.
+   */
+  public static final String OPENSEARCH_SERVER_URL_KEY = "org.opencastproject.opensearch.server.url";
 
-  /** Configuration key defining the scheme (http/https) of an external OpenSearch server */
-  public static final String OPENSEARCH_SERVER_SCHEME_KEY = "org.opencastproject.opensearch.server.scheme";
-
-  /** Configuration key defining the port of an external OpenSearch server */
-  public static final String OPENSEARCH_SERVER_PORT_KEY = "org.opencastproject.opensearch.server.port";
+  /**
+   * Configuration keys replaced by {@link #OPENSEARCH_SERVER_URL_KEY}. Opencast refuses to start if they are still set.
+   * This check can be removed with Opencast 24.
+   */
+  private static final List<String> REMOVED_SERVER_KEYS = List.of(
+      "org.opencastproject.opensearch.server.hostname",
+      "org.opencastproject.opensearch.server.scheme",
+      "org.opencastproject.opensearch.server.port");
 
   /** Configuration key defining the username of an external OpenSearch server */
   public static final String OPENSEARCH_USERNAME_KEY = "org.opencastproject.opensearch.username";
@@ -99,14 +109,8 @@ public abstract class AbstractOpenSearchIndex {
   /** Configuration key defining the password of an external OpenSearch server */
   public static final String OPENSEARCH_PASSWORD_KEY = "org.opencastproject.opensearch.password";
 
-  /** Default port of an external OpenSearch server */
-  private static final int OPENSEARCH_SERVER_PORT_DEFAULT = 9200;
-
-  /** Default hostname of an external OpenSearch server */
-  private static final String OPENSEARCH_SERVER_HOSTNAME_DEFAULT = "localhost";
-
-  /** Default scheme of an external OpenSearch server */
-  private static final String OPENSEARCH_SERVER_SCHEME_DEFAULT = "http";
+  /** Default URL of the OpenSearch server */
+  private static final String OPENSEARCH_SERVER_URL_DEFAULT = "http://localhost:9200";
 
   /** The index identifier */
   private String indexIdentifier = null;
@@ -120,9 +124,6 @@ public abstract class AbstractOpenSearchIndex {
 
   /** The document types */
   protected static final String VERSION_DOCUMENT_TYPE = "version";
-
-  /** The legacy high level client, only used for its connection */
-  private RestHighLevelClient legacyClient = null;
 
   /** The OpenSearch client */
   private OpenSearchClient client = null;
@@ -148,17 +149,8 @@ public abstract class AbstractOpenSearchIndex {
   /** The version number */
   private int indexVersion = -1;
 
-  /** The path to the index settings */
-  protected String indexSettingsPath;
-
-  /** Hostname of an external OpenSearch server to connect to. */
-  private String externalServerHostname = OPENSEARCH_SERVER_HOSTNAME_DEFAULT;
-
-  /** Scheme of an external OpenSearch server to connect to. */
-  private String externalServerScheme = OPENSEARCH_SERVER_SCHEME_DEFAULT;
-
-  /** Port of an external OpenSearch server to connect to */
-  private int externalServerPort = OPENSEARCH_SERVER_PORT_DEFAULT;
+  /** The OpenSearch nodes to connect to */
+  private List<HttpHost> hosts = List.of();
 
   /** Username of an external OpenSearch server to connect to. */
   private String username;
@@ -194,19 +186,24 @@ public abstract class AbstractOpenSearchIndex {
             .get(INDEX_IDENTIFIER_PROPERTY), DEFAULT_INDEX_IDENTIFIER);
     logger.info("Index identifier set to {}.", indexIdentifier);
 
-    indexSettingsPath = StringUtils.trimToNull(bundleContext.getProperty("karaf.etc"));
-    if (indexSettingsPath == null) {
-      throw new ComponentException("Could not determine Karaf configuration path");
+    for (String key : REMOVED_SERVER_KEYS) {
+      if (bundleContext.getProperty(key) != null) {
+        throw new ComponentException("Configuration key " + key + " is no longer supported. Remove it and use "
+            + OPENSEARCH_SERVER_URL_KEY + " instead.");
+      }
     }
-    externalServerHostname = StringUtils
-            .defaultIfBlank(bundleContext.getProperty(OPENSEARCH_SERVER_HOSTNAME_KEY),
-                    OPENSEARCH_SERVER_HOSTNAME_DEFAULT);
-    externalServerScheme = StringUtils
-            .defaultIfBlank(bundleContext.getProperty(OPENSEARCH_SERVER_SCHEME_KEY),
-                    OPENSEARCH_SERVER_SCHEME_DEFAULT);
-    externalServerPort = Integer.parseInt(StringUtils
-            .defaultIfBlank(bundleContext.getProperty(OPENSEARCH_SERVER_PORT_KEY),
-                    OPENSEARCH_SERVER_PORT_DEFAULT + ""));
+    final String urls = StringUtils.defaultIfBlank(bundleContext.getProperty(OPENSEARCH_SERVER_URL_KEY),
+        OPENSEARCH_SERVER_URL_DEFAULT);
+    final List<HttpHost> configuredHosts = new ArrayList<>();
+    for (String url : StringUtils.split(urls, ", ")) {
+      try {
+        configuredHosts.add(HttpHost.create(StringUtils.stripEnd(url, "/")));
+      } catch (URISyntaxException e) {
+        throw new ComponentException("Invalid OpenSearch URL '" + url + "' in " + OPENSEARCH_SERVER_URL_KEY
+            + ". Use scheme, host and port only, paths are not supported.", e);
+      }
+    }
+    hosts = List.copyOf(configuredHosts);
     username = StringUtils.trimToNull(bundleContext.getProperty(OPENSEARCH_USERNAME_KEY));
     password = StringUtils.trimToNull(bundleContext.getProperty(OPENSEARCH_PASSWORD_KEY));
   }
@@ -256,15 +253,18 @@ public abstract class AbstractOpenSearchIndex {
   }
 
   /**
-   * Executes a request, retrying it as configured if OpenSearch reports an error. Bad requests are not retried.
+   * Executes a request, retrying it as configured if it fails temporarily (see {@link #isTemporaryFailure(Exception)}).
+   * Other errors, like bad requests or missing documents, are not retried. All requests Opencast sends are idempotent,
+   * so retrying them is safe.
    *
    * @param request
    *          the request to execute
    * @return the response
    * @throws IOException
-   *          if the request fails because of a connection problem
+   *          if the request fails because of a connection problem, or OpenSearch reports an error without a
+   *          structured error response (e.g. too many requests or a server error), and all retries are used up
    * @throws OpenSearchException
-   *          if OpenSearch reports an error and all retries are used up
+   *          if OpenSearch reports an error with a structured error response (e.g. bad request, not found)
    * @throws InterruptedException
    *          if waiting for the next attempt is interrupted
    */
@@ -272,8 +272,8 @@ public abstract class AbstractOpenSearchIndex {
     for (int attempt = 1; ; attempt++) {
       try {
         return request.execute(client);
-      } catch (OpenSearchException e) {
-        if (e.status() == 400 || attempt > maxRetryAttempts) {
+      } catch (OpenSearchException | IOException e) {
+        if (attempt > maxRetryAttempts || !isTemporaryFailure(e)) {
           throw e;
         }
         logger.warn("Request to OpenSearch index {} failed ({}), retrying in {} ms.", getIndexName(),
@@ -281,6 +281,53 @@ public abstract class AbstractOpenSearchIndex {
         Thread.sleep(retryWaitingPeriod);
       }
     }
+  }
+
+  /**
+   * The HTTP status code of a failed request to OpenSearch.
+   * <p>
+   * The client reports errors in different ways depending on the status code: errors with a structured error response
+   * (400, 404, 405) as {@link OpenSearchException}, all others as {@link ResponseException}. Some of them, e.g. 401
+   * and 403, are additionally wrapped in other exceptions.
+   *
+   * @param e
+   *          the exception thrown by the client
+   * @return the HTTP status code, or -1 if the exception does not stem from an HTTP error response
+   */
+  protected static int httpStatus(Exception e) {
+    for (Throwable t = e; t != null; t = t.getCause()) {
+      if (t instanceof OpenSearchException openSearchException) {
+        return openSearchException.status();
+      }
+      if (t instanceof ResponseException responseException) {
+        return responseException.status();
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Whether a request failed for a reason which may go away by itself, so that trying again makes sense: OpenSearch
+   * cannot be reached, the connection breaks or times out, or OpenSearch reports a timeout, too many requests or a
+   * server error.
+   *
+   * @param e
+   *          the exception thrown by the client
+   * @return whether the failure is temporary
+   */
+  static boolean isTemporaryFailure(Exception e) {
+    final int status = httpStatus(e);
+    if (status >= 0) {
+      return status == 408 || status == 429 || status >= 500;
+    }
+    for (Throwable t = e; t != null; t = t.getCause()) {
+      // SocketException includes refused and reset connections
+      if (t instanceof SocketException || t instanceof SocketTimeoutException || t instanceof ConnectTimeoutException
+          || t instanceof ConnectionClosedException || t instanceof NoHttpResponseException) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -397,20 +444,19 @@ public abstract class AbstractOpenSearchIndex {
     this.indexVersion = version;
 
     if (client == null) {
-      final HttpHost host = new HttpHost(externalServerScheme, externalServerHostname, externalServerPort);
-      final RestClientBuilder builder = RestClient.builder(host);
-
+      final ApacheHttpClient5TransportBuilder builder = ApacheHttpClient5TransportBuilder
+          .builder(hosts.toArray(new HttpHost[0]))
+          .setMapper(new JacksonJsonpMapper());
       if (username != null && password != null) {
         final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(new AuthScope(host),
-            new UsernamePasswordCredentials(username, password.toCharArray()));
+        for (HttpHost host : hosts) {
+          credentialsProvider.setCredentials(new AuthScope(host),
+              new UsernamePasswordCredentials(username, password.toCharArray()));
+        }
         builder.setHttpClientConfigCallback(
             httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
       }
-
-      legacyClient = new RestHighLevelClient(builder);
-      client = new OpenSearchClient(new RestClientTransport(legacyClient.getLowLevelClient(),
-          new JacksonJsonpMapper()));
+      client = new OpenSearchClient(builder.build());
     }
 
     // Test if opensearch is reachable and continuously retry if it is not
@@ -442,11 +488,10 @@ public abstract class AbstractOpenSearchIndex {
   /**
    * Checks if OpenSearch is reachable.
    *
-   * @return true if OpenSearch is reachable, false otherwise
+   * @return true if OpenSearch is reachable, false if it is not (yet) available
    *
-   * @throws OpenSearchException if an OpenSearchException occurs, e.g. if the server returns a 4xx or 5xx error
-   *
-   * @throws RuntimeException if an unexpected exception occurs
+   * @throws RuntimeException if OpenSearch rejects the request, e.g. because of wrong credentials, or an unexpected
+   *           exception occurs
    */
   private boolean isOpensearchReachable() {
     try {
@@ -461,32 +506,23 @@ public abstract class AbstractOpenSearchIndex {
       }
       logger.debug("Connected to OpenSearch, but cluster health is {}", resp.status());
       return false;
-    } catch (ConnectException | ConnectionClosedException connectException) {
-      // Get thrown when we are unable to connect. Normally this should only happen when
-      // opensearch is not running or is just starting up, therefore only log the error on debug level
-      logger.debug("Unable to connect to OpenSearch", connectException);
-      return false;
-    } catch (IOException ioException) {
-      // Could be thrown when a docker container with opensearch is just starting up,
-      // so we check further if the cause is a socket exception
-      if (ioException.getCause() instanceof java.net.SocketException) {
-        // it seems like a container is starting up, we continue the loop
-        logger.debug("Unable to connect to OpenSearch", ioException);
+    } catch (IOException | OpenSearchException e) {
+      if (isTemporaryFailure(e)) {
+        // Normally this should only happen when OpenSearch is not running or is just starting up, therefore only log
+        // the error on debug level and continue the loop
+        logger.debug("OpenSearch is not reachable or not ready yet", e);
         return false;
       }
-      // something different triggered an ioexception, so we fail
-      throw new RuntimeException("Couldn't connect to opensearch due to IOExceptionError", ioException);
-    } catch (OpenSearchException opensearchException) {
-      if (opensearchException.status() >= 500) {
-        logger.debug("OpenSearch health request ended with HTTP status code {}. Is OpenSearch service running?",
-            opensearchException.status());
-        return false;
+      final int status = httpStatus(e);
+      if (status == 401 || status == 403) {
+        // We want the startup to fail, so that the configuration can be fixed
+        logger.error("OpenSearch rejected the connection with HTTP status code {}. Check {} and {}.", status,
+            OPENSEARCH_USERNAME_KEY, OPENSEARCH_PASSWORD_KEY);
+        throw new RuntimeException("OpenSearch rejected the connection with HTTP status code " + status, e);
       }
-      // An OpenSearchException is usually thrown in case where the server returns a 4xx or 5xx error code.
-      // So for example for an HTTP 401 Unauthorized: In this case we want the startup to fail, so
-      // we get an error and have the chance to change the configuration
-      logger.error("Error while testing OpenSearch connection", opensearchException);
-      throw opensearchException;
+      // Something else went wrong, e.g. OpenSearch rejected the request, so we fail
+      logger.error("Error while testing OpenSearch connection", e);
+      throw new RuntimeException("Unable to connect to OpenSearch", e);
     } catch (Exception e) {
       // When another exception occurs, we throw a runtime exception, so the startup of Opencast will fail
       throw new RuntimeException("Unable to connect to OpenSearch, unexpected exception", e);
@@ -500,9 +536,8 @@ public abstract class AbstractOpenSearchIndex {
    *           if stopping the OpenSearch node fails
    */
   protected void close() throws IOException {
-    if (legacyClient != null) {
-      // Also closes the transport of the new client, which shares the same connection
-      legacyClient.close();
+    if (client != null) {
+      client._transport().close();
     }
   }
 
@@ -681,7 +716,7 @@ public abstract class AbstractOpenSearchIndex {
    * @return the OpenSearch URL
    */
   private String getOpensearchURL() {
-    return this.externalServerScheme + "://" + this.externalServerHostname + ":" + this.externalServerPort;
+    return hosts.stream().map(HttpHost::toURI).collect(Collectors.joining(", "));
   }
 
   /**
