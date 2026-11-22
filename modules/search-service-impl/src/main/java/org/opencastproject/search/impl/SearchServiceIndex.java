@@ -34,6 +34,8 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.impl.AbstractOpenSearchIndex;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.opensearch.index.rebuild.IndexProducer;
@@ -62,24 +64,13 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-
 import org.apache.commons.io.IOUtils;
-import org.opensearch.OpenSearchStatusException;
-import org.opensearch.action.DocWriteResponse;
-import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
-import org.opensearch.action.support.clustermanager.AcknowledgedResponse;
-import org.opensearch.action.update.UpdateRequest;
-import org.opensearch.action.update.UpdateResponse;
 import org.opensearch.client.RequestOptions;
-import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.common.unit.Fuzziness;
-import org.opensearch.common.xcontent.XContentType;
-import org.opensearch.core.rest.RestStatus;
 import org.opensearch.index.query.BoolQueryBuilder;
 import org.opensearch.index.query.MultiMatchQueryBuilder;
 import org.opensearch.index.query.Operator;
@@ -95,7 +86,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -147,8 +137,6 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
       SearchResult.DUBLINCORE + ".*.search._4gram");
   private static final float TEXT_BOOST = 1.2f;
 
-  private final Gson gson = new Gson();
-
   private OpenSearchIndex esIndex;
 
   private SeriesService seriesService;
@@ -192,31 +180,27 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
   }
 
   private void createIndex() {
-    var mapping = "";
-    try (var in = this.getClass().getResourceAsStream("/opensearch/search-mapping.json")) {
-      mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      throw new SearchException("Could not read mapping.", e);
-    }
     try {
-      logger.debug("Trying to create index for '{}'", INDEX_NAME);
-      InputStream is = getClass().getResourceAsStream("/opensearch/indexSettings.json");
-      String indexSettings = IOUtils.toString(is, StandardCharsets.UTF_8);
-      final CreateIndexRequest request = new CreateIndexRequest(INDEX_NAME)
-          .settings(indexSettings, XContentType.JSON)
-          .mapping(mapping, XContentType.JSON);
-      var response = esIndex.getClient().indices().create(request, RequestOptions.DEFAULT);
-      if (!response.isAcknowledged()) {
-        throw new SearchException("Unable to create index for '" + INDEX_NAME + "'");
-      }
-    } catch (OpenSearchStatusException e) {
-      if (e.getDetailedMessage().contains("already_exists_exception")) {
-        logger.info("Detected existing index '{}'", INDEX_NAME);
-      } else {
-        throw e;
-      }
-    } catch (IOException e) {
-      throw new SearchException(e);
+      esIndex.createIndexIfMissing(INDEX_NAME, loadResource("/opensearch/indexSettings.json"),
+          loadResource("/opensearch/search-mapping.json"));
+    } catch (IOException | SearchIndexException e) {
+      throw new SearchException("Could not create index " + INDEX_NAME, e);
+    }
+  }
+
+  private String loadResource(String path) throws IOException {
+    try (var in = getClass().getResourceAsStream(path)) {
+      return IOUtils.toString(in, StandardCharsets.UTF_8);
+    }
+  }
+
+  /** Executes a request against OpenSearch, with retries as configured for the OpenSearch index. */
+  private <T> T request(AbstractOpenSearchIndex.Request<T> request) throws IOException {
+    try {
+      return esIndex.withRetries(request);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IOException("Interrupted while waiting to retry a request", e);
     }
   }
 
@@ -228,13 +212,11 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
   @Override
   public void clear() throws IOException {
     try {
-      final DeleteIndexRequest request = new DeleteIndexRequest(INDEX_NAME);
-      final AcknowledgedResponse response = esIndex.getClient().indices().delete(request, RequestOptions.DEFAULT);
-      if (!response.isAcknowledged()) {
+      if (!request(c -> c.indices().delete(d -> d.index(INDEX_NAME))).acknowledged()) {
         logger.error("Index '{}' could not be deleted", INDEX_NAME);
       }
-    } catch (OpenSearchStatusException e) {
-      if (e.status() != RestStatus.NOT_FOUND) {
+    } catch (OpenSearchException e) {
+      if (e.status() != 404) {
         throw e;
       }
       logger.info("Cannot clear non-existing index '{}'", INDEX_NAME);
@@ -266,7 +248,7 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
     final SearchSourceBuilder searchSource = toSearchSource(query);
     logger.debug("Sending for query: {}", searchSource.query());
     try {
-      final SearchResponse response = esIndex.getClient()
+      final SearchResponse response = esIndex.getLegacyClient()
           .search(new SearchRequest(INDEX_NAME).source(searchSource), RequestOptions.DEFAULT);
       final List<Map<String, Object>> documents = Arrays.stream(response.getHits().getHits())
           .map(SearchHit::getSourceAsMap)
@@ -436,10 +418,7 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
         null != delDate ? delDate.toInstant() : null);
     Map<String, Object> metadata = item.dehydrateForIndex();
     try {
-      var request = new IndexRequest(INDEX_NAME);
-      request.id(mediaPackageId);
-      request.source(metadata);
-      esIndex.getClient().index(request, RequestOptions.DEFAULT);
+      request(c -> c.index(i -> i.index(INDEX_NAME).id(mediaPackageId).document(metadata)));
       logger.debug("Indexed episode {}", mediaPackageId);
     } catch (IOException e) {
       throw new SearchException(e);
@@ -456,10 +435,7 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
 
       Map<String, Object> seriesData = item.dehydrateForIndex();
       try {
-        var request = new IndexRequest(INDEX_NAME);
-        request.id(seriesId);
-        request.source(seriesData);
-        esIndex.getClient().index(request, RequestOptions.DEFAULT);
+        request(c -> c.index(i -> i.index(INDEX_NAME).id(seriesId).document(seriesData)));
         logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
       } catch (IOException e) {
         throw new SearchException(e);
@@ -538,14 +514,12 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
 
     try {
       logger.info("Marking media package {} as deleted in search index", mediaPackageId);
-      JsonElement json = gson.toJsonTree(Map.of(
+      final Map<String, Object> update = Map.of(
           SearchResult.DELETED_DATE, deletionString,
-          SearchResult.MODIFIED_DATE, deletionString));
-      var updateRequst = new UpdateRequest(INDEX_NAME, mediaPackageId)
-          .doc(gson.toJson(json), XContentType.JSON);
-      esIndex.getClient().update(updateRequst, RequestOptions.DEFAULT);
-    } catch (OpenSearchStatusException e) {
-      if (e.status().getStatus() != RestStatus.NOT_FOUND.getStatus()) {
+          SearchResult.MODIFIED_DATE, deletionString);
+      request(c -> c.update(u -> u.index(INDEX_NAME).id(mediaPackageId).doc(update), Map.class));
+    } catch (OpenSearchException e) {
+      if (e.status() != 404) {
         throw e;
       }
       logger.warn("Event {} is not in the search index. Skipping deletion", mediaPackageId);
@@ -579,14 +553,14 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
             final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
                 .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
                 .reduce(new AccessControlList(), AccessControlList::mergeActions);
-            JsonElement json = gson.toJsonTree(Map.of(
+            final Map<String, Object> update = Map.of(
                 SearchResult.INDEX_ACL, SearchResult.dehydrateAclForIndex(seriesAcl),
-                SearchResult.MODIFIED_DATE, deletionString));
-            var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
+                SearchResult.MODIFIED_DATE, deletionString);
+            final String id = seriesId;
             try {
-              esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
-            } catch (OpenSearchStatusException e) {
-              if (RestStatus.NOT_FOUND == e.status()) {
+              request(c -> c.update(u -> u.index(INDEX_NAME).id(id).doc(update), Map.class));
+            } catch (OpenSearchException e) {
+              if (e.status() == 404) {
                 logger.warn("Attempted to modify {}, but that series does not exist in the index.", seriesId);
               }
             }
@@ -616,16 +590,15 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
   public boolean deleteSeriesSynchronously(String seriesId) throws SearchException {
     try {
       logger.info("Marking {} as deleted in the search index", seriesId);
-      JsonElement json = gson.toJsonTree(Map.of(
+      final Map<String, Object> update = Map.of(
           "deleted", Instant.now().getEpochSecond(),
-          "modified", Instant.now().toString()));
-      var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
+          "modified", Instant.now().toString());
       try {
-        UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+        final var response = request(c -> c.update(u -> u.index(INDEX_NAME).id(seriesId).doc(update), Map.class));
         //NB: We're marking things as deleted but *not actually deleting them**
-        return DocWriteResponse.Result.UPDATED == response.getResult();
-      } catch (OpenSearchStatusException e) {
-        if (RestStatus.NOT_FOUND == e.status()) {
+        return Result.Updated == response.result();
+      } catch (OpenSearchException e) {
+        if (e.status() == 404) {
           logger.debug("Attempted to delete {}, but that series does not exist in the index.", seriesId);
           return true;
         }

@@ -43,11 +43,9 @@ import org.opencastproject.security.util.SecurityUtil;
 
 import com.google.common.util.concurrent.Striped;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.opensearch.OpenSearchStatusException;
-import org.opensearch.action.DocWriteResponse;
-import org.opensearch.action.delete.DeleteResponse;
 import org.opensearch.action.search.SearchRequest;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.core.rest.RestStatus;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
@@ -79,23 +77,6 @@ import javax.xml.bind.Unmarshaller;
         service = { OpenSearchIndex.class }
 )
 public class OpenSearchIndex extends AbstractOpenSearchIndex {
-
-  /** Retry configuration */
-  private int maxRetryAttemptsGet;
-  private static final String MAX_RETRY_ATTEMPTS_GET_PROPERTY = "max.retry.attempts.get";
-  private static final int DEFAULT_MAX_RETRY_ATTEMPTS_GET = 0;
-
-  private int maxRetryAttemptsUpdate;
-  private static final String MAX_RETRY_ATTEMPTS_UPDATE_PROPERTY = "max.retry.attempts.update";
-  private static final int DEFAULT_MAX_RETRY_ATTEMPTS_UPDATE = 0;
-
-  private int retryWaitingPeriodGet;
-  private static final String RETRY_WAITING_PERIOD_GET_PROPERTY = "retry.waiting.period.get";
-  private static final int DEFAULT_RETRY_WAITING_PERIOD_GET = 1000;
-
-  private int retryWaitingPeriodUpdate;
-  private static final String RETRY_WAITING_PERIOD_UPDATE_PROPERTY = "retry.waiting.period.update";
-  private static final int DEFAULT_RETRY_WAITING_PERIOD_UPDATE = 1000;
 
   /** The required index version */
   private static final int INDEX_VERSION = 1;
@@ -154,26 +135,6 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
   @Modified
   public void modified(Map<String, Object> properties) {
     super.modified(properties);
-
-    maxRetryAttemptsGet = NumberUtils.toInt((String) properties.get(MAX_RETRY_ATTEMPTS_GET_PROPERTY),
-            DEFAULT_MAX_RETRY_ATTEMPTS_GET);
-    retryWaitingPeriodGet = NumberUtils.toInt((String) properties.get(RETRY_WAITING_PERIOD_GET_PROPERTY),
-            DEFAULT_RETRY_WAITING_PERIOD_GET);
-    logger.info("Max retry attempts for get requests set to {}, timeout set to {} ms.", maxRetryAttemptsGet,
-            retryWaitingPeriodGet);
-
-    maxRetryAttemptsUpdate = NumberUtils.toInt((String) properties.get(MAX_RETRY_ATTEMPTS_UPDATE_PROPERTY),
-            DEFAULT_MAX_RETRY_ATTEMPTS_UPDATE);
-    retryWaitingPeriodUpdate = NumberUtils.toInt((String) properties.get(RETRY_WAITING_PERIOD_UPDATE_PROPERTY),
-            DEFAULT_RETRY_WAITING_PERIOD_UPDATE);
-    logger.info("Max retry attempts for update requests set to {}, timeout set to {} ms.", maxRetryAttemptsUpdate,
-            retryWaitingPeriodUpdate);
-
-    if (maxRetryAttemptsGet < 0 || maxRetryAttemptsUpdate < 0 || retryWaitingPeriodGet < 0
-            || retryWaitingPeriodUpdate < 0) {
-      logger.warn("You have configured negative values for max attempts or retry periods. Is this intended? This is "
-              + "equivalent to setting those values to 0.");
-    }
   }
 
   /**
@@ -206,35 +167,10 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    */
   public Optional<Event> getEvent(String mediaPackageId, Organization organization, User user)
           throws SearchIndexException {
-    return getEvent(mediaPackageId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
-  }
-
-  /**
-   * Loads the event from the search index if it exists.
-   *
-   * @param mediaPackageId
-   *          The media package identifier
-   * @param organization
-   *          The organization
-   * @param user
-   *          The user
-   * @param maxRetryAttempts
-   *          How often to retry query in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
-   * @return the event (optional)
-   *
-   * @throws SearchIndexException
-   *           If querying the search index fails
-   * @throws IllegalStateException
-   *           If multiple events with the same identifier are found
-   */
-  private Optional<Event> getEvent(String mediaPackageId, Organization organization, User user, int maxRetryAttempts,
-          int retryWaitingPeriod) throws SearchIndexException {
     EventSearchQuery query = new EventSearchQuery(organization.getId(), user)
         .withoutActions()
         .withIdentifier(mediaPackageId);
-    SearchResult<Event> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
+    SearchResult<Event> searchResult = getByQuery(query);
     if (searchResult.getPageSize() == 0) {
       return Optional.empty();
     } else if (searchResult.getPageSize() == 1) {
@@ -263,35 +199,10 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    */
   public Optional<Series> getSeries(String seriesId, Organization organization, User user)
           throws SearchIndexException {
-    return getSeries(seriesId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
-  }
-
-  /**
-   * Loads the series from the search index if it exists.
-   *
-   * @param seriesId
-   *          The series identifier
-   * @param organization
-   *          The organization
-   * @param user
-   *          The user
-   * @param maxRetryAttempts
-   *          How often to retry query in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
-   * @return the series (optional)
-   *
-   * @throws SearchIndexException
-   *           If querying the search index fails
-   * @throws IllegalStateException
-   *           If multiple series with the same identifier are found
-   */
-  private Optional<Series> getSeries(String seriesId, Organization organization, User user, int maxRetryAttempts,
-          int retryWaitingPeriod) throws SearchIndexException {
     SeriesSearchQuery query = new SeriesSearchQuery(organization.getId(), user)
         .withoutActions()
         .withIdentifier(seriesId);
-    SearchResult<Series> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
+    SearchResult<Series> searchResult = getByQuery(query);
     if (searchResult.getPageSize() == 0) {
       return Optional.empty();
     } else if (searchResult.getPageSize() == 1) {
@@ -327,7 +238,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
     logger.debug("Locked event '{}'", id);
 
     try {
-      Optional<Event> eventOpt = getEvent(id, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+      Optional<Event> eventOpt = getEvent(id, organization, user);
       Optional<Event> updatedEventOpt = updateFunction.apply(eventOpt);
 
       if (updatedEventOpt.isPresent()) {
@@ -364,7 +275,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
             inputDocument.getDocumentType(), resourceMetadata);
 
     try {
-      update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
+      update(doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write event " + event + " to index", t);
     }
@@ -393,7 +304,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
               inputDocument.getDocumentType(), resourceMetadata));
     }
     try {
-      bulkUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+      bulkUpdate(docs);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write events " + eventList + " to index", t);
     }
@@ -421,7 +332,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
     logger.debug("Locked series '{}'", id);
 
     try {
-      Optional<Series> seriesOpt = getSeries(id, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+      Optional<Series> seriesOpt = getSeries(id, organization, user);
       Optional<Series> updatedSeriesOpt = updateFunction.apply(seriesOpt);
       if (updatedSeriesOpt.isPresent()) {
         update(updatedSeriesOpt.get());
@@ -452,7 +363,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
             inputDocument.getDocumentType(), resourceMetadata);
 
     try {
-      update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
+      update(doc);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write series " + series + " to index", t);
     }
@@ -478,7 +389,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
               inputDocument.getDocumentType(), resourceMetadata));
     }
     try {
-      bulkUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
+      bulkUpdate(docs);
     } catch (Throwable t) {
       throw new SearchIndexException("Cannot write series " + seriesList + " to index", t);
     }
@@ -543,8 +454,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
       String idWithOrgId = id.concat(organization.getId());
       logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getSubIndexIdentifier(type));
 
-      DeleteResponse deleteResponse = delete(type, idWithOrgId, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
-      if (deleteResponse.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
+      if (!delete(type, idWithOrgId)) {
         logger.trace("Document {} to delete was not found on index '{}'", idWithOrgId, getSubIndexIdentifier(type));
         return false;
       }
@@ -570,23 +480,6 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    *          Thrown if there is an error getting the results.
    */
   public SearchResult<Event> getByQuery(EventSearchQuery query) throws SearchIndexException {
-    return getByQuery(query, maxRetryAttemptsGet, retryWaitingPeriodGet);
-  }
-
-  /**
-   * @param query
-   *          The query to use to retrieve the events that match the query
-   * @param maxRetryAttempts
-   *          How often to retry query in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
-   * @return {@link SearchResult} collection of {@link Event} from a query.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an error getting the results.
-   */
-  private SearchResult<Event> getByQuery(EventSearchQuery query, int maxRetryAttempts, int retryWaitingPeriod)
-          throws SearchIndexException {
     logger.debug("Searching index using event query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new EventQueryBuilder(query));
@@ -599,7 +492,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
         } catch (IOException e) {
           return chuck(e);
         }
-      }, maxRetryAttempts, retryWaitingPeriod);
+      });
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying event index", t, isBadRequest(t));
     }
@@ -615,24 +508,6 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    *          Thrown if there is an error getting the results.
    */
   public SearchResult<Series> getByQuery(SeriesSearchQuery query) throws SearchIndexException {
-    return getByQuery(query, maxRetryAttemptsGet, retryWaitingPeriodGet);
-  }
-
-  /**
-   * @param query
-   *          The query to use to retrieve the series that match the query
-   * @param maxRetryAttempts
-   *          How often to retry query in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
-   *
-   * @return {@link SearchResult} collection of {@link Series} from a query.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an error getting the results.
-   */
-  private SearchResult<Series> getByQuery(SeriesSearchQuery query, int maxRetryAttempts, int retryWaitingPeriod)
-          throws SearchIndexException {
     logger.debug("Searching index using series query '{}'", query);
     // Create the request
     final SearchRequest searchRequest = getSearchRequest(query, new SeriesQueryBuilder(query));
@@ -644,7 +519,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
         } catch (IOException e) {
           return chuck(e);
         }
-      }, maxRetryAttempts, retryWaitingPeriod);
+      });
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying series index", t, isBadRequest(t));
     }
@@ -669,7 +544,7 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
    * operational problem such as a missing index or an unreachable search service.
    */
   private static boolean isBadRequest(Throwable t) {
-    return t instanceof OpenSearchStatusException
-            && ((OpenSearchStatusException) t).status() == RestStatus.BAD_REQUEST;
+    return t instanceof OpenSearchStatusException e && e.status() == RestStatus.BAD_REQUEST
+        || t instanceof OpenSearchException e2 && e2.status() == 400;
   }
 }

@@ -39,33 +39,29 @@ import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.core5.http.ConnectionClosedException;
 import org.apache.hc.core5.http.HttpHost;
-import org.opensearch.OpenSearchException;
 import org.opensearch.OpenSearchStatusException;
-import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.opensearch.action.bulk.BulkRequest;
-import org.opensearch.action.bulk.BulkResponse;
-import org.opensearch.action.delete.DeleteRequest;
-import org.opensearch.action.delete.DeleteResponse;
-import org.opensearch.action.get.GetRequest;
-import org.opensearch.action.get.GetResponse;
-import org.opensearch.action.index.IndexRequest;
-import org.opensearch.action.index.IndexResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.search.SearchType;
-import org.opensearch.action.support.WriteRequest;
-import org.opensearch.action.support.clustermanager.AcknowledgedResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
-import org.opensearch.client.indices.CreateIndexRequest;
-import org.opensearch.client.indices.CreateIndexResponse;
-import org.opensearch.cluster.health.ClusterHealthStatus;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.HealthStatus;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.Refresh;
+import org.opensearch.client.opensearch._types.Result;
+import org.opensearch.client.opensearch.cluster.HealthResponse;
+import org.opensearch.client.opensearch.core.BulkResponse;
+import org.opensearch.client.opensearch.core.GetResponse;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.opensearch.generic.Response;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.opensearch.common.document.DocumentField;
-import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.core.rest.RestStatus;
 import org.opensearch.index.query.QueryBuilder;
 import org.opensearch.script.Script;
@@ -146,8 +142,29 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   /** The document types */
   protected static final String VERSION_DOCUMENT_TYPE = "version";
 
-  /** The high level client */
-  private RestHighLevelClient client = null;
+  /** The legacy high level client, still used for search requests */
+  private RestHighLevelClient legacyClient = null;
+
+  /** The OpenSearch client */
+  private OpenSearchClient client = null;
+
+  /** How often to retry failed requests */
+  private int maxRetryAttempts;
+  private static final String MAX_RETRY_ATTEMPTS_PROPERTY = "max.retry.attempts";
+  private static final int DEFAULT_MAX_RETRY_ATTEMPTS = 0;
+
+  /** How long to wait between retries of failed requests */
+  private int retryWaitingPeriod;
+  private static final String RETRY_WAITING_PERIOD_PROPERTY = "retry.waiting.period";
+  private static final int DEFAULT_RETRY_WAITING_PERIOD = 1000;
+
+  /**
+   * Configuration keys replaced by {@link #MAX_RETRY_ATTEMPTS_PROPERTY} and {@link #RETRY_WAITING_PERIOD_PROPERTY}.
+   * The configuration is rejected if they are still set. This check can be removed with Opencast 24.
+   */
+  private static final List<String> REMOVED_RETRY_PROPERTIES = List.of(
+      "max.retry.attempts.get", "max.retry.attempts.update",
+      "retry.waiting.period.get", "retry.waiting.period.update");
 
   /** The version number */
   private int indexVersion = -1;
@@ -233,6 +250,58 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
           + " was wrongly configured. Value has to be greater than 0.");
     }
     logger.info("Retry delay on startup set to {} ms.", retryDelayOnStartup);
+
+    for (String key : REMOVED_RETRY_PROPERTIES) {
+      if (properties.containsKey(key)) {
+        throw new IllegalArgumentException("Configuration key " + key + " is no longer supported. Remove it and use "
+            + MAX_RETRY_ATTEMPTS_PROPERTY + " and " + RETRY_WAITING_PERIOD_PROPERTY + " instead.");
+      }
+    }
+    maxRetryAttempts = Math.max(0, NumberUtils.toInt((String) properties.get(MAX_RETRY_ATTEMPTS_PROPERTY),
+        DEFAULT_MAX_RETRY_ATTEMPTS));
+    retryWaitingPeriod = Math.max(0, NumberUtils.toInt((String) properties.get(RETRY_WAITING_PERIOD_PROPERTY),
+        DEFAULT_RETRY_WAITING_PERIOD));
+    logger.info("Failed requests are retried {} times, waiting {} ms between attempts.", maxRetryAttempts,
+        retryWaitingPeriod);
+  }
+
+  /**
+   * A request to OpenSearch.
+   *
+   * @param <T>
+   *          the type of the response
+   */
+  @FunctionalInterface
+  public interface Request<T> {
+    T execute(OpenSearchClient client) throws IOException;
+  }
+
+  /**
+   * Executes a request, retrying it as configured if OpenSearch reports an error. Bad requests are not retried.
+   *
+   * @param request
+   *          the request to execute
+   * @return the response
+   * @throws IOException
+   *          if the request fails because of a connection problem
+   * @throws OpenSearchException
+   *          if OpenSearch reports an error and all retries are used up
+   * @throws InterruptedException
+   *          if waiting for the next attempt is interrupted
+   */
+  public <T> T withRetries(Request<T> request) throws IOException, InterruptedException {
+    for (int attempt = 1; ; attempt++) {
+      try {
+        return request.execute(client);
+      } catch (OpenSearchException e) {
+        if (e.status() == 400 || attempt > maxRetryAttempts) {
+          throw e;
+        }
+        logger.warn("Request to OpenSearch index {} failed ({}), retrying in {} ms.", getIndexName(),
+            e.getMessage(), retryWaitingPeriod);
+        Thread.sleep(retryWaitingPeriod);
+      }
+    }
   }
 
   @Override
@@ -243,118 +312,65 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   @Override
   public void clear() throws IOException {
     try {
-      final DeleteIndexRequest request = new DeleteIndexRequest(
-              Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new));
-      final AcknowledgedResponse delete = client.indices().delete(request, RequestOptions.DEFAULT);
-      if (!delete.isAcknowledged()) {
+      final List<String> indices = Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toList();
+      if (!client.indices().delete(d -> d.index(indices)).acknowledged()) {
         logger.error("Index '{}' could not be deleted", getIndexName());
       }
       createIndex();
     } catch (OpenSearchException exception) {
-      if (exception.status() == RestStatus.NOT_FOUND) {
-        logger.error("Cannot clear non-existing index '{}'", exception.getIndex().getName());
+      if (exception.status() != 404) {
+        throw exception;
       }
+      logger.error("Cannot clear non-existing index '{}'", getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Unable to re-create the index after a clear", e);
     }
   }
 
   /**
-   * Posts the input document to the search index.
+   * Adds or replaces a document in the search index.
    *
-   * @param maxRetryAttempts
-   *          How often to retry update in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
    * @param document
    *          The OpenSearch document
-   * @return the query response
    *
    * @throws IOException
    *         If updating the index fails
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected IndexResponse update(int maxRetryAttempts, int retryWaitingPeriod, OpenSearchDocument document)
-          throws IOException, InterruptedException {
-
-    final IndexRequest indexRequest = new IndexRequest(getSubIndexIdentifier(document.getType())).id(document.getUID())
-            .source(document).setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-
-    IndexResponse indexResponse = null;
-    int retryAttempts = 0;
-    do {
-      try {
-        indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-      } catch (OpenSearchStatusException e) {
-        retryAttempts++;
-
-        if (retryAttempts <= maxRetryAttempts) {
-          logger.warn("Could not update documents in index {}, retrying in {} ms.", getIndexName(),
-                  retryWaitingPeriod, e);
-          if (retryWaitingPeriod > 0) {
-            Thread.sleep(retryWaitingPeriod);
-          }
-        } else {
-          logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
-                  e);
-          throw e;
-        }
-      }
-    } while (indexResponse == null);
-
-    return indexResponse;
+  protected void update(OpenSearchDocument document) throws IOException, InterruptedException {
+    withRetries(c -> c.index(i -> i
+        .index(getSubIndexIdentifier(document.getType()))
+        .id(document.getUID())
+        .document(document)
+        .refresh(Refresh.True)));
   }
 
   /**
-   * Posts the input documents to the search index.
+   * Adds or replaces documents in the search index.
    *
-   * @param maxRetryAttempts
-   *          How often to retry update in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
    * @param documents
    *          The OpenSearch documents
-   * @return the query response
    *
    * @throws IOException
    *         If updating the index fails
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected BulkResponse bulkUpdate(int maxRetryAttempts, int retryWaitingPeriod,
-      List<OpenSearchDocument> documents)
-          throws IOException, InterruptedException {
-    BulkRequest bulkRequest = new BulkRequest().setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-
-    for (OpenSearchDocument document: documents) {
-      bulkRequest.add(new IndexRequest(getSubIndexIdentifier(document.getType())).id(document.getUID())
-          .source(document));
+  protected void bulkUpdate(List<OpenSearchDocument> documents) throws IOException, InterruptedException {
+    final List<BulkOperation> operations = documents.stream()
+        .map(document -> BulkOperation.of(o -> o.index(i -> i
+            .index(getSubIndexIdentifier(document.getType()))
+            .id(document.getUID())
+            .document(document))))
+        .toList();
+    final BulkResponse response = withRetries(c -> c.bulk(b -> b.operations(operations).refresh(Refresh.True)));
+    if (response.errors()) {
+      response.items().stream()
+          .filter(item -> item.error() != null)
+          .forEach(item -> logger.error("Could not update document {} in index {}: {}", item.id(), item.index(),
+              item.error().reason()));
     }
-
-    BulkResponse bulkResponse = null;
-    int retryAttempts = 0;
-    do {
-      try {
-        bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
-      } catch (OpenSearchStatusException e) {
-        retryAttempts++;
-
-        if (retryAttempts <= maxRetryAttempts) {
-          logger.warn("Could not update documents in index {} because of {}, retrying in {} ms.", getIndexName(),
-                  e.getMessage(), retryWaitingPeriod);
-          if (retryWaitingPeriod > 0) {
-            Thread.sleep(retryWaitingPeriod);
-          }
-        } else {
-          logger.error("Could not update documents in index {}, not retrying.", getIndexName(),
-                  e);
-          throw e;
-        }
-      }
-    } while (bulkResponse == null);
-
-    return bulkResponse;
   }
 
   /**
@@ -365,40 +381,16 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
    * @param id
    *         The identifier of the document
    * @return
-   *         The delete response
+   *         Whether the document existed
    *
    * @throws IOException
    *         If deleting from the index fails
    * @throws InterruptedException
    *         If waiting during retry is interrupted
    */
-  protected DeleteResponse delete(String type, String id, int maxRetryAttempts, int retryWaitingPeriod)
-          throws IOException, InterruptedException {
-    final DeleteRequest deleteRequest = new DeleteRequest(getSubIndexIdentifier(type), id).setRefreshPolicy(
-            WriteRequest.RefreshPolicy.IMMEDIATE);
-    DeleteResponse deleteResponse = null;
-    int retryAttempts = 0;
-    do {
-      try {
-        deleteResponse = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
-      } catch (OpenSearchStatusException e) {
-        retryAttempts++;
-
-        if (retryAttempts <= maxRetryAttempts) {
-          logger.warn("Could not remove documents from index {} because of {}, retrying in {} ms.", getIndexName(),
-                  e.getMessage(), retryWaitingPeriod);
-          if (retryWaitingPeriod > 0) {
-            Thread.sleep(retryWaitingPeriod);
-          }
-        } else {
-          logger.error("Could not remove documents from index {}, not retrying.", getIndexName(),
-                  e);
-          throw e;
-        }
-      }
-    } while (deleteResponse == null);
-
-    return deleteResponse;
+  protected boolean delete(String type, String id) throws IOException, InterruptedException {
+    return withRetries(c -> c.delete(d -> d.index(getSubIndexIdentifier(type)).id(id).refresh(Refresh.True)))
+        .result() != Result.NotFound;
   }
 
   /**
@@ -429,7 +421,9 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
             httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
       }
 
-      client = new RestHighLevelClient(builder);
+      legacyClient = new RestHighLevelClient(builder);
+      client = new OpenSearchClient(new RestClientTransport(legacyClient.getLowLevelClient(),
+          new JacksonJsonpMapper()));
     }
 
     // Test if opensearch is reachable and continuously retry if it is not
@@ -470,17 +464,15 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   private boolean isOpensearchReachable() {
     try {
       // test connection
-      ClusterHealthRequest request = new ClusterHealthRequest();
-      request.waitForYellowStatus();
-      ClusterHealthResponse resp = client.cluster().health(request, RequestOptions.DEFAULT);
-      if (resp.getStatus().equals(ClusterHealthStatus.GREEN)) {
-        logger.debug("Connected to OpenSearch, cluster health is {}", resp.getStatus());
+      final HealthResponse resp = client.cluster().health(h -> h.waitForStatus(HealthStatus.Yellow));
+      if (resp.status() == HealthStatus.Green) {
+        logger.debug("Connected to OpenSearch, cluster health is {}", resp.status());
         return true;
-      } else if (resp.getStatus().equals(ClusterHealthStatus.YELLOW)) {
-        logger.warn("Connected to OpenSearch, cluster health is {}", resp.getStatus());
+      } else if (resp.status() == HealthStatus.Yellow) {
+        logger.warn("Connected to OpenSearch, cluster health is {}", resp.status());
         return true;
       }
-      logger.debug("Connected to OpenSearch, but cluster health is {}", resp.getStatus());
+      logger.debug("Connected to OpenSearch, but cluster health is {}", resp.status());
       return false;
     } catch (ConnectException | ConnectionClosedException connectException) {
       // Get thrown when we are unable to connect. Normally this should only happen when
@@ -498,9 +490,9 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
       // something different triggered an ioexception, so we fail
       throw new RuntimeException("Couldn't connect to opensearch due to IOExceptionError", ioException);
     } catch (OpenSearchException opensearchException) {
-      if (opensearchException.status().getStatus() >= 500) {
+      if (opensearchException.status() >= 500) {
         logger.debug("OpenSearch health request ended with HTTP status code {}. Is OpenSearch service running?",
-            opensearchException.status().getStatus());
+            opensearchException.status());
         return false;
       }
       // An OpenSearchException is usually thrown in case where the server returns a 4xx or 5xx error code.
@@ -521,8 +513,9 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
    *           if stopping the OpenSearch node fails
    */
   protected void close() throws IOException {
-    if (client != null) {
-      client.close();
+    if (legacyClient != null) {
+      // Also closes the transport of the new client, which shares the same connection
+      legacyClient.close();
     }
   }
 
@@ -546,51 +539,56 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
   }
 
   private void createSubIndex(String type, String idxName) throws SearchIndexException, IOException {
-    try {
-      logger.debug("Trying to create index for '{}'", idxName);
-      final CreateIndexRequest request = new CreateIndexRequest(idxName)
-              .settings(loadResources("indexSettings.json"), XContentType.JSON)
-              .mapping(loadResources(type + "-mapping.json"), XContentType.JSON);
+    createIndexIfMissing(idxName, loadResources("indexSettings.json"), loadResources(type + "-mapping.json"));
 
-      final CreateIndexResponse siteIdxResponse = client.indices().create(request, RequestOptions.DEFAULT);
-      if (!siteIdxResponse.isAcknowledged()) {
-        throw new SearchIndexException("Unable to create index for '" + idxName + "'");
-      }
-    } catch (OpenSearchStatusException e) {
-      if (e.getDetailedMessage().contains("already_exists_exception")) {
-        logger.info("Detected existing index '{}'", idxName);
-      } else {
-        throw e;
-      }
-    }
-
-    // See if the index version exists and check if it matches. The request will
-    // fail if there is no version index
-    boolean versionIndexExists = false;
-    final GetRequest getRequest = new GetRequest(getSubIndexIdentifier(VERSION_DOCUMENT_TYPE), idxName);
+    // See if the index version exists and check if it matches.
+    final String versionIndex = getSubIndexIdentifier(VERSION_DOCUMENT_TYPE);
+    final GetResponse<Map> version;
     try {
-      final GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
-      if (getResponse.isExists() && !getResponse.isSourceEmpty()
-          && getResponse.getSource().containsKey(IndexSchema.VERSION)) {
-        final int actualIndexVersion = (Integer) getResponse.getSource().get(IndexSchema.VERSION);
-        if (indexVersion != actualIndexVersion) {
-          throw new SearchIndexException("Search index '" + idxName + "' is at version " + actualIndexVersion
-              + ", but codebase expects version " + indexVersion);
-        }
-        versionIndexExists = true;
-        logger.debug("Search index '{}' is at version {}", idxName, indexVersion);
-      }
+      version = client.get(g -> g.index(versionIndex).id(idxName), Map.class);
     } catch (OpenSearchException e) {
       throw new SearchIndexException("Requesting version of the index '" + idxName + "' failed.", e);
     }
+    if (version.found() && version.source() != null && version.source().containsKey(IndexSchema.VERSION)) {
+      final int actualIndexVersion = ((Number) version.source().get(IndexSchema.VERSION)).intValue();
+      if (indexVersion != actualIndexVersion) {
+        throw new SearchIndexException("Search index '" + idxName + "' is at version " + actualIndexVersion
+            + ", but codebase expects version " + indexVersion);
+      }
+      logger.debug("Search index '{}' is at version {}", idxName, indexVersion);
+    } else {
+      logger.debug("Creating version index for site '{}' at version {}", idxName, indexVersion);
+      client.index(i -> i.index(versionIndex).id(idxName).document(Map.of(IndexSchema.VERSION, indexVersion)));
+    }
+  }
 
-    // The index does not exist, let's create it
-    if (!versionIndexExists) {
-      logger.debug("Creating version index for site '{}'", idxName);
-      final IndexRequest indexRequest = new IndexRequest(getSubIndexIdentifier(VERSION_DOCUMENT_TYPE)).id(idxName)
-              .source(Collections.singletonMap(IndexSchema.VERSION, indexVersion));
-      logger.debug("Index version of site '{}' is {}", idxName, indexVersion);
-      client.index(indexRequest, RequestOptions.DEFAULT);
+  /**
+   * Creates an index unless it already exists.
+   *
+   * @param name
+   *          the name of the index
+   * @param settings
+   *          the index settings as JSON
+   * @param mapping
+   *          the index mapping as JSON
+   * @throws SearchIndexException
+   *          if OpenSearch refuses to create the index
+   * @throws IOException
+   *          if the request fails
+   */
+  public void createIndexIfMissing(String name, String settings, String mapping)
+          throws SearchIndexException, IOException {
+    logger.debug("Trying to create index '{}'", name);
+    final String body = "{\"settings\": " + settings + ", \"mappings\": " + mapping + "}";
+    try (Response response = client.generic()
+        .execute(Requests.builder().method("PUT").endpoint("/" + name).json(body).build())) {
+      if (response.getStatus() >= 400) {
+        final String error = response.getBody().map(Body::bodyAsString).orElse("");
+        if (!error.contains("resource_already_exists_exception")) {
+          throw new SearchIndexException("Unable to create index '" + name + "': " + error);
+        }
+        logger.info("Detected existing index '{}'", name);
+      }
     }
   }
 
@@ -738,8 +736,22 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
     return subIndexIdentifier.substring(this.indexIdentifier.length() + 1);
   }
 
-  public RestHighLevelClient getClient() {
+  /**
+   * Returns the OpenSearch client.
+   *
+   * @return the client
+   */
+  public OpenSearchClient getClient() {
     return client;
+  }
+
+  /**
+   * Returns the deprecated high level client, still used for search requests.
+   *
+   * @return the legacy client
+   */
+  public RestHighLevelClient getLegacyClient() {
+    return legacyClient;
   }
 
   /**
@@ -751,10 +763,6 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
    *          The builder to use to create the query.
    * @param toSearchResult
    *          The function to convert the results to a {@link SearchResult}
-   * @param maxRetryAttempts
-   *          How often to retry query in case of OpenSearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
    * @return A {@link SearchResult} containing the relevant objects.
    *
    * @throws IOException
@@ -763,14 +771,13 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
    *         If waiting during retry is interrupted
    */
   protected <T> SearchResult<T> executeQuery(SearchQuery query, SearchRequest request,
-          Function<SearchMetadataCollection, T> toSearchResult, int maxRetryAttempts, int retryWaitingPeriod)
-          throws IOException, InterruptedException {
+          Function<SearchMetadataCollection, T> toSearchResult) throws IOException, InterruptedException {
     // Execute the query and try to get hold of a query response
     SearchResponse searchResponse = null;
     int retryAttempts = 0;
     do {
       try {
-        searchResponse = getClient().search(request, RequestOptions.DEFAULT);
+        searchResponse = legacyClient.search(request, RequestOptions.DEFAULT);
       } catch (OpenSearchStatusException e) {
         if (e.status() == RestStatus.BAD_REQUEST) {
           logger.warn("Could not query documents from index {} because of a bad request: {}", getIndexName(),
@@ -858,7 +865,7 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
     final SearchSourceBuilder searchSource = new SearchSourceBuilder().aggregation(aggBuilder);
     final SearchRequest searchRequest = new SearchRequest(this.getSubIndexIdentifier(type)).source(searchSource);
     try {
-      final SearchResponse response = getClient().search(searchRequest, RequestOptions.DEFAULT);
+      final SearchResponse response = legacyClient.search(searchRequest, RequestOptions.DEFAULT);
 
       final List<String> terms = new ArrayList<>();
       final Terms aggs = response.getAggregations().get(facetName);

@@ -37,6 +37,25 @@
     <!-- opensearch -->
     <dependency>
       <groupId>org.opensearch.client</groupId>
+      <artifactId>opensearch-java</artifactId>
+      <version>${opensearch-java.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.json</groupId>
+      <artifactId>jakarta.json-api</artifactId>
+      <version>2.1.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.parsson</groupId>
+      <artifactId>parsson</artifactId>
+      <version>1.1.7</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opensearch.client</groupId>
       <artifactId>opensearch-rest-high-level-client</artifactId>
       <version>${opensearch.version}</version>
     </dependency>
@@ -210,6 +229,11 @@
             <ignoredUnusedDeclaredDependency>io.projectreactor:reactor-core</ignoredUnusedDeclaredDependency>
             <!-- embedded, needed at runtime by the high-level REST client -->
             <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-common</ignoredUnusedDeclaredDependency>
+            <!-- the default JSON implementation used by the OpenSearch client -->
+            <ignoredUnusedDeclaredDependency>org.eclipse.parsson:parsson</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>jakarta.json:jakarta.json-api</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>com.fasterxml.jackson.core:jackson-databind</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-x-content</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -267,6 +291,9 @@
               !org.tartarus.*,
               !org.zeromq.*,
               !com.github.mustachejava.*,
+              !jakarta.json.bind*,
+              !org.glassfish.hk2.osgiresourcelocator,
+              !software.amazon.awssdk.*,
               *
             </Import-Package>
             <Export-Package>
@@ -276,6 +303,8 @@
             <Embed-Dependency>
               groupId=org.opensearch;scope=compile,
               groupId=org.opensearch.client;scope=compile,
+              jakarta.json-api,
+              parsson,
               groupId=org.opensearch.plugin;scope=compile,
               httpcore5-reactive,
               groupId=tools.jackson.core;scope=compile,
@@ -289,6 +318,10 @@
               lucene-queries
             </Embed-Dependency>
             <_exportcontents>
+              org.opensearch.client.json.*,
+              org.opensearch.client.opensearch.*,
+              org.opensearch.client.transport.*,
+              org.opensearch.client.util,
               org.opensearch,
               org.opensearch.action,
               org.opensearch.action.admin.cluster.health,
