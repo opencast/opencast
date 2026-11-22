@@ -1,0 +1,29 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "org": {
+              "value": "mh_default_org"
+            }
+          }
+        },
+        {
+          "term": {
+            "type": {
+              "value": "Episode"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "exists": {
+            "field": "deleted"
+          }
+        }
+      ]
+    }
+  }
+}

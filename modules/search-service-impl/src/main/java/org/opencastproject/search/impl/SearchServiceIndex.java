@@ -113,7 +113,7 @@ import java.util.stream.Collectors;
                 "service.pid=org.opencastproject.search.impl.SearchServiceIndex"
         }
 )
-public final class SearchServiceIndex extends AbstractIndexProducer implements IndexProducer {
+public class SearchServiceIndex extends AbstractIndexProducer implements IndexProducer {
 
   @Override
   public IndexRebuildService.Service getService() {

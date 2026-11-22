@@ -1,0 +1,52 @@
+{
+  "from": 0,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "bool": {
+            "must_not": [
+              {
+                "exists": {
+                  "field": "deleted"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "term": {
+            "org": {
+              "value": "mh_default_org"
+            }
+          }
+        },
+        {
+          "term": {
+            "type": {
+              "value": "Series"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "size": 20,
+  "sort": [
+    {
+      "modified": {
+        "order": "asc"
+      }
+    },
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ]
+}

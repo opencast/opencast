@@ -1,0 +1,45 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "acl_permission_read": [
+              "ROLE_USER_A",
+              "ROLE_USER_B"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "acl_permission_write": [
+              "ROLE_USER_A",
+              "ROLE_USER_B"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "organization": [
+              "mh_default_org"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "size": 2147483647,
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647
+}

@@ -1,0 +1,69 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "acl_permission_read": [
+              "ROLE_USER_A",
+              "ROLE_USER_B"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "organization": [
+              "mh_default_org"
+            ]
+          }
+        }
+      ],
+      "minimum_should_match": "1",
+      "should": [
+        {
+          "multi_match": {
+            "fields": [
+              "*.search^1.2",
+              "*.search._2gram^1.2",
+              "*.search._3gram^1.2",
+              "*.search._4gram^1.2",
+              "uid"
+            ],
+            "operator": "and",
+            "query": "lecture",
+            "type": "bool_prefix"
+          }
+        }
+      ]
+    }
+  },
+  "size": 2147483647,
+  "sort": [
+    {
+      "title.sort": {
+        "order": "desc"
+      }
+    },
+    {
+      "createdDateTime": {
+        "order": "asc"
+      }
+    },
+    {
+      "organizers.sort": {
+        "order": "asc"
+      }
+    },
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647
+}

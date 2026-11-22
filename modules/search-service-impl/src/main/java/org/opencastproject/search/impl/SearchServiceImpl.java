@@ -80,7 +80,7 @@ import java.util.regex.Pattern;
         "service.pid=org.opencastproject.search.impl.SearchServiceImpl"
     }
 )
-public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, StaticFileAuthorization {
+public class SearchServiceImpl extends AbstractJobProducer implements SearchService, StaticFileAuthorization {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);

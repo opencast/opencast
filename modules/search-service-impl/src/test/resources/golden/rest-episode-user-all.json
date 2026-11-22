@@ -1,0 +1,100 @@
+{
+  "from": 3,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "bool": {
+            "must_not": [
+              {
+                "exists": {
+                  "field": "deleted"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "term": {
+            "org": {
+              "value": "mh_default_org"
+            }
+          }
+        },
+        {
+          "term": {
+            "type": {
+              "value": "Episode"
+            }
+          }
+        },
+        {
+          "terms": {
+            "searchable_acl.read": [
+              "ROLE_USER_A",
+              "ROLE_USER_B"
+            ]
+          }
+        }
+      ],
+      "minimum_should_match": "1",
+      "must": [
+        {
+          "ids": {
+            "values": [
+              "event-1"
+            ]
+          }
+        },
+        {
+          "term": {
+            "dc.isPartOf": {
+              "value": "series-1"
+            }
+          }
+        },
+        {
+          "term": {
+            "live": {
+              "value": true
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "multi_match": {
+            "fields": [
+              "dc.*.search^1.2",
+              "dc.*.search._2gram^1.2",
+              "dc.*.search._3gram^1.2",
+              "dc.*.search._4gram^1.2"
+            ],
+            "fuzziness": "AUTO",
+            "operator": "and",
+            "query": "intro",
+            "type": "bool_prefix"
+          }
+        }
+      ]
+    }
+  },
+  "size": 7,
+  "sort": [
+    {
+      "dc.created": {
+        "order": "asc"
+      }
+    },
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ]
+}

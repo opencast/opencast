@@ -651,6 +651,20 @@ public class OpenSearchIndex extends AbstractOpenSearchIndex {
   }
 
   /**
+   * Renders the body of the search request for an event query as JSON. Only meant for testing.
+   */
+  String searchRequestBody(EventSearchQuery query) {
+    return getSearchRequest(query, new EventQueryBuilder(query)).source().toString();
+  }
+
+  /**
+   * Renders the body of the search request for a series query as JSON. Only meant for testing.
+   */
+  String searchRequestBody(SeriesSearchQuery query) {
+    return getSearchRequest(query, new SeriesQueryBuilder(query)).source().toString();
+  }
+
+  /**
    * Whether the given failure means the query itself was rejected as malformed, rather than indicating an
    * operational problem such as a missing index or an unreachable search service.
    */

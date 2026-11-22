@@ -1,0 +1,42 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "bool": {
+            "must_not": [
+              {
+                "exists": {
+                  "field": "deleted"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "term": {
+            "org": {
+              "value": "mh_default_org"
+            }
+          }
+        },
+        {
+          "term": {
+            "type": {
+              "value": "Series"
+            }
+          }
+        }
+      ],
+      "must": [
+        {
+          "term": {
+            "dc.title": {
+              "value": "Series"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "organization": [
+              "mh_default_org"
+            ]
+          }
+        }
+      ],
+      "must": [
+        {
+          "range": {
+            "start_date": {
+              "gt": "2021-01-01T00:00:00Z"
+            }
+          }
+        },
+        {
+          "range": {
+            "start_date": {
+              "gte": "2023-11-14T22:13:20Z",
+              "lte": "2024-03-09T16:00:00Z"
+            }
+          }
+        },
+        {
+          "range": {
+            "start_date": {
+              "lt": "2025-01-01T00:00:00Z"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "size": 2147483647,
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647
+}

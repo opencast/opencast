@@ -1,0 +1,253 @@
+{
+  "from": 10,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "acl_permission_write": [
+              "ROLE_X"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "agent_id": [
+              "agent"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "contributor": [
+              "Contributor"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "created": [
+              "2024-01-01T00:00:00Z"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "creator": [
+              "Creator"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "description": [
+              "Description"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "event_status": [
+              "EVENTS.EVENTS.STATUS.PROCESSED"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "extended_metadata_dublincore/extended_field": [
+              "value"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "has_comments": [
+              true
+            ]
+          }
+        },
+        {
+          "terms": {
+            "has_open_comments": [
+              false
+            ]
+          }
+        },
+        {
+          "terms": {
+            "is_published": [
+              true
+            ]
+          }
+        },
+        {
+          "terms": {
+            "language": [
+              "en"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "license": [
+              "CC-BY"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "location": [
+              "Location"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "managed_acl": [
+              "Managed ACL"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "needs_cutting": [
+              true
+            ]
+          }
+        },
+        {
+          "terms": {
+            "organization": [
+              "mh_default_org"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "presenter": [
+              "Presenter A",
+              "Presenter B"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "publisher": [
+              "Publisher"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "rights": [
+              "Rights"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "series_id": [
+              "series-1"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "series_name": [
+              "Series"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "source": [
+              "Source"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "start_date": [
+              "2024-02-01T00:00:00Z"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "subject": [
+              "Subject"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "technical_presenters": [
+              "tech-presenter"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "title": [
+              "Title"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "uid": [
+              "event-1",
+              "event-2"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "workflow_id": [
+              42
+            ]
+          }
+        },
+        {
+          "terms": {
+            "workflow_state": [
+              "SUCCEEDED"
+            ]
+          }
+        }
+      ],
+      "must": [
+        {
+          "range": {
+            "start_date": {
+              "gte": "2023-11-14T22:13:20Z",
+              "lte": "2024-03-09T16:00:00Z"
+            }
+          }
+        },
+        {
+          "range": {
+            "technical_start": {
+              "gte": "2023-11-14T22:13:20Z",
+              "lte": "2024-03-09T16:00:00Z"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "size": 20,
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647
+}
