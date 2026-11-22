@@ -121,7 +121,7 @@ public abstract class AbstractOpenSearchIndex {
   /** The document types */
   protected static final String VERSION_DOCUMENT_TYPE = "version";
 
-  /** The legacy high level client, still used for search requests of the search service */
+  /** The legacy high level client, only used for its connection */
   private RestHighLevelClient legacyClient = null;
 
   /** The OpenSearch client */
@@ -629,15 +629,6 @@ public abstract class AbstractOpenSearchIndex {
    */
   public OpenSearchClient getClient() {
     return client;
-  }
-
-  /**
-   * Returns the deprecated high level client, still used for search requests of the search service.
-   *
-   * @return the legacy client
-   */
-  public RestHighLevelClient getLegacyClient() {
-    return legacyClient;
   }
 
   /**

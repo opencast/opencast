@@ -124,13 +124,6 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- Needed by the OpenSearch server classes (e.g. SearchSourceBuilder) when rendering queries in tests -->
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>2.25.4</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-opensearch-index</artifactId>
@@ -140,32 +133,6 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-opensearch-impl</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opensearch.client</groupId>
-      <artifactId>opensearch-rest-high-level-client</artifactId>
-      <version>${opensearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opensearch.client</groupId>
-      <artifactId>opensearch-rest-client</artifactId>
-      <version>${opensearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opensearch</groupId>
-      <artifactId>opensearch</artifactId>
-      <version>${opensearch.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-core</artifactId>
-      <version>${lucene.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -183,8 +150,6 @@
           <ignoredUnusedDeclaredDependencies>
             <!-- provide a database for testing -->
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-core</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-api</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

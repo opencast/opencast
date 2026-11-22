@@ -65,19 +65,18 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
-import org.opensearch.action.search.SearchRequest;
-import org.opensearch.action.search.SearchResponse;
-import org.opensearch.client.RequestOptions;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Result;
-import org.opensearch.common.unit.Fuzziness;
-import org.opensearch.index.query.BoolQueryBuilder;
-import org.opensearch.index.query.MultiMatchQueryBuilder;
-import org.opensearch.index.query.Operator;
-import org.opensearch.index.query.QueryBuilders;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.SortOrder;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Operator;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch._types.query_dsl.TextQueryType;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.TotalHits;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -90,7 +89,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -131,11 +129,10 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
 
   /** Fields searched by free text queries */
   private static final List<String> TEXT_FIELDS = List.of(
-      SearchResult.DUBLINCORE + ".*.search",
-      SearchResult.DUBLINCORE + ".*.search._2gram",
-      SearchResult.DUBLINCORE + ".*.search._3gram",
-      SearchResult.DUBLINCORE + ".*.search._4gram");
-  private static final float TEXT_BOOST = 1.2f;
+      SearchResult.DUBLINCORE + ".*.search^1.2",
+      SearchResult.DUBLINCORE + ".*.search._2gram^1.2",
+      SearchResult.DUBLINCORE + ".*.search._3gram^1.2",
+      SearchResult.DUBLINCORE + ".*.search._4gram^1.2");
 
   private OpenSearchIndex esIndex;
 
@@ -244,16 +241,17 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
    * @throws SearchException
    *          if querying the index fails
    */
+  @SuppressWarnings("unchecked")
   public Hits search(SearchServiceQuery query) throws SearchException {
-    final SearchSourceBuilder searchSource = toSearchSource(query);
-    logger.debug("Sending for query: {}", searchSource.query());
+    final SearchRequest request = toSearchRequest(query);
+    logger.debug("Sending for query: {}", request);
     try {
-      final SearchResponse response = esIndex.getLegacyClient()
-          .search(new SearchRequest(INDEX_NAME).source(searchSource), RequestOptions.DEFAULT);
-      final List<Map<String, Object>> documents = Arrays.stream(response.getHits().getHits())
-          .map(SearchHit::getSourceAsMap)
+      final SearchResponse<Map> response = request(c -> c.search(request, Map.class));
+      final List<Map<String, Object>> documents = response.hits().hits().stream()
+          .map(hit -> (Map<String, Object>) hit.source())
           .collect(Collectors.toList());
-      return new Hits(documents, response.getHits().getTotalHits().value());
+      final TotalHits total = response.hits().total();
+      return new Hits(documents, total != null ? total.value() : documents.size());
     } catch (IOException e) {
       throw new SearchException(e);
     }
@@ -263,59 +261,68 @@ public class SearchServiceIndex extends AbstractIndexProducer implements IndexPr
    * Renders the body of the search request for a query as JSON. Only meant for testing.
    */
   static String searchRequestBody(SearchServiceQuery query) {
-    return toSearchSource(query).toString();
+    return toSearchRequest(query).toJsonString();
   }
 
-  private static SearchSourceBuilder toSearchSource(SearchServiceQuery query) {
-    final BoolQueryBuilder bool = QueryBuilders.boolQuery()
-        .filter(QueryBuilders.termQuery(SearchResult.ORG, query.getOrganization()))
-        .filter(QueryBuilders.termQuery(SearchResult.TYPE, query.getType().name()));
+  private static SearchRequest toSearchRequest(SearchServiceQuery query) {
+    return SearchRequest.of(r -> {
+      r.index(INDEX_NAME).query(q -> q.bool(bool -> buildQuery(bool, query)));
+      if (query.getOffset() >= 0) {
+        r.from(query.getOffset());
+      }
+      if (query.getLimit() >= 0) {
+        r.size(query.getLimit());
+      }
+      query.getSortOrders().forEach((field, order) -> r.sort(s -> s.field(f -> f.field(field)
+          .order(order == SortCriterion.Order.Descending ? SortOrder.Desc : SortOrder.Asc))));
+      r.sort(s -> s.score(sc -> sc.order(SortOrder.Desc)));
+      // Used to stabilize the sort order of results with the same score.
+      r.sort(s -> s.doc(d -> d.order(SortOrder.Asc)));
+      return r;
+    });
+  }
+
+  private static BoolQuery.Builder buildQuery(BoolQuery.Builder bool, SearchServiceQuery query) {
+    bool.filter(term(SearchResult.ORG, FieldValue.of(query.getOrganization())))
+        .filter(term(SearchResult.TYPE, FieldValue.of(query.getType().name())));
     if (!query.isIncludeDeleted()) {
-      bool.filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+      bool.filter(f -> f.bool(b -> b.mustNot(m -> m.exists(e -> e.field(SearchResult.DELETED_DATE)))));
     }
-    query.getReadRoles().ifPresent(roles -> bool.filter(QueryBuilders.termsQuery(INDEX_ACL_READ, roles)));
-    query.getModifiedSince().ifPresent(since -> bool.filter(
-        QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime())));
-    query.getId().ifPresent(id -> bool.must(QueryBuilders.idsQuery().addIds(id)));
-    query.getSeriesTitle().ifPresent(title -> bool.must(QueryBuilders.termQuery(DC_TITLE, title)));
+    query.getReadRoles().ifPresent(roles -> bool.filter(f -> f.terms(t -> t.field(INDEX_ACL_READ)
+        .terms(v -> v.value(roles.stream().map(FieldValue::of).toList())))));
+    query.getModifiedSince().ifPresent(since -> bool.filter(f -> f.range(r -> r.field(SearchResult.MODIFIED_DATE)
+        .gte(JsonData.of(since.getTime())))));
+    query.getId().ifPresent(id -> bool.must(m -> m.ids(i -> i.values(id))));
+    query.getSeriesTitle().ifPresent(title -> bool.must(term(DC_TITLE, FieldValue.of(title))));
 
     final List<String> seriesIds = query.getSeriesIds();
     if (seriesIds.size() == 1) {
-      bool.must(QueryBuilders.termQuery(DC_IS_PART_OF, seriesIds.get(0)));
+      bool.must(term(DC_IS_PART_OF, FieldValue.of(seriesIds.get(0))));
     } else if (seriesIds.size() > 1) {
-      final BoolQueryBuilder seriesQuery = QueryBuilders.boolQuery();
-      seriesIds.forEach(id -> seriesQuery.should(QueryBuilders.termQuery(DC_IS_PART_OF, id)));
-      bool.must(seriesQuery);
+      bool.must(m -> m.bool(b -> b.should(seriesIds.stream()
+          .map(id -> term(DC_IS_PART_OF, FieldValue.of(id)))
+          .toList())));
     }
 
-    query.getLive().ifPresent(live -> bool.must(QueryBuilders.termQuery(SearchResult.LIVE, live)));
+    query.getLive().ifPresent(live -> bool.must(term(SearchResult.LIVE, FieldValue.of(live))));
 
     query.getText().ifPresent(text -> {
-      final MultiMatchQueryBuilder multiMatch = QueryBuilders.multiMatchQuery(text)
-          .type(MultiMatchQueryBuilder.Type.BOOL_PREFIX)
-          .operator(Operator.AND)
-          .fuzziness(Fuzziness.AUTO)
-          .fuzzyTranspositions(true);
       // Search-as-you-type generates useful subfields for autocompletion, we should use it
       // https://docs.opensearch.org/latest/field-types/supported-field-types/search-as-you-type/
-      TEXT_FIELDS.forEach(field -> multiMatch.field(field, TEXT_BOOST));
-      bool.minimumShouldMatch(1);
-      bool.should(multiMatch);
+      bool.should(s -> s.multiMatch(m -> m
+          .query(text)
+          .fields(TEXT_FIELDS)
+          .type(TextQueryType.BoolPrefix)
+          .operator(Operator.And)
+          .fuzziness("AUTO")
+          .fuzzyTranspositions(true)));
+      bool.minimumShouldMatch("1");
     });
+    return bool;
+  }
 
-    final SearchSourceBuilder searchSource = new SearchSourceBuilder().query(bool);
-    if (query.getOffset() >= 0) {
-      searchSource.from(query.getOffset());
-    }
-    if (query.getLimit() >= 0) {
-      searchSource.size(query.getLimit());
-    }
-    query.getSortOrders().forEach((field, order) -> searchSource.sort(field,
-        order == SortCriterion.Order.Descending ? SortOrder.DESC : SortOrder.ASC));
-    searchSource.sort("_score", SortOrder.DESC);
-    // Used to stabilize the sort order of results with the same score.
-    searchSource.sort("_doc", SortOrder.ASC);
-    return searchSource;
+  private static Query term(String field, FieldValue value) {
+    return Query.of(q -> q.term(t -> t.field(field).value(value)));
   }
 
   /**
