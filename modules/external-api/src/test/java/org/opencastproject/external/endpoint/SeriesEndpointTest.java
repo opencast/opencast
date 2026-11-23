@@ -30,10 +30,12 @@ import static org.apache.http.HttpStatus.SC_NOT_ACCEPTABLE;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.commons.io.IOUtils;
@@ -86,6 +88,30 @@ public class SeriesEndpointTest {
     final JSONArray subjects = (JSONArray) series1.get("subjects");
     assertEquals(1, subjects.size());
     assertEquals("Topic", subjects.get(0));
+  }
+
+  @Test
+  public void testGetEditableSeriesAsJson() {
+    given().queryParam("edit", true).expect().statusCode(SC_OK).when().get(env.host("/series.json"));
+
+    assertArrayEquals(new String[] {Permissions.Action.WRITE.toString()},
+            TestSeriesEndpoint.getCapturedQuery().getActions());
+  }
+
+  @Test
+  public void testGetSeriesAsJsonWithEditFalse() {
+    given().queryParam("edit", false).expect().statusCode(SC_OK).when().get(env.host("/series.json"));
+
+    assertArrayEquals(new String[] {Permissions.Action.READ.toString()},
+            TestSeriesEndpoint.getCapturedQuery().getActions());
+  }
+
+  @Test
+  public void testGetSeriesAsJsonWithoutEdit() {
+    given().expect().statusCode(SC_OK).when().get(env.host("/series.json"));
+
+    assertArrayEquals(new String[] {Permissions.Action.READ.toString()},
+            TestSeriesEndpoint.getCapturedQuery().getActions());
   }
 
   /** Unit test for {@link SeriesEndpoint#getSeries(String, String, Boolean)} */

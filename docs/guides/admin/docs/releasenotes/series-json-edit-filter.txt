@@ -1,0 +1,7 @@
+The External API endpoint GET /api/series/series.json now honors edit=true and
+returns only series for which the current user has write access, matching the
+onlyWithWriteAccess filter of GET /api/series. Previously, edit was ignored, so
+clients sending edit=true could also receive series they could only read.
+Omitting edit or setting edit=false keeps the existing read-access filter.
+
+No database schema or search index changes.
