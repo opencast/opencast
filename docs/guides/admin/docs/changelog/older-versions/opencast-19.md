@@ -1,6 +1,14 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.11 (2026-11-23)
+- [[GHSA-87w3-phwh-q8vx](https://github.com/opencast/opencast/security/advisories/GHSA-87w3-phwh-q8vx)] - Path traversal through unvalidated media package and element identifiers leading to arbitrary file write, deletion, and remote code execution
+- [[GHSA-gr3h-hxr8-phqm](https://github.com/opencast/opencast/security/advisories/GHSA-gr3h-hxr8-phqm)] - Server-side template injection via workflow properties in FreeMarker-rendered workflow operation settings
+- [[GHSA-hgqh-jpvg-xx9f](https://github.com/opencast/opencast/security/advisories/GHSA-hgqh-jpvg-xx9f)] - Users can delete events they only have read access to
+- [[GHSA-x4wc-h58f-2wm9](https://github.com/opencast/opencast/security/advisories/GHSA-x4wc-h58f-2wm9)] - Unauthenticated reflected XSS in the REST documentation endpoint (/docs.html)
+- [[GHSA-qqqp-5j2v-jvfp](https://github.com/opencast/opencast/security/advisories/GHSA-qqqp-5j2v-jvfp)] - Cross-tenant exposure of playlists in multi-organization installations
+- [[GHSA-jrcq-hch7-gvv5](https://github.com/opencast/opencast/security/advisories/GHSA-jrcq-hch7-gvv5)] - Unconditional Trust of X-Forwarded-* Headers (No Trusted-Proxy Allowlist)
+
 ## Opencast 19.10 (2026-10-28)
 - [[#8159](https://github.com/opencast/opencast/pull/8159)] -
   Opencast 19.10 release notes

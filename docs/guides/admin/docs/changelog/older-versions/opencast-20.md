@@ -1,6 +1,11 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.7 (2026-11-23)
+
+- [[#8313](https://github.com/opencast/opencast/pull/8313)] -
+  Fix deletion of events for admins
+
 ## Opencast 20.6 (2026-11-18)
 
 - [[#8283](https://github.com/opencast/opencast/pull/8283)] -
