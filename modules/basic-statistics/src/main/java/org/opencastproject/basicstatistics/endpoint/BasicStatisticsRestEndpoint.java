@@ -337,7 +337,11 @@ public class BasicStatisticsRestEndpoint {
   @RestQuery(
       name = "trustedPush",
       description = "Push raw events from trusted servers/nodes, e.g. octoka. "
-          + "Requires a special role, see the security config.",
+          + "Requires a special role, see the security config. "
+          + "Unlike file fetches that this server records itself, this endpoint does not merge connecting byte "
+          + "ranges of fetch-file events (e.g. adaptive streaming segments of the same file) into one. Trusted "
+          + "pushers are responsible for merging those themselves before pushing, to avoid storing one event per "
+          + "segment.",
       responses = {
           @RestResponse(
               responseCode = HttpServletResponse.SC_OK,

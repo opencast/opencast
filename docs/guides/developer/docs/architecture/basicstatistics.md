@@ -176,5 +176,9 @@ Of course, we still want to report progress somewhat regularly (to avoid losing 
 
 #### Notes for file servers
 Requests for consecutive byte ranges of the same file should be merged already, to reduce the number of events stored.
+This matters most for adaptive streaming, which fetches one file in many small byte-range requests, one per segment.
+Opencast's own static file server does this merging automatically before reporting fetch-file events to itself; a
+trusted server reporting its own deliveries via `trustedPush` (e.g. octoka) has to do this merging itself, since
+`trustedPush` does not merge on its behalf.
 Ideally, file servers should report byte ranges of data actually sent to the client instead of the request `Range` parameters.
 For example, clients just sending requests and immediately closing the connection wouldn't count, or at least only for one packet worth of bytes.
