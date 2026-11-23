@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -125,7 +126,11 @@ public class BasicStatisticsAggregationService {
       String systemUserName = SecurityUtil.getSystemUserName(cc);
       durationLookup = new DurationLookup(openSearchIndex, organizationDirectoryService, systemUserName);
 
-      quartz = new StdSchedulerFactory().getScheduler();
+      // StdSchedulerFactory's no-arg constructor returns a scheduler shared by name ("DefaultQuartzScheduler")
+      // across the whole JVM; naming this one keeps its start()/shutdown() from affecting unrelated schedulers.
+      Properties quartzProperties = new Properties();
+      quartzProperties.setProperty("org.quartz.scheduler.instanceName", "BasicStatisticsAggregationScheduler");
+      quartz = new StdSchedulerFactory(quartzProperties).getScheduler();
       quartz.start();
 
       JobDetail job = new JobDetail();
