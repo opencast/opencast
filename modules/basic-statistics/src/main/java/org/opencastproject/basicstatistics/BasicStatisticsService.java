@@ -113,6 +113,9 @@ public class BasicStatisticsService implements FileFetchListener {
 
   private final AtomicLong droppedFileFetches = new AtomicLong();
 
+  /** For throttling the warning in {@link #recordFileFetch}: a down DB or secret service must not spam the log. */
+  private final AtomicLong failedFileFetches = new AtomicLong();
+
   /**
    * How long a run of fetches for the same (session, item, element) may go without a new, connecting byte range
    * before it is persisted as-is. Chosen to match {@code ViewCorrelator}'s own fetch/play matching tolerance, so it
@@ -366,7 +369,11 @@ public class BasicStatisticsService implements FileFetchListener {
       FetchRangeMerger.Key key = new FetchRangeMerger.Key(session, itemId, elementId);
       fetchRangeMerger.record(key, timestamp, from, to, organization, user);
     } catch (BasicStatisticsSecretServiceException | RuntimeException | InternalError e) {
-      logger.warn("Could not record file fetch event", e);
+      // A down DB or secret service would otherwise log this, with a stacktrace, for every single file fetch.
+      long failed = failedFileFetches.incrementAndGet();
+      if (failed == 1 || failed % 1000 == 0) {
+        logger.warn("Could not record file fetch event, {} have failed so far", failed, e);
+      }
     }
   }
 
