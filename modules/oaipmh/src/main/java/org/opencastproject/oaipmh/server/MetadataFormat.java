@@ -23,7 +23,6 @@
 package org.opencastproject.oaipmh.server;
 
 import java.net.URI;
-import java.net.URL;
 
 /**
  * Describes the repository metadata format as defined in
@@ -38,7 +37,7 @@ public interface MetadataFormat {
   /**
    * The location of the associated XML schema.
    */
-  URL getSchema();
+  URI getSchema();
 
   /**
    * The XML namespace URI of this metadata format.

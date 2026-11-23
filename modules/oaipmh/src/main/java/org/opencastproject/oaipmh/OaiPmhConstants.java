@@ -21,12 +21,10 @@
 package org.opencastproject.oaipmh;
 
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.UrlSupport.url;
 
 import org.opencastproject.oaipmh.server.MetadataFormat;
 
 import java.net.URI;
-import java.net.URL;
 
 /**
  * OAI specific constants like request parameter names etc.
@@ -54,7 +52,7 @@ public interface OaiPmhConstants {
   String OAI_DC_XML_NS = "http://www.openarchives.org/OAI/2.0/oai_dc/";
   URI OAI_DC_XML_NS_URI = uri(OAI_DC_XML_NS);
   String OAI_DC_SCHEMA = "http://www.openarchives.org/OAI/2.0/oai_dc.xsd";
-  URL OAI_DC_SCHEMA_URL = url(OAI_DC_SCHEMA);
+  URI OAI_DC_SCHEMA_URI = uri(OAI_DC_SCHEMA);
   String OAI_DC_SCHEMA_LOCATION = OAI_DC_XML_NS + " " + OAI_DC_SCHEMA;
 
   /** ACL read permission (action). */
@@ -67,8 +65,8 @@ public interface OaiPmhConstants {
     }
 
     @Override
-    public URL getSchema() {
-      return OAI_DC_SCHEMA_URL;
+    public URI getSchema() {
+      return OAI_DC_SCHEMA_URI;
     }
 
     @Override

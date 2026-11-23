@@ -56,7 +56,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -223,7 +222,15 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     BundleContext bundleContext = cc.getBundleContext();
 
     // Get configuration
-    serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
+    String serverUrlString = bundleContext.getProperty(SERVER_URL_PROPERTY);
+    if (serverUrlString == null) {
+      throw new IllegalStateException(SERVER_URL_PROPERTY + " is not configured");
+    }
+    try {
+      serverUrl = URI.create(serverUrlString).toURL();
+    } catch (MalformedURLException | IllegalArgumentException e) {
+      throw new IllegalStateException(SERVER_URL_PROPERTY + " is not a valid URL: " + serverUrlString, e);
+    }
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             bundleContext.getProperty(STREAMING_PUBLISH_PROPERTY), ",")).orElse(new String[0]));
   }

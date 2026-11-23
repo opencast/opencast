@@ -23,13 +23,12 @@ package org.opencastproject.oaipmh.server;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.oaipmh.server.OaiPmhServer.repositoryId;
 
-import org.opencastproject.util.UrlSupport;
-
 import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -152,7 +151,7 @@ public class OaiPmhServerTest {
 
       @Override
       public String getRequestURI() {
-        return UrlSupport.url(url).getPath();
+        return URI.create(url).getPath();
       }
 
       @Override

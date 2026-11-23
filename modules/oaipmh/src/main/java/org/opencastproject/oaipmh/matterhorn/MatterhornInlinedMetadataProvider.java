@@ -21,7 +21,6 @@
 package org.opencastproject.oaipmh.matterhorn;
 
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.UrlSupport.url;
 
 import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
@@ -36,7 +35,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +44,7 @@ import java.util.Optional;
  * series ACLs.
  */
 public class MatterhornInlinedMetadataProvider implements MetadataProvider {
-  private static final URL SCHEMA_URL = url("http://www.opencastproject.org/oai/matterhorn-inlined.xsd");
+  private static final URI SCHEMA_URI = uri("http://www.opencastproject.org/oai/matterhorn-inlined.xsd");
   private static final URI NAMESPACE_URI = uri("http://www.opencastproject.org/oai/matterhorn-inlined");
 
   private static final MetadataFormat METADATA_FORMAT = new MetadataFormat() {
@@ -56,8 +54,8 @@ public class MatterhornInlinedMetadataProvider implements MetadataProvider {
     }
 
     @Override
-    public URL getSchema() {
-      return SCHEMA_URL;
+    public URI getSchema() {
+      return SCHEMA_URI;
     }
 
     @Override

@@ -23,7 +23,6 @@
 package org.opencastproject.oaipmh.matterhorn;
 
 import static org.opencastproject.util.UrlSupport.uri;
-import static org.opencastproject.util.UrlSupport.url;
 
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
@@ -36,14 +35,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.Optional;
 
 /**
  * The Opencast metadata provider provides whole media packages.
  */
 public class MatterhornMetadataProvider implements MetadataProvider {
-  private static final URL SCHEMA_URL = url("http://www.opencastproject.org/oai/matterhorn.xsd");
+  private static final URI SCHEMA_URI = uri("http://www.opencastproject.org/oai/matterhorn.xsd");
   private static final URI NAMESPACE_URI = uri("http://www.opencastproject.org/oai/matterhorn");
 
   private static final MetadataFormat METADATA_FORMAT = new MetadataFormat() {
@@ -53,8 +51,8 @@ public class MatterhornMetadataProvider implements MetadataProvider {
     }
 
     @Override
-    public URL getSchema() {
-      return SCHEMA_URL;
+    public URI getSchema() {
+      return SCHEMA_URI;
     }
 
     @Override
