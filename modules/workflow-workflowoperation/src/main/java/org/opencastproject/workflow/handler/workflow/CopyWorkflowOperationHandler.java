@@ -32,7 +32,6 @@ import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -168,7 +167,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
         String ext = FilenameUtils.getExtension(element.getURI().toString());
         ext = ext.length() > 0 ? ".".concat(ext) : "";
-        File targetFile = new File(UrlSupport.concat(targetDirectoryOption, fileName.concat(ext)));
+        File targetFile = new File(targetDirectoryOption, fileName + ext);
 
         copyElement(element, targetFile);
       }
@@ -185,7 +184,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
         String ext = FilenameUtils.getExtension(element.getURI().toString());
         ext = ext.length() > 0 ? ".".concat(ext) : "";
-        File targetFile = new File(UrlSupport.concat(targetDirectoryOption, fileName + ext));
+        File targetFile = new File(targetDirectoryOption, fileName + ext);
 
         copyElement(element, targetFile);
         i++;

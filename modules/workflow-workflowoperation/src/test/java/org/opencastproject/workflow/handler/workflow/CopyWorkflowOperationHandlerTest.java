@@ -24,7 +24,6 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -104,7 +103,7 @@ public class CopyWorkflowOperationHandlerTest {
 
   @Test
   public void testOptionalFilename() throws Exception {
-    File copy = new File(UrlSupport.concat(videoFile.getParent(), "copy", videoFile.getName()));
+    File copy = new File(new File(videoFile.getParent(), "copy"), videoFile.getName());
     String copyTargetDirectory = copy.getParent();
     FileUtils.forceMkdir(copy);
 
