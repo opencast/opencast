@@ -114,6 +114,25 @@ public class BasicStatisticsAggregationDatabaseServiceImplTest {
   }
 
   @Test
+  public void updateAggregatedEventAndTotalAppliesBothAtomically() throws Exception {
+    int[] views = new int[24];
+    views[10] = 2;
+    long[] watchtime = new long[24];
+    watchtime[10] = 90;
+    AggregatedEvent event = new AggregatedEvent(ORGANIZATION, ITEM_TYPE, ITEM_ID, DAY);
+    event.setViews(views);
+    event.setWatchtime(watchtime);
+
+    persistence.updateAggregatedEventAndTotal(event, 2, 90);
+
+    AggregatedEvent storedEvent = persistence.getAggregatedEvent(ORGANIZATION, ITEM_TYPE, ITEM_ID, DAY);
+    assertArrayEquals(views, storedEvent.getViews());
+    AggregatedTotal storedTotal = persistence.getTotal(ORGANIZATION, ITEM_TYPE, ITEM_ID);
+    assertEquals(2, storedTotal.getTotalViews());
+    assertEquals(90, storedTotal.getTotalWatchtime());
+  }
+
+  @Test
   public void totalAccumulatesAcrossCalls() throws Exception {
     AggregatedTotal beforeAnyActivity = persistence.getTotal(ORGANIZATION, ITEM_TYPE, ITEM_ID);
     assertEquals(0, beforeAnyActivity.getTotalViews());

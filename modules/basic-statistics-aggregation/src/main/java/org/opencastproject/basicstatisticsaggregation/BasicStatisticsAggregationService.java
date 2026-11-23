@@ -234,7 +234,8 @@ public class BasicStatisticsAggregationService {
     }
   }
 
-  private void reaggregateDay(ItemDay itemDay)
+  /** Synchronized: {@link #runTick} and {@link #reaggregate} can otherwise call this for the same item/day at once. */
+  private synchronized void reaggregateDay(ItemDay itemDay)
           throws BasicStatisticsDatabaseException, BasicStatisticsAggregationDatabaseException {
     Instant dayStart = itemDay.day().atStartOfDay(ZoneOffset.UTC).toInstant();
     Instant dayEnd = dayStart.plusSeconds(24 * 60 * 60);
@@ -254,14 +255,11 @@ public class BasicStatisticsAggregationService {
         : new AggregatedEvent(itemDay.organization(), itemDay.itemType(), itemDay.itemId(), itemDay.day());
     updated.setViews(recomputed.getViews());
     updated.setWatchtime(recomputed.getWatchtime());
-    aggregationDatabase.updateAggregatedEvent(updated);
 
     long deltaViews = Arrays.stream(recomputed.getViews()).sum() - previousViews;
     long deltaWatchtime = Arrays.stream(recomputed.getWatchtime()).sum() - previousWatchtime;
-    if (deltaViews != 0 || deltaWatchtime != 0) {
-      aggregationDatabase.addToTotal(itemDay.organization(), itemDay.itemType(), itemDay.itemId(), deltaViews,
-          deltaWatchtime);
-    }
+    // Both in one transaction, so a crash between them can never leave the total out of sync with the buckets.
+    aggregationDatabase.updateAggregatedEventAndTotal(updated, deltaViews, deltaWatchtime);
   }
 
   /**

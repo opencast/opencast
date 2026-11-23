@@ -53,6 +53,13 @@ public interface BasicStatisticsAggregationDatabaseService {
   void updateAggregatedEvent(AggregatedEvent event) throws BasicStatisticsAggregationDatabaseException;
 
   /**
+   * Like {@link #updateAggregatedEvent} followed by {@link #addToTotal}, but atomically: both happen in a single
+   * transaction, so a failure between the two can never leave the total out of sync with the day's buckets.
+   */
+  void updateAggregatedEventAndTotal(AggregatedEvent event, long viewsDelta, long watchtimeDelta)
+          throws BasicStatisticsAggregationDatabaseException;
+
+  /**
    * Get the all-time view/watchtime total for an item. Returns a zeroed-out total if none has been recorded yet.
    */
   AggregatedTotal getTotal(String organization, ItemType itemType, String itemId)

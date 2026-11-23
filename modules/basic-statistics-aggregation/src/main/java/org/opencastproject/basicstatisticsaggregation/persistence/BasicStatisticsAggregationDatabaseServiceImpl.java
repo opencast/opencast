@@ -126,6 +126,36 @@ public class BasicStatisticsAggregationDatabaseServiceImpl implements BasicStati
   }
 
   @Override
+  public void updateAggregatedEventAndTotal(AggregatedEvent event, long viewsDelta, long watchtimeDelta)
+          throws BasicStatisticsAggregationDatabaseException {
+    try {
+      db.execTx(em -> {
+        AggregatedEvent existingEvent = findByDay(em, event.getOrganization(), event.getItemType(),
+            event.getItemId(), event.getDay());
+        if (existingEvent == null) {
+          em.persist(event);
+        } else {
+          existingEvent.setViews(event.getViews());
+          existingEvent.setWatchtime(event.getWatchtime());
+        }
+
+        AggregatedTotal total = findTotal(em, event.getOrganization(), event.getItemType(), event.getItemId());
+        if (total == null) {
+          total = new AggregatedTotal(event.getOrganization(), event.getItemType(), event.getItemId());
+          total.setTotalViews(viewsDelta);
+          total.setTotalWatchtime(watchtimeDelta);
+          em.persist(total);
+        } else {
+          total.setTotalViews(total.getTotalViews() + viewsDelta);
+          total.setTotalWatchtime(total.getTotalWatchtime() + watchtimeDelta);
+        }
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsAggregationDatabaseException("Could not persist aggregated event and total", e);
+    }
+  }
+
+  @Override
   public AggregatedTotal getTotal(String organization, ItemType itemType, String itemId)
           throws BasicStatisticsAggregationDatabaseException {
     try {
