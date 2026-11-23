@@ -1,5 +1,12 @@
 # Opencast 20: Release Notes
 
+## Opencast 20.7
+
+This version fixes a bug introduced with the security fixes in Opencast 20.6:
+
+- [#8313](https://github.com/opencast/opencast/pull/8313)
+  admins were no longer able to delete events
+
 ## Opencast 20.6
 
 In addition to the usual collection of bug fixes and minor improvements for Opencast and the admin interface,
