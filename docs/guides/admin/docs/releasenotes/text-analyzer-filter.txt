@@ -1,0 +1,11 @@
+The dictionary service modules (`dictionary-api`, `dictionary-regexp` and `dictionary-none`) have been removed. Filtering
+the texts extracted by the text analyzer is now done by the text analyzer service itself and configured in
+`etc/org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg`:
+
+- `filter.pattern` replaces `pattern` from `etc/org.opencastproject.dictionary.regexp.DictionaryServiceImpl.cfg`.
+  The default is still `\w+`.
+- `filter.enabled=false` disables filtering, replacing the `dictionary-none` module.
+
+The default behavior does not change. An invalid pattern is no longer ignored, but rejected as invalid configuration.
+This also fixes a circular service reference which could cause errors on startup.
+[#8348](https://github.com/opencast/opencast/issues/8348)

@@ -22,3 +22,9 @@ TODO
     - `etc/jetty-opencast.xml` has been removed. If you enabled it by setting `org.ops4j.pax.web.config.file` in
       `etc/org.ops4j.pax.web.cfg` to raise the HTTP idle timeout, remove that setting and configure the timeout with
       `org.ops4j.pax.web.server.connector.idleTimeout` (in milliseconds) in the same file instead.
+- **Text analyzer filter**
+    - The dictionary service modules have been removed and the text analyzer service now filters extracted texts
+      itself. If you configured a custom `pattern` in
+      `etc/org.opencastproject.dictionary.regexp.DictionaryServiceImpl.cfg`, move it to `filter.pattern` in
+      `etc/org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg`. The old configuration file is no longer
+      used and can be removed.

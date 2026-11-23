@@ -21,7 +21,6 @@
 
 package org.opencastproject.textanalyzer.impl;
 
-import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
@@ -36,7 +35,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
-import org.opencastproject.metadata.mpeg7.Textual;
+import org.opencastproject.metadata.mpeg7.TextualImpl;
 import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
@@ -52,7 +51,6 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.cm.ConfigurationException;
@@ -72,6 +70,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Media analysis service that takes takes an image and returns text as extracted from that image.
@@ -105,6 +108,18 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /** The approximate load placed on the system by creating a text analysis job */
   private float analysisJobLoad = DEFAULT_ANALYSIS_JOB_LOAD;
 
+  /** Configuration key to enable or disable filtering the extracted text */
+  public static final String FILTER_ENABLED_KEY = "filter.enabled";
+
+  /** Configuration key for the regular expression used to filter the extracted text */
+  public static final String FILTER_PATTERN_KEY = "filter.pattern";
+
+  /** The default regular expression used to filter the extracted text */
+  public static final String DEFAULT_FILTER_PATTERN = "\\w+";
+
+  /** The pattern used to filter the extracted text or <code>null</code> if filtering is disabled */
+  private volatile Pattern filterPattern = Pattern.compile(DEFAULT_FILTER_PATTERN);
+
   /** The text extraction implemenetation */
   private TextExtractor textExtractor = null;
 
@@ -116,9 +131,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /** The mpeg-7 service */
   protected Mpeg7CatalogService mpeg7CatalogService;
-
-  /** The dictionary service */
-  protected DictionaryService dictionaryService;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -305,13 +317,12 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
     int i = 1;
     for (String line : extractedText) {
       VideoText videoText = new VideoTextImpl(id + "-" + i++);
-      Textual text = dictionaryService.cleanUpText(line);
+      String text = filterText(line);
       if (text != null) {
-        videoText.setText(text);
+        videoText.setText(new TextualImpl(text));
         videoTexts.add(videoText);
       }
     }
-
 
     return videoTexts.toArray(new VideoText[0]);
   }
@@ -368,17 +379,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   @Reference(name = "mpeg7service")
   protected void setMpeg7CatalogService(Mpeg7CatalogService mpeg7CatalogService) {
     this.mpeg7CatalogService = mpeg7CatalogService;
-  }
-
-  /**
-   * Sets the dictionary service
-   *
-   * @param dictionaryService
-   *          an instance of the dicitonary service
-   */
-  @Reference
-  protected void setDictionaryService(DictionaryService dictionaryService) {
-    this.dictionaryService = dictionaryService;
   }
 
   /**
@@ -446,12 +446,59 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   @Modified
   public void updated(Map<String, Object> properties) throws ConfigurationException {
+    updateFilter(properties);
     analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD,
             serviceRegistry);
   }
 
-  @Reference(target = "(artifact=dictionary)")
-  public void setReadinessIndicator(ReadinessIndicator readinessIndicator) {
-    //Only activate service if ReadinessIndicator is registered.
+  /**
+   * Configure the filter applied to the extracted text.
+   *
+   * @param properties
+   *          the service configuration
+   * @throws ConfigurationException
+   *           if the configured pattern is not a valid regular expression
+   */
+  void updateFilter(Map<String, Object> properties) throws ConfigurationException {
+    boolean enabled = Boolean.parseBoolean(Objects.toString(properties.get(FILTER_ENABLED_KEY), "true").trim());
+    if (!enabled) {
+      logger.info("Filtering of extracted texts is disabled");
+      filterPattern = null;
+      return;
+    }
+
+    String pattern = Objects.toString(properties.get(FILTER_PATTERN_KEY), "");
+    if (pattern.isBlank()) {
+      pattern = DEFAULT_FILTER_PATTERN;
+    }
+    try {
+      filterPattern = Pattern.compile(pattern);
+    } catch (PatternSyntaxException e) {
+      throw new ConfigurationException(FILTER_PATTERN_KEY, "Invalid regular expression '" + pattern + "'", e);
+    }
+    logger.info("Filtering extracted texts using pattern '{}'", pattern);
+  }
+
+  /**
+   * Filter the extracted text. If filtering is enabled, the configured pattern is applied to the text as often as it
+   * matches and the matches are returned, separated by a space character.
+   *
+   * @param text
+   *          the text to filter
+   * @return the filtered text or <code>null</code> if nothing is left
+   */
+  String filterText(String text) {
+    Pattern pattern = filterPattern;
+    String result = text;
+    if (pattern != null) {
+      StringJoiner words = new StringJoiner(" ");
+      Matcher matcher = pattern.matcher(text);
+      while (matcher.find()) {
+        words.add(matcher.group());
+      }
+      result = words.toString();
+    }
+    logger.debug("Filtered text “{}” to “{}”", text, result);
+    return result.isBlank() ? null : result;
   }
 }
