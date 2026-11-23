@@ -123,7 +123,7 @@ public class BasicStatisticsAggregationRestEndpoint {
       AggregatedTotal total = basicStatisticsAggregationService.getTotal(itemType, itemId);
 
       TotalDto dto = new TotalDto();
-      dto.setItemType(itemType.toString());
+      dto.setItemType(itemType.getApiName());
       dto.setItemId(itemId);
       dto.setViews(total.getTotalViews());
       dto.setWatchtime(total.getTotalWatchtime());
@@ -167,6 +167,12 @@ public class BasicStatisticsAggregationRestEndpoint {
     if (itemType == null) {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("Unknown itemType '" + itemTypeParam + "'")
+          .build();
+    }
+
+    if (fromParam == null || toParam == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("from and to are required")
           .build();
     }
 
