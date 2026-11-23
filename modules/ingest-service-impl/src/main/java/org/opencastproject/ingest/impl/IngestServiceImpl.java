@@ -146,6 +146,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -1719,84 +1720,113 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *           if storing the content fails
    */
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
-    InputStream in = null;
-    ClassicHttpResponse response = null;
-    CloseableHttpClient externalHttpClient = null;
-    try {
-      if (uri.toString().startsWith("http")) {
-        HttpGet get = new HttpGet(uri);
+    if (uri.toString().startsWith("http")) {
+      HttpGet get = new HttpGet(uri);
 
-        try {
-          if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
-            // NB: We're creating a new client here with *different* auth than the system auth creds
-            externalHttpClient = getAuthedHttpClient();
-            get.setHeader("X-Requested-Auth", downloadAuthMethod);
-            if ("Basic".equals(downloadAuthMethod) && downloadAuthForceBasic) {
-              String auth = downloadUser + ":" + downloadPassword;
-              byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
-              String authHeader = "Basic " + new String(encodedAuth);
-              get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
-            }
-            response = externalHttpClient.execute(get);
-          } else {
-            // httpClient checks internally to see if it should be sending the default auth, or not.
-            response = httpClient.execute(get);
+      if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
+        // NB: We're creating a new client here with *different* auth than the system auth creds
+        get.setHeader("X-Requested-Auth", downloadAuthMethod);
+        if ("Basic".equals(downloadAuthMethod) && downloadAuthForceBasic) {
+          String auth = downloadUser + ":" + downloadPassword;
+          byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
+          String authHeader = "Basic " + new String(encodedAuth);
+          get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        }
+        // Errors from within the response handler are passed through as they are. Every other I/O error means that
+        // no response could be fetched in the first place.
+        AtomicBoolean responseReceived = new AtomicBoolean(false);
+        try (CloseableHttpClient externalHttpClient = getAuthedHttpClient()) {
+          return externalHttpClient.execute(get, response -> {
+            responseReceived.set(true);
+            return addResponseToRepo(mp, elementId, uri, response);
+          });
+        } catch (IOException e) {
+          if (responseReceived.get()) {
+            throw e;
           }
-        } catch (IOException e) {
           throw new MediaFetchException(uri, e);
         }
-
-        if (null == response) {
-          // If you get here then chances are you're using a mock httpClient which does not have appropriate
-          // mocking to respond to the URL you are feeding it.  Try adding that URL to the mock and see if that works.
-          throw new IOException("Null response object from the http client, refer to code for explanation");
-        }
-
-        int httpStatusCode = response.getCode();
-        if (httpStatusCode != 200) {
-          throw new MediaFetchException(uri, "Server responded with HTTP status " + httpStatusCode, null);
-        }
-        try {
-          in = response.getEntity().getContent();
-        } catch (IOException e) {
-          throw new MediaFetchException(uri, e);
-        }
-        //If it does not start with file, or we're in test mode (ie, to allow arbitrary file:// access)
-      } else if (!uri.toString().startsWith("file") || testMode) {
-        try {
-          in = uri.toURL().openStream();
-        } catch (IOException e) {
-          throw new MediaFetchException(uri, e);
-        }
-      } else {
-        throw new MediaFetchException(uri, "Refusing to fetch files from the local filesystem", null);
-      }
-      String fileName = FilenameUtils.getName(uri.getPath());
-      if (isBlank(FilenameUtils.getExtension(fileName))) {
-        fileName = getContentDispositionFileName(response);
       }
 
-      if (isBlank(FilenameUtils.getExtension(fileName))) {
-        throw new MediaFetchException(uri, "No filename extension found: " + fileName, null);
-      }
-      SourceInputStream source = new SourceInputStream(in);
+      // httpClient checks internally to see if it should be sending the default auth, or not.
+      ClassicHttpResponse response = null;
       try {
-        return addContentToRepo(mp, elementId, fileName, source);
-      } catch (IOException e) {
-        if (source.readFailed) {
+        try {
+          response = httpClient.execute(get);
+        } catch (IOException e) {
           throw new MediaFetchException(uri, e);
         }
-        throw e;
+        return addResponseToRepo(mp, elementId, uri, response);
+      } finally {
+        httpClient.close(response);
       }
-    } finally {
-      if (in != null) {
-        in.close();
-      }
-      if (externalHttpClient != null) {
-        externalHttpClient.close();
-      }
-      httpClient.close(response);
     }
+
+    // Only allow arbitrary file:// access in test mode
+    if (uri.toString().startsWith("file") && !testMode) {
+      throw new MediaFetchException(uri, "Refusing to fetch files from the local filesystem", null);
+    }
+    InputStream in;
+    try {
+      in = uri.toURL().openStream();
+    } catch (IOException e) {
+      throw new MediaFetchException(uri, e);
+    }
+    try (in) {
+      return addSourceToRepo(mp, elementId, uri, getFileName(uri, null), in);
+    }
+  }
+
+  private URI addResponseToRepo(MediaPackage mp, String elementId, URI uri, ClassicHttpResponse response)
+          throws IOException {
+    if (null == response) {
+      // If you get here then chances are you're using a mock httpClient which does not have appropriate
+      // mocking to respond to the URL you are feeding it.  Try adding that URL to the mock and see if that works.
+      throw new IOException("Null response object from the http client, refer to code for explanation");
+    }
+
+    int httpStatusCode = response.getCode();
+    if (httpStatusCode != 200) {
+      throw new MediaFetchException(uri, "Server responded with HTTP status " + httpStatusCode, null);
+    }
+    InputStream in;
+    try {
+      in = response.getEntity().getContent();
+    } catch (IOException e) {
+      throw new MediaFetchException(uri, e);
+    }
+    try (in) {
+      return addSourceToRepo(mp, elementId, uri, getFileName(uri, response), in);
+    }
+  }
+
+  /**
+   * Stores content fetched from a URI in the working file repository. Errors while reading from the source are reported
+   * as {@link MediaFetchException}, errors while storing the content as plain {@link IOException}.
+   */
+  private URI addSourceToRepo(MediaPackage mp, String elementId, URI uri, String fileName, InputStream in)
+          throws IOException {
+    SourceInputStream source = new SourceInputStream(in);
+    try {
+      return addContentToRepo(mp, elementId, fileName, source);
+    } catch (IOException e) {
+      if (source.readFailed) {
+        throw new MediaFetchException(uri, e);
+      }
+      throw e;
+    }
+  }
+
+  private String getFileName(URI uri, ClassicHttpResponse response) throws MediaFetchException {
+    String fileName = FilenameUtils.getName(uri.getPath());
+    if (isBlank(FilenameUtils.getExtension(fileName))) {
+      fileName = getContentDispositionFileName(response);
+    }
+
+    if (isBlank(FilenameUtils.getExtension(fileName))) {
+      throw new MediaFetchException(uri, "No filename extension found: " + fileName, null);
+    }
+    return fileName;
   }
 
   private String getContentDispositionFileName(ClassicHttpResponse response) {

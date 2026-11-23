@@ -79,10 +79,9 @@ import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpStatus;
@@ -552,22 +551,18 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     HttpClientContext context = HttpClientContext.create();
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthCache(authCache);
-    CloseableHttpResponse response = null;
 
     try {
-      response = httpClient.execute(httpPost, context);
-      int code = response.getCode();
+      int code = httpClient.execute(httpPost, context, response -> response.getCode());
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
           logger.info("Callback url: {} had already already been registered", callbackUrl);
           callbackAlreadyRegistered = true;
-          EntityUtils.consume(response.getEntity());
           break;
         case HttpStatus.SC_CREATED: // 201
           logger.info("Callback url: {} has been successfully registered", callbackUrl);
           callbackAlreadyRegistered = true;
-          EntityUtils.consume(response.getEntity());
           break;
         case HttpStatus.SC_BAD_REQUEST: // 400
           logger.warn("Callback url {} could not be verified, status: {}", callbackUrl, code);
@@ -584,9 +579,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null) {
-          response.close();
-        }
       } catch (IOException e) {
       }
     }
@@ -630,7 +622,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     HttpClientContext context = HttpClientContext.create();
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthCache(authCache);
-    CloseableHttpResponse response = null;
     try {
       HttpPost httpPost = new HttpPost(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS)
               + String.format(
@@ -639,14 +630,13 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, track.getMimeType().toString());
       FileEntity fileEntity = new FileEntity(audioFile, ContentType.APPLICATION_OCTET_STREAM);
       httpPost.setEntity(fileEntity);
-      response = httpClient.execute(httpPost, context);
-      int code = response.getCode();
+      HttpResult response = execute(httpClient, httpPost, context);
+      int code = response.code();
 
       switch (code) {
         case HttpStatus.SC_CREATED: // 201
           logger.info("Recognitions job has been successfully created");
 
-          HttpEntity entity = response.getEntity();
           // Response returned is a json object:
           // {
           // "id": "4bd734c0-e575-21f3-de03-f932aa0468a0",
@@ -654,8 +644,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // "url":
           // "http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/4bd734c0-e575-21f3-de03-f932aa0468a0"
           // }
-          String jsonString = EntityUtils.toString(response.getEntity());
-          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          JsonObject jsonObject = GsonUtil.gson().fromJson(response.body(), JsonObject.class);
           String jobId = GsonUtil.getStringOrNull(jsonObject, "id");
           String jobStatus = GsonUtil.getStringOrNull(jsonObject, "status");
           String jobUrl = GsonUtil.getStringOrNull(jsonObject, "url");
@@ -664,7 +653,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                   track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
-          EntityUtils.consume(entity);
           return;
         case HttpStatus.SC_BAD_REQUEST: // 400
           logger.info("Invalid argument returned, status: {}", code);
@@ -683,9 +671,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null) {
-          response.close();
-        }
       } catch (IOException e) {
       }
     }
@@ -707,20 +692,16 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     HttpClientContext context = HttpClientContext.create();
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthCache(authCache);
-    CloseableHttpResponse response = null;
     String mpId = "unknown";
     try {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS, jobId));
-      response = httpClient.execute(httpGet, context);
-      int code = response.getCode();
+      HttpResult response = execute(httpClient, httpGet, context);
+      int code = response.code();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          HttpEntity entity = response.getEntity();
-
           // Response returned is a json object described above
-          String jsonString = EntityUtils.toString(entity);
-          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          JsonObject jsonObject = GsonUtil.gson().fromJson(response.body(), JsonObject.class);
           String jobStatus = GsonUtil.getStringOrNull(jsonObject, "status");
           mpId = GsonUtil.getStringOrNull(jsonObject, "user_token");
           // user_token doesn't come back if this is not in the context of a callback so get the mpId from the db
@@ -731,7 +712,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
             }
           }
           logger.info("Recognitions job {} has been found, status {}", jobId, jobStatus);
-          EntityUtils.consume(entity);
 
           if (jobStatus.indexOf(RecognitionJobStatus.COMPLETED) > -1 && has(jsonObject, "results")) {
             transcriptionDone(mpId, jsonObject);
@@ -761,12 +741,19 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null) {
-          response.close();
-        }
       } catch (IOException e) {
       }
     }
+  }
+
+  /** Status code and body of a completely consumed HTTP response. */
+  private record HttpResult(int code, String body) { }
+
+  private static HttpResult execute(CloseableHttpClient httpClient, ClassicHttpRequest request,
+          HttpClientContext context) throws IOException {
+    return httpClient.execute(request, context, response -> new HttpResult(
+        response.getCode(),
+        response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity())));
   }
 
   private void saveResults(String jobId, JsonObject jsonObj) throws IOException {

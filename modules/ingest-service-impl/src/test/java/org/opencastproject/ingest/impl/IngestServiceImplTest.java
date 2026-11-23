@@ -77,10 +77,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -313,8 +313,8 @@ public class IngestServiceImplTest {
         protected CloseableHttpClient getAuthedHttpClient() {
           CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
           try {
-            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject()))
-                .andReturn(CloseableHttpResponse.adapt(httpResponse)).anyTimes();
+            EasyMock.expect(client.execute(EasyMock.anyObject(HttpGet.class), anyHandler()))
+                .andAnswer(handle(httpResponse)).anyTimes();
             client.close();
             EasyMock.expectLastCall().once();
           } catch (Exception e) { }
@@ -444,8 +444,8 @@ public class IngestServiceImplTest {
     //There's one case (accessing the filesystem) where we *don't* expect the mocks to be used
     if (shouldTouchMocks) {
       if (shouldSendAuth) {
-        EasyMock.expect(customClient.execute(EasyMock.anyObject()))
-            .andReturn(CloseableHttpResponse.adapt(httpResponse)).once();
+        EasyMock.expect(customClient.execute(EasyMock.anyObject(HttpGet.class), anyHandler()))
+            .andAnswer(handle(httpResponse)).once();
         customClient.close();
         EasyMock.expectLastCall().once();
       } else {
@@ -1111,4 +1111,16 @@ public class IngestServiceImplTest {
     Assert.assertEquals("Always create a new series catalog.", true, service.updateSeries(mp));
   }
 
+  /** Matches any response handler passed to a mocked {@code execute} call. */
+  private static HttpClientResponseHandler<Object> anyHandler() {
+    return EasyMock.anyObject();
+  }
+
+  /** Answers a mocked {@code execute} call by passing the given response to the response handler. */
+  private static IAnswer<Object> handle(ClassicHttpResponse response) {
+    return () -> {
+      Object[] args = EasyMock.getCurrentArguments();
+      return ((HttpClientResponseHandler<?>) args[args.length - 1]).handleResponse(response);
+    };
+  }
 }

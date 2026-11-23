@@ -48,7 +48,6 @@ import com.google.gson.JsonParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.net.URIBuilder;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.annotations.Activate;
@@ -337,7 +336,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
     // Don't wait for responses indefinitely
     try (CloseableHttpClient client = HttpUtil.clientBuilder(5000, 10000).build()) {
-      try (CloseableHttpResponse resp = client.execute(get)) {
+      return client.execute(get, resp -> {
         var statusCode = resp.getCode();
         if (statusCode == 404) {
           // Stud.IP does not know about the user
@@ -361,7 +360,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
         }
 
         return jObj;
-      }
+      });
     }
   }
 

@@ -29,7 +29,6 @@ import com.google.gson.JsonObject;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -246,22 +245,21 @@ public class MoodleWebServiceImpl implements MoodleWebService {
     HttpGet get = new HttpGet(url.build());
     get.setHeader("User-Agent", OC_USERAGENT);
 
+    JsonElement obj;
     try (CloseableHttpClient client = HttpClients.createDefault()) {
-      try (CloseableHttpResponse resp = client.execute(get)) {
-        // Parse response
-        BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-        JsonElement obj = GsonUtil.gson().fromJson(reader, JsonElement.class);
+      // Parse response
+      obj = client.execute(get, resp -> GsonUtil.gson().fromJson(
+          new BufferedReader(new InputStreamReader(resp.getEntity().getContent())), JsonElement.class));
+    }
 
-        // Check for errors
-        if (obj != null && obj.isJsonObject()) {
-          JsonObject jObj = obj.getAsJsonObject();
-          if (jObj.has("exception") || jObj.has("errorcode")) {
-            throw new MoodleWebServiceException("Moodle returned an error: " + jObj);
-          }
-        }
-
-        return obj;
+    // Check for errors
+    if (obj != null && obj.isJsonObject()) {
+      JsonObject jObj = obj.getAsJsonObject();
+      if (jObj.has("exception") || jObj.has("errorcode")) {
+        throw new MoodleWebServiceException("Moodle returned an error: " + jObj);
       }
     }
+
+    return obj;
   }
 }

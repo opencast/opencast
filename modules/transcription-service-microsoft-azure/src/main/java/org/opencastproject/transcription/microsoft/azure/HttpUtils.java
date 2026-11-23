@@ -26,7 +26,8 @@ import org.opencastproject.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -63,15 +64,24 @@ public final class HttpUtils {
     }
   }
 
-  public static String formatResponseErrorString(ClassicHttpResponse response, String message) throws IOException {
-    String responseString = "";
-    if (response.getEntity() != null) {
-      responseString = entityToString(response.getEntity());
-    }
+  /** Status, headers and body of a completely consumed HTTP response. */
+  public record Response(int code, Header[] headers, String body) { }
+
+  /**
+   * Executes the request and reads the whole response, releasing the connection before returning.
+   */
+  public static Response execute(CloseableHttpClient httpClient, ClassicHttpRequest request) throws IOException {
+    return httpClient.execute(request, response -> new Response(
+        response.getCode(),
+        response.getHeaders(),
+        response.getEntity() == null ? "" : entityToString(response.getEntity())));
+  }
+
+  public static String formatResponseErrorString(Response response, String message) {
     if (StringUtils.isNotBlank(message)) {
-      return String.format("%s Microsoft response: %s", message, responseString);
+      return String.format("%s Microsoft response: %s", message, response.body());
     } else {
-      return String.format("Microsoft response: %s", responseString);
+      return String.format("Microsoft response: %s", response.body());
     }
   }
 }

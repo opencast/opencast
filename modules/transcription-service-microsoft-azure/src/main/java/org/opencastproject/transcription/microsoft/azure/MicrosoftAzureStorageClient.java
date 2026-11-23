@@ -28,12 +28,10 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,28 +89,26 @@ public class MicrosoftAzureStorageClient {
 
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(containerUrl);
-      try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getCode();
-        Map<String, String> headersMap = Arrays.stream(response.getHeaders())
-            .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-            EntityUtils.consume(response.getEntity());
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
-                "Not allowed to read Azure storage container properties for container %s.",
-                azureContainerName)));
-          case HttpStatus.SC_NOT_FOUND: // 404
-            throw new MicrosoftAzureNotFoundException(HttpUtils.formatResponseErrorString(response, String.format(
-                "Azure storage container %s does not exists.", azureContainerName)));
-          default:
-            throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response, String.format(
-                "Getting Azure storage container metadata failed with HTTP response code %d for container %s.",
-                code, azureContainerName)));
-        }
-        return headersMap;
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpGet);
+      int code = response.code();
+      Map<String, String> headersMap = Arrays.stream(response.headers())
+          .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
+              "Not allowed to read Azure storage container properties for container %s.",
+              azureContainerName)));
+        case HttpStatus.SC_NOT_FOUND: // 404
+          throw new MicrosoftAzureNotFoundException(HttpUtils.formatResponseErrorString(response, String.format(
+              "Azure storage container %s does not exists.", azureContainerName)));
+        default:
+          throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response, String.format(
+              "Getting Azure storage container metadata failed with HTTP response code %d for container %s.",
+              code, azureContainerName)));
       }
+      return headersMap;
     }
   }
 
@@ -127,20 +123,18 @@ public class MicrosoftAzureStorageClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpPut httpPut = new HttpPut(containerUrl);
       httpPut.addHeader("x-ms-blob-public-access", "blob");
-      try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-        int code = response.getCode();
-        switch (code) {
-          case HttpStatus.SC_CREATED: // 201
-            EntityUtils.consume(response.getEntity());
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
-                "Not allowed to read Azure storage container properties for container %s.", azureContainerName)));
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpPut);
+      int code = response.code();
+      switch (code) {
+        case HttpStatus.SC_CREATED: // 201
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
+              "Not allowed to read Azure storage container properties for container %s.", azureContainerName)));
 
-          default:
-            throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response, String.format(
-                "Creating Azure storage container %s failed with HTTP response code %d.", azureContainerName, code)));
-        }
+        default:
+          throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response, String.format(
+              "Creating Azure storage container %s failed with HTTP response code %d.", azureContainerName, code)));
       }
     }
   }
@@ -169,21 +163,19 @@ public class MicrosoftAzureStorageClient {
           HttpPut httpPut = new HttpPut(putBlockUrl);
           byte[] blockData = trackStream.readNBytes(blockSize);
           httpPut.setEntity(new ByteArrayEntity(blockData, ContentType.APPLICATION_OCTET_STREAM));
-          try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-            int code = response.getCode();
-            switch (code) {
-              case HttpStatus.SC_CREATED: // 201
-                blockIds.add(blockId);
-                EntityUtils.consume(response.getEntity());
-                break;
-              case HttpStatus.SC_FORBIDDEN: // 403
-                throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
-                    "Not allowed to put block to Azure storage container %s.", azureContainerName)));
-              default:
-                throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response,
-                    String.format("Putting block to Azure storage container %s failed with HTTP response code %d. ",
-                        azureContainerName, code)));
-            }
+          HttpUtils.Response response = HttpUtils.execute(httpClient, httpPut);
+          int code = response.code();
+          switch (code) {
+            case HttpStatus.SC_CREATED: // 201
+              blockIds.add(blockId);
+              break;
+            case HttpStatus.SC_FORBIDDEN: // 403
+              throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
+                  "Not allowed to put block to Azure storage container %s.", azureContainerName)));
+            default:
+              throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response,
+                  String.format("Putting block to Azure storage container %s failed with HTTP response code %d. ",
+                      azureContainerName, code)));
           }
         }
         // commit block list
@@ -200,20 +192,18 @@ public class MicrosoftAzureStorageClient {
         HttpPut httpPut = new HttpPut(putBlockListUrl);
         httpPut.setEntity(new StringEntity(blockList.toString(),
             ContentType.create("application/xml", StandardCharsets.UTF_8)));
-        try (CloseableHttpResponse response = httpClient.execute(httpPut)) {
-          int code = response.getCode();
-          switch (code) {
-            case HttpStatus.SC_CREATED: // 201
-              EntityUtils.consume(response.getEntity());
-              break;
-            case HttpStatus.SC_FORBIDDEN: // 403
-              throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
-                  "Not allowed to put block list to Azure storage container %s.", azureContainerName)));
-            default:
-              throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response,
-                  String.format("Putting block list to Azure storage container %s failed with HTTP response code %d.",
-                      azureContainerName, code)));
-          }
+        HttpUtils.Response response = HttpUtils.execute(httpClient, httpPut);
+        int code = response.code();
+        switch (code) {
+          case HttpStatus.SC_CREATED: // 201
+            break;
+          case HttpStatus.SC_FORBIDDEN: // 403
+            throw new MicrosoftAzureNotAllowedException(HttpUtils.formatResponseErrorString(response, String.format(
+                "Not allowed to put block list to Azure storage container %s.", azureContainerName)));
+          default:
+            throw new MicrosoftAzureStorageClientException(HttpUtils.formatResponseErrorString(response,
+                String.format("Putting block list to Azure storage container %s failed with HTTP response code %d.",
+                    azureContainerName, code)));
         }
       }
     }
@@ -226,24 +216,18 @@ public class MicrosoftAzureStorageClient {
     String deleteUrl = String.format("https://%s%s?%s", fileUrl.getHost(), fileUrl.getPath(), sasToken);
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpDelete httpDelete = new HttpDelete(deleteUrl);
-      try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_ACCEPTED:  // 202
-          case HttpStatus.SC_NOT_FOUND: // 404
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to delete storage blob %s. "
-                + "Microsoft Azure Storage Service response: %s", httpDelete.getRequestUri(), responseString));
-          default:
-            throw new MicrosoftAzureStorageClientException(String.format("Deleting Azure storage blob '%s' failed "
-                    + "with HTTP response code %d. Microsoft Azure Storage Service response: %s",
-                httpDelete.getRequestUri(), code, responseString));
-        }
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpDelete);
+      switch (response.code()) {
+        case HttpStatus.SC_ACCEPTED:  // 202
+        case HttpStatus.SC_NOT_FOUND: // 404
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to delete storage blob %s. "
+              + "Microsoft Azure Storage Service response: %s", httpDelete.getRequestUri(), response.body()));
+        default:
+          throw new MicrosoftAzureStorageClientException(String.format("Deleting Azure storage blob '%s' failed "
+                  + "with HTTP response code %d. Microsoft Azure Storage Service response: %s",
+              httpDelete.getRequestUri(), response.code(), response.body()));
       }
     }
   }

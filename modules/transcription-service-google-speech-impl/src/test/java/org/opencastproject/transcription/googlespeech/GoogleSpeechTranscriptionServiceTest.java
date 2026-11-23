@@ -61,12 +61,13 @@ import com.google.gson.JsonParser;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -243,8 +244,8 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
@@ -267,8 +268,8 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
@@ -341,8 +342,8 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     long before = System.currentTimeMillis();
@@ -369,15 +370,19 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
-    String token = service.refreshAccessToken(CLIENT_ID, CLIENT_SECRET, CLIENT_TOKEN);
+    try {
+      service.refreshAccessToken(CLIENT_ID, CLIENT_SECRET, CLIENT_TOKEN);
+      Assert.fail("Expected TranscriptionServiceException");
+    } catch (TranscriptionServiceException e) {
+      Assert.assertEquals(HttpStatus.SC_NOT_FOUND, e.getCode());
+    }
     Assert.assertEquals("client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET
             + "&refresh_token=" + CLIENT_TOKEN + "&grant_type=refresh_token",
             capturedPost.getValue().getUri().getQuery());
-    Assert.assertEquals("-1", token);
   }
 
   @Test
@@ -387,8 +392,8 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     try {
@@ -450,8 +455,8 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
     EasyMock.replay(httpEntity, response);
 
-    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID, Track.TYPE);
@@ -511,7 +516,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(CloseableHttpResponse.adapt(response));
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), anyHandler())).andAnswer(handle(response));
     EasyMock.replay(httpClient);
 
     Capture<Set<String>> capturedMpIds
@@ -557,6 +562,19 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(wfService, wfs);
 
     return capturedMpIds;
+  }
+
+  /** Matches any response handler passed to a mocked {@code execute} call. */
+  private static HttpClientResponseHandler<Object> anyHandler() {
+    return EasyMock.anyObject();
+  }
+
+  /** Answers a mocked {@code execute} call by passing the given response to the response handler. */
+  private static IAnswer<Object> handle(ClassicHttpResponse response) {
+    return () -> {
+      Object[] args = EasyMock.getCurrentArguments();
+      return ((HttpClientResponseHandler<?>) args[args.length - 1]).handleResponse(response);
+    };
   }
 
 }

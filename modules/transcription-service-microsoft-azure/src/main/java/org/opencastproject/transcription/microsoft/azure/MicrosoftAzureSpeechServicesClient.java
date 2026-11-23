@@ -36,7 +36,6 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -95,28 +94,24 @@ public class MicrosoftAzureSpeechServicesClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(url.toString());
       httpGet.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
-      try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcriptions. "
-                + "Microsoft Azure Speech Services response: %s", responseString));
-          default:
-            throw new MicrosoftAzureSpeechClientException(String.format(
-                "Getting transcriptions failed with HTTP response code %d. "
-                    + "Microsoft Azure Speech Services response: %s", code, responseString));
-        }
-        Gson gson = new GsonBuilder().create();
-        MicrosoftAzureSpeechTranscriptions transcriptions = gson.fromJson(responseString,
-            MicrosoftAzureSpeechTranscriptions.class);
-        return transcriptions.values;
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpGet);
+      int code = response.code();
+      String responseString = response.body();
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcriptions. "
+              + "Microsoft Azure Speech Services response: %s", responseString));
+        default:
+          throw new MicrosoftAzureSpeechClientException(String.format(
+              "Getting transcriptions failed with HTTP response code %d. "
+                  + "Microsoft Azure Speech Services response: %s", code, responseString));
       }
+      Gson gson = new GsonBuilder().create();
+      MicrosoftAzureSpeechTranscriptions transcriptions = gson.fromJson(responseString,
+          MicrosoftAzureSpeechTranscriptions.class);
+      return transcriptions.values;
     }
   }
 
@@ -140,28 +135,24 @@ public class MicrosoftAzureSpeechServicesClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(url);
       httpGet.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
-      try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription '%s'. "
-                    + "Microsoft Azure Speech Services response: %s", transcriptionUrl, responseString));
-          case HttpStatus.SC_NOT_FOUND: // 404
-            throw new MicrosoftAzureNotFoundException(String.format("Transcription '%s' not found.", transcriptionUrl));
-          default:
-            throw new MicrosoftAzureSpeechClientException(String.format(
-                "Getting transcription '%s' failed with HTTP response code %d. "
-                    + "Microsoft Azure Speech Services  response: %s", transcriptionUrl, code, responseString));
-        }
-        Gson gson = new GsonBuilder().create();
-        return gson.fromJson(responseString, MicrosoftAzureSpeechTranscription.class);
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpGet);
+      int code = response.code();
+      String responseString = response.body();
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription '%s'. "
+                  + "Microsoft Azure Speech Services response: %s", transcriptionUrl, responseString));
+        case HttpStatus.SC_NOT_FOUND: // 404
+          throw new MicrosoftAzureNotFoundException(String.format("Transcription '%s' not found.", transcriptionUrl));
+        default:
+          throw new MicrosoftAzureSpeechClientException(String.format(
+              "Getting transcription '%s' failed with HTTP response code %d. "
+                  + "Microsoft Azure Speech Services  response: %s", transcriptionUrl, code, responseString));
       }
+      Gson gson = new GsonBuilder().create();
+      return gson.fromJson(responseString, MicrosoftAzureSpeechTranscription.class);
     }
   }
 
@@ -204,27 +195,23 @@ public class MicrosoftAzureSpeechServicesClient {
       HttpPost httpPost = new HttpPost(url);
       httpPost.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
       httpPost.setEntity(new StringEntity(gson.toJson(requestTranscription), ContentType.APPLICATION_JSON));
-      try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-          case HttpStatus.SC_CREATED: // 201
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format(
-                "Not allowed to create transcription '%s'. Microsoft Azure Speech Services response: %s",
-                displayName, responseString));
-          default:
-            throw new MicrosoftAzureSpeechClientException(String.format(
-                "Creating transcription '%s' failed with HTTP response code %d. "
-                    + "Microsoft Azure Speech Services response: %s", displayName, code, responseString));
-        }
-        return gson.fromJson(responseString, MicrosoftAzureSpeechTranscription.class);
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpPost);
+      int code = response.code();
+      String responseString = response.body();
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+        case HttpStatus.SC_CREATED: // 201
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format(
+              "Not allowed to create transcription '%s'. Microsoft Azure Speech Services response: %s",
+              displayName, responseString));
+        default:
+          throw new MicrosoftAzureSpeechClientException(String.format(
+              "Creating transcription '%s' failed with HTTP response code %d. "
+                  + "Microsoft Azure Speech Services response: %s", displayName, code, responseString));
       }
+      return gson.fromJson(responseString, MicrosoftAzureSpeechTranscription.class);
     }
   }
 
@@ -248,29 +235,25 @@ public class MicrosoftAzureSpeechServicesClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(url);
       httpGet.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
-      try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription files '%s'. "
-                    + "Microsoft Azure Speech Services response: %s", transcriptionFilesUrl, responseString));
-          case HttpStatus.SC_NOT_FOUND: // 404
-            throw new MicrosoftAzureNotFoundException(String.format("Transcription files '%s' not found. "
-                + "Microsoft Azure Speech Services response: %s", transcriptionFilesUrl, responseString));
-          default:
-            throw new MicrosoftAzureSpeechClientException(String.format(
-                "Getting transcription files '%s' failed with HTTP response code %d. "
-                    + "Microsoft Azure Speech Services response: %s", transcriptionFilesUrl, code, responseString));
-        }
-        Gson gson = new GsonBuilder().create();
-        return gson.fromJson(responseString, MicrosoftAzureSpeechTranscriptionFiles.class);
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpGet);
+      int code = response.code();
+      String responseString = response.body();
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription files '%s'. "
+                  + "Microsoft Azure Speech Services response: %s", transcriptionFilesUrl, responseString));
+        case HttpStatus.SC_NOT_FOUND: // 404
+          throw new MicrosoftAzureNotFoundException(String.format("Transcription files '%s' not found. "
+              + "Microsoft Azure Speech Services response: %s", transcriptionFilesUrl, responseString));
+        default:
+          throw new MicrosoftAzureSpeechClientException(String.format(
+              "Getting transcription files '%s' failed with HTTP response code %d. "
+                  + "Microsoft Azure Speech Services response: %s", transcriptionFilesUrl, code, responseString));
       }
+      Gson gson = new GsonBuilder().create();
+      return gson.fromJson(responseString, MicrosoftAzureSpeechTranscriptionFiles.class);
     }
   }
 
@@ -281,30 +264,26 @@ public class MicrosoftAzureSpeechServicesClient {
     String transcriptionUrl = transcriptionFile.links.contentUrl;
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpGet httpGet = new HttpGet(transcriptionUrl);
-      try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription file '%s'. "
-                    + "Microsoft Azure Speech Services response: %s",
-                transcriptionUrl, responseString));
-          case HttpStatus.SC_NOT_FOUND: // 404
-            throw new MicrosoftAzureNotFoundException(String.format("Transcription file '%s' not found. "
-                    + "Microsoft Azure Speech Services response: %s", transcriptionUrl, responseString));
-          default:
-            throw new MicrosoftAzureSpeechClientException(String.format(
-                "Getting transcription file '%s' failed with HTTP response code %d. "
-                    + "Microsoft Azure Speech Services response: %s", transcriptionUrl, code, responseString));
-        }
-        Gson gson = new GsonBuilder().create();
-        return gson.fromJson(responseString, MicrosoftAzureSpeechTranscriptionJson.class);
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpGet);
+      int code = response.code();
+      String responseString = response.body();
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to get transcription file '%s'. "
+                  + "Microsoft Azure Speech Services response: %s",
+              transcriptionUrl, responseString));
+        case HttpStatus.SC_NOT_FOUND: // 404
+          throw new MicrosoftAzureNotFoundException(String.format("Transcription file '%s' not found. "
+                  + "Microsoft Azure Speech Services response: %s", transcriptionUrl, responseString));
+        default:
+          throw new MicrosoftAzureSpeechClientException(String.format(
+              "Getting transcription file '%s' failed with HTTP response code %d. "
+                  + "Microsoft Azure Speech Services response: %s", transcriptionUrl, code, responseString));
       }
+      Gson gson = new GsonBuilder().create();
+      return gson.fromJson(responseString, MicrosoftAzureSpeechTranscriptionJson.class);
     }
   }
 
@@ -345,26 +324,22 @@ public class MicrosoftAzureSpeechServicesClient {
     try (CloseableHttpClient httpClient = HttpUtils.makeHttpClient()) {
       HttpDelete httpDelete = new HttpDelete(transcriptionDeleteUrl);
       httpDelete.addHeader("Ocp-Apim-Subscription-Key", azureCognitiveServicesSubscriptionKey);
-      try (CloseableHttpResponse response = httpClient.execute(httpDelete)) {
-        int code = response.getCode();
-        String responseString = "";
-        if (response.getEntity() != null) {
-          responseString = HttpUtils.entityToString(response.getEntity());
-        }
-        switch (code) {
-          case HttpStatus.SC_OK: // 200
-          case HttpStatus.SC_NO_CONTENT: // 204
-          case HttpStatus.SC_NOT_FOUND: // 404
-            break;
-          case HttpStatus.SC_FORBIDDEN: // 403
-            throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to delete transcription '%s'. "
-                    + "Microsoft Azure Speech Services response: %s",
-                transcriptionId, responseString));
-          default:
-            throw new MicrosoftAzureSpeechClientException(String.format(
-                "Deleting transcription '%s' failed with HTTP response code %d. "
-                    + "Microsoft Azure Speech Services response: %s", transcriptionId, code, responseString));
-        }
+      HttpUtils.Response response = HttpUtils.execute(httpClient, httpDelete);
+      int code = response.code();
+      String responseString = response.body();
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+        case HttpStatus.SC_NO_CONTENT: // 204
+        case HttpStatus.SC_NOT_FOUND: // 404
+          break;
+        case HttpStatus.SC_FORBIDDEN: // 403
+          throw new MicrosoftAzureNotAllowedException(String.format("Not allowed to delete transcription '%s'. "
+                  + "Microsoft Azure Speech Services response: %s",
+              transcriptionId, responseString));
+        default:
+          throw new MicrosoftAzureSpeechClientException(String.format(
+              "Deleting transcription '%s' failed with HTTP response code %d. "
+                  + "Microsoft Azure Speech Services response: %s", transcriptionId, code, responseString));
       }
     }
   }
