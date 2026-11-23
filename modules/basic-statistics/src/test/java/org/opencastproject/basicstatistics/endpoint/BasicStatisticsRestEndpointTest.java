@@ -70,6 +70,10 @@ public class BasicStatisticsRestEndpointTest {
   }
 
   private BasicStatisticsRestEndpoint endpoint(String requestBody) {
+    return endpoint(requestBody, 90);
+  }
+
+  private BasicStatisticsRestEndpoint endpoint(String requestBody, long retentionDays) {
     BasicStatisticsService service = new BasicStatisticsService() {
       @Override
       public void create(List<RawEvent> events) {
@@ -81,6 +85,11 @@ public class BasicStatisticsRestEndpointTest {
         hashedIps.add(ip);
         hashedUserAgents.add(userAgent);
         return SESSION;
+      }
+
+      @Override
+      public long getRawEventRetentionDays() {
+        return retentionDays;
       }
     };
     BasicStatisticsRestEndpoint endpoint = new BasicStatisticsRestEndpoint() {
@@ -154,6 +163,10 @@ public class BasicStatisticsRestEndpointTest {
 
   private Response trustedPush(JsonObject... events) {
     return endpoint(body(events)).trustedPush(request(null, null, null));
+  }
+
+  private Response trustedPush(long retentionDays, JsonObject... events) {
+    return endpoint(body(events), retentionDays).trustedPush(request(null, null, null));
   }
 
   private Response rawClientPush(String requestBody) {
@@ -403,6 +416,30 @@ public class BasicStatisticsRestEndpointTest {
     // the address and user agent are those of the user, as reported by the trusted server
     assertEquals(List.of(InetAddress.getByName("9.8.7.6"), InetAddress.getByName("9.8.7.6")), hashedIps);
     assertEquals(List.of("trusted-ua", "trusted-ua"), hashedUserAgents);
+  }
+
+  @Test
+  public void testTrustedPushRejectsEventsOlderThanRetention() {
+    JsonObject fresh = trustedEvent();
+    fresh.addProperty("timestamp", Instant.now().minus(Duration.ofDays(1)).toString());
+    JsonObject stale = trustedEvent();
+    stale.addProperty("timestamp", Instant.now().minus(Duration.ofDays(3)).toString());
+
+    JsonObject response = responseBody(trustedPush(2, fresh, stale));
+
+    assertEquals(1, response.get("accepted").getAsInt());
+    assertEquals(1, stored.size());
+    assertRejected(rejected(response), 1, "too old");
+  }
+
+  @Test
+  public void testTrustedPushAcceptsAnyAgeWhenRetentionDisabled() {
+    JsonObject veryOld = trustedEvent();
+    veryOld.addProperty("timestamp", Instant.now().minus(Duration.ofDays(400)).toString());
+
+    JsonObject response = responseBody(trustedPush(0, veryOld));
+
+    assertEquals(1, response.get("accepted").getAsInt());
   }
 
   @Test

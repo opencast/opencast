@@ -60,4 +60,10 @@ public interface BasicStatisticsDatabaseService {
    * @return when statistics version 1 first became active, or {@code null} if it has never been recorded
    */
   Instant getVersion1Timestamp() throws BasicStatisticsDatabaseException;
+
+  /**
+   * Deletes all raw events older than the given cutoff, across all organizations.
+   * @return how many raw events were deleted
+   */
+  long deleteRawEventsBefore(Instant cutoff) throws BasicStatisticsDatabaseException;
 }

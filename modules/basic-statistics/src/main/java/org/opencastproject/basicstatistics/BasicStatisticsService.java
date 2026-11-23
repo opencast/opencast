@@ -58,6 +58,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -85,6 +87,12 @@ public class BasicStatisticsService implements FileFetchListener {
   /** Config key for an administrator-set override of the data-completeness threshold date (an ISO date). */
   private static final String COMPLETENESS_THRESHOLD_DATE_KEY = "completeness.threshold.date";
 
+  /** Config key for how many days of raw events to keep. 0 disables retention, keeping events forever. */
+  private static final String RAW_EVENT_RETENTION_DAYS_KEY = "raw.events.retention.days";
+
+  /** How often the raw event retention sweep runs. Cheap once the table is actually bounded by retention. */
+  private static final long RETENTION_SWEEP_INTERVAL_HOURS = 1;
+
   private volatile LocalDate configuredCompletenessThreshold;
 
   /**
@@ -95,6 +103,12 @@ public class BasicStatisticsService implements FileFetchListener {
 
   /** Limits what clients can send to the client push endpoint. Until it is configured, the defaults are used. */
   private volatile ClientPushRateLimiter clientPushRateLimiter = createClientPushRateLimiter(Map.of());
+
+  /**
+   * How many days of raw events to keep. Also used by the REST endpoint's {@code trustedPush} to bound how old a
+   * trusted push may be, since nothing older than retention could ever be aggregated before deletion.
+   */
+  private volatile long rawEventRetentionDays = parseLimit(Map.of(), RAW_EVENT_RETENTION_DAYS_KEY, 90);
 
   /** Persistent storage */
   protected BasicStatisticsDatabaseService persistence;
@@ -132,6 +146,9 @@ public class BasicStatisticsService implements FileFetchListener {
    */
   private FetchRangeMerger fetchRangeMerger;
 
+  /** Periodically deletes raw events older than {@link #rawEventRetentionDays}. */
+  private ScheduledExecutorService retentionSweeper;
+
   /** Callback to set the basic statistics database */
   @Reference(name = "basicstatistics-persistence")
   public void setPersistence(BasicStatisticsDatabaseService persistence) {
@@ -154,6 +171,11 @@ public class BasicStatisticsService implements FileFetchListener {
   void activate(Map<String, Object> properties) {
     logger.info("Activating Basic Statistics Service");
     modified(properties);
+    // Deliberately read once here and not kept up to date by modified(): unlike the other settings, a mistake in
+    // the config file must not be able to take effect immediately and silently delete raw events. Changing this
+    // requires an explicit restart. Must happen before retentionSweeper exists, so the first sweep it runs below
+    // never sees anything but this value.
+    rawEventRetentionDays = parseLimit(properties, RAW_EVENT_RETENTION_DAYS_KEY, 90);
     // Up to 10000 events can wait to be processed, further events are dropped
     fileFetchExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
         new ArrayBlockingQueue<>(10_000),
@@ -171,6 +193,14 @@ public class BasicStatisticsService implements FileFetchListener {
         });
 
     fetchRangeMerger = new FetchRangeMerger(fileFetchExecutor, this::flushMergedFetch, FETCH_MERGE_IDLE_SECONDS);
+
+    retentionSweeper = Executors.newSingleThreadScheduledExecutor(runnable -> {
+      Thread thread = new Thread(runnable, "basic-statistics-retention-sweep");
+      thread.setDaemon(true);
+      return thread;
+    });
+    retentionSweeper.scheduleWithFixedDelay(this::sweepRawEventRetention, 0, RETENTION_SWEEP_INTERVAL_HOURS,
+        TimeUnit.HOURS);
   }
 
   @Modified
@@ -181,6 +211,7 @@ public class BasicStatisticsService implements FileFetchListener {
 
   @Deactivate
   void deactivate() {
+    retentionSweeper.shutdownNow();
     // Flush whatever is still merged in memory before shutting down; stop() queues that onto fileFetchExecutor
     // ahead of the shutdown() below, so it still runs during the graceful drain.
     fetchRangeMerger.stop();
@@ -198,6 +229,29 @@ public class BasicStatisticsService implements FileFetchListener {
 
   public ClientPushRateLimiter getClientPushRateLimiter() {
     return clientPushRateLimiter;
+  }
+
+  public long getRawEventRetentionDays() {
+    return rawEventRetentionDays;
+  }
+
+  /** Deletes raw events older than {@link #rawEventRetentionDays}, if retention is enabled. Runs periodically. */
+  private void sweepRawEventRetention() {
+    long retentionDays = rawEventRetentionDays;
+    if (retentionDays <= 0) {
+      return;
+    }
+    // Day-aligned, so this only ever deletes whole days: aggregation always recomputes a full day at a time, and
+    // must never see one with some but not all of its raw events.
+    Instant cutoff = LocalDate.now(ZoneOffset.UTC).minusDays(retentionDays).atStartOfDay(ZoneOffset.UTC).toInstant();
+    try {
+      long deleted = persistence.deleteRawEventsBefore(cutoff);
+      if (deleted > 0) {
+        logger.info("Deleted {} raw events older than {}", deleted, cutoff);
+      }
+    } catch (BasicStatisticsDatabaseException e) {
+      logger.warn("Could not delete raw events older than {}", cutoff, e);
+    }
   }
 
   private ClientPushRateLimiter createClientPushRateLimiter(Map<String, Object> properties) {

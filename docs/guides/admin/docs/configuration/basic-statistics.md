@@ -26,6 +26,15 @@ Everybody can send statistics to Opencast, as they come from the browsers of the
     ratelimit.minute.bytes=524288
     ratelimit.hour.bytes=8388608
 
+Raw events are only kept for a limited time, after which they are deleted, so the underlying database table does
+not grow forever. Once an event is deleted, the day it belongs to can no longer be covered by manual
+re-aggregation. A limit of 0 means events are kept forever. The default is 90 days:
+
+    raw.events.retention.days=90
+
+The same setting also bounds how old an event reported to `trustedPush` by a trusted server (see below) may be,
+since nothing older than retention could ever be aggregated before it gets deleted.
+
 
 Requirements
 ------------

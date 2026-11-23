@@ -5,6 +5,8 @@ Opencast ships with its own mechanism for gathering and reporting basic statisti
 To that end external applications can send *raw events* to Opencast.
 
 - Raw events: low level user actions, with timestamp, pseudonomized for current day, fully anonymized for past days.
+  Only kept for a limited time (see the admin documentation), after which manual re-aggregation of a day is no
+  longer possible, since raw events are the only source it recomputes from.
 
 Opencast offers two endpoints for adding events, `/basic-statistics/clientPush` and `/basic-statistics/trustedPush`.
 
@@ -96,7 +98,9 @@ Apart from authentication and API path, there are the following differences:
     - `ua`: user agent string
 - During input verification:
     - All event types are allowed (including `fetch-file`)
-    - The `timestamp` may be arbitrarily far in the past (i.e. `MAX_CLIENT_PUSH_DELAY` is not used)
+    - The `timestamp` may be far in the past (i.e. `MAX_CLIENT_PUSH_DELAY` is not used), but not older than the
+      configured raw event retention (see the admin documentation), since it could then never be aggregated
+      before being deleted
 
 **Example**
 

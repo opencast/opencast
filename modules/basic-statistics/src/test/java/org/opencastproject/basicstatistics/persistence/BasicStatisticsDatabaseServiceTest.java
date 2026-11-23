@@ -217,6 +217,22 @@ public class BasicStatisticsDatabaseServiceTest {
   }
 
   @Test
+  public void testDeleteRawEventsBeforeCutoffIsExclusiveOfCutoff() throws Exception {
+    Instant cutoff = Instant.parse("2026-06-01T00:00:00Z");
+    service.createRawEvents(List.of(
+        event(cutoff.minusSeconds(1)),
+        event(cutoff),
+        event(cutoff.plusSeconds(1))));
+
+    long deleted = service.deleteRawEventsBefore(cutoff);
+
+    assertEquals(1, deleted);
+    List<Instant> remaining = service.getRawEvents("org", 100, 0, BY_ID).stream()
+        .map(RawEvent::getTimestamp).collect(Collectors.toList());
+    assertEquals(List.of(cutoff, cutoff.plusSeconds(1)), remaining);
+  }
+
+  @Test
   public void testDowngradeIsRecordedAgain() throws Exception {
     deleteVersions();
     // a later version has been active in between

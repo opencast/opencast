@@ -426,6 +426,13 @@ public class BasicStatisticsRestEndpoint {
           rejected.add((new RejectedEvent(index, "ua (user agent) field must be set on trusted push")));
           continue;
         }
+        // Nothing older than retention could ever be aggregated before it gets deleted. 0 means retention is
+        // disabled, i.e. events are kept forever, so there is no bound to check.
+        long retentionDays = basicStatisticsService.getRawEventRetentionDays();
+        if (retentionDays > 0 && event.getTimestamp().isBefore(now.minus(Duration.ofDays(retentionDays)))) {
+          rejected.add(new RejectedEvent(index, "Timestamp is too old."));
+          continue;
+        }
 
         // Calculate/Add session hash
         long sessionHash = basicStatisticsService.generateSessionHash(

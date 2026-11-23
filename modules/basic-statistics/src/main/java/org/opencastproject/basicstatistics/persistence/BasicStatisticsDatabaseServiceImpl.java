@@ -190,4 +190,19 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
       throw new BasicStatisticsDatabaseException("Could not fetch statistics version history", e);
     }
   }
+
+  /**
+   * {@inheritDoc}
+   * @see BasicStatisticsDatabaseServiceImpl#deleteRawEventsBefore(Instant)
+   */
+  @Override
+  public long deleteRawEventsBefore(Instant cutoff) throws BasicStatisticsDatabaseException {
+    try {
+      return db.execTx(em -> (long) em.createQuery("DELETE FROM RawEvent e WHERE e.timestamp < :cutoff")
+          .setParameter("cutoff", cutoff)
+          .executeUpdate());
+    } catch (Exception e) {
+      throw new BasicStatisticsDatabaseException("Could not delete raw events before " + cutoff, e);
+    }
+  }
 }
