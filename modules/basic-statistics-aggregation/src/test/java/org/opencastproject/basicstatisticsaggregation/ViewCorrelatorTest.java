@@ -35,10 +35,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Covers two main behaviors:
+ * Covers:
  * - a normal play/watch/fetch session becomes exactly one view with matching watchtime
- * - a session replaying the same item several times in a day is capped at 4 counted views.
- * Deliberately does not test implementation details like skew tolerance.
+ * - a session replaying the same item several times in a day is capped at 4 counted views
+ * - a fetch preceding its play within the allowed clock skew still counts.
  */
 public class ViewCorrelatorTest {
 
@@ -71,6 +71,22 @@ public class ViewCorrelatorTest {
       assertEquals("views[" + hour + "]", expectedViews[hour], result.getViews()[hour]);
       assertEquals("watchtime[" + hour + "]", expectedWatchtime[hour], result.getWatchtime()[hour]);
     }
+  }
+
+  /** A fetch may precede its play by up to ALLOWED_CLOCK_SKEW; it must still count toward that play's group. */
+  @Test
+  public void fetchPrecedingItsPlayWithinClockSkewStillCounts() {
+    long session = 1L;
+    Instant play = Instant.parse("2026-01-15T10:00:05Z");
+
+    List<RawEvent> events = new ArrayList<>();
+    events.add(event(session, EventType.FETCH_FILE, play.minusSeconds(5), null));
+    events.add(event(session, EventType.VIDEO_PLAY, play, null));
+    events.add(event(session, EventType.VIDEO_WATCHED, play.plusSeconds(40), watchedPayload(0, 35_000)));
+
+    HourlyBuckets result = ViewCorrelator.correlate(events, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
+
+    assertEquals(1, Arrays.stream(result.getViews()).sum());
   }
 
   @Test

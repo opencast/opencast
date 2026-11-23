@@ -92,12 +92,17 @@ public final class ViewCorrelator {
         .sorted(Comparator.comparing(RawEvent::getTimestamp))
         .collect(Collectors.toList());
 
+    // Two passes: a fetch may precede its play by up to ALLOWED_CLOCK_SKEW, so every group must already exist
+    // before any watched/fetch event is matched against it, even one chronologically earlier than its play.
     List<PlayGroup> groups = new ArrayList<>();
-
     for (RawEvent event : sorted) {
       if (event.getEventType() == EventType.VIDEO_PLAY) {
         groups.add(new PlayGroup(event.getTimestamp()));
-      } else if (event.getEventType() == EventType.VIDEO_WATCHED) {
+      }
+    }
+
+    for (RawEvent event : sorted) {
+      if (event.getEventType() == EventType.VIDEO_WATCHED) {
         findClosestGroupAtOrBefore(groups, event.getTimestamp())
             .ifPresent(group -> applyWatched(group, event));
       } else if (event.getEventType() == EventType.FETCH_FILE) {
