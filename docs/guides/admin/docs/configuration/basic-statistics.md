@@ -35,6 +35,12 @@ re-aggregation. A limit of 0 means events are kept forever. The default is 90 da
 The same setting also bounds how old an event reported to `trustedPush` by a trusted server (see below) may be,
 since nothing older than retention could ever be aggregated before it gets deleted.
 
+Increasing this value after already running with a smaller one does not recover days that were already deleted
+under the old, smaller setting: a trusted server could then push an event old enough to land in such an
+already-pruned day. If that day is later manually re-aggregated, it would be recomputed from only that one
+resurfaced event, which can show a lower view count than before — treat that as a sign the day's data is
+incomplete, not as a correction.
+
 
 Requirements
 ------------
