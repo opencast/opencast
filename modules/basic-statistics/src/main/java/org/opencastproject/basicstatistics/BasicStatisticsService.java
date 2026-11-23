@@ -354,9 +354,12 @@ public class BasicStatisticsService implements FileFetchListener {
       throw new IllegalArgumentException("User Agent missing from request header " + request);
     }
 
-    // The security context belongs to the thread of the request, so the background thread has to be given it
+    // The security context belongs to the thread of the request, so the background thread has to be given it.
+    // The user's identity is never actually read downstream (create() only needs the organization), so an
+    // anonymous placeholder is used instead of holding onto the real user, which can otherwise sit in
+    // FetchRangeMerger's pending ranges for a while.
     Organization organization = securityService.getOrganization();
-    User user = securityService.getUser();
+    User user = SecurityUtil.createAnonymousUser(organization);
     fileFetchExecutor.execute(() -> SecurityUtil.runAs(securityService, organization, user,
         () -> recordFileFetch(mediaPackageId, elementId, timestamp, from, to, ip, userAgent, organization, user)));
   }
