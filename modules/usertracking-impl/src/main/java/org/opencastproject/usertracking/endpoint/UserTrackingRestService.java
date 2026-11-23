@@ -430,7 +430,7 @@ public class UserTrackingRestService {
 
     URI uri;
     try {
-      uri = new URI(UrlSupport.concat(new String[] { serverUrl, serviceUrl, "action", a.getId().toString(), ".xml" }));
+      uri = new URI(UrlSupport.concat(serverUrl, serviceUrl, "action", a.getId() + ".xml"));
     } catch (URISyntaxException e) {
       throw new WebApplicationException(e);
     }

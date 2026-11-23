@@ -258,7 +258,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    *          the base path of the OAI-PMH server, e.g. /oaipmh
    */
   public static Optional<String> repositoryId(HttpServletRequest req, String mountPoint) {
-    String[] parts = Strings.CS.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint)
+    String[] parts = Strings.CS.removeStart(req.getRequestURI().replaceAll("/{2,}", "/"), mountPoint)
         .split("/");
 
     return Arrays.stream(parts)
