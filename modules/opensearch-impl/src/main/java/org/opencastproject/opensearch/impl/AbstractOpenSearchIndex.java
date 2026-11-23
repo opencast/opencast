@@ -56,6 +56,7 @@ import org.opensearch.action.index.IndexResponse;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.search.SearchType;
+import org.opensearch.action.support.IndicesOptions;
 import org.opensearch.action.support.WriteRequest;
 import org.opensearch.action.support.clustermanager.AcknowledgedResponse;
 import org.opensearch.client.RequestOptions;
@@ -243,20 +244,19 @@ public abstract class AbstractOpenSearchIndex implements SearchIndex {
 
   @Override
   public void clear() throws IOException {
+    // Ignore missing sub-indices. Otherwise, a single missing sub-index causes the whole request to fail with a 404,
+    // and none of the other sub-indices get deleted.
+    final DeleteIndexRequest request = new DeleteIndexRequest(
+            Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new))
+            .indicesOptions(IndicesOptions.lenientExpandOpen());
+    final AcknowledgedResponse delete = client.indices().delete(request, RequestOptions.DEFAULT);
+    if (!delete.isAcknowledged()) {
+      throw new IOException("Deletion of index '" + getIndexName() + "' was not acknowledged");
+    }
     try {
-      final DeleteIndexRequest request = new DeleteIndexRequest(
-              Arrays.stream(getDocumentTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new));
-      final AcknowledgedResponse delete = client.indices().delete(request, RequestOptions.DEFAULT);
-      if (!delete.isAcknowledged()) {
-        logger.error("Index '{}' could not be deleted", getIndexName());
-      }
       createIndex();
-    } catch (OpenSearchException exception) {
-      if (exception.status() == RestStatus.NOT_FOUND) {
-        logger.error("Cannot clear non-existing index '{}'", exception.getIndex().getName());
-      }
     } catch (SearchIndexException e) {
-      logger.error("Unable to re-create the index after a clear", e);
+      throw new IOException("Unable to re-create the index '" + getIndexName() + "' after a clear", e);
     }
   }
 
