@@ -126,6 +126,9 @@
               <bundle>mvn:com.fasterxml.jackson.datatype/*/[2,${jackson.version})</bundle>
               <bundle>mvn:com.fasterxml.jackson.jaxrs/*/[2,${jackson.version})</bundle>
               <bundle>mvn:com.fasterxml.jackson.module/*/[2,${jackson.version})</bundle>
+              <!-- CXF's cxf-specs feature brings the old javax.mail API (jakarta.mail-api 1.x). It is only
+                   wired to optional imports of third-party bundles. Opencast itself uses Jakarta Mail 2. -->
+              <bundle>mvn:jakarta.mail/jakarta.mail-api/[1,2)</bundle>
             </blacklistedBundles>
             <archiveZip>false</archiveZip>
             <archiveTarGz>false</archiveTarGz>
