@@ -221,15 +221,20 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages(int, int)
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages(Organization, int, int)
    */
   @Override
-  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages(int pagesize, int offset)
+  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages(Organization organization, int pagesize, int offset)
           throws SearchServiceDatabaseException {
     List<SearchEntity> searchEntities;
     try {
       int firstResult = pagesize * offset;
-      searchEntities = db.exec(namedQuery.findSome("Search.findAll", firstResult, pagesize, SearchEntity.class));
+      searchEntities = db.exec(namedQuery.findSome(
+          "Search.findAll",
+          firstResult,
+          pagesize,
+          SearchEntity.class,
+          Pair.of("organization", organization)));
     } catch (Exception e) {
       logger.error("Could not retrieve all episodes: {}", e.getMessage());
       throw new SearchServiceDatabaseException(e);
