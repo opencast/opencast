@@ -33,6 +33,7 @@ import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Optional;
 
 /**
@@ -53,10 +54,15 @@ public class DurationLookup {
   /** Bounds memory use; large enough to comfortably cover everything actively watched at any one time. */
   private static final long MAX_CACHED_ITEMS = 1000;
 
+  private static final Duration CACHE_DURATION = Duration.ofHours(1);
+
   private final OpenSearchIndex index;
   private final OrganizationDirectoryService organizationDirectoryService;
   private final String systemUserName;
-  private final Cache<String, Long> cache = CacheBuilder.newBuilder().maximumSize(MAX_CACHED_ITEMS).build();
+  private final Cache<String, Optional<Long>> cache = CacheBuilder.newBuilder()
+      .maximumSize(MAX_CACHED_ITEMS)
+      .expireAfterWrite(CACHE_DURATION)
+      .build();
 
   public DurationLookup(OpenSearchIndex index, OrganizationDirectoryService organizationDirectoryService,
       String systemUserName) {
@@ -69,13 +75,13 @@ public class DurationLookup {
    * @return the video's duration in seconds, or empty if it could not be determined
    */
   public Optional<Long> getDurationSeconds(String organizationId, String itemId) {
-    Long cached = cache.getIfPresent(itemId);
+    Optional<Long> cached = cache.getIfPresent(itemId);
     if (cached != null) {
-      return Optional.of(cached);
+      return cached;
     }
 
     Optional<Long> result = lookup(organizationId, itemId);
-    result.ifPresent(duration -> cache.put(itemId, duration));
+    cache.put(itemId, result);
     return result;
   }
 
