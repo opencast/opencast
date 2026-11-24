@@ -40,11 +40,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -118,7 +121,7 @@ public class AutoScalingTerminationStateServiceTest {
     service.setLifecycleHook(lifecycleHook);
     service.setScheduler(scheduler);
 
-    JobDetail jobDetail = new JobDetail();
+    JobDetail jobDetail = JobBuilder.newJob(CheckTerminationState.class).build();
     jobDetail.getJobDataMap().put(AutoScalingTerminationStateService.SCHEDULE_JOB_PARAM_PARENT, service);
     EasyMock.expect(jobExecutionContext.getJobDetail()).andReturn(jobDetail).anyTimes();
     EasyMock.replay(jobExecutionContext);
@@ -134,7 +137,7 @@ public class AutoScalingTerminationStateServiceTest {
   @Ignore // regularly fails. See https://github.com/opencast/opencast/issues/1111
   public void testLifeCyclePolling() throws Exception {
     service.startPollingLifeCycleHook();
-    String[] trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
+    String[] trigger = getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
     Assert.assertEquals(1, trigger.length);
     Assert.assertEquals(AutoScalingTerminationStateService.SCHEDULE_LIFECYCLE_POLLING_TRIGGER, trigger[0]);
     service.stopPollingLifeCycleHook();
@@ -142,7 +145,7 @@ public class AutoScalingTerminationStateServiceTest {
     // change Lifecycle state
     service.setState(AutoScalingTerminationStateService.TerminationState.WAIT);
     Assert.assertEquals(AutoScalingTerminationStateService.TerminationState.WAIT, service.getState());
-    trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
+    trigger = getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
     // Run job explicitly rather than waiting for scheduler
     CheckTerminationState checkTermState = new CheckTerminationState();
     checkTermState.execute(jobExecutionContext);
@@ -153,9 +156,15 @@ public class AutoScalingTerminationStateServiceTest {
     nRunningJobs = 0L;
     // Run job explicitly rather than waiting for scheduler
     checkTermState.execute(jobExecutionContext);
-    trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
+    trigger = getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
     Assert.assertEquals(0, trigger.length);
     Assert.assertEquals(AutoScalingTerminationStateService.TerminationState.READY, service.getState());
+  }
+
+  private String[] getTriggerNames(String group) throws SchedulerException {
+    return scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group)).stream()
+        .map(TriggerKey::getName)
+        .toArray(String[]::new);
   }
 
   @After

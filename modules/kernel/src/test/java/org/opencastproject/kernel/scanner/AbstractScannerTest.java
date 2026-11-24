@@ -29,11 +29,14 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 
 import java.util.Date;
+import java.util.List;
 
 public class AbstractScannerTest {
   private static final String JOB_NAME = "scheduled-jobs";
@@ -42,14 +45,14 @@ public class AbstractScannerTest {
   private static final String TRIGGER_GROUP = "scheduled-group";
 
   private Scheduler mockQuartz;
-  private String jobName = null;
-  private String jobGroup = null;
+  private String jobName = JOB_NAME;
+  private String jobGroup = JOB_GROUP;
   private OrganizationDirectoryService directoryService = null;
   private SecurityContext securityContext = null;
   private String systemUserName = null;
   private ServiceRegistry serviceRegistry = null;
-  private String triggerName = null;
-  private String triggerGroupName = null;
+  private String triggerName = TRIGGER_NAME;
+  private String triggerGroupName = TRIGGER_GROUP;
 
   private AbstractScanner abstractScanner = new AbstractScanner() {
     @Override
@@ -133,13 +136,13 @@ public class AbstractScannerTest {
 
   @Test
   public void scheduleInputBadCronExpectsNoException() throws SchedulerException {
-    Trigger[] triggers = {};
+    List<Trigger> triggers = List.of();
     jobName = JOB_NAME;
     jobGroup = JOB_GROUP;
     triggerName = TRIGGER_NAME;
     triggerGroupName = TRIGGER_GROUP;
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup)).andReturn(triggers);
+    EasyMock.expect(mockQuartz.getTriggersOfJob(JobKey.jobKey(jobName, jobGroup))).andReturn((List) triggers);
     EasyMock.expect(mockQuartz.scheduleJob(EasyMock.anyObject(Trigger.class))).andReturn(new Date());
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
@@ -155,7 +158,7 @@ public class AbstractScannerTest {
     triggerName = TRIGGER_NAME;
     triggerGroupName = TRIGGER_GROUP;
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup))
+    EasyMock.expect(mockQuartz.getTriggersOfJob(JobKey.jobKey(jobName, jobGroup)))
         .andThrow(new IllegalArgumentException("Mock Quartz Exception"));
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
@@ -165,13 +168,13 @@ public class AbstractScannerTest {
 
   @Test
   public void scheduleInputNoExistingJobsExpectsSchedulesTheJob() throws SchedulerException {
-    Trigger[] triggers = {};
+    List<Trigger> triggers = List.of();
     jobName = JOB_NAME;
     jobGroup = JOB_GROUP;
     triggerName = TRIGGER_NAME;
     triggerGroupName = TRIGGER_GROUP;
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup)).andReturn(triggers);
+    EasyMock.expect(mockQuartz.getTriggersOfJob(JobKey.jobKey(jobName, jobGroup))).andReturn((List) triggers);
     EasyMock.expect(mockQuartz.scheduleJob(EasyMock.anyObject(Trigger.class))).andReturn(new Date());
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
@@ -182,14 +185,14 @@ public class AbstractScannerTest {
   @Test
   public void scheduleInputExistingJobsExpectsReschedulesTheJob() throws SchedulerException {
     Trigger trigger = EasyMock.createNiceMock(Trigger.class);
-    Trigger[] triggers = {trigger};
+    List<Trigger> triggers = List.of(trigger);
     jobName = JOB_NAME;
     jobGroup = JOB_GROUP;
     triggerName = TRIGGER_NAME;
     triggerGroupName = TRIGGER_GROUP;
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup)).andReturn(triggers);
-    EasyMock.expect(mockQuartz.rescheduleJob(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class),
+    EasyMock.expect(mockQuartz.getTriggersOfJob(JobKey.jobKey(jobName, jobGroup))).andReturn((List) triggers);
+    EasyMock.expect(mockQuartz.rescheduleJob(EasyMock.anyObject(TriggerKey.class),
         EasyMock.anyObject(Trigger.class))).andReturn(new Date());
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
@@ -200,7 +203,7 @@ public class AbstractScannerTest {
   @Test
   public void unscheduleExpectsUnscheduleOfJobNameAndGroup() throws SchedulerException {
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.unscheduleJob(jobName, jobGroup)).andReturn(true);
+    EasyMock.expect(mockQuartz.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName))).andReturn(true);
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
     abstractScanner.unschedule();
@@ -209,7 +212,7 @@ public class AbstractScannerTest {
   @Test
   public void unscheduleInputSchedulerexceptionExpectsNoExceptionThrow() throws SchedulerException {
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.unscheduleJob(jobName, jobGroup))
+    EasyMock.expect(mockQuartz.unscheduleJob(TriggerKey.triggerKey(triggerName, triggerGroupName)))
         .andThrow(new SchedulerException("Mock scheduler exception."));
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
@@ -239,7 +242,7 @@ public class AbstractScannerTest {
   @Test
   public void triggerExpectsTriggerOfQuartz() throws SchedulerException {
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    mockQuartz.triggerJobWithVolatileTrigger(jobName, jobGroup);
+    mockQuartz.triggerJob(JobKey.jobKey(jobName, jobGroup));
     EasyMock.expectLastCall();
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
@@ -249,7 +252,7 @@ public class AbstractScannerTest {
   @Test
   public void triggerInputExceptionExpectsNoExceptionThrown() throws SchedulerException {
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    mockQuartz.triggerJobWithVolatileTrigger(jobName, jobGroup);
+    mockQuartz.triggerJob(JobKey.jobKey(jobName, jobGroup));
     EasyMock.expectLastCall().andThrow(new SchedulerException("Mock Scheduler Exception"));
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);

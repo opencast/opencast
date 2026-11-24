@@ -32,12 +32,17 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NeedleEye;
 
 import org.osgi.service.component.ComponentContext;
+import org.quartz.CronExpression;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,16 +146,15 @@ public abstract class AbstractScanner {
 
     logger.info("Schedule " + getScannerName() + " as a cron job ({})", getCronExpression());
     try {
-      final CronTrigger trigger = new CronTrigger();
-      trigger.setCronExpression(getCronExpression());
-      trigger.setName(getTriggerName());
-      trigger.setGroup(getTriggerGroupName());
-      trigger.setJobName(getJobName());
-      trigger.setJobGroup(getJobGroup());
-      if (getQuartz().getTriggersOfJob(getJobName(), getJobGroup()).length == 0) {
+      final CronTrigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(getTriggerName(), getTriggerGroupName())
+          .forJob(getJobName(), getJobGroup())
+          .withSchedule(CronScheduleBuilder.cronSchedule(new CronExpression(getCronExpression())))
+          .build();
+      if (getQuartz().getTriggersOfJob(JobKey.jobKey(getJobName(), getJobGroup())).isEmpty()) {
         getQuartz().scheduleJob(trigger);
       } else {
-        getQuartz().rescheduleJob(getTriggerName(), getTriggerGroupName(), trigger);
+        getQuartz().rescheduleJob(TriggerKey.triggerKey(getTriggerName(), getTriggerGroupName()), trigger);
       }
     } catch (ParseException e) {
       logger.error("Error scheduling " + getScannerName() + ", the cron expression '{}' could not be parsed: {}",
@@ -166,7 +170,7 @@ public abstract class AbstractScanner {
   public void unschedule() {
     try {
       if (quartz != null) {
-        quartz.unscheduleJob(getTriggerName(), getTriggerGroupName());
+        quartz.unscheduleJob(TriggerKey.triggerKey(getTriggerName(), getTriggerGroupName()));
       }
     } catch (SchedulerException e) {
       logger.error("Error unscheduling " + getScannerName(), e);
@@ -240,7 +244,7 @@ public abstract class AbstractScanner {
   /** Trigger the scheduler once independent of it's actual schedule. */
   public void trigger() {
     try {
-      quartz.triggerJobWithVolatileTrigger(getJobName(), getJobGroup());
+      quartz.triggerJob(JobKey.jobKey(getJobName(), getJobGroup()));
     } catch (Exception e) {
       logger.error("Error triggering Quartz job", e);
     }
@@ -260,7 +264,10 @@ public abstract class AbstractScanner {
    * public class Scheduler {
    *   ...
    *   // create the job
-   *   final JobDetail job = new JobDetail(JOB_NAME, JOB_GROUP, Runner.class);
+   *   final JobDetail job = JobBuilder.newJob(Runner.class)
+   *       .withIdentity(JOB_NAME, JOB_GROUP)
+   *       .storeDurably()
+   *       .build();
    *   // set the scheduler as parameter source
    *   job.getJobDataMap().put(JOB_PARAM_PARENT, this);
    *   // add to Quartz scheduler

@@ -24,16 +24,19 @@ package org.opencastproject.workspace.impl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
-import org.quartz.TriggerUtils;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 
 /** Clear outdated workspace files {@link Workspace}. */
 public class WorkspaceCleaner {
@@ -69,9 +72,10 @@ public class WorkspaceCleaner {
       quartz = new StdSchedulerFactory().getScheduler();
       quartz.start();
       // create and set the job. To actually run it call schedule(..)
-      final JobDetail job = new JobDetail(JOB_NAME, JOB_GROUP, Runner.class);
-      job.setDurability(false);
-      job.setVolatility(true);
+      final JobDetail job = JobBuilder.newJob(Runner.class)
+          .withIdentity(JOB_NAME, JOB_GROUP)
+          .storeDurably()
+          .build();
       job.getJobDataMap().put(JOB_PARAM_PARENT, this);
       quartz.addJob(job, true);
     } catch (org.quartz.SchedulerException e) {
@@ -97,16 +101,16 @@ public class WorkspaceCleaner {
     }
     logger.debug("Scheduling workspace cleaner to run every {} seconds.", schedulerPeriod);
     try {
-      final Trigger trigger = TriggerUtils.makeSecondlyTrigger(schedulerPeriod);
-      trigger.setStartTime(new Date());
-      trigger.setName(TRIGGER_NAME);
-      trigger.setGroup(TRIGGER_GROUP);
-      trigger.setJobName(JOB_NAME);
-      trigger.setJobGroup(JOB_GROUP);
-      if (quartz.getTriggersOfJob(JOB_NAME, JOB_GROUP).length == 0) {
+      final Trigger trigger = TriggerBuilder.newTrigger()
+          .withIdentity(TRIGGER_NAME, TRIGGER_GROUP)
+          .forJob(JOB_NAME, JOB_GROUP)
+          .startNow()
+          .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(schedulerPeriod))
+          .build();
+      if (quartz.getTriggersOfJob(JobKey.jobKey(JOB_NAME, JOB_GROUP)).isEmpty()) {
         quartz.scheduleJob(trigger);
       } else {
-        quartz.rescheduleJob(TRIGGER_NAME, TRIGGER_GROUP, trigger);
+        quartz.rescheduleJob(TriggerKey.triggerKey(TRIGGER_NAME, TRIGGER_GROUP), trigger);
       }
     } catch (Exception e) {
       logger.error("Error scheduling Quartz job", e);

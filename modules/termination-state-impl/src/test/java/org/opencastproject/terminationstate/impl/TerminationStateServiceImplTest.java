@@ -31,7 +31,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -81,16 +83,22 @@ public class TerminationStateServiceImplTest {
     service.setState(TerminationStateServiceImpl.TerminationState.WAIT);
     Assert.assertEquals(TerminationStateServiceImpl.TerminationState.WAIT, service.getState());
     Thread.sleep(3000);
-    String[] trigger = scheduler.getTriggerNames(TerminationStateServiceImpl.SCHEDULE_GROUP);
+    String[] trigger = getTriggerNames(TerminationStateServiceImpl.SCHEDULE_GROUP);
     Assert.assertEquals(1, trigger.length);
     Assert.assertEquals(TerminationStateServiceImpl.SCHEDULE_JOB_POLLING_TRIGGER, trigger[0]);
 
     // complete running jobs
     nRunningJobs = 0L;
     Thread.sleep(3000);
-    trigger = scheduler.getTriggerNames(TerminationStateServiceImpl.SCHEDULE_GROUP);
+    trigger = getTriggerNames(TerminationStateServiceImpl.SCHEDULE_GROUP);
     Assert.assertEquals(0, trigger.length);
     Assert.assertEquals(TerminationStateServiceImpl.TerminationState.READY, service.getState());
+  }
+
+  private String[] getTriggerNames(String group) throws SchedulerException {
+    return scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(group)).stream()
+        .map(TriggerKey::getName)
+        .toArray(String[]::new);
   }
 
   @After
