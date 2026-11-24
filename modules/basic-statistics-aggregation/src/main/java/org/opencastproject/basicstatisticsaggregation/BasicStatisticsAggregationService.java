@@ -47,6 +47,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -76,6 +77,9 @@ public class BasicStatisticsAggregationService {
 
   /** How often the aggregation tick runs. */
   private static final long TICK_INTERVAL_MILLIS = 2 * 60 * 1000;
+
+  /** How far beyond a day's boundary to look for raw events, so a session spanning midnight is seen in full. */
+  private static final Duration DAY_BOUNDARY_MARGIN = Duration.ofHours(6);
 
   private static final Logger logger = LoggerFactory.getLogger(BasicStatisticsAggregationService.class);
 
@@ -245,10 +249,10 @@ public class BasicStatisticsAggregationService {
     Instant dayStart = itemDay.day().atStartOfDay(ZoneOffset.UTC).toInstant();
     Instant dayEnd = dayStart.plusSeconds(24 * 60 * 60);
 
-    List<RawEvent> dayEvents = rawEventDatabase.getRawEvents(itemDay.organization(), itemDay.itemType(),
-        itemDay.itemId(), dayStart, dayEnd);
-    HourlyBuckets recomputed = ViewCorrelator.correlate(dayEvents, itemDay.organization(), itemDay.itemId(),
-        durationLookup);
+    List<RawEvent> marginEvents = rawEventDatabase.getRawEvents(itemDay.organization(), itemDay.itemType(),
+        itemDay.itemId(), dayStart.minus(DAY_BOUNDARY_MARGIN), dayEnd.plus(DAY_BOUNDARY_MARGIN));
+    HourlyBuckets recomputed = ViewCorrelator.correlate(marginEvents, dayStart, itemDay.organization(),
+        itemDay.itemId(), durationLookup);
 
     AggregatedEvent existing = aggregationDatabase.getAggregatedEvent(itemDay.organization(), itemDay.itemType(),
         itemDay.itemId(), itemDay.day());

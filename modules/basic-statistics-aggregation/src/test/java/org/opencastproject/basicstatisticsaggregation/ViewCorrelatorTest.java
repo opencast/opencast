@@ -38,13 +38,15 @@ import java.util.List;
  * Covers:
  * - a normal play/watch/fetch session becomes exactly one view with matching watchtime
  * - a session replaying the same item several times in a day is capped at 4 counted views
- * - a fetch preceding its play within the allowed clock skew still counts.
+ * - a fetch preceding its play within the allowed clock skew still counts
+ * - a session spanning midnight splits its view and watchtime correctly across both days.
  */
 public class ViewCorrelatorTest {
 
   private static final String ORGANIZATION = "mh_default_org";
   private static final String ITEM_ID = "item-1";
   private static final DurationLookup DURATION_LOOKUP = new DurationLookup(null, null, null);
+  private static final Instant DAY_START = Instant.parse("2026-01-15T00:00:00Z");
 
   @Test
   public void normalSessionCountsAsOneView() {
@@ -59,7 +61,7 @@ public class ViewCorrelatorTest {
     // 25s claimed, 25s after the previous watched event: within the rate cap (62s), so fully counted.
     events.add(event(session, EventType.VIDEO_WATCHED, play.plusSeconds(35), watchedPayload(20_000, 45_000)));
 
-    HourlyBuckets result = ViewCorrelator.correlate(events, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
+    HourlyBuckets result = ViewCorrelator.correlate(events, DAY_START, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
 
     int[] expectedViews = new int[24];
     expectedViews[10] = 1;
@@ -84,9 +86,42 @@ public class ViewCorrelatorTest {
     events.add(event(session, EventType.VIDEO_PLAY, play, null));
     events.add(event(session, EventType.VIDEO_WATCHED, play.plusSeconds(40), watchedPayload(0, 35_000)));
 
-    HourlyBuckets result = ViewCorrelator.correlate(events, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
+    HourlyBuckets result = ViewCorrelator.correlate(events, DAY_START, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
 
     assertEquals(1, Arrays.stream(result.getViews()).sum());
+  }
+
+  /**
+   * A play just before midnight, watched into the next day: the view belongs to the play's day, and watchtime
+   * splits across both days' hours, with neither day double-counting the other's slice.
+   */
+  @Test
+  public void sessionSpanningMidnightSplitsAcrossBothDays() {
+    long session = 1L;
+    Instant play = Instant.parse("2026-01-15T23:58:00Z");
+    Instant fetch = play.plusSeconds(2);
+    // 20s before midnight, 40s after: 60s total, well past the 30s view threshold.
+    Instant watchedBeforeMidnight = play.plusSeconds(20);
+    Instant watchedAfterMidnight = Instant.parse("2026-01-16T00:00:40Z");
+
+    List<RawEvent> events = new ArrayList<>();
+    events.add(event(session, EventType.VIDEO_PLAY, play, null));
+    events.add(event(session, EventType.FETCH_FILE, fetch, null));
+    events.add(event(session, EventType.VIDEO_WATCHED, watchedBeforeMidnight, watchedPayload(0, 20_000)));
+    events.add(event(session, EventType.VIDEO_WATCHED, watchedAfterMidnight, watchedPayload(20_000, 60_000)));
+
+    HourlyBuckets day1 = ViewCorrelator.correlate(events, DAY_START, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
+    HourlyBuckets day2 = ViewCorrelator.correlate(events, DAY_START.plusSeconds(24 * 3600), ORGANIZATION, ITEM_ID,
+        DURATION_LOOKUP);
+
+    // The view belongs entirely to the play's day.
+    assertEquals(1, day1.getViews()[23]);
+    assertEquals(0, Arrays.stream(day2.getViews()).sum());
+    // Watchtime splits: 20s in day 1's last hour, 40s in day 2's first hour.
+    assertEquals(20, day1.getWatchtime()[23]);
+    assertEquals(40, day2.getWatchtime()[0]);
+    assertEquals(0, Arrays.stream(day1.getWatchtime()).sum() - 20);
+    assertEquals(0, Arrays.stream(day2.getWatchtime()).sum() - 40);
   }
 
   @Test
@@ -102,7 +137,7 @@ public class ViewCorrelatorTest {
       events.add(event(session, EventType.VIDEO_WATCHED, play.plusSeconds(40), watchedPayload(0, 35_000)));
     }
 
-    HourlyBuckets result = ViewCorrelator.correlate(events, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
+    HourlyBuckets result = ViewCorrelator.correlate(events, DAY_START, ORGANIZATION, ITEM_ID, DURATION_LOOKUP);
 
     // Only the first four plays (chronologically) count as views ...
     assertEquals(4, Arrays.stream(result.getViews()).sum());

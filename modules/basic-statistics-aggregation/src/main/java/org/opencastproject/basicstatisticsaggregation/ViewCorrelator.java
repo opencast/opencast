@@ -29,9 +29,9 @@ import com.google.gson.JsonParser;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +45,10 @@ import java.util.stream.Collectors;
  * hash. A video:watched event is attributed to the closest preceding video:play event; a
  * file-fetch event may match a video:play up to 30s in the future, to tolerate clock skew. A
  * session is capped at 4 counted views per item per day.
+ *
+ * A session may span midnight; the caller passes events from a margin around the day too, so the play and its
+ * watched/fetch events are seen together regardless of which side of midnight they fall on. The view is counted
+ * on the day its play falls on, and watchtime is split by the hour it actually happened in.
  */
 public final class ViewCorrelator {
 
@@ -66,7 +70,13 @@ public final class ViewCorrelator {
   private ViewCorrelator() {
   }
 
-  public static HourlyBuckets correlate(List<RawEvent> dayEvents, String organization, String itemId,
+  /**
+   * @param events events of the day being computed, plus enough margin on either side to see a session that
+   *     spans midnight in full; only the slice of it that actually falls on {@code dayStart}'s day is counted
+   *     into the returned buckets
+   * @param dayStart the start (UTC) of the day being computed
+   */
+  public static HourlyBuckets correlate(List<RawEvent> events, Instant dayStart, String organization, String itemId,
       DurationLookup durationLookup) {
     int[] views = new int[24];
     long[] watchtime = new long[24];
@@ -75,18 +85,18 @@ public final class ViewCorrelator {
         .map(duration -> Math.min(MIN_VIEW_SECONDS, (long) (duration * VIEW_LENGTH_FRACTION)))
         .orElse(MIN_VIEW_SECONDS);
 
-    Map<Long, List<RawEvent>> bySession = dayEvents.stream()
+    Map<Long, List<RawEvent>> bySession = events.stream()
         .collect(Collectors.groupingBy(RawEvent::getSession));
 
     for (List<RawEvent> sessionEvents : bySession.values()) {
-      correlateSession(sessionEvents, viewThreshold, views, watchtime);
+      correlateSession(sessionEvents, dayStart, viewThreshold, views, watchtime);
     }
 
     return new HourlyBuckets(views, watchtime);
   }
 
-  private static void correlateSession(List<RawEvent> sessionEvents, long viewThreshold, int[] views,
-      long[] watchtime) {
+  private static void correlateSession(List<RawEvent> sessionEvents, Instant dayStart, long viewThreshold,
+      int[] views, long[] watchtime) {
     // Order ascending by playTimestamp, since events are processed in chronological order.
     List<RawEvent> sorted = sessionEvents.stream()
         .sorted(Comparator.comparing(RawEvent::getTimestamp))
@@ -104,30 +114,34 @@ public final class ViewCorrelator {
     for (RawEvent event : sorted) {
       if (event.getEventType() == EventType.VIDEO_WATCHED) {
         findClosestGroupAtOrBefore(groups, event.getTimestamp())
-            .ifPresent(group -> applyWatched(group, event));
+            .ifPresent(group -> applyWatched(group, event, dayStart));
       } else if (event.getEventType() == EventType.FETCH_FILE) {
         findClosestGroupAtOrBefore(groups, event.getTimestamp().plus(ALLOWED_CLOCK_SKEW))
             .ifPresent(group -> group.hasFetch = true);
       }
     }
 
+    // A session spanning midnight is reconstructed identically by both days it touches (each queries a margin
+    // past its own boundary); each one counts only its own slice, by relative hour, so nothing is counted twice.
     int countedViews = 0;
     for (PlayGroup group : groups) {
       boolean qualifiesAsView = group.hasFetch && group.watchedSeconds >= viewThreshold;
-      if (qualifiesAsView && countedViews < MAX_VIEWS_PER_SESSION_PER_DAY) {
-        views[hourOf(group.playTimestamp)]++;
+      int playHour = relativeHour(group.playTimestamp, dayStart);
+      if (qualifiesAsView && isWithinDay(playHour) && countedViews < MAX_VIEWS_PER_SESSION_PER_DAY) {
+        views[playHour]++;
         countedViews++;
       }
-      // Watchtime counts for every play/fetch-associated group, independent of the per-day view cap.
       if (group.hasFetch) {
-        for (int hour = 0; hour < 24; hour++) {
-          watchtime[hour] += group.watchtimeByHour[hour];
+        for (Map.Entry<Integer, Long> entry : group.watchtimeByHour.entrySet()) {
+          if (isWithinDay(entry.getKey())) {
+            watchtime[entry.getKey()] += entry.getValue();
+          }
         }
       }
     }
   }
 
-  private static void applyWatched(PlayGroup group, RawEvent event) {
+  private static void applyWatched(PlayGroup group, RawEvent event, Instant dayStart) {
     String storedPayload = event.getEventPayload();
     JsonElement payloadJson = storedPayload == null ? null : JsonParser.parseString(storedPayload);
     EventPayload.VideoWatched payload =
@@ -141,7 +155,7 @@ public final class ViewCorrelator {
     long cappedSeconds = Math.min(claimedSeconds, (long) (elapsedSeconds * WATCHED_EVENT_RATE_CAP));
 
     group.watchedSeconds += cappedSeconds;
-    group.watchtimeByHour[hourOf(event.getTimestamp())] += cappedSeconds;
+    group.watchtimeByHour.merge(relativeHour(event.getTimestamp(), dayStart), cappedSeconds, Long::sum);
     group.lastWatchedTimestamp = event.getTimestamp();
   }
 
@@ -161,8 +175,13 @@ public final class ViewCorrelator {
     return Optional.ofNullable(match);
   }
 
-  private static int hourOf(Instant timestamp) {
-    return timestamp.atZone(ZoneOffset.UTC).getHour();
+  /** {@code timestamp}'s hour, relative to {@code dayStart}: 0-23 for its own day, negative or &gt;=24 outside it. */
+  private static int relativeHour(Instant timestamp, Instant dayStart) {
+    return (int) Math.floorDiv(Duration.between(dayStart, timestamp).getSeconds(), 3600L);
+  }
+
+  private static boolean isWithinDay(int relativeHour) {
+    return relativeHour >= 0 && relativeHour < 24;
   }
 
   private static final class PlayGroup {
@@ -170,7 +189,8 @@ public final class ViewCorrelator {
     private long watchedSeconds;
     private Instant lastWatchedTimestamp;
     private boolean hasFetch;
-    private final long[] watchtimeByHour = new long[24];
+    /** Keyed by hour relative to the day being computed, since a session may span into a neighboring day. */
+    private final Map<Integer, Long> watchtimeByHour = new HashMap<>();
 
     private PlayGroup(Instant playTimestamp) {
       this.playTimestamp = playTimestamp;
