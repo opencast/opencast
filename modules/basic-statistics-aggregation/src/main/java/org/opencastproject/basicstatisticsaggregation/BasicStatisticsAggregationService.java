@@ -256,6 +256,10 @@ public class BasicStatisticsAggregationService {
 
     AggregatedEvent existing = aggregationDatabase.getAggregatedEvent(itemDay.organization(), itemDay.itemType(),
         itemDay.itemId(), itemDay.day());
+    if (existing == null && Arrays.stream(recomputed.getViews()).sum() == 0) {
+      // Only days with at least one view are stored; nothing to create, and nothing to change on the total.
+      return;
+    }
     long previousViews = existing != null ? Arrays.stream(existing.getViews()).sum() : 0;
     long previousWatchtime = existing != null ? Arrays.stream(existing.getWatchtime()).sum() : 0;
 

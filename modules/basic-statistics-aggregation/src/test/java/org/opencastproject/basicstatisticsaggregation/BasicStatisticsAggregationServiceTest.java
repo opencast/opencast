@@ -21,6 +21,7 @@
 package org.opencastproject.basicstatisticsaggregation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -99,6 +100,19 @@ public class BasicStatisticsAggregationServiceTest {
     AggregatedTotal total = aggregationDatabase.getTotal(ORGANIZATION, ItemType.VIDEO, ITEM_ID);
     assertEquals(1, total.getTotalViews());
     assertEquals(35, total.getTotalWatchtime());
+  }
+
+  /** Only days with at least one view are stored; a fetch with no play never produces one. */
+  @Test
+  public void reaggregateDoesNotCreateARowWithoutAnyView() throws Exception {
+    Instant fetch = DAY.atStartOfDay(ZoneOffset.UTC).plusSeconds(10 * 3600).toInstant();
+    rawEventDatabase.createRawEvents(List.of(rawEvent(EventType.FETCH_FILE, fetch, null)));
+
+    int daysRecomputed = service.reaggregate(ITEM_ID, DAY, DAY);
+
+    assertEquals(1, daysRecomputed);
+    assertNull(aggregationDatabase.getAggregatedEvent(ORGANIZATION, ItemType.VIDEO, ITEM_ID, DAY));
+    assertEquals(0, aggregationDatabase.getTotal(ORGANIZATION, ItemType.VIDEO, ITEM_ID).getTotalViews());
   }
 
   private static RawEvent rawEvent(EventType eventType, Instant timestamp, String payload) {
