@@ -23,10 +23,10 @@ package org.opencastproject.capture.admin.impl;
 
 import static org.opencastproject.capture.admin.api.AgentState.CAPTURING;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
+import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
-import org.opencastproject.security.api.DefaultOrganization;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -41,7 +41,7 @@ public class AgentTest {
 
   @Before
   public void setUp() {
-    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", new Properties());
+    agent = new AgentImpl("test", DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", new Properties());
     Assert.assertNotNull(agent);
     time = agent.getLastHeardFrom();
   }

@@ -252,8 +252,9 @@ public class CaptureAgentStateServiceImplTest {
         assertEquals("Key " + key + " does not match", caps.getProperty(key), agentConf.getProperty(key));
       }
     } catch (NotFoundException e) {
-      if (state != null)
+      if (state != null) {
         fail("Agent not found by the service, but the desired state is not null");
+      }
     }
   }
 
@@ -401,25 +402,25 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   // This verifies the *configuration* of the agent.  This is the config data + the capabilities
-  private void assert2xAgentConf(String agentName, String agentState, Properties sentConfig, Properties returnedConfig) {
-    service.setAgentState(agentName, agentState);
-    service.setAgentConfiguration(agentName, sentConfig);
+  private void assert2xAgentConf(String name, String state, Properties sentConfig, Properties returnedConfig) {
+    service.setAgentState(name, state);
+    service.setAgentConfiguration(name, sentConfig);
 
-    verifyAgentConfiguration(agentName, agentState, returnedConfig);
+    verifyAgentConfiguration(name, state, returnedConfig);
   }
 
   // This verifies the *capabilities* of the agent, which is a subset of the full configuration above
-  private void assert2xAgentCaps(String agentName, String agentState, Properties sentConfig, Properties returnedConfig) {
-    service.setAgentState(agentName, agentState);
-    service.setAgentConfiguration(agentName, sentConfig);
+  private void assert2xAgentCaps(String name, String state, Properties sentConfig, Properties returnedConfig) {
+    service.setAgentState(name, state);
+    service.setAgentConfiguration(name, sentConfig);
 
-    verifyAgentCapabilities(agentName, agentState, returnedConfig);
+    verifyAgentCapabilities(name, state, returnedConfig);
   }
 
 
-  private void assert2xAgentException(String agentName, String agentState, Properties sentConfig) {
-    service.setAgentState(agentName, agentState);
-    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration(agentName, sentConfig));
+  private void assert2xAgentException(String name, String state, Properties sentConfig) {
+    service.setAgentState(name, state);
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration(name, sentConfig));
   }
 
   @Test
@@ -881,7 +882,7 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "o".repeat(257), "does not matter");
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "not matching", "does not matter");
-    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "diacritics-like-ümlauts-no-bueno", "does not matter");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "diacritics-ümlauts-no", "does not matter");
     // This next one has the prefix, but nothing else
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX, "does not matter");
     returnedConfig = new Properties();
