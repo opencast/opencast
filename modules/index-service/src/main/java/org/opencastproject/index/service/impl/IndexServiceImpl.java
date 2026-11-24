@@ -1572,8 +1572,8 @@ public class IndexServiceImpl implements IndexService {
             workflowService.stop(instance.getId());
             workflowService.remove(instance.getId());
             toRemove--;
-          } catch (WorkflowDatabaseException e) {
-            if (e.getCause() instanceof  NotFoundException) {
+          } catch (NotFoundException | WorkflowDatabaseException e) {
+            if (e instanceof NotFoundException || e.getCause() instanceof  NotFoundException) {
               // Someone already removed this. That's fine. Continue with the next workflow
               logger.warn("Workflow {} has already been removed", instance.getId());
             } else {
