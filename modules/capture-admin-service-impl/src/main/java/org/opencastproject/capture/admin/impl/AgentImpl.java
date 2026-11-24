@@ -21,10 +21,24 @@
 
 package org.opencastproject.capture.admin.impl;
 
+import static org.opencastproject.capture.CaptureParameters.AGENT_VERSION;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_CONTENT;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_NAMES;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_POSITIONS;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_PREFIX;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_EXTENSION_PREFIX;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_LOCAL_CAPABLE;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CAPABLE;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CONFIGURATION;
+import static org.opencastproject.capture.CaptureParameters.VENDOR_FIRMWARE;
+import static org.opencastproject.capture.CaptureParameters.VENDOR_HARDWARE;
+import static org.opencastproject.capture.CaptureParameters.VENDOR_MODEL;
+import static org.opencastproject.capture.CaptureParameters.VENDOR_NAME;
 import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BOOLEAN_OFF;
 import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BOOLEAN_ON;
 
-import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentVersion;
 
@@ -302,10 +316,10 @@ public class AgentImpl implements Agent {
 
   private Properties parseCapabilities(Properties configuration) {
     Properties deviceCaps = new Properties();
-    String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
-    deviceCaps.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
+    String names = configuration.getProperty(CAPTURE_DEVICE_NAMES);
+    deviceCaps.put(CAPTURE_DEVICE_NAMES, names);
     // Get the names and setup a hash map of them
-    String[] friendlyNames = deviceCaps.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES).split(",");
+    String[] friendlyNames = deviceCaps.getProperty(CAPTURE_DEVICE_NAMES).split(",");
     HashMap<String, Integer> propertyCounts = new HashMap<String, Integer>();
     for (String name : friendlyNames) {
       propertyCounts.put(name, 0);
@@ -315,7 +329,7 @@ public class AgentImpl implements Agent {
     for (String key : configuration.stringPropertyNames()) {
       // For each device
       for (String name : friendlyNames) {
-        String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
+        String check = CAPTURE_DEVICE_PREFIX + name;
         // If the key looks like a device prefix + the name, copy it
         if (key.startsWith(check)) {
           String property = configuration.getProperty(key);
@@ -342,7 +356,7 @@ public class AgentImpl implements Agent {
       // Version 1.0 agents *must* support local capture
       return true;
     }
-    return capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, BOOLEAN_OFF).equals(BOOLEAN_ON);
+    return capabilitiesProperties.getProperty(CAPTURE_LOCAL_CAPABLE, BOOLEAN_OFF).equals(BOOLEAN_ON);
   }
 
   /**
@@ -353,7 +367,7 @@ public class AgentImpl implements Agent {
   @Override
   public boolean canStartLocalPaused() {
     return canCaptureLocal()
-        && capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_OFF).equals(BOOLEAN_ON);
+        && capabilitiesProperties.getProperty(CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_OFF).equals(BOOLEAN_ON);
   }
 
   /**
@@ -363,7 +377,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public boolean canStream() {
-    return capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF).equals(BOOLEAN_ON);
+    return capabilitiesProperties.getProperty(CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF).equals(BOOLEAN_ON);
   }
 
   /**
@@ -374,7 +388,7 @@ public class AgentImpl implements Agent {
   @Override
   public boolean canStartStreamPaused() {
     return canStream()
-        && capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF).equals(BOOLEAN_ON);
+        && capabilitiesProperties.getProperty(CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF).equals(BOOLEAN_ON);
   }
 
   /**
@@ -384,7 +398,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public Set<String> getInputs() {
-    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "")
+    return Arrays.stream(capabilitiesProperties.getProperty(CAPTURE_DEVICE_NAMES, "")
         .split(","))
         .collect(Collectors.toSet());
   }
@@ -396,7 +410,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public Set<String> streamConfigurations() {
-    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "")
+    return Arrays.stream(capabilitiesProperties.getProperty(CAPTURE_STREAM_CONFIGURATION, "")
         .split(","))
         .collect(Collectors.toSet());
   }
@@ -408,7 +422,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public Set<String> devicePositions() {
-    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "")
+    return Arrays.stream(capabilitiesProperties.getProperty(CAPTURE_DEVICE_POSITIONS, "")
         .split(","))
         .collect(Collectors.toSet());
   }
@@ -420,7 +434,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public Set<String> contentConfigurations() {
-    return Arrays.stream(capabilitiesProperties.getProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "")
+    return Arrays.stream(capabilitiesProperties.getProperty(CAPTURE_DEVICE_CONTENT, "")
             .split(","))
         .collect(Collectors.toSet());
   }
@@ -433,7 +447,7 @@ public class AgentImpl implements Agent {
   @Override
   public Map<String, String> vendorKeys() {
     return capabilitiesProperties.stringPropertyNames().stream()
-        .filter(s -> s.startsWith(CaptureParameters.CAPTURE_EXTENSION_PREFIX))
+        .filter(s -> s.startsWith(CAPTURE_EXTENSION_PREFIX))
         .collect(Collectors.toUnmodifiableMap(
             key -> key,
             capabilitiesProperties::getProperty));
@@ -446,7 +460,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public String getVendor() {
-    return configurationProperties.getProperty(CaptureParameters.VENDOR_NAME, "");
+    return configurationProperties.getProperty(VENDOR_NAME, "");
   }
 
   /**
@@ -456,7 +470,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public String getModel() {
-    return configurationProperties.getProperty(CaptureParameters.VENDOR_MODEL, "");
+    return configurationProperties.getProperty(VENDOR_MODEL, "");
   }
 
   /**
@@ -466,7 +480,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public String getHardware() {
-    return configurationProperties.getProperty(CaptureParameters.VENDOR_HARDWARE, "");
+    return configurationProperties.getProperty(VENDOR_HARDWARE, "");
   }
 
   /**
@@ -476,7 +490,7 @@ public class AgentImpl implements Agent {
    */
   @Override
   public String getFirmware() {
-    return configurationProperties.getProperty(CaptureParameters.VENDOR_FIRMWARE, "");
+    return configurationProperties.getProperty(VENDOR_FIRMWARE, "");
   }
 
   /**
@@ -494,10 +508,10 @@ public class AgentImpl implements Agent {
     configurationProperties.putAll(configuration);
 
     Set<String> requiredKeys2x = Set.of(
-      CaptureParameters.VENDOR_NAME,
-      CaptureParameters.VENDOR_MODEL,
-      CaptureParameters.VENDOR_FIRMWARE,
-      CaptureParameters.VENDOR_HARDWARE);
+        VENDOR_NAME,
+        VENDOR_MODEL,
+        VENDOR_FIRMWARE,
+        VENDOR_HARDWARE);
 
     Set<String> configs = configuration.stringPropertyNames().stream()
         .filter(requiredKeys2x::contains).collect(Collectors.toSet());
@@ -529,17 +543,17 @@ public class AgentImpl implements Agent {
     // Figure out the capabilities variables
 
     capabilitiesProperties = new Properties();
-    capabilitiesProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
-    configurationProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    capabilitiesProperties.put(AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    configurationProperties.put(AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     // Parse names
-    String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
+    String names = configuration.getProperty(CAPTURE_DEVICE_NAMES);
     if (names == null) {
-      log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
+      log.debug("Capture agent '{}' failed to provide device names ({})", name, CAPTURE_DEVICE_NAMES);
       return;
     }
 
-    capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
+    capabilitiesProperties.put(CAPTURE_DEVICE_NAMES, names);
     // Get the names and setup a hash map of them
     String[] friendlyNames = names.split(",");
     HashMap<String, Integer> propertyCounts = new HashMap<String, Integer>();
@@ -551,7 +565,7 @@ public class AgentImpl implements Agent {
     for (String key : configuration.stringPropertyNames()) {
       // For each device
       for (String name : friendlyNames) {
-        String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
+        String check = CAPTURE_DEVICE_PREFIX + name;
         // If the key looks like a device prefix + the name, copy it
         if (key.startsWith(check)) {
           String property = configuration.getProperty(key);
@@ -571,14 +585,14 @@ public class AgentImpl implements Agent {
     // Figure out the capabilities variables
 
     capabilitiesProperties = new Properties();
-    capabilitiesProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
-    configurationProperties.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+    capabilitiesProperties.put(AGENT_VERSION, AgentVersion.VERSION_2.toString());
+    configurationProperties.put(AGENT_VERSION, AgentVersion.VERSION_2.toString());
 
     // Parse names
-    if (!configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_NAMES)) {
-      log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
+    if (!configuration.containsKey(CAPTURE_DEVICE_NAMES)) {
+      log.debug("Capture agent '{}' failed to provide device names ({})", name, CAPTURE_DEVICE_NAMES);
     } else {
-      Set<String> names = Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "")
+      Set<String> names = Arrays.stream(configuration.getProperty(CAPTURE_DEVICE_NAMES, "")
           .split(","))
           .map(String::trim)
           .collect(Collectors.toSet());
@@ -590,7 +604,7 @@ public class AgentImpl implements Agent {
         throw new IllegalArgumentException("Agent device names too long");
       } else {
         // We rebuild the string here since we need everything in this Properties to be string-able for sanity
-        capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, String.join(",", names));
+        capabilitiesProperties.put(CAPTURE_DEVICE_NAMES, String.join(",", names));
 
         Properties devices = parseCapabilities(configuration);
         for (String key : devices.stringPropertyNames()) {
@@ -599,22 +613,22 @@ public class AgentImpl implements Agent {
       }
     }
 
-    boolean supportLocalCapture = getKeyBoolean(configuration, CaptureParameters.CAPTURE_LOCAL_CAPABLE);
+    boolean supportLocalCapture = getKeyBoolean(configuration, CAPTURE_LOCAL_CAPABLE);
     boolean supportLocalStartPaused =
-        supportLocalCapture && getKeyBoolean(configuration, CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED);
-    boolean supportStreaming = getKeyBoolean(configuration, CaptureParameters.CAPTURE_STREAM_CAPABLE);
+        supportLocalCapture && getKeyBoolean(configuration, CAPTURE_LOCAL_CANSTARTPAUSED);
+    boolean supportStreaming = getKeyBoolean(configuration, CAPTURE_STREAM_CAPABLE);
     boolean supportStreamStartPaused =
-        supportStreaming && getKeyBoolean(configuration, CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED);
+        supportStreaming && getKeyBoolean(configuration, CAPTURE_STREAM_CANSTARTPAUSED);
 
-    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, supportLocalCapture ? BOOLEAN_ON : BOOLEAN_OFF);
+    capabilitiesProperties.setProperty(CAPTURE_LOCAL_CAPABLE, supportLocalCapture ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportLocalCapture) {
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, supportLocalStartPaused
+      capabilitiesProperties.setProperty(CAPTURE_LOCAL_CANSTARTPAUSED, supportLocalStartPaused
           ? BOOLEAN_ON
           : BOOLEAN_OFF);
     }
-    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, supportStreaming ? BOOLEAN_ON : BOOLEAN_OFF);
+    capabilitiesProperties.setProperty(CAPTURE_STREAM_CAPABLE, supportStreaming ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportStreaming) {
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, supportStreamStartPaused
+      capabilitiesProperties.setProperty(CAPTURE_STREAM_CANSTARTPAUSED, supportStreamStartPaused
           ? BOOLEAN_ON
           : BOOLEAN_OFF);
     }
@@ -629,10 +643,10 @@ public class AgentImpl implements Agent {
       throw new IllegalArgumentException("Invalid agent configuration: Supports neither streaming nor local capture");
     }
 
-    if (configuration.containsKey(CaptureParameters.CAPTURE_STREAM_CONFIGURATION)) {
+    if (configuration.containsKey(CAPTURE_STREAM_CONFIGURATION)) {
       //GDLGDL: Do we want to define a maximum number of options here?
       TreeSet<String> agentStreamConfigs =
-          Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "")
+          Arrays.stream(configuration.getProperty(CAPTURE_STREAM_CONFIGURATION, "")
               .split(","))
               .map(String::trim)
               .collect(Collectors.toCollection(TreeSet::new));
@@ -642,14 +656,14 @@ public class AgentImpl implements Agent {
       } else if (agentStreamConfigs.stream().anyMatch(s -> s.length() > 32)) {
         throw new IllegalArgumentException("Stream configs have a configuration which is too long");
       }
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION,
+      capabilitiesProperties.setProperty(CAPTURE_STREAM_CONFIGURATION,
           String.join(",", agentStreamConfigs));
     }
 
-    if (configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_POSITIONS)) {
+    if (configuration.containsKey(CAPTURE_DEVICE_POSITIONS)) {
       //GDLGDL: Do we want to define a maximum number of options here?
       TreeSet<String> agentDevicePositions =
-          Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "")
+          Arrays.stream(configuration.getProperty(CAPTURE_DEVICE_POSITIONS, "")
               .split(","))
               .map(String::trim)
               .collect(Collectors.toCollection(TreeSet::new));
@@ -659,14 +673,14 @@ public class AgentImpl implements Agent {
       } else if (agentDevicePositions.stream().anyMatch(s -> s.length() > 256)) {
         throw new IllegalArgumentException("Position configs have a configuration which is too long");
       }
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS,
+      capabilitiesProperties.setProperty(CAPTURE_DEVICE_POSITIONS,
           String.join(",", agentDevicePositions));
     }
 
-    if (configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_CONTENT)) {
+    if (configuration.containsKey(CAPTURE_DEVICE_CONTENT)) {
       //GDLGDL: Do we want to define a maximum number of options here?
       TreeSet<String> agentContent =
-          Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "")
+          Arrays.stream(configuration.getProperty(CAPTURE_DEVICE_CONTENT, "")
                   .split(","))
               .map(String::trim)
               .collect(Collectors.toCollection(TreeSet::new));
@@ -676,13 +690,13 @@ public class AgentImpl implements Agent {
       } else if (agentContent.stream().anyMatch(s -> s.length() > 256)) {
         throw new IllegalArgumentException("Content configs have a configuration which is too long");
       }
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT,
+      capabilitiesProperties.setProperty(CAPTURE_DEVICE_CONTENT,
           String.join(",", agentContent));
     }
 
     // These, assuming they match the regex, are passed through unmodified since they're vendor tools
     Set<String> vendorKeys = configuration.stringPropertyNames().stream()
-        .filter(s -> s.startsWith(CaptureParameters.CAPTURE_EXTENSION_PREFIX))
+        .filter(s -> s.startsWith(CAPTURE_EXTENSION_PREFIX))
         .filter(s -> s.matches("X-[A-Za-z0-9._-]{1,256}"))
         .collect(Collectors.toSet());
     for (String key : vendorKeys) {
@@ -698,7 +712,7 @@ public class AgentImpl implements Agent {
 
   public AgentVersion getVersion() {
     if (capabilitiesProperties != null) {
-      return AgentVersion.fromVersion(capabilitiesProperties.getProperty(CaptureParameters.AGENT_VERSION));
+      return AgentVersion.fromVersion(capabilitiesProperties.getProperty(AGENT_VERSION));
     }
     return AgentVersion.VERSION_1;
   }
