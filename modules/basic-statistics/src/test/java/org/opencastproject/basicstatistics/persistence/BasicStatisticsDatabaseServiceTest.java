@@ -134,15 +134,15 @@ public class BasicStatisticsDatabaseServiceTest {
 
   @Test
   public void testTypesAreStoredAsStableIds() throws Exception {
-    service.createRawEvents(List.of(event("org", Instant.now(), 1L, ItemType.PLAYLIST, EventType.FETCH_FILE,
+    service.createRawEvents(List.of(event("org", Instant.now(), 1L, ItemType.VIDEO, EventType.FETCH_FILE,
         "{\"elem\":\"a\",\"from\":0}")));
 
     // not as ordinals, which would change if the enums were reordered, and not as names
     Object[] row = (Object[]) query("SELECT item_type, event_type FROM oc_basic_statistics_raw_event").get(0);
-    assertEquals(3, ((Number) row[0]).intValue());
+    assertEquals(1, ((Number) row[0]).intValue());
     assertEquals(7, ((Number) row[1]).intValue());
     RawEvent read = service.getRawEvents("org", 10, 0, BY_ID).get(0);
-    assertEquals(ItemType.PLAYLIST, read.getItemType());
+    assertEquals(ItemType.VIDEO, read.getItemType());
     assertEquals(EventType.FETCH_FILE, read.getEventType());
   }
 

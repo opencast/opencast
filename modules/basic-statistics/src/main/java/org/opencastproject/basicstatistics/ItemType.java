@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
  * name is a breaking API change.
  */
 public enum ItemType {
-  VIDEO(1, "video"),
-  SERIES(2, "series"),
-  PLAYLIST(3, "playlist");
+  VIDEO(1, "video");
+  // SERIES(2, "series") and PLAYLIST(3, "playlist") are reserved, not yet supported by aggregation. Uncomment
+  // with these exact ids if that support is added.
 
   private static final Map<Short, ItemType> BY_DB_ID = Arrays.stream(values())
       .collect(Collectors.toMap(ItemType::getDbId, Function.identity()));
