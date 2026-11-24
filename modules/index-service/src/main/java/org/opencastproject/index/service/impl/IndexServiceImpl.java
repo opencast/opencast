@@ -890,18 +890,21 @@ public class IndexServiceImpl implements IndexService {
     DublinCoreMetadataUtil.validateRequiredFieldsPresent(eventMetadata);
 
     Date currentStartDate = null;
-    JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
-    if (sourceMetadata != null
-            && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
+    Properties sourceMetadata = new Properties();
+    JSONObject jsonMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
+    if (null != jsonMetadata) {
+      sourceMetadata.putAll(jsonMetadata);
+    }
+    if (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE)) {
       try {
         MetadataField current = eventMetadata.getOutputFields().get("location");
-        eventMetadata.updateStringField(current, (String) sourceMetadata.get("device"));
+        eventMetadata.updateStringField(current, sourceMetadata.getProperty("device"));
       } catch (Exception e) {
-        logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
+        logger.warn("Unable to parse device {}", sourceMetadata.getProperty("device"));
         throw new IllegalArgumentException("Unable to parse device");
       }
-      if (StringUtils.isNotEmpty((String) sourceMetadata.get("start"))) {
-        currentStartDate = EncodingSchemeUtils.decodeDate((String) sourceMetadata.get("start"));
+      if (StringUtils.isNotEmpty(sourceMetadata.getProperty("start"))) {
+        currentStartDate = EncodingSchemeUtils.decodeDate(sourceMetadata.getProperty("start"));
       }
     }
 
@@ -952,19 +955,18 @@ public class IndexServiceImpl implements IndexService {
     long duration = 0L;
     Properties caProperties = new Properties();
     RRule<ZonedDateTime> rRule = null;
-    if (sourceMetadata != null
-            && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
+    if (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE)) {
       Properties configuration;
       try {
-        captureAgentId = (String) sourceMetadata.get("device");
-        configuration = captureAgentStateService.getAgentConfiguration((String) sourceMetadata.get("device"));
+        captureAgentId = sourceMetadata.getProperty("device");
+        configuration = captureAgentStateService.getAgentConfiguration(sourceMetadata.getProperty("device"));
         caProperties.putAll(configuration);
       } catch (Exception e) {
         logger.warn("Unable to parse device {}: because:", sourceMetadata.get("device"), e);
         throw new IllegalArgumentException("Unable to parse device");
       }
 
-      String durationString = (String) sourceMetadata.get("duration");
+      String durationString = sourceMetadata.getProperty("duration");
       if (StringUtils.isBlank(durationString)) {
         throw new IllegalArgumentException("No duration in source metadata");
       }
@@ -981,50 +983,44 @@ public class IndexServiceImpl implements IndexService {
       }
 
       org.joda.time.DateTime now = new org.joda.time.DateTime(DateTimeZone.UTC);
-      start = now.withMillis(DateTimeSupport.fromUTC((String) sourceMetadata.get("start")));
-      end = now.withMillis(DateTimeSupport.fromUTC((String) sourceMetadata.get("end")));
+      start = now.withMillis(DateTimeSupport.fromUTC(sourceMetadata.getProperty("start")));
+      end = now.withMillis(DateTimeSupport.fromUTC(sourceMetadata.getProperty("end")));
       duration = Long.parseLong(durationString);
       DublinCoreValue period = EncodingSchemeUtils
               .encodePeriod(new DCMIPeriod(start.toDate(), start.plus(duration).toDate()), Precision.Second);
       dc.set(DublinCore.PROPERTY_TEMPORAL, period);
 
       // Extended API fields
-      String inputs = (String) sourceMetadata.get("inputs");
+      String inputs = sourceMetadata.getProperty("inputs");
       if (inputs != null) {
+        //FIXME: if configurations this should be all inputs
         caProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, inputs);
       }
 
-      String stream = (String) sourceMetadata.get("stream");
-      if (stream != null) {
-        caProperties.put(CaptureParameters.CAPTURE_DEVICE_STREAM, stream);
-      } else {
-        if (configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_STREAM) != null) {
-          caProperties.put(CaptureParameters.CAPTURE_DEVICE_STREAM, "0");
-        }
+      //FIXME: Need the local, stream, and canstartpaused keys
+
+      String stream = sourceMetadata.getProperty("stream");
+      if (null != stream) {
+        caProperties.put(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, stream);
       }
 
-      String record = (String) sourceMetadata.get("record");
-      if (record != null) {
-        caProperties.put(CaptureParameters.CAPTURE_DEVICE_RECORD, record);
-      } else {
-        if (configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_RECORD) != null) {
-          caProperties.put(CaptureParameters.CAPTURE_DEVICE_RECORD, "0");
-        }
+      String position = sourceMetadata.getProperty("position");
+      if (null != position) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_POSITIONS, position);
       }
 
-      String layout = (String) sourceMetadata.get("layout");
-      if (layout != null) {
-        caProperties.put(CaptureParameters.CAPTURE_DEVICE_LAYOUT, layout);
+      String content = sourceMetadata.getProperty("content");
+      if (null != content) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_CONTENT, content);
       }
 
-      String cameraPosition = (String) sourceMetadata.get("cameraPosition");
-      if (cameraPosition != null) {
-        caProperties.put(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION, cameraPosition);
-      }
+      sourceMetadata.stringPropertyNames().stream()
+          .filter(key -> key.startsWith(CaptureParameters.CAPTURE_EXTENSION_PREFIX))
+          .forEach(key -> caProperties.put(key, sourceMetadata.getProperty(key)));
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
-      rRule = new RRule<>((String) sourceMetadata.get("rrule"));
+      rRule = new RRule<>(sourceMetadata.getProperty("rrule"));
     }
 
     Map<String, String> configuration = new HashMap<>();
