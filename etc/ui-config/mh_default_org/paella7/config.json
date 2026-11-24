@@ -75,6 +75,10 @@
             "video": {
                "flavor": "*/delivery"
             }
+        },
+        "jwt": {
+            "authStaticFiles": false,
+            "trustedOrigins": []
         }
     },
 
