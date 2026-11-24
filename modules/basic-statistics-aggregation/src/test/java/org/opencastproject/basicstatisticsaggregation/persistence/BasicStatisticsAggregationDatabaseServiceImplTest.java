@@ -32,18 +32,16 @@ import org.opencastproject.basicstatisticsaggregation.AggregatedTotal;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
  * Covers:
  * - a day's hourly buckets can be upserted and read back
  * - all-time total accumulates across multiple calls rather than being overwritten by them
- * - the scan cursor is stored as a timestamp.
+ * - the scan cursor round-trips.
  */
 public class BasicStatisticsAggregationDatabaseServiceImplTest {
 
@@ -65,22 +63,10 @@ public class BasicStatisticsAggregationDatabaseServiceImplTest {
   }
 
   @Test
-  public void scanCursorIsStoredAsTimestamp() throws Exception {
-    Instant cursor = Instant.parse("2026-01-15T10:15:30.123Z");
+  public void scanCursorRoundTrips() throws Exception {
+    persistence.setCursor(42L);
 
-    persistence.setCursor(cursor);
-
-    assertEquals(cursor, persistence.getCursor());
-    // as a timestamp the database understands, not as a serialized Java object, which is what happens to an
-    // Instant if the converter is not registered in the persistence.xml
-    EntityManager em = emf.createEntityManager();
-    try {
-      assertEquals("TIMESTAMP", em.createNativeQuery("SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE "
-          + "TABLE_NAME = 'OC_BASIC_STATISTICS_AGGREGATION_CURSOR' AND COLUMN_NAME = 'SCANNED_UNTIL'")
-          .getSingleResult());
-    } finally {
-      em.close();
-    }
+    assertEquals(42L, persistence.getCursor());
   }
 
   @Test

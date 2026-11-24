@@ -34,7 +34,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -190,11 +189,11 @@ public class BasicStatisticsAggregationDatabaseServiceImpl implements BasicStati
   }
 
   @Override
-  public Instant getCursor() throws BasicStatisticsAggregationDatabaseException {
+  public long getCursor() throws BasicStatisticsAggregationDatabaseException {
     try {
       return db.exec(em -> {
         AggregationCursor cursor = em.find(AggregationCursor.class, AggregationCursor.SINGLETON_ID);
-        return cursor != null ? cursor.getScannedUntil() : Instant.EPOCH;
+        return cursor != null ? cursor.getScannedUntilId() : 0L;
       });
     } catch (Exception e) {
       throw new BasicStatisticsAggregationDatabaseException("Could not fetch aggregation cursor", e);
@@ -202,16 +201,16 @@ public class BasicStatisticsAggregationDatabaseServiceImpl implements BasicStati
   }
 
   @Override
-  public void setCursor(Instant scannedUntil) throws BasicStatisticsAggregationDatabaseException {
+  public void setCursor(long scannedUntilId) throws BasicStatisticsAggregationDatabaseException {
     try {
       db.execTx(em -> {
         AggregationCursor cursor = em.find(AggregationCursor.class, AggregationCursor.SINGLETON_ID);
         if (cursor == null) {
           cursor = new AggregationCursor();
-          cursor.setScannedUntil(scannedUntil);
+          cursor.setScannedUntilId(scannedUntilId);
           em.persist(cursor);
         } else {
-          cursor.setScannedUntil(scannedUntil);
+          cursor.setScannedUntilId(scannedUntilId);
         }
       });
     } catch (Exception e) {

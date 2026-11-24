@@ -59,9 +59,10 @@ import javax.persistence.Transient;
         query = "SELECT p FROM RawEvent p WHERE p.id = :id and p.organization = :organizationId"
     ),
     @NamedQuery(
+        // id, not timestamp: a raw event's own timestamp can be older than ones already scanned (e.g. a buffered
+        // file-fetch flush, or a late clientPush within its allowed delay), but its id, assigned on insert, never is.
         name = "RawEvent.findSince",
-        query = "SELECT p FROM RawEvent p WHERE p.itemType = :itemType AND p.timestamp > :since "
-            + "ORDER BY p.timestamp ASC"
+        query = "SELECT p FROM RawEvent p WHERE p.itemType = :itemType AND p.id > :sinceId ORDER BY p.id ASC"
     ),
     @NamedQuery(
         name = "RawEvent.findByItemDay",

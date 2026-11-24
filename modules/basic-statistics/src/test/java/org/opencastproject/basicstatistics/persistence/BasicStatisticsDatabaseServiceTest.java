@@ -178,6 +178,27 @@ public class BasicStatisticsDatabaseServiceTest {
     assertEquals(timestamps, read);
   }
 
+  /**
+   * A buffered/delayed insert (e.g. a merged file-fetch flush, or a late clientPush within its allowed delay) can
+   * have an earlier timestamp than an event already scanned. Since the cursor advances by id, not timestamp, it
+   * must still be found.
+   */
+  @Test
+  public void testGetRawEventsSinceFollowsInsertionOrderNotTimestamp() throws Exception {
+    Instant later = Instant.parse("2026-01-15T10:05:00Z");
+    Instant earlier = Instant.parse("2026-01-15T10:00:00Z");
+
+    service.createRawEvents(List.of(event(later)));
+    long cursor = service.getRawEventsSince(ItemType.VIDEO, 0).get(0).getId();
+
+    service.createRawEvents(List.of(event(earlier)));
+
+    List<RawEvent> sinceCursor = service.getRawEventsSince(ItemType.VIDEO, cursor);
+
+    assertEquals(1, sinceCursor.size());
+    assertEquals(earlier, sinceCursor.get(0).getTimestamp());
+  }
+
   @Test
   public void testVersionIsRecordedOnce() throws Exception {
     assertEquals(List.of("1:v1"), versions());

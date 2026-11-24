@@ -20,17 +20,17 @@
  */
 package org.opencastproject.basicstatisticsaggregation;
 
-import java.time.Instant;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * Marks how far the aggregation job has scanned the raw event log for new activity. There is only ever one row:
- * this is not a correctness boundary (raw events are re-scanned in full per affected item/day), just a cheap way
- * to avoid re-scanning the entire raw event log on every tick.
+ * Marks how far the aggregation job has scanned the raw event log for new activity, by raw event id rather than
+ * timestamp, since an event's id (assigned on insert) never ends up behind one already scanned, unlike its
+ * timestamp (e.g. a buffered file-fetch flush, or a late clientPush within its allowed delay). There is only ever
+ * one row: this is not a correctness boundary (raw events are re-scanned in full per affected item/day), just a
+ * cheap way to avoid re-scanning the entire raw event log on every tick.
  */
 @Entity(name = "AggregationCursor")
 @Table(name = "oc_basic_statistics_aggregation_cursor")
@@ -42,18 +42,18 @@ public class AggregationCursor {
   @Column(name = "id")
   private long id = SINGLETON_ID;
 
-  @Column(name = "scanned_until", nullable = false)
-  private Instant scannedUntil = Instant.EPOCH;
+  @Column(name = "scanned_until_id", nullable = false)
+  private long scannedUntilId = 0L;
 
   public long getId() {
     return id;
   }
 
-  public Instant getScannedUntil() {
-    return scannedUntil;
+  public long getScannedUntilId() {
+    return scannedUntilId;
   }
 
-  public void setScannedUntil(Instant scannedUntil) {
-    this.scannedUntil = scannedUntil;
+  public void setScannedUntilId(long scannedUntilId) {
+    this.scannedUntilId = scannedUntilId;
   }
 }

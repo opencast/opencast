@@ -115,19 +115,19 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
 
   /**
    * {@inheritDoc}
-   * @see BasicStatisticsDatabaseServiceImpl#getRawEventsSince(ItemType, Instant)
+   * @see BasicStatisticsDatabaseServiceImpl#getRawEventsSince(ItemType, long)
    */
   @Override
-  public List<RawEvent> getRawEventsSince(ItemType itemType, Instant since) throws BasicStatisticsDatabaseException {
+  public List<RawEvent> getRawEventsSince(ItemType itemType, long sinceId) throws BasicStatisticsDatabaseException {
     try {
       return db.exec(em -> {
         TypedQuery<RawEvent> query = em.createNamedQuery("RawEvent.findSince", RawEvent.class);
         query.setParameter("itemType", itemType);
-        query.setParameter("since", since);
+        query.setParameter("sinceId", sinceId);
         return query.getResultList();
       });
     } catch (Exception e) {
-      throw new BasicStatisticsDatabaseException("Error fetching raw events since " + since, e);
+      throw new BasicStatisticsDatabaseException("Error fetching raw events since id " + sinceId, e);
     }
   }
 

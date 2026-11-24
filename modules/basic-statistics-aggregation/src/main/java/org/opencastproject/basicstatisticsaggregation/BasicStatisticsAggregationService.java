@@ -217,19 +217,19 @@ public class BasicStatisticsAggregationService {
    */
   void runTick() {
     try {
-      Instant cursor = aggregationDatabase.getCursor();
+      long cursor = aggregationDatabase.getCursor();
       List<RawEvent> newEvents = rawEventDatabase.getRawEventsSince(ItemType.VIDEO, cursor);
       if (newEvents.isEmpty()) {
         return;
       }
 
       Set<ItemDay> touched = new HashSet<>();
-      Instant maxTimestamp = cursor;
+      long maxId = cursor;
       for (RawEvent event : newEvents) {
         touched.add(new ItemDay(event.getOrganization(), event.getItemType(), event.getItemId(),
             event.getTimestamp().atZone(ZoneOffset.UTC).toLocalDate()));
-        if (event.getTimestamp().isAfter(maxTimestamp)) {
-          maxTimestamp = event.getTimestamp();
+        if (event.getId() > maxId) {
+          maxId = event.getId();
         }
       }
 
@@ -237,7 +237,7 @@ public class BasicStatisticsAggregationService {
         reaggregateDay(itemDay);
       }
 
-      aggregationDatabase.setCursor(maxTimestamp);
+      aggregationDatabase.setCursor(maxId);
     } catch (BasicStatisticsDatabaseException | BasicStatisticsAggregationDatabaseException e) {
       logger.warn("Failed to run basic statistics aggregation tick", e);
     }

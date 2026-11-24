@@ -24,7 +24,6 @@ import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatisticsaggregation.AggregatedEvent;
 import org.opencastproject.basicstatisticsaggregation.AggregatedTotal;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -72,13 +71,13 @@ public interface BasicStatisticsAggregationDatabaseService {
           throws BasicStatisticsAggregationDatabaseException;
 
   /**
-   * Get the timestamp up to which the raw event log has already been scanned for new activity.
-   * Returns {@link Instant} if the job has never run before.
+   * Get the raw event id up to which the raw event log has already been scanned for new activity.
+   * Returns {@code 0} if the job has never run before.
    */
-  Instant getCursor() throws BasicStatisticsAggregationDatabaseException;
+  long getCursor() throws BasicStatisticsAggregationDatabaseException;
 
   /**
-   * Advance the cursor to the given timestamp.
+   * Advance the cursor to the given raw event id.
    */
-  void setCursor(Instant scannedUntil) throws BasicStatisticsAggregationDatabaseException;
+  void setCursor(long scannedUntilId) throws BasicStatisticsAggregationDatabaseException;
 }

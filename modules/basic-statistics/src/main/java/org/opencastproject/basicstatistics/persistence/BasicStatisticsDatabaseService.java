@@ -44,10 +44,10 @@ public interface BasicStatisticsDatabaseService {
           throws BasicStatisticsDatabaseException;
 
   /**
-   * Get all raw events of the given item type that happened after {@code since}, in chronological order. Used to
-   * discover which items have new activity that needs (re-)aggregating.
+   * Get all raw events of the given item type inserted after {@code sinceId} (by {@link RawEvent#getId()}, not
+   * timestamp), in that order. Used to discover which items have new activity that needs (re-)aggregating.
    */
-  List<RawEvent> getRawEventsSince(ItemType itemType, Instant since)
+  List<RawEvent> getRawEventsSince(ItemType itemType, long sinceId)
           throws BasicStatisticsDatabaseException;
 
   /**
