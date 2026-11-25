@@ -631,9 +631,7 @@ public class AgentImpl implements Agent {
           .split(","))
           .map(String::trim)
           .collect(Collectors.toSet());
-      if (names.isEmpty()) {
-        throw new IllegalArgumentException("Agent provided devices key, but no devices");
-      } else if (names.stream().anyMatch(String::isBlank)) {
+      if (names.stream().anyMatch(String::isBlank)) {
         throw new IllegalArgumentException("Agent device names contains a blank name");
       } else if (names.stream().anyMatch(s -> s.length() > 256)) {
         throw new IllegalArgumentException("Agent device names too long");
