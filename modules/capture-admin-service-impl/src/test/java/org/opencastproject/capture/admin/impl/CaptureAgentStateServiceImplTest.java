@@ -659,11 +659,13 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "my config with spaces");
     Properties returnedConfig = new Properties();
     returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "my config with spaces");
 
     assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
@@ -672,14 +674,33 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     // NOTE: There's an extra space here after the comma!
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b config,  a config");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "a config");
     returnedConfig = new Properties();
     returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
     // NOTE: The extra space above has been trimmed, and the configs sorted
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a config,b config");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "a config");
 
     assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 1a: Defaults must exist and be within the list of stream configs
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Blank default
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b content, a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // A default that's not in the list
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b config, a config");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "not in the list");
+
+    assert2xAgentException("test", IDLE, sentConfig);
 
     // Case 2: An empty list, this is an error case and should be rejected
     // This is what the CA is sending to the core
@@ -728,9 +749,11 @@ public class CaptureAgentStateServiceImplTest {
     Properties sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "my positions with spaces");
     Properties returnedConfig = new Properties();
     returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "my positions with spaces");
 
     assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
@@ -738,12 +761,31 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.putAll(agentRegistration2x);
     // NOTE: There's an extra space here after the comma!
     sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "a position");
     returnedConfig = new Properties();
     returnedConfig.putAll(agentCaps2x);
     // NOTE: The extra space above has been trimmed, and the configs sorted
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a position,b position");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "a position");
 
     assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 1a: Defaults must exist and be within the list of stream configs
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Blank default
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // A default that's not in the list
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "not in the list");
+
+    assert2xAgentException("test", IDLE, sentConfig);
 
     // Case 2: An empty list, this is an error case and should be rejected
     // This is what the CA is sending to the core
@@ -786,9 +828,11 @@ public class CaptureAgentStateServiceImplTest {
     Properties sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "my content with spaces");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "my content with spaces");
     Properties returnedConfig = new Properties();
     returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "my content with spaces");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "my content with spaces");
 
     assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
@@ -796,12 +840,31 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.putAll(agentRegistration2x);
     // NOTE: There's an extra space here after the comma!
     sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content,  a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "a content");
     returnedConfig = new Properties();
     returnedConfig.putAll(agentCaps2x);
     // NOTE: The extra space above has been trimmed, and the configs sorted
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a content,b content");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "a content");
 
     assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 1a: Defaults must exist and be within the list of contents
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Blank default
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content, a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "null");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // A default that's not in the list
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content, a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "not in the list");
+
+    assert2xAgentException("test", IDLE, sentConfig);
 
     // Case 2: An empty list, this is an error case and should be rejected
     // This is what the CA is sending to the core

@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -86,26 +87,32 @@ public final class CaptureAgentUtils {
     config.add(JSON_KEY_INPUTS, inputs);
 
     Gson gson = new Gson();
-    config.add("streams", gson.toJsonTree(
-        agent.streamConfigurations()
-            .stream()
-            .filter(Predicate.not(String::isBlank))
-            .collect(Collectors.toSet())
-    ).getAsJsonArray());
+    Set<String> streams = agent.streamConfigurations()
+        .stream()
+        .filter(Predicate.not(String::isBlank))
+        .collect(Collectors.toSet());
+    if (!streams.isEmpty()) {
+      config.add("streams", gson.toJsonTree(streams).getAsJsonArray());
+      config.addProperty("streams_default", safeString(agent.defaultStreamConfiguration()));
+    }
 
-    config.add("positions", gson.toJsonTree(
-        agent.devicePositions()
-            .stream()
-            .filter(Predicate.not(String::isBlank))
-            .collect(Collectors.toSet())
-    ).getAsJsonArray());
+    Set<String> positions = agent.devicePositions()
+        .stream()
+        .filter(Predicate.not(String::isBlank))
+        .collect(Collectors.toSet());
+    if (!positions.isEmpty()) {
+      config.add("positions", gson.toJsonTree(positions).getAsJsonArray());
+      config.addProperty("positions_default", safeString(agent.defaultDevicePosition()));
+    }
 
-    config.add("contents", gson.toJsonTree(
-        agent.contentConfigurations()
-            .stream()
-            .filter(Predicate.not(String::isBlank))
-            .collect(Collectors.toSet())
-    ).getAsJsonArray());
+    Set<String> contents = agent.contentConfigurations()
+        .stream()
+        .filter(Predicate.not(String::isBlank))
+        .collect(Collectors.toSet());
+    if (!contents.isEmpty()) {
+      config.add("contents", gson.toJsonTree(contents).getAsJsonArray());
+      config.addProperty("contents_default", safeString(agent.defaultContentConfiguration()));
+    }
 
     JsonObject vendorKeys = new JsonObject();
     agent.vendorKeys().forEach(vendorKeys::addProperty);

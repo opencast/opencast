@@ -23,8 +23,10 @@ package org.opencastproject.capture.admin.impl;
 
 import static org.opencastproject.capture.CaptureParameters.AGENT_VERSION;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_CONTENT;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_NAMES;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_POSITIONS;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_PREFIX;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_EXTENSION_PREFIX;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED;
@@ -32,6 +34,7 @@ import static org.opencastproject.capture.CaptureParameters.CAPTURE_LOCAL_CAPABL
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CAPABLE;
 import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CONFIGURATION;
+import static org.opencastproject.capture.CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT;
 import static org.opencastproject.capture.CaptureParameters.VENDOR_FIRMWARE;
 import static org.opencastproject.capture.CaptureParameters.VENDOR_HARDWARE;
 import static org.opencastproject.capture.CaptureParameters.VENDOR_MODEL;
@@ -419,6 +422,16 @@ public class AgentImpl implements Agent {
   /**
    * {@inheritDoc}
    *
+   * @see Agent#defaultStreamConfiguration()
+   */
+  @Override
+  public String defaultStreamConfiguration() {
+    return capabilitiesProperties.getProperty(CAPTURE_STREAM_CONFIGURATION_DEFAULT);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see Agent#devicePositions()
    */
   @Override
@@ -426,6 +439,16 @@ public class AgentImpl implements Agent {
     return Arrays.stream(capabilitiesProperties.getProperty(CAPTURE_DEVICE_POSITIONS, "")
         .split(","))
         .collect(Collectors.toSet());
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#defaultDevicePosition()
+   */
+  @Override
+  public String defaultDevicePosition() {
+    return capabilitiesProperties.getProperty(CAPTURE_DEVICE_POSITIONS_DEFAULT);
   }
 
   /**
@@ -439,6 +462,17 @@ public class AgentImpl implements Agent {
             .split(","))
         .collect(Collectors.toSet());
   }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see Agent#defaultContentConfiguration()
+   */
+  @Override
+  public String defaultContentConfiguration() {
+    return capabilitiesProperties.getProperty(CAPTURE_DEVICE_CONTENT_DEFAULT);
+  }
+
 
   /**
    * {@inheritDoc}
@@ -657,8 +691,19 @@ public class AgentImpl implements Agent {
       } else if (agentStreamConfigs.stream().anyMatch(s -> s.length() > 32)) {
         throw new IllegalArgumentException("Stream configs have a configuration which is too long");
       }
+
+      String defaultStream = configuration.getProperty(CAPTURE_STREAM_CONFIGURATION_DEFAULT);
+      if (null == defaultStream) {
+        throw new IllegalArgumentException("Stream configs has no default");
+      } else if (defaultStream.isBlank()) {
+        throw new IllegalArgumentException("Stream configs has an empty default");
+      } else if (!agentStreamConfigs.contains(defaultStream)) {
+        throw new IllegalArgumentException("Specified stream config default does not exist in the options");
+      }
+
       capabilitiesProperties.setProperty(CAPTURE_STREAM_CONFIGURATION,
           String.join(",", agentStreamConfigs));
+      capabilitiesProperties.setProperty(CAPTURE_STREAM_CONFIGURATION_DEFAULT, defaultStream.trim());
     }
 
     if (configuration.containsKey(CAPTURE_DEVICE_POSITIONS)) {
@@ -674,8 +719,19 @@ public class AgentImpl implements Agent {
       } else if (agentDevicePositions.stream().anyMatch(s -> s.length() > 256)) {
         throw new IllegalArgumentException("Position configs have a configuration which is too long");
       }
+
+      String defaultPosition = configuration.getProperty(CAPTURE_DEVICE_POSITIONS_DEFAULT);
+      if (null == defaultPosition) {
+        throw new IllegalArgumentException("Device position has no default");
+      } else if (defaultPosition.isBlank()) {
+        throw new IllegalArgumentException("Device position has an empty default");
+      } else if (!agentDevicePositions.contains(defaultPosition)) {
+        throw new IllegalArgumentException("Specified device position default does not exist in the options");
+      }
+
       capabilitiesProperties.setProperty(CAPTURE_DEVICE_POSITIONS,
           String.join(",", agentDevicePositions));
+      capabilitiesProperties.setProperty(CAPTURE_DEVICE_POSITIONS_DEFAULT, defaultPosition.trim());
     }
 
     if (configuration.containsKey(CAPTURE_DEVICE_CONTENT)) {
@@ -691,8 +747,19 @@ public class AgentImpl implements Agent {
       } else if (agentContent.stream().anyMatch(s -> s.length() > 256)) {
         throw new IllegalArgumentException("Content configs have a configuration which is too long");
       }
+
+      String defaultContent = configuration.getProperty(CAPTURE_DEVICE_CONTENT_DEFAULT);
+      if (null == defaultContent) {
+        throw new IllegalArgumentException("Content configuration has no default");
+      } else if (defaultContent.isBlank()) {
+        throw new IllegalArgumentException("Content configuration has an empty default");
+      } else if (!agentContent.contains(defaultContent)) {
+        throw new IllegalArgumentException("Specified content configuration default does not exist in the options");
+      }
+
       capabilitiesProperties.setProperty(CAPTURE_DEVICE_CONTENT,
           String.join(",", agentContent));
+      capabilitiesProperties.setProperty(CAPTURE_DEVICE_CONTENT_DEFAULT, defaultContent.trim());
     }
 
     // These, assuming they match the regex, are passed through unmodified since they're vendor tools

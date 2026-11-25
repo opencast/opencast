@@ -360,18 +360,21 @@ public class CaptureAgentsEndpoint {
               .stream()
               .filter(Predicate.not(String::isBlank))
               .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "STREAM."));
+      parsedCapabilities.addProperty("streams_default", safeString(agent.defaultStreamConfiguration()));
 
       parsedCapabilities.add("positions",
           generateJsonDevice(agent.devicePositions()
               .stream()
               .filter(Predicate.not(String::isBlank))
-              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "RECORD."));
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "POSITION."));
+      parsedCapabilities.addProperty("positions_default", safeString(agent.defaultDevicePosition()));
 
       parsedCapabilities.add("contents",
           generateJsonDevice(agent.contentConfigurations()
               .stream()
               .filter(Predicate.not(String::isBlank))
-              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "LAYOUT."));
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "CONTENT."));
+      parsedCapabilities.addProperty("contents_default", safeString(agent.defaultContentConfiguration()));
 
       Map<String, String> vendorKeys = agent.vendorKeys();
 

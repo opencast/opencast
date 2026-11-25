@@ -97,14 +97,38 @@ public interface CaptureParameters {
    */
   String CAPTURE_STREAM_AUTOSTART = "capture.stream.autostart";
 
-  /** A comma delimited list of bitrates and frame sizes supported by the CA's streaming system */
+  /** A comma delimited list of bitrates and frame sizes supported by the CA's streaming system. */
   String CAPTURE_STREAM_CONFIGURATION = "capture.stream.configuration";
 
-  /** A command delimited list of PTZ positions supported by the CA */
+  /**
+   * The default configuration that should be displayed to the user.  This must match one of the configurations listed
+   * in the {@link CAPTURE_STREAM_CONFIGURATION}, and will cause a registration failure if it does not.  In the case
+   * that an agent receives calendaring data with a selected configuration which does not lie within its options, it
+   * must fall back to using its default configuration.
+   */
+  String CAPTURE_STREAM_CONFIGURATION_DEFAULT = "capture.stream.configuration.default";
+
+  /** A command delimited list of PTZ positions supported by the CA. */
   String CAPTURE_DEVICE_POSITIONS = "capture.device.positions";
 
-  /** A comma delimited list of frame composition options supported by the CA */
+  /**
+   * The default position that should be displayed to the user.  This must match one of the positions listed
+   * in the {@link CAPTURE_DEVICE_POSITIONS}, and will cause a registration failure if it does not.  In the case
+   * that an agent receives calendaring data with a selected positions which does not lie within its options, it
+   * must fall back to using its default position.
+   */
+  String CAPTURE_DEVICE_POSITIONS_DEFAULT = "capture.device.positions.default";
+
+  /** A comma delimited list of frame composition options supported by the CA. */
   String CAPTURE_DEVICE_CONTENT = "capture.device.content";
+
+  /**
+   * The default content config that should be displayed to the user.  This must match one of the content configs listed
+   * in the {@link CAPTURE_DEVICE_CONTENT}, and will cause a registration failure if it does not.  In the case
+   * that an agent receives calendaring data with a selected content config which does not lie within its options, it
+   * must fall back to using its default content config.
+   */
+  String CAPTURE_DEVICE_CONTENT_DEFAULT = "capture.device.content.default";
 
   /** The vendor specific extension prefix for anything a CA might need that's not otherwise defined */
   String CAPTURE_EXTENSION_PREFIX = "X-";

@@ -700,13 +700,28 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
 
       @Override
+      public String defaultStreamConfiguration() {
+        return null;
+      }
+
+      @Override
       public Set<String> devicePositions() {
         return Set.of();
       }
 
       @Override
+      public String defaultDevicePosition() {
+        return null;
+      }
+
+      @Override
       public Set<String> contentConfigurations() {
         return Set.of();
+      }
+
+      @Override
+      public String defaultContentConfiguration() {
+        return null;
       }
 
       @Override

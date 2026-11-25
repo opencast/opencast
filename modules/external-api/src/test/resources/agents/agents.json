@@ -52,16 +52,19 @@
         "b",
         "c"
       ],
+      "streams_default": "b",
       "positions": [
         "d",
         "e",
         "f"
       ],
+      "positions_default": "e",
       "contents": [
         "g",
         "h",
         "i"
       ],
+      "contents_default": "h",
       "vendorKeys": {
         "X-pyca-thing1": "vendor extensions woo",
         "X-pyca.needsonly": "X- prefix"

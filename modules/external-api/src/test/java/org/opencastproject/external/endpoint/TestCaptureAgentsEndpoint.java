@@ -75,8 +75,11 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
   private static final String JSON_KEY_STREAM = "stream";
   private static final String JSON_KEY_INPUTS = "inputs";
   private static final String JSON_KEY_STREAMS = "streams";
+  private static final String JSON_KEY_STREAMS_DEFAULT = "streams_default";
   private static final String JSON_KEY_POSITIONS = "positions";
+  private static final String JSON_KEY_POSITIONS_DEFAULT = "positions_default";
   private static final String JSON_KEY_CONTENTS = "contents";
+  private static final String JSON_KEY_CONTENTS_DEFAULT = "contents_default";
   private static final String JSON_KEY_VENDORS = "vendorKeys";
 
   public TestCaptureAgentsEndpoint() throws Exception {
@@ -132,15 +135,24 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
     JSONArray streamConfigs = new JSONArray();
     streamConfigs.addAll(agent.streamConfigurations());
-    config.put(JSON_KEY_STREAMS, streamConfigs);
+    if (!streamConfigs.isEmpty()) {
+      config.put(JSON_KEY_STREAMS, streamConfigs);
+      config.put(JSON_KEY_STREAMS_DEFAULT, agent.defaultStreamConfiguration());
+    }
 
     JSONArray positions = new JSONArray();
     positions.addAll(agent.devicePositions());
-    config.put(JSON_KEY_POSITIONS, positions);
+    if (!positions.isEmpty()) {
+      config.put(JSON_KEY_POSITIONS, positions);
+      config.put(JSON_KEY_POSITIONS_DEFAULT, agent.defaultDevicePosition());
+    }
 
     JSONArray content = new JSONArray();
     content.addAll(agent.contentConfigurations());
-    config.put(JSON_KEY_CONTENTS, content);
+    if (!content.isEmpty()) {
+      config.put(JSON_KEY_CONTENTS, content);
+      config.put(JSON_KEY_CONTENTS_DEFAULT, agent.defaultContentConfiguration());
+    }
 
     JSONObject vendorkeys = new JSONObject();
     vendorkeys.putAll(agent.vendorKeys());
@@ -189,10 +201,16 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
         .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_INPUTS, new JSONArray()))).anyTimes();
     expect(agent.streamConfigurations())
         .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_STREAMS, new JSONArray()))).anyTimes();
+    expect(agent.defaultStreamConfiguration())
+        .andReturn((String) config.getOrDefault(JSON_KEY_STREAMS_DEFAULT, "")).anyTimes();
     expect(agent.devicePositions())
         .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_POSITIONS, new JSONArray()))).anyTimes();
+    expect(agent.defaultDevicePosition())
+        .andReturn((String) config.getOrDefault(JSON_KEY_POSITIONS_DEFAULT, "")).anyTimes();
     expect(agent.contentConfigurations())
         .andReturn(setify((JSONArray) config.getOrDefault(JSON_KEY_CONTENTS, new JSONArray()))).anyTimes();
+    expect(agent.defaultContentConfiguration())
+        .andReturn((String) config.getOrDefault(JSON_KEY_CONTENTS_DEFAULT, "")).anyTimes();
     expect(agent.vendorKeys()).andReturn(Map.of()).anyTimes();
     replay(agent);
     return agent;

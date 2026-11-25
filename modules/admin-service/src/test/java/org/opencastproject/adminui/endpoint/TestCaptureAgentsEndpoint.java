@@ -182,6 +182,10 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
       return Set.of();
     }
 
+    public String defaultStreamConfiguration() {
+      return "b";
+    }
+
     public Set<String> devicePositions() {
       if ("pyca-2.x".equals(name)) {
         return Set.of("d", "e", "f");
@@ -189,11 +193,19 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
       return Set.of();
     }
 
+    public String defaultDevicePosition() {
+      return "e";
+    }
+
     public Set<String> contentConfigurations() {
       if ("pyca-2.x".equals(name)) {
         return Set.of("g", "h", "i");
       }
       return Set.of();
+    }
+
+    public String defaultContentConfiguration() {
+      return "h";
     }
 
     public Map<String, String> vendorKeys() {

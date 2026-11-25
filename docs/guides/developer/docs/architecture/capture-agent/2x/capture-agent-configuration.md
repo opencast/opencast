@@ -57,9 +57,16 @@ Capture Stream Configurations
 An agent which supports streaming can define one or more capture stream configurations for per-event configuration.
 If your agent supports this it should provide a set of comma delimited plain text strings, each no longer than 32 utf8
 characters, under the `capture.stream.configuration` agent configuration key.  These strings are vendor specific, but
-should generally indicate frame size and rate, as well as bitrate.  If you agent does not support per-event stream
-configuration, you should omit this configuration key.  Agents which attempt to configure an empty list, or pass one or
-more configurations longer than 32 utf8 characters will be rejected with an HTTP 400.
+should generally indicate frame size and rate, as well as bitrate.
+
+If your agent supports streaming configurations, it must also specify a `capture.stream.configuration.default` value,
+and this value MUST be present in the `capture.stream.configuration` list.  This value is presented to the
+user as the chosen by default value in the scheduling UI.  Agents MUST use this default in cases where the scheduling
+data received from Opencast contains a configuration not currently present on the device.
+
+If you agent does not support per-event stream configuration, you must omit both configuration keys.  Agents which
+attempt to configure an empty list, pass one or more configurations longer than 32 utf8 characters, or omit the default
+will be rejected with an HTTP 400.
 
 
 Capture Device Positions
@@ -68,9 +75,16 @@ Capture Device Positions
 An agent which supports directly controlling PTZ cameras can define one or more device positions.  If your agent
 supports this it should provide a set of comma delimited plain text strings, each no longer than 256 utf8 characters,
 under the `capture.device.positions` agent configuration key.  These strings are vendor specific, but you should expect
-these to be directly visible to Opencast administrative users and thus be clear for end users.  If you agent does not
-support per-event device positions, you should omit this configuration key.  Agents which attempt to configure an empty
-list, or pass one or more configurations longer than 256 utf8 characters will be rejected with an HTTP 400.
+these to be directly visible to Opencast administrative users and thus be clear for end users.
+
+If your agent supports controlling PTZ cameras, it must also specify a `capture.device.positions.default` value,
+and this value MUST be present in the `capture.device.positions` list.  This value is presented to the
+user as the chosen by default value in the scheduling UI.  Agents MUST use this default in cases where the scheduling
+data received from Opencast contains a position not currently present on the device.
+
+If you agent does not support controlling PTZ cameras, you must omit both configuration keys.  Agents which
+attempt to configure an empty list, pass one or more configurations longer than 256 utf8 characters, or omit the default
+will be rejected with an HTTP 400.
 
 
 Capture Device Content
@@ -85,9 +99,16 @@ configure different inputs for different capture outputs.  For example, a config
 inputs to separate files, but only stream a single input is something your device is allowed to support.  If your agent
 supports this it should provide a set of comma delimited plain text strings, each no longer than 256 utf8 characters,
 under the `capture.device.content` agent configuration key.  These strings are vendor specific, but you should expect
-these to be directly visible to Opencast administrative users and thus be clear for end users.  If your agent does not
-per-event content configurations, you should omit this configuration key.  Agents which attempt to configure an empty
-list, or pass one or more configurations longer than 256 utf8 characters will be rejected with an http 400.
+these to be directly visible to Opencast administrative users and thus be clear for end users.
+
+If your agent supports onboard frame composition, it must also specify a `capture.device.content.default` value,
+and this value MUST be present in the `capture.device.content` list.  This value is presented to the
+user as the chosen by default value in the scheduling UI.  Agents MUST use this default in cases where the scheduling
+data received from Opencast contains a position not currently present on the device.
+
+If you agent does not support onboard frame composition, you must omit both configuration keys.  Agents which
+attempt to configure an empty list, pass one or more configurations longer than 256 utf8 characters, or omit the default
+will be rejected with an HTTP 400.
 
 
 Additional Vendor Configuration Keys

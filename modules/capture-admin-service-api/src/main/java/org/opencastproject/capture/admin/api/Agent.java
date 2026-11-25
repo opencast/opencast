@@ -161,6 +161,13 @@ public interface Agent {
   Set<String> streamConfigurations();
 
   /**
+   * Returns the default stream configuration specified by the agent.  For 2.x agents this is guaranteed to be within
+   * the set of stream configurations.  For 1.x agents this will be null.
+   * @return The default stream configuration for this 2.x agent, or null for 1.x agents
+   */
+  String defaultStreamConfiguration();
+
+  /**
    * Returns a list of PTZ camera positions for the agent.  These are passed to the CA in the event properties, and
    * should be used to aim PTZ cameras controlled by the CA in a vendor specific way.  If the agent does not support
    * configuring these settings on a per-event basis then this list will be empty.
@@ -168,6 +175,13 @@ public interface Agent {
    * @return The list of camera positions provided by the capture agent, if any.
    */
   Set<String> devicePositions();
+
+  /**
+   * Returns the default device position specified by the agent.  For 2.x agents this is guaranteed to be within
+   * the set of device positions.  For 1.x agents this will be null.
+   * @return The default device position for this 2.x agent, or null for 1.x agents
+   */
+  String defaultDevicePosition();
 
   /**
    * Returns a list of content composition configurations for the agent.  These are passed to the CA in the event
@@ -178,6 +192,13 @@ public interface Agent {
    * @return The list of content configurations provided by the capture agent, if any.
    */
   Set<String> contentConfigurations();
+
+  /**
+   * Returns the default content configuration specified by the agent.  For 2.x agents this is guaranteed to be within
+   * the set of content configuration.  For 1.x agents this will be null.
+   * @return The default content configuration for this 2.x agent, or null for 1.x agents
+   */
+  String defaultContentConfiguration();
 
   /**
    * Returns a {@link Map} of vendor extension configurations in a key, value pair.  If none were passed by the vendor
