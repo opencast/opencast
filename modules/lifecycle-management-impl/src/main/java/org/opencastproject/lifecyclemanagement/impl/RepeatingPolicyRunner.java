@@ -24,6 +24,7 @@ package org.opencastproject.lifecyclemanagement.impl;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
+import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.security.api.Organization;
@@ -150,26 +151,12 @@ public class RepeatingPolicyRunner {
   public void unschedule() {
     try {
       if (quartz != null) {
-        quartz.unscheduleJob(dynamicTriggerName, dynamicTriggerGroup);
+        // Delete only this runner's job and triggers; other components share the scheduler.
+        quartz.deleteJob(dynamicJobName, dynamicJobGroup);
       }
     } catch (SchedulerException e) {
       logger.error("Error unscheduling " + policy.getTitle(), e);
     }
-  }
-
-  /** Shutdown the scheduler. */
-  public void shutdown() {
-    try {
-      quartz.shutdown();
-    } catch (org.quartz.SchedulerException ignore) {
-    }
-  }
-
-  // just to make sure Quartz is being shut down...
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    shutdown();
   }
 
   // --
@@ -199,14 +186,13 @@ public class RepeatingPolicyRunner {
                 policy = repeatingPolicyRunner.getLifeCycleService().getLifeCyclePolicyById(
                     repeatingPolicyRunner.getLifeCyclePolicy().getId()
                 );
-                if (!policy.isActive()) {
-                  repeatingPolicyRunner.unschedule();
+                // PolicyCheckRunner owns scheduling, including removal and replacement of jobs.
+                if (!policy.isActive() || policy.getTiming() != Timing.REPEATING) {
                   return;
                 }
                 logger.info("Exists: " + policy.getTitle());
               } catch (NotFoundException e) {
-                logger.info("Unschedule " + repeatingPolicyRunner.getLifeCyclePolicy().getTitle());
-                repeatingPolicyRunner.unschedule();
+                logger.info("Skip deleted policy {}", repeatingPolicyRunner.getLifeCyclePolicy().getTitle());
                 return;
               } catch (LifeCycleServiceException e) {
                 logger.warn(e.toString());

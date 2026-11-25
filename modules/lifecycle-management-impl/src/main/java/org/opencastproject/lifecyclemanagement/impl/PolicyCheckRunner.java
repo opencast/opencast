@@ -48,11 +48,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Periodically checks on the policies in the database.
@@ -79,7 +81,8 @@ public class PolicyCheckRunner {
   private User systemAdminUser;
   private Organization defaultOrganization;
 
-  private Set<RepeatingPolicyRunner> repeatingPolicyRunners = new HashSet<>();
+  private final Set<RepeatingPolicyRunner> repeatingPolicyRunners = new HashSet<>();
+  private boolean stopping;
 
   @Reference
   public void setLifeCycleService(LifeCycleService lifeCycleService) {
@@ -103,6 +106,9 @@ public class PolicyCheckRunner {
     String systemAdminUserName = ctx.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     this.systemAdminUser = SecurityUtil.createSystemUser(systemAdminUserName, defaultOrganization);
 
+    synchronized (repeatingPolicyRunners) {
+      stopping = false;
+    }
     scheduledExecutor = Executors.newScheduledThreadPool(1);
     scheduledExecutor.scheduleWithFixedDelay(new Runner(), 10, 5,
         TimeUnit.SECONDS);
@@ -110,15 +116,57 @@ public class PolicyCheckRunner {
 
   @Deactivate
   public void deactivate() {
+    synchronized (repeatingPolicyRunners) {
+      stopping = true;
+      repeatingPolicyRunners.forEach(RepeatingPolicyRunner::unschedule);
+      repeatingPolicyRunners.clear();
+    }
     if (scheduledExecutor != null) {
       try {
         scheduledExecutor.shutdownNow();
-        if (!scheduledExecutor.isShutdown()) {
+        if (!scheduledExecutor.isTerminated()) {
           logger.info("Waiting for Dispatcher to terminate");
           scheduledExecutor.awaitTermination(10, TimeUnit.SECONDS);
         }
       } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
         logger.error("Error shutting down the Dispatcher", e);
+      }
+    }
+  }
+
+  private void reconcileRepeatingPolicies(Organization org, List<LifeCyclePolicy> policies) {
+    synchronized (repeatingPolicyRunners) {
+      if (stopping) {
+        return;
+      }
+      Map<String, LifeCyclePolicy> repeatingPolicies = policies.stream()
+          .filter(policy -> policy.isActive() && policy.getTiming() == Timing.REPEATING)
+          .collect(Collectors.toMap(LifeCyclePolicy::getId, policy -> policy));
+
+      repeatingPolicyRunners.removeIf(runner -> {
+        if (!runner.getOrganization().getId().equals(org.getId())) {
+          return false;
+        }
+        LifeCyclePolicy policy = repeatingPolicies.get(runner.getLifeCyclePolicy().getId());
+        if (policy == null || !Objects.equals(policy.getCronTrigger(), runner.getLifeCyclePolicy().getCronTrigger())) {
+          runner.unschedule();
+          return true;
+        }
+        return false;
+      });
+
+      for (LifeCyclePolicy policy : repeatingPolicies.values()) {
+        boolean scheduled = repeatingPolicyRunners.stream().anyMatch(runner ->
+            runner.getOrganization().getId().equals(org.getId())
+                && runner.getLifeCyclePolicy().getId().equals(policy.getId()));
+        if (!scheduled) {
+          logger.debug("Start repeating policy runner for policy {}", policy.getTitle());
+          RepeatingPolicyRunner runner = new RepeatingPolicyRunner(
+              policy, org, lifeCycleService, securityService, systemAdminUser);
+          runner.schedule();
+          repeatingPolicyRunners.add(runner);
+        }
       }
     }
   }
@@ -142,6 +190,8 @@ public class PolicyCheckRunner {
               logger.info("Could not get active policies ", e);
               return;
             }
+
+            reconcileRepeatingPolicies(org, policies);
 
             for (LifeCyclePolicy policy : policies) {
               if (!policy.isActive()) {
@@ -209,25 +259,6 @@ public class PolicyCheckRunner {
                   logger.warn(e.toString());
                 } catch (LifeCycleServiceException e) {
                   logger.warn(e.toString());
-                }
-
-              } else if (policy.getTiming() == Timing.REPEATING) {
-
-                // Start a timer for the policy
-                // If there is not already a timer running
-                Optional optRunner = repeatingPolicyRunners.stream().parallel()
-                    .filter(r -> r.getLifeCyclePolicy().getId().equals(policy.getId()))
-                    .findAny();
-                if (optRunner.isEmpty()) {
-                  logger.debug("Start repeating policy runner for policy " + policy.getTitle());
-                  RepeatingPolicyRunner runner = new RepeatingPolicyRunner(
-                      policy,
-                      org,
-                      lifeCycleService,
-                      securityService,
-                      systemAdminUser);
-                  runner.schedule();
-                  repeatingPolicyRunners.add(runner);
                 }
               }
             }
