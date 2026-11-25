@@ -125,8 +125,6 @@ public class BasicStatisticsRestEndpoint {
 
   private static final Gson GSON = new Gson();
 
-  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
-
   @GET
   @Path("")
   @RestQuery(
@@ -212,22 +210,12 @@ public class BasicStatisticsRestEndpoint {
           + "error: string with short, developer focussed error message }"
   )
   public Response clientPush(@Context HttpServletRequest request) {
-    // Parse request header
-    // Parse client IP
+    // Behind a trusted reverse proxy, Opencast's own request filter already validates X-Forwarded-For and
+    // rewrites getRemoteAddr() to the real client IP; the header itself is left untouched, so reading it here
+    // directly would use an unvalidated, client-controlled value instead.
     InetAddress ip;
-    String ipString;
-    // Behind a reverse proxy, the connection comes from the proxy, so the client address is taken from the
-    // X-Forwarded-For header.
-    if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {
-      logger.trace("Found '{}' header for client IP '{}'", X_FORWARDED_FOR, request.getHeader(X_FORWARDED_FOR));
-      ipString = request.getHeader(X_FORWARDED_FOR);
-      ipString = ipString.split(",")[0].trim();
-    } else {
-      logger.trace("Using client IP from request '{}'", request.getRemoteAddr());
-      ipString = request.getRemoteAddr();
-    }
     try {
-      ip = parseIpAddress(ipString);
+      ip = parseIpAddress(request.getRemoteAddr());
     } catch (IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST)
           .type(MediaType.TEXT_PLAIN)

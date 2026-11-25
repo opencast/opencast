@@ -319,15 +319,16 @@ public class BasicStatisticsRestEndpointTest {
     assertRejected(rejected(response), 0, "disallowed on clientPush");
   }
 
+  /**
+   * The trusted-proxy request filter already validates X-Forwarded-For and rewrites getRemoteAddr() if
+   * applicable; reading the header directly here would use an unvalidated, client-controlled value instead.
+   */
   @Test
-  public void testClientPushUsesForwardedClientIp() throws Exception {
+  public void testClientPushIgnoresXForwardedForHeader() throws Exception {
     responseBody(clientPush("1.2.3.4, 5.6.7.8", event()));
-    assertEquals(List.of(InetAddress.getByName("1.2.3.4")), hashedIps);
-    assertEquals(List.of("client-ua"), hashedUserAgents);
 
-    hashedIps.clear();
-    responseBody(clientPush(null, event()));
     assertEquals(List.of(InetAddress.getByName("10.0.0.7")), hashedIps);
+    assertEquals(List.of("client-ua"), hashedUserAgents);
   }
 
   @Test
@@ -345,9 +346,9 @@ public class BasicStatisticsRestEndpointTest {
 
   @Test
   public void testClientPushRejectsRequestWithoutValidClientIp() {
-    for (String forwardedFor : new String[]{"example.org", "not an ip", "127.1"}) {
-      Response response = endpoint(body(event())).clientPush(request(forwardedFor, "10.0.0.7", "client-ua"));
-      assertEquals(forwardedFor, 400, response.getStatus());
+    for (String remoteAddr : new String[]{"example.org", "not an ip", "127.1"}) {
+      Response response = endpoint(body(event())).clientPush(request(null, remoteAddr, "client-ua"));
+      assertEquals(remoteAddr, 400, response.getStatus());
     }
     assertTrue(stored.isEmpty());
   }

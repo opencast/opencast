@@ -37,7 +37,6 @@ import com.google.common.net.InetAddresses;
 
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.apache.commons.codec.digest.HmacUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -81,8 +80,6 @@ public class BasicStatisticsService implements FileFetchListener {
 
   /** The module specific logger */
   private static final Logger logger = LoggerFactory.getLogger(BasicStatisticsService.class);
-
-  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
   /** Config key for an administrator-set override of the data-completeness threshold date (an ISO date). */
   private static final String COMPLETENESS_THRESHOLD_DATE_KEY = "completeness.threshold.date";
@@ -391,16 +388,11 @@ public class BasicStatisticsService implements FileFetchListener {
     String mediaPackageId = parts[3];
     String elementId = parts[4];
 
-    InetAddress ip;
-    String ipString;
-    if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {
-      ipString = request.getHeader(X_FORWARDED_FOR);
-      ipString = ipString.split(",")[0].trim();
-    } else {
-      ipString = request.getRemoteAddr();
-    }
+    // Behind a trusted reverse proxy, Opencast's own request filter already validates X-Forwarded-For and
+    // rewrites getRemoteAddr() to the real client IP; the header itself is left untouched, so reading it here
+    // directly would use an unvalidated, client-controlled value instead.
     // Only parse IP addresses. Looking up host names would let clients trigger DNS lookups through the header.
-    ip = InetAddresses.forString(ipString);
+    InetAddress ip = InetAddresses.forString(request.getRemoteAddr());
 
     // Parse user agent
     String userAgent = request.getHeader("User-Agent");
