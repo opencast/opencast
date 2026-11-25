@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.persistence.CollectionTable;
@@ -697,8 +698,11 @@ public class AgentImpl implements Agent {
     // These, assuming they match the regex, are passed through unmodified since they're vendor tools
     Set<String> vendorKeys = configuration.stringPropertyNames().stream()
         .filter(s -> s.startsWith(CAPTURE_EXTENSION_PREFIX))
-        .filter(s -> s.matches("X-[A-Za-z0-9._-]{1,256}"))
         .collect(Collectors.toSet());
+    if (vendorKeys.stream().anyMatch(Predicate.not(s -> s.matches("X-[A-Za-z0-9._-]{1,256}")))) {
+      throw new IllegalArgumentException(
+          "Vendor extension keys have a key that is too long or contains invalid characters");
+    }
     for (String key : vendorKeys) {
       String value = configuration.getProperty(key);
       if (value.isEmpty()) {

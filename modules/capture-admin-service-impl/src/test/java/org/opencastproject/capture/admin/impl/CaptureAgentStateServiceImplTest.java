@@ -885,11 +885,8 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "diacritics-ümlauts-no", "does not matter");
     // This next one has the prefix, but nothing else
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX, "does not matter");
-    returnedConfig = new Properties();
-    returnedConfig.putAll(agentCaps2x);
-    // None of the extensions above match the vendor key requirements, so they are *silently* stripped!
 
-    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentException("test", IDLE, sentConfig);
 
   }
 
