@@ -546,19 +546,21 @@ public class AgentImpl implements Agent {
         VENDOR_NAME,
         VENDOR_MODEL,
         VENDOR_FIRMWARE,
-        VENDOR_HARDWARE);
+        VENDOR_HARDWARE,
+        AGENT_VERSION);
 
     Set<String> configs = configuration.stringPropertyNames().stream()
         .filter(requiredKeys2x::contains).collect(Collectors.toSet());
     // Ensure there are four strings, and that they're all between 1 and at most 256 characters
-    boolean hasRequired2xKeys = configs.size() == 4
+    boolean hasRequired2xKeys = configs.size() == 5
         // Strings must be at least 1 character, and less than 256
         && configs.stream()
             .map(configuration::getProperty)
             .map(String::length)
             .allMatch(i -> i > 0 && i <= 256);
 
-    if (hasRequired2xKeys) {
+    AgentVersion desiredVersion = AgentVersion.fromVersion(configuration.getProperty(AGENT_VERSION));
+    if (hasRequired2xKeys && desiredVersion.equals(AgentVersion.VERSION_2)) {
       set2xAgentConfiguration(configuration);
       configurationProperties.putAll(capabilitiesProperties);
     } else {

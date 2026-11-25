@@ -16,6 +16,7 @@ A CA API 2.x agent *MUST* populate the following keys with human readable string
 - `vendor.model`: Set to the capture agent's model
 - `vendor.hardware`: Set to the capture agent's hardware revision
 - `vendor.firmware`: Set to the capture agent's firmware revision
+- `opencast.agent.version`: Set the desired agent version.  Currently only `2` is supported for this field.
 
 Agent which do not populate all of these keys will be treated as CA API 1.x agents.
 

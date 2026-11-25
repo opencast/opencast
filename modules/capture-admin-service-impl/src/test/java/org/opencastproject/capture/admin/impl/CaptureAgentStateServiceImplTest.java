@@ -102,6 +102,7 @@ public class CaptureAgentStateServiceImplTest {
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_HARDWARE, "Mock Hardware");
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_FIRMWARE, "Mock Firmware");
     agentRegistration2x.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, BOOLEAN_ON);
+    agentRegistration2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
 
     agentConfig2x = new Properties();
     agentConfig2x.putAll(agentCaps2x);
@@ -305,7 +306,7 @@ public class CaptureAgentStateServiceImplTest {
     // Iterate through each of the required fields, and make them too long or missing
     // this should result in a 1x agent, since the required field now fails validation
     List<String> reqFields = List.of(CaptureParameters.VENDOR_FIRMWARE, CaptureParameters.VENDOR_HARDWARE,
-        CaptureParameters.VENDOR_NAME, CaptureParameters.VENDOR_MODEL);
+        CaptureParameters.VENDOR_NAME, CaptureParameters.VENDOR_MODEL, CaptureParameters.AGENT_VERSION);
     for (String field : reqFields) {
       Properties agentReg = new Properties();
       agentReg.putAll(agentRegistration2x);
@@ -320,7 +321,11 @@ public class CaptureAgentStateServiceImplTest {
       agent4Conf.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
       agentReg.remove(field);
-      agent4Conf.remove(field);
+      // If there's no agent version field in agentReg (the data POSTed to the core), then it's a 1.x agent
+      // which is set above, and thus should not be removed from agent4Conf (the core's return data)
+      if (!CaptureParameters.AGENT_VERSION.equals(field)) {
+        agent4Conf.remove(field);
+      }
 
       //We set this state once, then vary the config.
       service.setAgentState("agent4", IDLE);
@@ -335,7 +340,9 @@ public class CaptureAgentStateServiceImplTest {
       // This should spit out a 1.x agent with the keys, even the blank one
       agentReg.putAll(agentRegistration2x);
       agentReg.put(field, "");
-      agent4Conf.put(field, "");
+      if (!CaptureParameters.AGENT_VERSION.equals(field)) {
+        agent4Conf.put(field, "");
+      }
 
       service.setAgentConfiguration("agent4", agentReg);
       verifyAgentCapabilities("agent4", IDLE, agent4Caps);
@@ -345,7 +352,9 @@ public class CaptureAgentStateServiceImplTest {
       // This should spit out a 1.x agent with all of the keys
       agentReg.putAll(agentRegistration2x);
       agentReg.put(field, "a".repeat(257));
-      agent4Conf.put(field, "a".repeat(257));
+      if (!CaptureParameters.AGENT_VERSION.equals(field)) {
+        agent4Conf.put(field, "a".repeat(257));
+      }
 
       service.setAgentConfiguration("agent4", agentReg);
       verifyAgentCapabilities("agent4", IDLE, agent4Caps);

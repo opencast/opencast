@@ -150,8 +150,8 @@ validated as a 2.x agent you should check that an HTTP GET request to
     and 
     /capture-admin/agents/$AGENT_NAME/configuration.json
 
-…both contain `opencast.agent.version=2`.  Be aware that the core blindly sets the value for that key, overwriting
-anything that an integration might send!
+…both contain `opencast.agent.version=2`.  Be aware that while you can set the desired agent version when registering,
+the core overrides the value for that key, overwriting it with what version your agent has been registered as.
 
 
 ### Getting the Calendar/Schedule
