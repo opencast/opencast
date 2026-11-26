@@ -548,7 +548,7 @@
     <property name="redirectingEntryPoint" ref="redirectingEntryPoint" />
     <property name="redirectingPathPatterns">
       <list>
-        <value>**/index.html</value>
+        <value>/**/index.html</value>
         <value>/admin-ui/**</value>
         <value>/admin-ng</value>
         <value>/admin-ng/</value>
