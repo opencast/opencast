@@ -30,6 +30,7 @@ import org.apache.commons.codec.digest.HmacUtils;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -91,7 +92,13 @@ public class ClientPushRateLimiter {
     if (maxMinuteBytes <= 0 && maxHourBytes <= 0) {
       return true;
     }
-    long hash = ByteBuffer.wrap(new HmacUtils(HmacAlgorithms.HMAC_SHA_256, key).hmac(client.getAddress())).getLong();
+    // For IPv6, only the first 8 bytes identify the network; the last 8 bytes are an interface id that a client
+    // can freely change, so only the network part is used to identify the client.
+    byte[] address = client.getAddress();
+    if (address.length == 16) {
+      address = Arrays.copyOf(address, 8);
+    }
+    long hash = ByteBuffer.wrap(new HmacUtils(HmacAlgorithms.HMAC_SHA_256, key).hmac(address)).getLong();
     return usages.asMap().computeIfAbsent(hash, h -> new Usage()).add(bytes, nowMillis);
   }
 

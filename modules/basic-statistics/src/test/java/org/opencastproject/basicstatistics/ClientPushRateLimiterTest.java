@@ -38,6 +38,13 @@ public class ClientPushRateLimiterTest {
     return InetAddress.getByAddress(new byte[]{1, 2, 3, (byte) lastByte});
   }
 
+  private static InetAddress ipv6Client(int network, int interfaceId) throws Exception {
+    byte[] address = new byte[16];
+    address[7] = (byte) network;
+    address[15] = (byte) interfaceId;
+    return InetAddress.getByAddress(address);
+  }
+
   @Test
   public void testLimitOfSingleRequest() throws Exception {
     ClientPushRateLimiter limiter = new ClientPushRateLimiter(100, 0, 0);
@@ -83,5 +90,15 @@ public class ClientPushRateLimiterTest {
     assertTrue(limiter.allow(client(1), 100, 0));
     assertFalse(limiter.allow(client(1), 1, 0));
     assertTrue(limiter.allow(client(2), 100, 0));
+  }
+
+  @Test
+  public void testIpv6ClientsAreCountedByNetworkNotInterfaceId() throws Exception {
+    ClientPushRateLimiter limiter = new ClientPushRateLimiter(100, 100, 0);
+
+    assertTrue(limiter.allow(ipv6Client(1, 1), 100, 0));
+    // same network, different interface id: still the same client
+    assertFalse(limiter.allow(ipv6Client(1, 2), 1, 0));
+    assertTrue(limiter.allow(ipv6Client(2, 1), 100, 0));
   }
 }
