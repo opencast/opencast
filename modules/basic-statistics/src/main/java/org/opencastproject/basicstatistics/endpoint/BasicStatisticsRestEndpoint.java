@@ -116,6 +116,8 @@ public class BasicStatisticsRestEndpoint {
   private static final Duration ALLOWED_CLOCK_SKEW = Duration.ofSeconds(30);
   /** Maximum length of an item id, matching the size of the database column it is stored in. */
   private static final int MAX_ITEM_ID_LENGTH = 255;
+  /** Maximum number of events {@link #getRawEvents} returns for a single request, regardless of the limit asked for. */
+  private static final int MAX_GET_RAW_EVENTS_LIMIT = 10_000;
 
   /** The service */
   protected BasicStatisticsService basicStatisticsService;
@@ -134,7 +136,8 @@ public class BasicStatisticsRestEndpoint {
       returnDescription = "A JSON object containing an array of raw events.",
       restParameters = {
           @RestParameter(name = "limit", isRequired = false, type = INTEGER,
-              description = "The maximum number of results to return for a single request.", defaultValue = "100"),
+              description = "The maximum number of results to return for a single request, capped at "
+                  + MAX_GET_RAW_EVENTS_LIMIT + ".", defaultValue = "100"),
           @RestParameter(name = "offset", isRequired = false, type = INTEGER,
               description = "The index of the first result to return.", defaultValue = "0"),
       },
@@ -158,7 +161,7 @@ public class BasicStatisticsRestEndpoint {
 
     // Apply pagination
     int effectiveOffset = optOffset.orElse(0);
-    int effectiveLimit = optLimit.orElse(100);
+    int effectiveLimit = Math.min(optLimit.orElse(100), MAX_GET_RAW_EVENTS_LIMIT);
 
     List<RawEvent> allEvents
         = basicStatisticsService.getRawEvents(effectiveLimit, effectiveOffset);
