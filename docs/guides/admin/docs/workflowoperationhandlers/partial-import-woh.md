@@ -37,13 +37,14 @@ Parameter Table
 |**target-presenter-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type and subtype must not be *\**||
 |**target-presentation-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type nor subtype must not be *\**||
 |**preencode-encoding-profile**\*|String|Encoding profile to for pre-processing videos. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile||
-|**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
+|**concat-encoding-profile**\*|String|Encoding profile used for concatenating video files||
 |concat-output-framerate|Float|The optional output framerate for concatenated video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
+|audio-merge-encoding-profile| String | Encoding profile used for merging audio files. If the default profile is not configured, a built-in profile is used (codec: `-c:a flac`; suffix = `-merged.mkv`).|audiomerge.work|
 
 \* **required keys**
 
@@ -226,12 +227,48 @@ order of occurrences of *video* and *audio* elements are independent from each o
 appearance in the SMIL file is not correct.
 
 
-### Overlapping Partial Tracks
+### Overlapping Partial Tracks (Videos)
 
-The behavior of overlapping partial tracks is unspecified, i.e. for a given element *e* (*video* or *audio*), the value
-of *begin* for the subsequent element *(e+1)* of the same type (*video* or *audio*) within the same sequence must be
+The behavior of overlapping partial tracks is unspecified for videos, i.e. for a given video *e*, the value
+of *begin* for the subsequent element *(e+1)* within the same sequence must be
 equal or greater than *e.begin + e.dur*, i.e. make sure that the following invariant holds: *(e+1).begin >= e.begin +
 e.dur*
+
+### Overlapping Partial Tracks (Audio)
+
+Audio elements may overlap. The audio files of a sequence are not joined end to end, but merged: every file is placed
+at the position given by its attribute *begin*, and all files are mixed into one audio track. This is how e.g.
+BigBlueButton 3 delivers its recordings: one audio file per microphone activation, and several participants can talk
+at the same time.
+
+The merge is a single FFmpeg call using `filter_complex`:
+
+- `aresample=async=1` fills gaps in the timestamps of an audio file with silence. Recordings of live streams can have
+  such gaps where packets were lost or the microphone was muted. Without filling them, the audio after a gap would be
+  out of sync.
+- `adelay` puts silence in front of an audio file to move it to its position in the timeline.
+- `amix` mixes all audio files into one audio track. Normalization is disabled (`normalize=0`), so every file keeps its
+  original volume. Note that several loud sources at the same time can therefore clip.
+
+Things to keep in mind:
+
+- Merging audio requires FFmpeg 4.4 or newer.
+- The result is encoded with the *audio-merge-encoding-profile*, not with the *concat-encoding-profile*.
+- Audio-only files are not encoded with the *preencode-encoding-profile*. They are merged in their original format, and
+  FFmpeg converts different sample rates or channel layouts while mixing.
+- A single audio file that covers the whole recording is not merged, but passed on as it is.
+
+Here is an example:
+```
+ffmpeg -i in1.mp3 -i in2.mp3 -i in3.mp3 -filter_complex \
+"[0:a]aresample=async=1:first_pts=0,adelay=1500:all=1[a0]; \
+[1:a]aresample=async=1:first_pts=0,adelay=2500:all=1[a1]; \
+[2:a]aresample=async=1:first_pts=0,adelay=4000:all=1[a2]; \
+[a0][a1][a2]amix=inputs=3:duration=longest:normalize=0[aout]" \
+-map "[aout]" \
+-c:a flac \
+merged.mkv
+```
 
 Encoding Profiles
 -----------------
@@ -255,9 +292,10 @@ supposed to be changed by the user.
 
 |Configuration Key         |Description |
 |--------------------------|------------|
-|concat-encoding-profile   |Used to concatenate partial tracks into tracks|
+|concat-encoding-profile   |Used to concatenate partial video tracks into tracks|
+|audio-merge-encoding-profile|Used to merge the audio files of a sequence into one audio track. Optional: if no profile with the default name `audiomerge.work` is configured, a built-in profile is used (FLAC audio in a Matroska file)|
 |trim-encoding-profile     |Used to trim the resulting concatenated single tracks if necessary|
-|preencode-encoding-profile|Used to encode all source video tracks before any processing happens, to avoid errors with non-uniform input and prepare them for lossless concatenation. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile. |
+|preencode-encoding-profile|Used to encode all source video tracks before any processing happens, to avoid errors with non-uniform input and prepare them for lossless concatenation. Must ensure same resolution, codec, framerate and samplerate. Must use the same framerate as the image-movie.work profile. Audio-only tracks are not preencoded. |
 |force-encoding-profile    |Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
 
 ### Missing Encoding Profiles
