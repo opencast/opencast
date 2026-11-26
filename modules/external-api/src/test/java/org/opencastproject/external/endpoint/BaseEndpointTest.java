@@ -61,7 +61,7 @@ public class BaseEndpointTest {
 
     JsonObject json = JsonParser.parseString(response).getAsJsonObject();
     assertEquals("https://api.opencast.org", json.get("url").getAsString());
-    assertEquals("v1.12.0", json.get("version").getAsString());
+    assertEquals("v1.13.0", json.get("version").getAsString());
   }
 
   /** Test case for {@link BaseEndpoint#getUserInfo()} */
@@ -123,7 +123,7 @@ public class BaseEndpointTest {
 
     JsonObject json = JsonParser.parseString(response).getAsJsonObject();
     JsonArray version = json.getAsJsonArray("versions");
-    assertEquals("v1.12.0", json.get("default").getAsString());
+    assertEquals("v1.13.0", json.get("default").getAsString());
     assertTrue(version.contains(new JsonPrimitive("v1.0.0")));
     assertTrue(version.contains(new JsonPrimitive("v1.1.0")));
     assertTrue(version.contains(new JsonPrimitive("v1.2.0")));
@@ -137,7 +137,8 @@ public class BaseEndpointTest {
     assertTrue(version.contains(new JsonPrimitive("v1.10.0")));
     assertTrue(version.contains(new JsonPrimitive("v1.11.0")));
     assertTrue(version.contains(new JsonPrimitive("v1.12.0")));
-    assertEquals(13, version.size());
+    assertTrue(version.contains(new JsonPrimitive("v1.13.0")));
+    assertEquals(14, version.size());
   }
 
   /** Test case for {@link BaseEndpoint#getVersionDefault()} */
@@ -147,7 +148,7 @@ public class BaseEndpointTest {
             .asString();
 
     JsonObject json = JsonParser.parseString(response).getAsJsonObject();
-    assertEquals("v1.12.0", json.get("default").getAsString());
+    assertEquals("v1.13.0", json.get("default").getAsString());
   }
 
 }
