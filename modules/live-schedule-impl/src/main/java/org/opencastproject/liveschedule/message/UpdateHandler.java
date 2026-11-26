@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class UpdateHandler {
 
-  protected static final String PUBLISH_LIVE_PROPERTY = "publishLive";
-
   private static final Logger logger = LoggerFactory.getLogger(UpdateHandler.class);
 
   /** Services */

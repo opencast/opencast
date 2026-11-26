@@ -31,7 +31,6 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Publication;
@@ -43,11 +42,8 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.search.api.SearchService;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
@@ -62,7 +58,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
@@ -74,7 +69,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
@@ -85,6 +79,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LiveScheduleServiceImplTest {
 
@@ -115,7 +110,6 @@ public class LiveScheduleServiceImplTest {
   private DownloadDistributionService downloadDistributionService;
   private DublinCoreCatalogService dublinCoreService;
   private AssetManager assetManager;
-  private AuthorizationService authService;
   private OrganizationDirectoryService organizationService;
   private SecurityService securityService;
 
@@ -142,7 +136,6 @@ public class LiveScheduleServiceImplTest {
     workspace = EasyMock.createNiceMock(Workspace.class);
     dublinCoreService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
     assetManager = EasyMock.createNiceMock(AssetManager.class);
-    authService = new AuthorizationServiceMock();
     organizationService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
 
     Organization defOrg = new DefaultOrganization();
@@ -180,7 +173,6 @@ public class LiveScheduleServiceImplTest {
     service.setWorkspace(workspace);
     service.setDublinCoreService(dublinCoreService);
     service.setAssetManager(assetManager);
-    service.setAuthorizationService(authService);
     service.setOrganizationService(organizationService);
     service.setSecurityService(securityService);
     service.activate(cc);
@@ -377,36 +369,6 @@ public class LiveScheduleServiceImplTest {
     EasyMock.verify(downloadDistributionService);
   }
 
-  @Test
-  public void testReplaceAndDistributeAcl() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype><url>http://host/security-policy-episode.xml</url></attachment>");
-    EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(String.class), EasyMock.anyBoolean())).andReturn(job).once();
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
-
-    AccessControlList acl = new AccessControlList(new AccessControlEntry("user", "read", true));
-
-    MediaPackage mp1 = service.replaceAndDistributeAcl(mp, acl);
-
-    Attachment[] atts = mp1.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-    Assert.assertNotNull(atts);
-    Assert.assertEquals(1, atts.length);
-    Attachment att = atts[0];
-    Assert.assertEquals("http://host/security-policy-episode.xml", att.getURI().toString());
-    Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
-    EasyMock.verify(downloadDistributionService);
-  }
-
   private void setUpAssetManager(MediaPackage mp) {
     version = EasyMock.createNiceMock(Version.class);
     snapshot = EasyMock.createNiceMock(Snapshot.class);
@@ -513,6 +475,14 @@ public class LiveScheduleServiceImplTest {
     catalog.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, "123456abcd"));
     Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
     catalog.setChecksum(previousChecksum);
+    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
+
+    // Change access control list
+    Attachment acl = mp2.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE)[0];
+    previousChecksum = acl.getChecksum();
+    acl.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, "123456abcd"));
+    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
+    acl.setChecksum(previousChecksum);
     Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
 
     // Change attachment flavor
@@ -832,45 +802,75 @@ public class LiveScheduleServiceImplTest {
     EasyMock.verify(searchService, downloadDistributionService);
   }
 
-  class AuthorizationServiceMock implements AuthorizationService {
-    @Override
-    public Tuple<MediaPackage, Attachment> setAcl(MediaPackage mp, AclScope scope, AccessControlList acl) {
-      try {
-        Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-                .elementFromURI(new URI("http://host/episode_auth.xml"), Attachment.TYPE,
-                        MediaPackageElements.XACML_POLICY_EPISODE);
-        attachment.setMimeType(MimeTypes.XML);
-        mp.add(attachment);
-      } catch (URISyntaxException e) {
-      }
-      return null;
-    }
+  /**
+   * Count how often the live service looks up the published media package, which is the first step of retracting a
+   * live publication. The media package is never found, so nothing is actually retracted.
+   */
+  private AtomicInteger countRetractAttempts() throws Exception {
+    AtomicInteger lookups = new AtomicInteger();
+    EasyMock.expect(searchService.get(MP_ID)).andAnswer(() -> {
+      lookups.incrementAndGet();
+      throw new NotFoundException();
+    }).anyTimes();
+    return lookups;
+  }
 
-    @Override
-    public MediaPackage removeAcl(MediaPackage mp, AclScope scope) {
-      return null;
-    }
+  @Test
+  public void testUpdateLiveEventRecordingState() throws Exception {
+    AtomicInteger retractAttempts = countRetractAttempts();
+    replayServices();
 
-    @Override
-    public boolean hasPermission(MediaPackage mp, String action) {
-      return false;
+    for (String state : List.of(RecordingState.CAPTURING, RecordingState.UPLOAD_FINISHED, RecordingState.UNKNOWN)) {
+      service.updateLiveEventRecordingState(MP_ID, state);
     }
+    Assert.assertEquals("The capture is not over", 0, retractAttempts.get());
 
-    @Override
-    public boolean hasPermission(AccessControlList acl, String action) {
-      return false;
+    for (String state : List.of(RecordingState.CAPTURE_FINISHED, RecordingState.UPLOADING, RecordingState.UPLOAD_ERROR,
+            RecordingState.CAPTURE_ERROR)) {
+      service.updateLiveEventRecordingState(MP_ID, state);
     }
+    Assert.assertEquals("The capture is over", 4, retractAttempts.get());
+  }
 
-    @Override
-    public Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp) {
-      return null;
+  @Test
+  public void testUpdateLiveEventRecordingStateKeepOnCaptureError() throws Exception {
+    AtomicInteger retractAttempts = countRetractAttempts();
+    replayServices();
+
+    activateWithDeleteOnCaptureError("false");
+
+    service.updateLiveEventRecordingState(MP_ID, RecordingState.CAPTURE_ERROR);
+    Assert.assertEquals("Capture errors are configured to keep the publication", 0, retractAttempts.get());
+
+    service.updateLiveEventRecordingState(MP_ID, RecordingState.CAPTURE_FINISHED);
+    Assert.assertEquals("Finished captures are always retracted", 1, retractAttempts.get());
+  }
+
+  @Test
+  public void testUpdateLiveEventRecordingStateInvalidDeleteOnCaptureError() throws Exception {
+    AtomicInteger retractAttempts = countRetractAttempts();
+    replayServices();
+
+    for (String value : List.of("", " ", "flase")) {
+      activateWithDeleteOnCaptureError(value);
+      service.updateLiveEventRecordingState(MP_ID, RecordingState.CAPTURE_ERROR);
     }
+    Assert.assertEquals("Invalid values fall back to the default", 3, retractAttempts.get());
+  }
 
-    @Override
-    public Tuple<AccessControlList, AclScope> getAcl(MediaPackage mp, AclScope scope) {
-      return null;
-    }
-
+  /**
+   * Activate the service with the given value for {@link LiveScheduleServiceImpl#LIVE_DELETE_ON_CAPTURE_ERROR}.
+   */
+  private void activateWithDeleteOnCaptureError(String value) {
+    BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bc.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER)).andReturn("system-user").anyTimes();
+    Dictionary<String, Object> props = new Hashtable<>();
+    props.put(LiveScheduleServiceImpl.LIVE_DELETE_ON_CAPTURE_ERROR, value);
+    ComponentContext context = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(context.getBundleContext()).andReturn(bc).anyTimes();
+    EasyMock.expect(context.getProperties()).andReturn(props).anyTimes();
+    EasyMock.replay(bc, context);
+    service.activate(context);
   }
 
 }

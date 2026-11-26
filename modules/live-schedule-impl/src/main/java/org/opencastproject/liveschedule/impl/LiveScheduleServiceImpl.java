@@ -30,7 +30,6 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.liveschedule.api.LiveScheduleException;
 import org.opencastproject.liveschedule.api.LiveScheduleService;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
@@ -50,10 +49,8 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.search.api.SearchService;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -72,6 +69,7 @@ import com.google.common.cache.CacheBuilder;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Equator;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -147,6 +145,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   public static final String LIVE_TARGET_FLAVORS = "live.targetFlavors";
   public static final String LIVE_DISTRIBUTION_SERVICE = "live.distributionService";
   public static final String LIVE_PUBLISH_STREAMING = "live.publishStreaming";
+  public static final String LIVE_DELETE_ON_CAPTURE_ERROR = "live.deleteOnCaptureError";
+
+  /** Recording states after which the live publication is retracted, in addition to capture errors */
+  private static final Set<String> CAPTURE_OVER_STATES = Set.of(RecordingState.CAPTURE_FINISHED,
+      RecordingState.UPLOADING, RecordingState.UPLOAD_ERROR);
 
   private static final MediaPackageElementFlavor[] publishFlavors = { MediaPackageElements.EPISODE,
       MediaPackageElements.SERIES, MediaPackageElements.XACML_POLICY_EPISODE,
@@ -165,6 +168,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
   /** Which streaming formats should be published automatically */
   private List<String> publishedStreamingFormats = null;
+  /** Whether to retract the live publication if the capture agent reports a capture error */
+  private boolean deleteOnCaptureError = true;
   private String systemUserName;
 
   /** Services */
@@ -176,7 +181,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private ServiceRegistry serviceRegistry; // to create publish/retract jobs
   private Workspace workspace; // to save dc catalogs before distributing
   private AssetManager assetManager; // to get current media package
-  private AuthorizationService authService;
   private OrganizationDirectoryService organizationService;
   private SecurityService securityService;
 
@@ -248,14 +252,18 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
 
+    deleteOnCaptureError = Objects.requireNonNullElse(BooleanUtils.toBooleanObject(
+        StringUtils.trimToNull((String) properties.get(LIVE_DELETE_ON_CAPTURE_ERROR))), true);
+
     publishElementSelector = new SimpleElementSelector();
     for (MediaPackageElementFlavor flavor : publishFlavors) {
       publishElementSelector.addFlavor(flavor);
     }
 
     logger.info(
-            "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}",
-            streamName, streamMimeType, resolution, flavors);
+            "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}, "
+                + "delete on capture error: {}",
+            streamName, streamMimeType, resolution, flavors, deleteOnCaptureError);
   }
 
   @Override
@@ -298,21 +306,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   @Override
-  public boolean updateLiveEventAcl(String mpId, AccessControlList acl) throws LiveScheduleException {
-    MediaPackage previousMp = getMediaPackageFromSearch(mpId);
-    if (previousMp != null) {
-      if (!previousMp.isLive()) {
-        logger.info("Media package {} is not live. Not updating acl.", mpId);
-        return false;
-      }
-      // Replace and distribute acl, this creates new mp
-      MediaPackage newMp = replaceAndDistributeAcl(previousMp, acl);
-      // Publish mp to engage search index
-      publishToSearch(newMp);
-      // Don't leave garbage there!
-      retractPreviousElements(previousMp, newMp);
-      logger.info("Updated live acl for media package {}", newMp);
-      return true;
+  public boolean updateLiveEventRecordingState(String mpId, String recordingState) throws LiveScheduleException {
+    if (CAPTURE_OVER_STATES.contains(recordingState)
+        || deleteOnCaptureError && RecordingState.CAPTURE_ERROR.equals(recordingState)) {
+      return deleteLiveEvent(mpId);
     }
     return false;
   }
@@ -690,45 +687,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  MediaPackage replaceAndDistributeAcl(MediaPackage previousMp, AccessControlList acl) throws LiveScheduleException {
-    try {
-      // This is the mp from the search index
-      MediaPackage mp = (MediaPackage) previousMp.clone();
-
-      // Remove previous Acl from the mp
-      Attachment[] atts = mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-      if (atts.length > 0) {
-        mp.remove(atts[0]);
-      }
-
-      // Attach current ACL to mp, acl will be created in the ws/wfr
-      authService.setAcl(mp, AclScope.Episode, acl);
-      atts = mp.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-      if (atts.length > 0) {
-        String aclId = atts[0].getIdentifier();
-        // Distribute new acl
-        Job distributionJob = downloadDistributionService.distribute(CHANNEL_ID, mp, aclId, false);
-        if (!waitForStatus(distributionJob).isSuccess()) {
-          throw new LiveScheduleException(
-                  "Acl for live media package " + mp.getIdentifier() + " could not be distributed");
-        }
-
-        MediaPackageElement e = mp.getElementById(aclId);
-        // Cleanup workspace/wfr
-        mp.remove(e);
-        workspace.delete(e.getURI());
-
-        // Add distributed acl to mp
-        mp.add(MediaPackageElementParser.getFromXml(distributionJob.getPayload()));
-      }
-      return mp;
-    } catch (LiveScheduleException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new LiveScheduleException(e);
-    }
-  }
-
   MediaPackage addLivePublicationToMediaPackage(Snapshot snapshot, Map<String, Track> generatedTracks)
           throws LiveScheduleException {
     MediaPackage mp = snapshot.getMediaPackage();
@@ -909,11 +867,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
-  }
-
-  @Reference
-  public void setAuthorizationService(AuthorizationService service) {
-    this.authService = service;
   }
 
   @Reference
