@@ -77,12 +77,19 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -94,6 +101,7 @@ public class ComposerServiceTest {
   /** The sources file to test with */
   private File sourceVideoOnly = null;
   private File sourceAudioOnly = null;
+  private File sourceAudioWithGap = null;
   private File sourceImage = null;
   private File sourceAVTS = null;
 
@@ -155,6 +163,11 @@ public class ComposerServiceTest {
     f = getFile("/audio.mp3");
     sourceAudioOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3", testDir);
     FileUtils.copyFile(f, sourceAudioOnly);
+
+    // Audio file with a timestamp gap: 4 seconds long, but without packets between 1 and 3 seconds
+    f = getFile("/audio_gap.webm");
+    sourceAudioWithGap = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".webm", testDir);
+    FileUtils.copyFile(f, sourceAudioWithGap);
 
     // Create an image file
     f = getFile("/image.jpg");
@@ -339,6 +352,149 @@ public class ComposerServiceTest {
 
     Job job = composerService.mux(sourceVideoTrack, sourceAudioTrack, "mux-av.copy");
     MediaPackageElementParser.getFromXml(job.getPayload());
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#mergeAudioTracks(String, List, List)}
+   */
+  @Test
+  public void testMergeAudioTracks() throws Exception {
+    // The source audio is 2 seconds long. Placed at 0 and 2 seconds, the result is 4 seconds long.
+    File merged = mergeAudioTracks("audiomerge.work", Arrays.asList(0L, 2000L));
+    assertEquals(4.0, getDuration(merged), 0.1);
+    // The snippets don't overlap, so merging must not change the volume
+    assertEquals(getMaxVolume(sourceAudioOnly), getMaxVolume(merged), 0.5);
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#mergeAudioTracks(String, List, List)} with overlapping tracks
+   */
+  @Test
+  public void testMergeOverlappingAudioTracks() throws Exception {
+    File merged = mergeAudioTracks("audiomerge.work", Arrays.asList(0L, 1000L));
+    assertEquals(3.0, getDuration(merged), 0.1);
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#mergeAudioTracks(String, List, List)} with a timestamp gap in the
+   * first track. Recordings of live streams (e.g. BigBlueButton) have such gaps where packets were lost or the
+   * microphone was muted. amix takes its timestamps from the first track, so the gap must not shift the other tracks.
+   */
+  @Test
+  public void testMergeAudioTracksWithGapInFirstTrack() throws Exception {
+    // The track with the gap ends at 4 seconds, the second track (2 seconds) placed at 3 seconds ends at 5 seconds.
+    // Without filling the gap, the second track would be shifted back by it and end at 7 seconds.
+    File merged = mergeAudioTracks("audiomerge.work", Arrays.asList(0L, 3000L),
+        Arrays.asList(sourceAudioWithGap, sourceAudioOnly));
+    assertEquals(5.0, getDuration(merged), 0.1);
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#mergeAudioTracks(String, List, List)} with a timestamp gap in a
+   * track that is not the first one
+   */
+  @Test
+  public void testMergeAudioTracksWithGapInSecondTrack() throws Exception {
+    // The track with the gap placed at 1 second ends at 5 seconds. Without filling the gap, its audio after the gap
+    // would move forward by it and end at 3 seconds.
+    File merged = mergeAudioTracks("audiomerge.work", Arrays.asList(0L, 1000L),
+        Arrays.asList(sourceAudioOnly, sourceAudioWithGap));
+    assertEquals(5.0, getDuration(merged), 0.1);
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#mergeAudioTracks(String, List, List)} without a configured
+   * audio merge profile
+   */
+  @Test
+  public void testMergeAudioTracksWithBuiltInProfile() throws Exception {
+    // The built-in profile is created on activation
+    BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
+    EasyMock.replay(bc, cc);
+    // The activation needs a service registry to read the job loads
+    ServiceRegistry jobRegistry = composerService.getServiceRegistry();
+    ServiceRegistry activationRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    EasyMock.expect(activationRegistry.getHostRegistrations()).andReturn(new ArrayList<>()).anyTimes();
+    EasyMock.replay(activationRegistry);
+    composerService.setServiceRegistry(activationRegistry);
+    composerService.activate(cc, new HashMap<>());
+    composerService.setServiceRegistry(jobRegistry);
+    composerService.setProfileScanner(new EncodingProfileScanner());
+
+    File merged = mergeAudioTracks("audiomerge.work", Arrays.asList(0L, 2000L));
+    assertEquals(4.0, getDuration(merged), 0.1);
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#mergeAudioTracks(String, List, List)} with an unknown profile
+   */
+  @Test(expected = EncoderException.class)
+  public void testMergeAudioTracksWithUnknownProfile() throws Exception {
+    mergeAudioTracks("unknown.work", Arrays.asList(0L, 2000L));
+  }
+
+  /** Merges the audio source with itself at the given start times and returns the resulting file */
+  private File mergeAudioTracks(String profileId, List<Long> startTimes) throws Exception {
+    List<File> sources = new ArrayList<>();
+    for (int i = 0; i < startTimes.size(); i++) {
+      sources.add(sourceAudioOnly);
+    }
+    return mergeAudioTracks(profileId, startTimes, sources);
+  }
+
+  /** Merges the audio files at the given start times and returns the resulting file */
+  private File mergeAudioTracks(String profileId, List<Long> startTimes, List<File> sources) throws Exception {
+    File merged = File.createTempFile("merged", ".mkv", testDir);
+    merged.deleteOnExit();
+
+    // One track per source file, the workspace returns the file for the track's URI
+    List<Track> tracks = new ArrayList<>();
+    Map<URI, File> files = new HashMap<>();
+    for (File source : sources) {
+      Track track = (Track) sourceAudioTrack.clone();
+      track.setURI(source.toURI());
+      tracks.add(track);
+      files.put(track.getURI(), source);
+    }
+
+    // Keep a copy of the merged file, as the composer deletes it after putting it into the workspace
+    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean()))
+            .andAnswer(() -> files.get((URI) EasyMock.getCurrentArguments()[0])).anyTimes();
+    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
+            .andAnswer(() -> {
+              FileUtils.copyInputStreamToFile((InputStream) EasyMock.getCurrentArguments()[2], merged);
+              return merged.toURI();
+            }).anyTimes();
+    composerService.setWorkspace(workspace);
+    EasyMock.replay(workspace);
+
+    Job job = composerService.mergeAudioTracks(profileId, startTimes, tracks);
+    assertNotNull(MediaPackageElementParser.getFromXml(job.getPayload()));
+    return merged;
+  }
+
+  private static double getDuration(File file) throws Exception {
+    Matcher m = Pattern.compile("Duration: (\\d+):(\\d+):(\\d+\\.\\d+)").matcher(analyzeAudio(file));
+    assertTrue("FFmpeg did not report a duration for " + file, m.find());
+    return Integer.parseInt(m.group(1)) * 3600 + Integer.parseInt(m.group(2)) * 60 + Double.parseDouble(m.group(3));
+  }
+
+  private static double getMaxVolume(File file) throws Exception {
+    Matcher m = Pattern.compile("max_volume: (-?\\d+(\\.\\d+)?) dB").matcher(analyzeAudio(file));
+    assertTrue("FFmpeg did not report a volume for " + file, m.find());
+    return Double.parseDouble(m.group(1));
+  }
+
+  /** Runs FFmpeg's volume detection on the file and returns its output */
+  private static String analyzeAudio(File file) throws Exception {
+    Process p = new ProcessBuilder(FFMPEG_BINARY, "-hide_banner", "-nostdin", "-i", file.getAbsolutePath(),
+        "-af", "volumedetect", "-f", "null", "-").redirectErrorStream(true).start();
+    String output = IOUtils.toString(p.getInputStream(), StandardCharsets.UTF_8);
+    p.waitFor();
+    return output;
   }
 
   @Test
