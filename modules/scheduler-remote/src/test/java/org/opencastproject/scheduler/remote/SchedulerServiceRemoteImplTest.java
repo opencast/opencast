@@ -22,7 +22,7 @@
 package org.opencastproject.scheduler.remote;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.hc.core5.http.HttpStatus.SC_CREATED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -32,11 +32,10 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -58,14 +57,14 @@ public class SchedulerServiceRemoteImplTest {
     private String responseBody = "[]";
 
     @Override
-    protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
-      BasicHttpResponse response = new BasicHttpResponse(HttpVersion.HTTP_1_1, responseStatus, "");
+    protected ClassicHttpResponse getResponse(ClassicHttpRequest httpRequest, Integer... expectedHttpStatus) {
+      BasicClassicHttpResponse response = new BasicClassicHttpResponse(responseStatus);
       response.setEntity(new StringEntity(responseBody, UTF_8));
       return response;
     }
 
     @Override
-    protected void closeConnection(HttpResponse response) {
+    protected void closeConnection(ClassicHttpResponse response) {
     }
   }
 
