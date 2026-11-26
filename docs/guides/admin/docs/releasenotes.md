@@ -1,5 +1,13 @@
 # Opencast 20: Release Notes
 
+## Opencast 20.8
+
+This version fixes the login redirect for anonymous users opening protected `index.html` pages, e.g. of the editor or
+Studio. Instead of being sent to the login page, they got an HTTP 403 error
+([#8368](https://github.com/opencast/opencast/issues/8368)).
+If you maintain your own security configuration in `etc/security/`, change the entry `**/index.html` in the list
+`redirectingPathPatterns` to `/**/index.html`.
+
 ## Opencast 20.7
 
 This version fixes a bug introduced with the security fixes in Opencast 20.6:
