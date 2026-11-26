@@ -50,6 +50,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 
+import org.easymock.Capture;
+import org.easymock.CaptureType;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,6 +60,8 @@ import org.junit.Test;
 import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class VideoGridWorkflowOperationHandlerTest {
 
@@ -221,6 +225,46 @@ public class VideoGridWorkflowOperationHandlerTest {
     Track[] tracks = result.getMediaPackage().getTracks(MediaPackageElementFlavor.parseFlavor(TARGET_FLAVOR_RETURN));
     Assert.assertEquals(1, tracks.length);
     Assert.assertEquals(inspectTrack.getURI(), tracks[0].getURI());
+  }
+
+  @Test
+  public void testColorProperties() throws Exception {
+    EasyMock.expect(instance.getConfiguration(SOURCE_FLAVOR)).andReturn(SOURCE_FLAVOR_KEY).anyTimes();
+    EasyMock.expect(instance.getConfiguration(SOURCE_SMIL_FLAVOR)).andReturn(SOURCE_SMIL_FLAVOR_KEY).anyTimes();
+    EasyMock.expect(instance.getConfiguration(ENCODING_PROFILE)).andReturn(ENCODING_PROFILE_ID).anyTimes();
+    EasyMock.replay(instance);
+
+    // Capture the FFmpeg commands of all sections
+    Capture<List<String>> commands = Capture.newInstance(CaptureType.ALL);
+    Job videoGridJob = new JobImpl(0);
+    videoGridJob.setPayload(gson.toJson(track.getURI()));
+    VideoGridService videoGridService = EasyMock.createMock(VideoGridService.class);
+    EasyMock.expect(videoGridService.createPartialTrack(EasyMock.capture(commands)))
+        .andReturn(videoGridJob).anyTimes();
+    EasyMock.expect(videoGridService.createPartialTrack(EasyMock.capture(commands), anyObject()))
+        .andReturn(videoGridJob).anyTimes();
+    EasyMock.replay(videoGridService);
+    handler.setVideoGridService(videoGridService);
+
+    handler.start(workflow, null);
+
+    // The sections are concatenated later on, so they all need the same color properties
+    Assert.assertTrue(commands.getValues().size() > 1);
+    List<String> colorArgs = Arrays.asList("-color_range", "tv", "-colorspace", "bt709",
+        "-color_primaries", "bt709", "-color_trc", "bt709");
+    int sectionsWithVideos = 0;
+    for (List<String> command : commands.getValues()) {
+      Assert.assertNotEquals(-1, Collections.indexOfSubList(command, colorArgs));
+      // Every video in a section is converted to these color properties
+      String filter = command.get(command.indexOf("-filter_complex") + 1);
+      int videos = filter.split("movie=", -1).length - 1;
+      int converted = filter.split("out_color_matrix=bt709:out_range=tv", -1).length - 1;
+      Assert.assertEquals(videos, converted);
+      if (videos > 0) {
+        sectionsWithVideos++;
+      }
+    }
+    Assert.assertTrue(sectionsWithVideos > 0);
   }
 
   @Test

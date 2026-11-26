@@ -127,7 +127,14 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       "-q:v", "2",
       "-g", Integer.toString(FFMPEG_WF_FRAMERATE * 10),
       "-pix_fmt", "yuv420p",
-      "-r", Integer.toString(FFMPEG_WF_FRAMERATE)
+      "-r", Integer.toString(FFMPEG_WF_FRAMERATE),
+      // All sections need the same color properties. Otherwise, they change mid-stream after concatenating the
+      // sections, which makes FFmpeg reinitialize its filters when processing the video later on (e.g. in the
+      // editor), resetting timestamps and dropping frames.
+      "-color_range", "tv",
+      "-colorspace", "bt709",
+      "-color_primaries", "bt709",
+      "-color_trc", "bt709"
   };
 
   /** Services */
@@ -794,8 +801,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
         // cuts the video there
         ffmpegFilter += String.format(",fps=%d:start_time=%s", FFMPEG_WF_FRAMERATE, msToS(video.startTime));
         // Reset the timestamps to start at 0 so that everything is synced
-        // for the video tiling, and scale to the desired size.
-        ffmpegFilter += String.format(",setpts=PTS-STARTPTS,scale=%d:%d,setsar=1",
+        // for the video tiling, and scale to the desired size. Convert the colors to the color properties
+        // of the output (see FFMPEG_WF_ARGS), since the sources may use different ones.
+        ffmpegFilter += String.format(",setpts=PTS-STARTPTS,scale=%d:%d:out_color_matrix=bt709:out_range=tv,setsar=1",
             videoScaled.aspectRatioWidth, videoScaled.aspectRatioHeight);
         // And finally, pad the video to the desired aspect ratio
         ffmpegFilter += String.format(",pad=w=%d:h=%d:x=%d:y=%d:color=%s", tileWidth, tileHeight,
