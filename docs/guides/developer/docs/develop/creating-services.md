@@ -233,30 +233,9 @@ a job producer with that type is registered. In the example above, `MediaInspect
 `opencast.service.type` are both `org.opencastproject.inspection`.
 
 Jobs also have a *load*, which tells the dispatcher how much of a node's capacity the job needs. As in the example
-above, it is passed to `createJob`, and it should be configurable. `MediaInspectionServiceImpl` reads its load values
-in a `@Modified` method, like any other configuration. What the load values mean and how administrators set them is
-described in the "Job Load" page of the administration guide.
-
-
-## `ManagedService` and why not to use it
-
-Older code, and plenty of code that was copied from it, implements `org.osgi.service.cm.ManagedService` (or
-`ManagedServiceFactory`) to receive configuration through a method called `updated`. Do not use this in new code. Use
-`@Activate` and `@Modified` as shown above.
-
-The reason is that DS already does the job of a `ManagedService` and the two interact badly. If a component does not
-have a `@Modified` method, DS restarts it on every configuration change. A component that is also a `ManagedService`
-therefore receives the new configuration in `updated`, and then receives it a second time after the restart. If the
-configuration is broken, for example a number that is not a number, `updated` throws and logs the same exception twice,
-and the first call is wasted because the component is shut down right after. With `@Activate` and `@Modified` there is
-one code path for the initial and for every later configuration, and no second mechanism to reason about.
-
-Many older services in the code base still implement `ManagedService`. Do not copy them for new code.
-
-If you need one service instance per configuration file, for example one user directory provider per organization, use
-the factory configuration of DS instead of a `ManagedServiceFactory`: set `configurationPid` and
-`configurationPolicy = ConfigurationPolicy.REQUIRE` on the component and name the files `<pid>-<name>.cfg`. For example,
-`StudipUserProviderInstance` is created once for each `org.opencastproject.userdirectory.studip-*.cfg` file in `etc/`.
+above, it is passed to `createJob`. It should be configurable: `MediaInspectionServiceImpl` reads its load value in a
+`@Modified` method, like any other configuration, which the abridged example above leaves out. What the load values
+mean and how administrators set them is described in the "Job Load" page of the administration guide.
 
 
 ## Checklist for a new service
