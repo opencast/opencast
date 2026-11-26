@@ -73,7 +73,7 @@ public class HelloWorldServiceImpl implements HelloWorldService {
 
   public String helloName(String name) {
     logger.info("Name is {}.", name);
-    if ("".equals(name)) {
+    if (name == null || name.isBlank()) {
       return "Hello!";
     }
     return "Hello " + name + "!";
