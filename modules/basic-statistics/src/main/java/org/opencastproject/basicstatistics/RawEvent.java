@@ -46,8 +46,8 @@ import javax.persistence.Transient;
  */
 @Entity(name = "RawEvent")
 @Table(name = "oc_basic_statistics_raw_event", indexes = {
-    // Range queries for timestamp, for one type of item
-    @Index(name = "IX_oc_basic_statistics_raw_event_item_type_timestamp", columnList = "item_type, timestamp"),
+    // Range queries for timestamp alone, e.g. for deleting events older than a cutoff
+    @Index(name = "IX_oc_basic_statistics_raw_event_timestamp", columnList = "timestamp"),
     // Lookup by item ID (together with item type, and the organization all queries are limited to), and range queries
     // for timestamp within that
     @Index(name = "IX_oc_basic_statistics_raw_event_item_timestamp",
