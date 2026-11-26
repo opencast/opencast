@@ -85,6 +85,7 @@ public class StaticResourceServlet extends HttpServlet {
 
   private static final String PROP_AUTH_REQUIRED = "authentication.required";
   private static final String PROP_X_ACCEL_REDIRECT = "x.accel.redirect";
+  private static final String PROP_RECORD_FILE_FETCHES = "record.file.fetches";
 
   /** static initializer */
   static {
@@ -98,6 +99,7 @@ public class StaticResourceServlet extends HttpServlet {
 
   private boolean authRequired = true;
   private String xAccelRedirect = null;
+  private boolean recordFileFetches = true;
 
   private SecurityService securityService = null;
 
@@ -167,10 +169,14 @@ public class StaticResourceServlet extends HttpServlet {
       // set defaults
       authRequired = true;
       xAccelRedirect = null;
+      recordFileFetches = true;
     } else {
       authRequired = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get(PROP_AUTH_REQUIRED), "true"));
 
       xAccelRedirect = Objects.toString(cc.getProperties().get(PROP_X_ACCEL_REDIRECT), null);
+
+      recordFileFetches = BooleanUtils.toBoolean(
+          Objects.toString(cc.getProperties().get(PROP_RECORD_FILE_FETCHES), "true"));
 
       distributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
       if (StringUtils.isEmpty(distributionDirectory)) {
@@ -181,6 +187,7 @@ public class StaticResourceServlet extends HttpServlet {
       }
     }
     logger.debug("Authentication check enabled: {}", authRequired);
+    logger.debug("Recording file fetches enabled: {}", recordFileFetches);
 
     if (StringUtils.isEmpty(distributionDirectory)) {
       throw new ConfigurationException("Distribution directory not set");
@@ -615,6 +622,9 @@ public class StaticResourceServlet extends HttpServlet {
       long from,
       Long to
   ) {
+    if (!recordFileFetches) {
+      return;
+    }
     try {
       FileFetchListener listener = fileFetchListener;
       if (listener != null) {

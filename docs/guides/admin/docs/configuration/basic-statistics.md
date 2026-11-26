@@ -79,3 +79,8 @@ like octoka is used. That server then has to report the deliveries to Opencast i
 
 Anyone with these credentials can add arbitrary data to the statistics, so use a dedicated user, keep the credentials
 secret and use HTTPS.
+
+To stop Opencast's own static file server from recording file fetches, without affecting anything served through it,
+set this in `etc/org.opencastproject.fsresources.StaticResourceServlet.cfg`:
+
+    record.file.fetches=false
