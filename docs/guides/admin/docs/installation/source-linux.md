@@ -41,7 +41,7 @@ Please make sure to install the following dependencies.
 Required:
 
     java-17-openjdk-devel / openjdk-17-jdk
-    ffmpeg >= 3.2.4
+    ffmpeg >= 4.4
     maven >= 3.6
     python >= 2.7
     unzip

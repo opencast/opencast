@@ -47,7 +47,7 @@ Required:
 
     Xcode
     jdk 17
-    ffmpeg >= 3.2.4
+    ffmpeg >= 4.4
     maven >= 3.6
     python >= 2.6
     Firefox or Chrome

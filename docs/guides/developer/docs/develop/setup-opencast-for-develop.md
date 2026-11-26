@@ -50,7 +50,7 @@ Please make sure to install the following dependencies.
 Required:
 
     java-17-openjdk-devel
-    ffmpeg >= 3.2.4
+    ffmpeg >= 4.4
     maven >= 3.6
     python
     firefox/chrome/chromium
