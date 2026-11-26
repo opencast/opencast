@@ -3,8 +3,9 @@ Admin UI
 
 The admin UI is Opencast's primary web interface for day-to-day administration: managing events, series, users,
 access control, and more. Unlike most of Opencast, it isn't a Java module at all — `modules/admin` is a git
-submodule containing a separate, modern single-page application (React, Redux, built with Vite), developed
-and versioned independently of the rest of the codebase.
+submodule pointing at the [admin interface repository](https://github.com/opencast/admin-interface), a separate,
+modern single-page application (React, Redux, built with Vite), developed and versioned independently of the rest
+of the codebase.
 
 This page covers how that frontend fits into an otherwise Java-and-OSGi system: how it gets built and served, and
 how it talks to the backend.
@@ -13,9 +14,14 @@ how it talks to the backend.
 Building and Serving the Frontend
 ------------------------------------
 
-Building `modules/admin` still goes through the regular Maven build. The `frontend-maven-plugin` installs a pinned
-Node and npm version (`node.version` in the root `pom.xml`), then runs `npm ci` and `npm run build` during Maven's
-`generate-resources` phase, producing a static build directory.
+This is how Opencast integrates the frontend into its own build, not how to work on the frontend itself: actually
+developing the admin UI happens in the [admin interface repository](https://github.com/opencast/admin-interface)
+itself, not by rebuilding it through Maven for every change — see that repository's own documentation for how to
+run it against a separately-running backend.
+
+For building a full Opencast distribution, `modules/admin` still goes through the regular Maven build. The
+`frontend-maven-plugin` installs a pinned Node and npm version (`node.version` in the root `pom.xml`), then runs
+`npm ci` and `npm run build` during Maven's `generate-resources` phase, producing a static build directory.
 
 From there, nothing Opencast-specific happens in Java at all: the built assets are embedded directly into the
 `opencast-admin` OSGi bundle (`Include-Resource = /admin-ui=-build/`) and served through the OSGi HTTP Service —
