@@ -629,34 +629,41 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       }
     }
 
-    // Concatenate sections
-    Job concatJob = null;
-    try {
-      concatJob = composerService.concat(composerService.getProfile(concatEncodingProfile).getIdentifier(),
-              new Dimension(layoutArea.width,layoutArea.height) , true, tracks.toArray(new Track[tracks.size()]));
-    } catch (EncoderException | MediaPackageException e) {
-      throw new WorkflowOperationException("The concat job failed", e);
-    }
-    if (!waitForStatus(concatJob).isSuccess()) {
-      throw new WorkflowOperationException("The concat job did not complete successfully.");
+    if (tracks.isEmpty()) {
+      throw new WorkflowOperationException("No section long enough to create a video from");
     }
 
-    // Add to mediapackage
-    if (concatJob.getPayload().length() > 0) {
-      Track concatTrack;
+    // Concatenate sections. A single section (e.g. one video covering the whole recording) is used as it is,
+    // since the concat operation requires at least two tracks.
+    Track resultTrack;
+    if (tracks.size() == 1) {
+      logger.info("Only one section, skipping concatenation");
+      resultTrack = tracks.get(0);
+    } else {
+      Job concatJob = null;
       try {
-        concatTrack = (Track) MediaPackageElementParser.getFromXml(concatJob.getPayload());
+        concatJob = composerService.concat(composerService.getProfile(concatEncodingProfile).getIdentifier(),
+                new Dimension(layoutArea.width,layoutArea.height) , true, tracks.toArray(new Track[tracks.size()]));
+      } catch (EncoderException | MediaPackageException e) {
+        throw new WorkflowOperationException("The concat job failed", e);
+      }
+      if (!waitForStatus(concatJob).isSuccess()) {
+        throw new WorkflowOperationException("The concat job did not complete successfully.");
+      }
+      if (concatJob.getPayload().length() == 0) {
+        throw new WorkflowOperationException("Concat operation unsuccessful, no payload returned.");
+      }
+      try {
+        resultTrack = (Track) MediaPackageElementParser.getFromXml(concatJob.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException("Could not parse track returned by concat service", e);
       }
-      concatTrack.setFlavor(targetPresenterFlavor);
-      concatTrack.setURI(concatTrack.getURI());
-      applyTargetTagsToElement(targetTags, concatTrack);
-
-      mediaPackage.add(concatTrack);
-    } else {
-      throw new WorkflowOperationException("Concat operation unsuccessful, no payload returned.");
     }
+
+    // Add to mediapackage
+    resultTrack.setFlavor(targetPresenterFlavor);
+    applyTargetTagsToElement(targetTags, resultTrack);
+    mediaPackage.add(resultTrack);
 
     try {
       workspace.cleanup(mediaPackage.getIdentifier());

@@ -63,6 +63,7 @@ public class VideoGridWorkflowOperationHandlerTest {
 
   private VideoGridWorkflowOperationHandler handler;
   private WorkflowInstance workflow;
+  private WorkflowInstance singleSectionWorkflow;
   private WorkflowOperationInstance instance;
 
   private TrackImpl track;
@@ -70,6 +71,7 @@ public class VideoGridWorkflowOperationHandlerTest {
   private TrackImpl concatTrack;
   private MediaPackageElement videoGridElement;
   private URI mpSmilURI;
+  private URI singleSectionSmilURI;
   private EncodingProfile profile;
   private Workspace workspace;
   private Gson gson = new Gson();
@@ -100,6 +102,7 @@ public class VideoGridWorkflowOperationHandlerTest {
     // Smil
     MediaPackageBuilder mpBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mpSmilURI = getClass().getResource("/smil_ingest.xml").toURI();
+    singleSectionSmilURI = getClass().getResource("/smil_single_section.xml").toURI();
 
     // Track
     track = new TrackImpl();
@@ -119,6 +122,13 @@ public class VideoGridWorkflowOperationHandlerTest {
     mediaPackage.add(mpSmilURI, MediaPackageElement.Type.Catalog,
         MediaPackageElementFlavor.parseFlavor(SOURCE_SMIL_FLAVOR_KEY));
 
+    // MediaPackage with a single video covering the whole recording
+    MediaPackage singleSectionMediaPackage = new MediaPackageBuilderImpl().createNew();
+    singleSectionMediaPackage.setIdentifier(new IdImpl("123-789"));
+    singleSectionMediaPackage.add((Track) track.clone());
+    singleSectionMediaPackage.add(singleSectionSmilURI, MediaPackageElement.Type.Catalog,
+        MediaPackageElementFlavor.parseFlavor(SOURCE_SMIL_FLAVOR_KEY));
+
     /** Create Mocks **/
     instance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
     EasyMock.expect(instance.getConfiguration("target-flavor")).andReturn(TARGET_FLAVOR_RETURN).anyTimes();
@@ -126,12 +136,17 @@ public class VideoGridWorkflowOperationHandlerTest {
     workspace = EasyMock.createNiceMock(Workspace.class);
     // To avoid NullPointerEx when the SMIL is parsed
     EasyMock.expect(workspace.get(mpSmilURI)).andReturn(new File(mpSmilURI)).anyTimes();
+    EasyMock.expect(workspace.get(singleSectionSmilURI)).andReturn(new File(singleSectionSmilURI)).anyTimes();
     // To avoid NullPointerEx when grabbing Absolute Track Path
     EasyMock.expect(workspace.get(trackURI)).andReturn(new File(trackURI)).anyTimes();
 
     workflow = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflow.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     EasyMock.expect(workflow.getCurrentOperation()).andReturn(instance).anyTimes();
+
+    singleSectionWorkflow = EasyMock.createNiceMock(WorkflowInstance.class);
+    EasyMock.expect(singleSectionWorkflow.getMediaPackage()).andReturn(singleSectionMediaPackage).anyTimes();
+    EasyMock.expect(singleSectionWorkflow.getCurrentOperation()).andReturn(instance).anyTimes();
 
     /** Create Service Mocks **/
     Job videoGridJob = new JobImpl(0);
@@ -169,7 +184,8 @@ public class VideoGridWorkflowOperationHandlerTest {
         .andReturn(concatJob)
         .anyTimes();
 
-    EasyMock.replay(videoGridService, workspace, workflow, mediaInspectionService, composerService);
+    EasyMock.replay(videoGridService, workspace, workflow, singleSectionWorkflow, mediaInspectionService,
+        composerService);
 
     handler.setVideoGridService(videoGridService);
     handler.setWorkspace(workspace);
@@ -189,6 +205,22 @@ public class VideoGridWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracks = mpNew.getTracks(MediaPackageElementFlavor.parseFlavor(TARGET_FLAVOR_RETURN));
     Assert.assertEquals(1, tracks.length);
+  }
+
+  @Test
+  public void testSingleSection() throws Exception {
+    EasyMock.expect(instance.getConfiguration(SOURCE_FLAVOR)).andReturn(SOURCE_FLAVOR_KEY).anyTimes();
+    EasyMock.expect(instance.getConfiguration(SOURCE_SMIL_FLAVOR)).andReturn(SOURCE_SMIL_FLAVOR_KEY).anyTimes();
+    EasyMock.expect(instance.getConfiguration(ENCODING_PROFILE)).andReturn(ENCODING_PROFILE_ID).anyTimes();
+    EasyMock.replay(instance);
+    // One video covering the whole recording results in a single section, which must not be concatenated
+    // (the composer mock does not expect a concat call with a single track)
+    WorkflowOperationResult result = handler.start(singleSectionWorkflow, null);
+    Assert.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+
+    Track[] tracks = result.getMediaPackage().getTracks(MediaPackageElementFlavor.parseFlavor(TARGET_FLAVOR_RETURN));
+    Assert.assertEquals(1, tracks.length);
+    Assert.assertEquals(inspectTrack.getURI(), tracks[0].getURI());
   }
 
   @Test
