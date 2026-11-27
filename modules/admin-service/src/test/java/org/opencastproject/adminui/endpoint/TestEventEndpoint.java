@@ -37,6 +37,7 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
@@ -661,6 +662,91 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       @Override
       public String getName() {
         return "testagent";
+      }
+
+      @Override
+      public AgentVersion getVersion() {
+        return AgentVersion.VERSION_1;
+      }
+
+      @Override
+      public boolean canCaptureLocal() {
+        return true;
+      }
+
+      @Override
+      public boolean canStartLocalPaused() {
+        return false;
+      }
+
+      @Override
+      public boolean canStream() {
+        return false;
+      }
+
+      @Override
+      public boolean canStartStreamPaused() {
+        return false;
+      }
+
+      @Override
+      public Set<String> getInputs() {
+        return Set.of();
+      }
+
+      @Override
+      public Set<String> streamConfigurations() {
+        return Set.of();
+      }
+
+      @Override
+      public String defaultStreamConfiguration() {
+        return null;
+      }
+
+      @Override
+      public Set<String> devicePositions() {
+        return Set.of();
+      }
+
+      @Override
+      public String defaultDevicePosition() {
+        return null;
+      }
+
+      @Override
+      public Set<String> contentConfigurations() {
+        return Set.of();
+      }
+
+      @Override
+      public String defaultContentConfiguration() {
+        return null;
+      }
+
+      @Override
+      public Map<String, String> vendorKeys() {
+        return Map.of();
+      }
+
+      @Override
+      public String getVendor() {
+        return "";
+      }
+
+      @Override
+      public String getModel() {
+        return "";
+      }
+
+      @Override
+      public String getHardware() {
+        return "";
+      }
+
+      @Override
+      public String getFirmware() {
+        return "";
       }
 
       @Override

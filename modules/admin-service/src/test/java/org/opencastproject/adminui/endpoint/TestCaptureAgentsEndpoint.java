@@ -24,8 +24,8 @@ package org.opencastproject.adminui.endpoint;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -64,6 +65,12 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
             new TestAgent("agent3", "ok", "http://agent3", DateTimeSupport.fromUTC("2016-06-09T18:00:00Z")));
     agents.put("agent4",
             new TestAgent("agent4", "ok", "http://agent4", DateTimeSupport.fromUTC("2016-06-09T06:00:00Z")));
+    //NB: The class below has a ton of if-else dependent on this specific name
+    //    Someday we should come back and fix that, but for now this'll do.
+    //    Doing it nicely would end up duplicating a *ton* of logic from AgentImpl
+    //    ...maybe Agent should be AgentImpl rather than just an interface
+    agents.put("pyca-2.x",
+            new TestAgent("pyca-2.x", "ok", "http://pyca-2.x", DateTimeSupport.fromUTC("2026-10-30T20:36:46Z")));
 
     expect(captureAgentService.getKnownAgents()).andStubReturn(agents);
     replay(captureAgentService);
@@ -103,6 +110,14 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     }
 
     @Override
+    public AgentVersion getVersion() {
+      if ("pyca-2.x".equals(name)) {
+        return AgentVersion.VERSION_2;
+      }
+      return AgentVersion.VERSION_1;
+    }
+
+    @Override
     public void setUrl(String agentUrl) {
       this.url = agentUrl;
     }
@@ -124,22 +139,109 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
     @Override
     public Properties getCapabilities() {
-      Properties capabilities = new Properties();
-      capabilities.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "microphone");
-      return capabilities;
-
+      throw new RuntimeException("Not implemented");
     }
 
     @Override
     public Properties getConfiguration() {
-      return null;
+      throw new RuntimeException("Not implemented");
     }
 
     @Override
     public void setConfiguration(Properties configuration) {
-
+      throw new RuntimeException("Not implemented");
     }
 
+    public boolean canCaptureLocal() {
+      return true;
+    }
+
+    public boolean canStartLocalPaused() {
+      return false;
+    }
+
+    public boolean canStream() {
+      return "pyca-2.x".equals(name);
+    }
+
+    public boolean canStartStreamPaused() {
+      return false;
+    }
+
+    public Set<String> getInputs() {
+      if ("pyca-2.x".equals(name)) {
+        return Set.of("alpha", "beta");
+      }
+      return Set.of("microphone");
+    }
+
+    public Set<String> streamConfigurations() {
+      if ("pyca-2.x".equals(name)) {
+        return Set.of("a", "b", "c");
+      }
+      return Set.of();
+    }
+
+    public String defaultStreamConfiguration() {
+      return "b";
+    }
+
+    public Set<String> devicePositions() {
+      if ("pyca-2.x".equals(name)) {
+        return Set.of("d", "e", "f");
+      }
+      return Set.of();
+    }
+
+    public String defaultDevicePosition() {
+      return "e";
+    }
+
+    public Set<String> contentConfigurations() {
+      if ("pyca-2.x".equals(name)) {
+        return Set.of("g", "h", "i");
+      }
+      return Set.of();
+    }
+
+    public String defaultContentConfiguration() {
+      return "h";
+    }
+
+    public Map<String, String> vendorKeys() {
+      if ("pyca-2.x".equals(name)) {
+        return Map.of("X-pyca.needsonly", "X- prefix", "X-pyca-thing1", "vendor extensions woo");
+      }
+      return Map.of();
+    }
+
+    public String getVendor() {
+      if ("pyca-2.x".equals(name)) {
+        return "pyca";
+      }
+      return "";
+    }
+
+    public String getModel() {
+      if ("pyca-2.x".equals(name)) {
+        return "pyca";
+      }
+      return "";
+    }
+
+    public String getHardware() {
+      if ("pyca-2.x".equals(name)) {
+        return "git_sha";
+      }
+      return "";
+    }
+
+    public String getFirmware() {
+      if ("pyca-2.x".equals(name)) {
+        return "git_sha";
+      }
+      return "";
+    }
   }
 
 }

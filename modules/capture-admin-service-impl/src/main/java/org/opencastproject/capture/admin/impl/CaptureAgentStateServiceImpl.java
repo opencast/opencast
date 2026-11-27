@@ -489,6 +489,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // If the agent doesn't exists, but the name is not null nor empty, create a new one.
       logger.debug("Creating Agent {} with state {}.", agentName, UNKNOWN);
       agent = new AgentImpl(agentName, orgId, UNKNOWN, "", configuration);
+
     }
 
     updateAgentInDatabase(agent);

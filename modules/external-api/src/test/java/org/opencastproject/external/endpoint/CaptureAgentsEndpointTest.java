@@ -85,7 +85,10 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgentsWithOffset() {
     final int offset = 1;
-    final String expectedJson = toJson(allAgents.subList(offset, allAgents.size())).toJSONString();
+    // The endpoint returns a latest-first ordering, so we grab the *first* two agents in the test json which is
+    // currently organized chronologically.
+    // And no, the endpoint does not currently support any sorting.
+    final String expectedJson = toJson(allAgents.subList(0, offset + 1)).toJSONString();
     String result = given().queryParam("offset", offset).expect().statusCode(SC_OK).when().get(env.host(""))
         .asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
@@ -94,7 +97,11 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgentsWithLimit() {
     final int limit = 1;
-    final String expectedJson = toJson(allAgents.subList(0, limit)).toJSONString();
+    // The endpoint returns a latest-first ordering, so we grab the *last* agent in the test json which is currently
+    // organized chronologically.
+    // If this test is failing, it's *probably* because you've added an agent which has updated most recently
+    // And no, the endpoint does not currently support any sorting.
+    final String expectedJson = toJson(allAgents.subList(allAgents.size() - 1, allAgents.size())).toJSONString();
     String result = given().queryParam("limit", limit).expect().statusCode(SC_OK).when().get(env.host(""))
         .asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());

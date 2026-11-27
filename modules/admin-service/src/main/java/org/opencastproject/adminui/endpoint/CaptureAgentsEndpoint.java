@@ -30,7 +30,6 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
-import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.AgentsListQuery;
@@ -59,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -66,6 +66,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -139,8 +141,9 @@ public class CaptureAgentsEndpoint {
               isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset",
               type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "false", description = "Define if the inputs should or not returned with the "
-              + "capture agent.", isRequired = false, name = "inputs", type = RestParameter.Type.BOOLEAN),
+          @RestParameter(defaultValue = "false", description = "Define if the parsed capabilities should or not "
+              + "returned with the capture agent.", isRequired = false, name = "parsed capabilities",
+              type = RestParameter.Type.BOOLEAN),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the "
               + "following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).",
               type = STRING)
@@ -151,7 +154,8 @@ public class CaptureAgentsEndpoint {
       },
       returnDescription = "")
   public Response getAgents(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
-      @QueryParam("inputs") boolean inputs, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
+      @QueryParam("withParsedCapabilities") boolean withParsedCapabilities, @QueryParam("filter") String filter,
+      @QueryParam("sort") String sort) {
     Optional<String> filterName = Optional.empty();
     Optional<String> filterStatus = Optional.empty();
     Optional<Long> filterLastUpdated = Optional.empty();
@@ -235,7 +239,7 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JsonObject> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, inputs, false));
+      agentsJSON.add(generateJsonAgent(agent, withParsedCapabilities, false));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
@@ -308,29 +312,86 @@ public class CaptureAgentsEndpoint {
    *
    * @param agent
    *          The target capture agent
-   * @param withInputs
-   *          Whether the agent has inputs
+   * @param withParsedCapabilities
+   *          Add capabilities as individual fields and pre-parse them
    * @param details
    *          Whether the configuration and capabilities should be serialized
    * @return A {@link JsonObject} representing the capture agent
    */
-  private JsonObject generateJsonAgent(Agent agent, boolean withInputs, boolean details) {
+  private JsonObject generateJsonAgent(Agent agent, boolean withParsedCapabilities, boolean details) {
     JsonObject json = new JsonObject();
     String status = AgentState.TRANSLATION_PREFIX + agent.getState().toUpperCase();
     json.addProperty("Status", safeString(status));
     json.addProperty("Name", agent.getName());
     json.addProperty("Update", safeString(toUTC(agent.getLastHeardFrom())));
     json.addProperty("URL", safeString(agent.getUrl()));
+    json.addProperty("Vendor", safeString(agent.getVendor()));
+    json.addProperty("Model", safeString(agent.getModel()));
+    json.addProperty("Hardware", safeString(agent.getHardware()));
+    json.addProperty("Firmware", safeString(agent.getFirmware()));
+    json.addProperty("Version", agent.getVersion().toString());
 
-    if (withInputs) {
-      String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-      if (devices == null || devices.isEmpty()) {
-        json.add("inputs", new JsonArray());
-      } else {
-        json.add("inputs", generateJsonDevice(devices.split(",")));
-      }
+    // This makes for a json structure that's (hopefully) much easier for the ui to parse
+    if (withParsedCapabilities) {
+      JsonObject parsedCapabilities = new JsonObject();
+
+      /* Add the core agent configuration data */
+      JsonObject localCapabilities = new JsonObject();
+      JsonObject streamCapabilities = new JsonObject();
+      localCapabilities.addProperty("capture", agent.canCaptureLocal());
+      localCapabilities.addProperty("startpaused", agent.canStartLocalPaused());
+      streamCapabilities.addProperty("stream", agent.canStream());
+      streamCapabilities.addProperty("startpaused", agent.canStartStreamPaused());
+
+      JsonObject config = new JsonObject();
+      config.add("local", localCapabilities);
+      config.add("stream", streamCapabilities);
+      parsedCapabilities.add("config", config);
+
+      //NB: Even for a CA API 2.0+ agent, we still have the device names as a fallback, though agents may override them
+      parsedCapabilities.add("inputs",
+          generateJsonDevice(agent.getInputs()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "INPUTS."));
+
+      parsedCapabilities.add("streams",
+          generateJsonDevice(agent.streamConfigurations()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "STREAM."));
+      parsedCapabilities.addProperty("streams_default", safeString(agent.defaultStreamConfiguration()));
+
+      parsedCapabilities.add("positions",
+          generateJsonDevice(agent.devicePositions()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "POSITION."));
+      parsedCapabilities.addProperty("positions_default", safeString(agent.defaultDevicePosition()));
+
+      parsedCapabilities.add("contents",
+          generateJsonDevice(agent.contentConfigurations()
+              .stream()
+              .filter(Predicate.not(String::isBlank))
+              .collect(Collectors.toSet()), TRANSLATION_KEY_PREFIX + "CONTENT."));
+      parsedCapabilities.addProperty("contents_default", safeString(agent.defaultContentConfiguration()));
+
+      Map<String, String> vendorKeys = agent.vendorKeys();
+
+      //This is handled differently than above because it's a (potentially empty) map rather than a set
+      JsonArray vendorArray = new JsonArray();
+      vendorKeys.forEach((key, value) -> {
+        JsonObject vendorJson = new JsonObject();
+        vendorJson.addProperty("key", key);
+        vendorJson.addProperty("value", value);
+        vendorArray.add(vendorJson);
+      });
+      parsedCapabilities.add("vendorKeys", vendorArray);
+
+      json.add("parsedCapabilities", parsedCapabilities);
     }
 
+    // This dumps out the raw config and capabilities blobs.  This is a *lot* of duplication.
     if (details) {
       json.add("configuration", generateJsonProperties(agent.getConfiguration()));
       json.add("capabilities", generateJsonProperties(agent.getCapabilities()));
@@ -368,13 +429,13 @@ public class CaptureAgentsEndpoint {
    *          an array of devices String
    * @return A {@link JsonArray} representing the devices
    */
-  private JsonArray generateJsonDevice(String[] devices) {
+  private JsonArray generateJsonDevice(Collection<String> devices, String translationPrefix) {
     JsonArray jsonDevices = new JsonArray();
 
     for (String device : devices) {
       JsonObject jsonDevice = new JsonObject();
       jsonDevice.addProperty("id", device);
-      jsonDevice.addProperty("value", TRANSLATION_KEY_PREFIX + device.toUpperCase());
+      jsonDevice.addProperty("value", translationPrefix + device.toUpperCase());
       jsonDevices.add(jsonDevice);
     }
 

@@ -23,6 +23,7 @@ package org.opencastproject.capture.admin.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.capture.admin.api.AgentState.CAPTURING;
@@ -30,11 +31,14 @@ import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 import static org.opencastproject.capture.admin.api.AgentState.OFFLINE;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 import static org.opencastproject.capture.admin.api.AgentState.UPLOADING;
+import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BOOLEAN_OFF;
+import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BOOLEAN_ON;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -53,15 +57,25 @@ import org.osgi.service.component.ComponentContext;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
-  private Properties capabilities;
+  /* This is what a 1.x agent would return from any of the config endpoints when fully populated with data. */
+  private Properties agentConfig1x;
+  /* This is what a 2.x agent would return from any of the capabilities endpoints. */
+  private Properties agentCaps2x;
+  /* This is what a 2.x agent would return from any of the config endpoints. */
+  private Properties agentConfig2x;
+  /* This is what a 2.x agent needs to register. */
+  private Properties agentRegistration2x;
   private static BundleContext bundleContext;
   private static ComponentContext cc;
 
@@ -69,11 +83,30 @@ public class CaptureAgentStateServiceImplTest {
   public void setUp() throws Exception {
     setupService();
 
-    capabilities = new Properties();
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA", "/dev/video0");
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "SCREEN", "/dev/video1");
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "AUDIO", "hw:0");
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
+    agentConfig1x = new Properties();
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA", "/dev/video0");
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "SCREEN", "/dev/video1");
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "AUDIO", "hw:0");
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
+    agentConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+    agentCaps2x = new Properties();
+    agentCaps2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+    agentCaps2x.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+    agentCaps2x.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, BOOLEAN_ON);
+    agentCaps2x.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_OFF);
+
+    agentRegistration2x = new Properties();
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "Mock Vendor");
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_MODEL, "Mock Model");
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_HARDWARE, "Mock Hardware");
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_FIRMWARE, "Mock Firmware");
+    agentRegistration2x.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, BOOLEAN_ON);
+    agentRegistration2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+
+    agentConfig2x = new Properties();
+    agentConfig2x.putAll(agentCaps2x);
+    agentConfig2x.putAll(agentRegistration2x);
   }
 
   private void setupCC() {
@@ -162,7 +195,7 @@ public class CaptureAgentStateServiceImplTest {
   @Test
   public void badAgentCapabilities() {
     try {
-      service.setAgentConfiguration(null, capabilities);
+      service.setAgentConfiguration(null, agentConfig1x);
       fail("Null agent name accepted");
     } catch (IllegalArgumentException e) {
       assertNotNull(e);
@@ -170,7 +203,7 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(0, service.getKnownAgents().size());
 
     try {
-      service.setAgentConfiguration("", capabilities);
+      service.setAgentConfiguration("", agentConfig1x);
       fail("Empty agent name accepted");
     } catch (IllegalArgumentException e) {
       assertNotNull(e);
@@ -186,72 +219,789 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(0, service.getKnownAgents().size());
   }
 
-  private void verifyAgent(String name, String state, Properties caps) {
+  private void verifyAgentCapabilities(String name, String state, Properties caps) {
     try {
       Agent agent = service.getAgent(name);
       assertEquals(name, agent.getName());
       assertEquals(state, agent.getState());
-      assertEquals(caps, agent.getCapabilities());
+      Properties agentCaps = agent.getCapabilities();
+      Set<String> keynames = Stream.concat(
+              caps.stringPropertyNames().stream(),
+              agentCaps.stringPropertyNames().stream())
+          .collect(Collectors.toSet());
+      for (String key : keynames) {
+        assertEquals("Key " + key + " does not match", caps.getProperty(key), agentCaps.getProperty(key));
+      }
     } catch (NotFoundException e) {
       if (state != null) {
-        fail();
+        fail("Agent not found by the service, but the desired state is not null");
+      }
+    }
+  }
+
+  private void verifyAgentConfiguration(String name, String state, Properties caps) {
+    try {
+      Agent agent = service.getAgent(name);
+      assertEquals(name, agent.getName());
+      assertEquals(state, agent.getState());
+      Properties agentConf = agent.getConfiguration();
+      Set<String> keynames = Stream.concat(
+              caps.stringPropertyNames().stream(),
+              agentConf.stringPropertyNames().stream())
+          .collect(Collectors.toSet());
+      for (String key : keynames) {
+        assertEquals("Key " + key + " does not match", caps.getProperty(key), agentConf.getProperty(key));
+      }
+    } catch (NotFoundException e) {
+      if (state != null) {
+        fail("Agent not found by the service, but the desired state is not null");
       }
     }
   }
 
   @Test
   public void oneAgentState() {
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", IDLE, new Properties());
+    verifyAgentCapabilities("notAgent1", null, null);
+    verifyAgentCapabilities("agent1", IDLE, bare1xAgent);
 
     service.setAgentState("agent1", CAPTURING);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", CAPTURING, new Properties());
+    verifyAgentCapabilities("notAgent1", null, null);
+    verifyAgentCapabilities("agent1", CAPTURING, bare1xAgent);
+  }
+
+  @Test
+  public void agentRegistration2x() {
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+    Properties bare2xAgent = new Properties();
+    bare2xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+
+    // We're going to make agent2 a 2.x agent.  These *must* register with more info, but this one didn't
+    // What happens now?
+    service.setAgentState("agent2", IDLE);
+    assertEquals(1, service.getKnownAgents().size());
+    // That's right, it shows up as a *1.x* agent.
+    verifyAgentCapabilities("agent2", IDLE, bare1xAgent);
+
+    // Note: *just* setting the config, but not the state does not finalize the registration process!
+    service.setAgentConfiguration("agent2", agentRegistration2x);
+    // Now, with the configuration, it's a 2.x agent!
+    verifyAgentCapabilities("agent2", IDLE, agentCaps2x);
+
+    // Now we do agent 3 to demonstrate that you don't need to register the state first
+    // Order of operation here *does not* matter
+    service.setAgentConfiguration("agent3", agentRegistration2x);
+    service.setAgentState("agent3", IDLE);
+    verifyAgentCapabilities("agent3", IDLE, agentCaps2x);
+
+    // Iterate through each of the required fields, and make them too long or missing
+    // this should result in a 1x agent, since the required field now fails validation
+    List<String> reqFields = List.of(CaptureParameters.VENDOR_FIRMWARE, CaptureParameters.VENDOR_HARDWARE,
+        CaptureParameters.VENDOR_NAME, CaptureParameters.VENDOR_MODEL, CaptureParameters.AGENT_VERSION);
+    for (String field : reqFields) {
+      Properties agentReg = new Properties();
+      agentReg.putAll(agentRegistration2x);
+
+      Properties agent4Caps = new Properties();
+      //Note that we should not have the caps generated by the core!  These won't register as a 2x agent!
+      agent4Caps.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+      Properties agent4Conf = new Properties();
+      // Similar to above, we're adding the registration data (the vendor keys), but not the generated caps
+      agent4Conf.putAll(agentRegistration2x);
+      agent4Conf.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+      agentReg.remove(field);
+      // If there's no agent version field in agentReg (the data POSTed to the core), then it's a 1.x agent
+      // which is set above, and thus should not be removed from agent4Conf (the core's return data)
+      if (!CaptureParameters.AGENT_VERSION.equals(field)) {
+        agent4Conf.remove(field);
+      }
+
+      //We set this state once, then vary the config.
+      service.setAgentState("agent4", IDLE);
+
+      // Test what happens if the required field is completely missing
+      // This should spit out a 1.x agent with the rest of the keys
+      service.setAgentConfiguration("agent4", agentReg);
+      verifyAgentCapabilities("agent4", IDLE, agent4Caps);
+      verifyAgentConfiguration("agent4", IDLE, agent4Conf);
+
+      // Test what happens when the required field is blank
+      // This should spit out a 1.x agent with the keys, even the blank one
+      agentReg.putAll(agentRegistration2x);
+      agentReg.put(field, "");
+      if (!CaptureParameters.AGENT_VERSION.equals(field)) {
+        agent4Conf.put(field, "");
+      }
+
+      service.setAgentConfiguration("agent4", agentReg);
+      verifyAgentCapabilities("agent4", IDLE, agent4Caps);
+      verifyAgentConfiguration("agent4", IDLE, agent4Conf);
+
+      // Now we test strings which are too long
+      // This should spit out a 1.x agent with all of the keys
+      agentReg.putAll(agentRegistration2x);
+      agentReg.put(field, "a".repeat(257));
+      if (!CaptureParameters.AGENT_VERSION.equals(field)) {
+        agent4Conf.put(field, "a".repeat(257));
+      }
+
+      service.setAgentConfiguration("agent4", agentReg);
+      verifyAgentCapabilities("agent4", IDLE, agent4Caps);
+      verifyAgentConfiguration("agent4", IDLE, agent4Conf);
+    }
+  }
+
+  @Test
+  public void testAgentDowngrade() {
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+    service.setAgentState("agent1", IDLE);
+    service.setAgentConfiguration("agent1", agentRegistration2x);
+    verifyAgentCapabilities("agent1", IDLE, agentCaps2x);
+    verifyAgentConfiguration("agent1", IDLE, agentConfig2x);
+
+    try {
+      assertEquals(AgentVersion.VERSION_2, service.getAgent("agent1").getVersion());
+    } catch (NotFoundException e) {
+      fail("Agent not found");
+    }
+
+    // This is an edge case, but re-configuring an agent that's *already* a 2.x agent
+    // should spit out a 1.x agent
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "");
+    Properties downgraded = new Properties();
+    downgraded.putAll(agentRegistration2x);
+    downgraded.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    downgraded.setProperty(CaptureParameters.VENDOR_NAME, "");
+
+    service.setAgentConfiguration("agent1", agentRegistration2x);
+    verifyAgentCapabilities("agent1", IDLE, bare1xAgent);
+    verifyAgentConfiguration("agent1", IDLE, downgraded);
+
+    try {
+      assertEquals(AgentVersion.VERSION_1, service.getAgent("agent1").getVersion());
+    } catch (NotFoundException e) {
+      fail("Agent not found");
+    }
+  }
+
+  @Test
+  public void testNullConfiguration() {
+    assert2xAgentException("agentFail", IDLE, null);
+  }
+
+  @Test
+  public void testInvalid2xAgent() {
+    agentRegistration2x.setProperty(CaptureParameters.CAPTURE_LOCAL_CAPABLE, BOOLEAN_OFF);
+    agentRegistration2x.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+
+    assert2xAgentException("agentFail", IDLE, agentRegistration2x);
+  }
+
+  // This verifies the *configuration* of the agent.  This is the config data + the capabilities
+  private void assert2xAgentConf(String name, String state, Properties sentConfig, Properties returnedConfig) {
+    service.setAgentState(name, state);
+    service.setAgentConfiguration(name, sentConfig);
+
+    verifyAgentConfiguration(name, state, returnedConfig);
+  }
+
+  // This verifies the *capabilities* of the agent, which is a subset of the full configuration above
+  private void assert2xAgentCaps(String name, String state, Properties sentConfig, Properties returnedConfig) {
+    service.setAgentState(name, state);
+    service.setAgentConfiguration(name, sentConfig);
+
+    verifyAgentCapabilities(name, state, returnedConfig);
+  }
+
+
+  private void assert2xAgentException(String name, String state, Properties sentConfig) {
+    service.setAgentState(name, state);
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration(name, sentConfig));
+  }
+
+  @Test
+  public void agent2xBasic() {
+    // Case 1: Happy path
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: Still happy, fixed inputs so no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+
+    // This is what the core should respond with in terms of configuration data
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+
+    assert2xAgentCaps("test2", IDLE, sentConfig, returnedConfig);
+
+    // Case 3: Devices string is too long (> 256 char)
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "a".repeat(257));
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+
+    // Case 4: Provide the key, but no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "");
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xWithCaps() {
+    // Case 1: Happy path
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty("capture.device.alpha.capability1", "test");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedCaps = new Properties();
+    returnedCaps.putAll(agentCaps2x);
+    returnedCaps.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedCaps.setProperty("capture.device.alpha.capability1", "test");
+
+    Properties returnedConf = new Properties();
+    returnedConf.putAll(agentConfig2x);
+    returnedConf.putAll(returnedCaps);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedCaps);
+    assert2xAgentConf("test", IDLE, sentConfig, returnedConf);
+
+    // Case 2: Still happy, fixed inputs so no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+
+    // This is what the core should respond with in terms of configuration data
+    returnedCaps = new Properties();
+    returnedCaps.putAll(agentCaps2x);
+
+    assert2xAgentCaps("test2", IDLE, sentConfig, returnedCaps);
+
+    // Case 3: Devices string is too long (> 256 char)
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "a".repeat(257));
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+
+    // Case 4: Provide the key, but no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "");
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xLocalStartPaused() {
+    // Case 1: starting paused is *not* supported
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_OFF);
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_OFF);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: starting paused *is* supported
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_ON);
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, BOOLEAN_ON);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 3: invalid data is sent to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, "banana");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_CANSTARTPAUSED, "3");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xStreamCapable() {
+    // Case 1: streaming is *not* supported
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: streaming *is* supported
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 3: invalid data is sent to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "banana");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "3");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xStreamStartPaused() {
+    // Case 1: streaming is *not* supported, but we (erroneously) say we support starting paused
+    // This is technically an error case, though the core should just silently ignore the flag
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_ON);
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: streaming *is* supported, starting paused is not
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 3: streaming and starting paused are both supported
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_ON);
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_ON);
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 4: bad data passed to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, "banana");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, "3");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xStreamConfigs() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "my config with spaces");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "my config with spaces");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    // NOTE: There's an extra space here after the comma!
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b config,  a config");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "a config");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CANSTARTPAUSED, BOOLEAN_OFF);
+    // NOTE: The extra space above has been trimmed, and the configs sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a config,b config");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "a config");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 1a: Defaults must exist and be within the list of stream configs
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Blank default
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b content, a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // A default that's not in the list
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b config, a config");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION_DEFAULT, "not in the list");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a".repeat(33));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b," + "A".repeat(33));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "A".repeat(33) + ", b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    // Note: There's a double comma here, so three items but one of them is blank
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a,,b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xDevicePositions() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "my positions with spaces");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "my positions with spaces");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // NOTE: There's an extra space here after the comma!
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "a position");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    // NOTE: The extra space above has been trimmed, and the configs sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a position,b position");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "a position");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 1a: Defaults must exist and be within the list of stream configs
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Blank default
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // A default that's not in the list
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS_DEFAULT, "not in the list");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b," + "A".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "A".repeat(257) + ", b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Note: There's a double comma here, so three items but one of them is blank
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a,,b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xContent() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "my content with spaces");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "my content with spaces");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "my content with spaces");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "my content with spaces");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // NOTE: There's an extra space here after the comma!
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content,  a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "a content");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    // NOTE: The extra space above has been trimmed, and the configs sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a content,b content");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "a content");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 1a: Defaults must exist and be within the list of contents
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Blank default
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content, a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "null");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // A default that's not in the list
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b content, a content");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT_DEFAULT, "not in the list");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "b," + "A".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "A".repeat(257) + ", b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Note: There's a double comma here, so three items but one of them is blank
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_CONTENT, "a,,b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
+  public void agent2xVendorExtensions() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "with commas, my vendor extension");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    // Note: We don't touch the contents, so this *does not* get split, trimmed, and/or sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast",
+        "with commas, my vendor extension");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", " we do trim spaces ");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentCaps2x);
+    // Note: We do, however, trim the overall string
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "we do trim spaces");
+
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "a".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 4: The *key* is too long
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "o".repeat(257), "does not matter");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "not matching", "does not matter");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "diacritics-ümlauts-no", "does not matter");
+    // This next one has the prefix, but nothing else
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX, "does not matter");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
   }
 
   @Test
   public void oneAgentCapabilities() {
-    service.setAgentConfiguration("agent1", capabilities);
+    service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", UNKNOWN, capabilities);
+    verifyAgentCapabilities("notAgent1", null, new Properties());
+    verifyAgentCapabilities("agent1", UNKNOWN, agentConfig1x);
 
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", IDLE, capabilities);
+    verifyAgentCapabilities("notAgent1", null, new Properties());
+    verifyAgentCapabilities("agent1", IDLE, agentConfig1x);
 
     service.setAgentConfiguration("agent1", new Properties());
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAnAgent", null, null);
-    verifyAgent("agent1", IDLE, new Properties());
+    verifyAgentCapabilities("notAnAgent", null, new Properties());
+    Properties bareConfig1x = new Properties();
+    bareConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    verifyAgentCapabilities("agent1", IDLE, bareConfig1x);
   }
 
   @Test
   public void removeAgent() {
-    service.setAgentConfiguration("agent1", capabilities);
+    service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
-    service.setAgentConfiguration("agent2", capabilities);
+    service.setAgentConfiguration("agent2", agentConfig1x);
     service.setAgentState("agent2", UPLOADING);
 
-    verifyAgent("notAnAgent", null, capabilities);
-    verifyAgent("agent1", UNKNOWN, capabilities);
-    verifyAgent("agent2", UPLOADING, capabilities);
+    verifyAgentCapabilities("notAnAgent", null, agentConfig1x);
+    verifyAgentCapabilities("agent1", UNKNOWN, agentConfig1x);
+    verifyAgentCapabilities("agent2", UPLOADING, agentConfig1x);
 
     try {
       service.removeAgent("agent1");
       assertEquals(1, service.getKnownAgents().size());
-      verifyAgent("notAnAgent", null, capabilities);
-      verifyAgent("agent1", null, capabilities);
-      verifyAgent("agent2", UPLOADING, capabilities);
+      verifyAgentCapabilities("notAnAgent", null, agentConfig1x);
+      verifyAgentCapabilities("agent1", null, agentConfig1x);
+      verifyAgentCapabilities("agent2", UPLOADING, agentConfig1x);
     } catch (NotFoundException e) {
       fail();
     }
@@ -263,9 +1013,9 @@ public class CaptureAgentStateServiceImplTest {
       assertNotNull(e);
     }
     assertEquals(1, service.getKnownAgents().size());
-    verifyAgent("notAnAgent", null, capabilities);
-    verifyAgent("agent1", null, capabilities);
-    verifyAgent("agent2", UPLOADING, capabilities);
+    verifyAgentCapabilities("notAnAgent", null, agentConfig1x);
+    verifyAgentCapabilities("agent1", null, agentConfig1x);
+    verifyAgentCapabilities("agent2", UPLOADING, agentConfig1x);
   }
 
   @Test
@@ -283,11 +1033,11 @@ public class CaptureAgentStateServiceImplTest {
       assertNotNull(e);
     }
 
-    service.setAgentConfiguration("agent", capabilities);
+    service.setAgentConfiguration("agent", agentConfig1x);
     Properties agentCapabilities;
     try {
       agentCapabilities = service.getAgentCapabilities("agent");
-      assertEquals(capabilities, agentCapabilities);
+      assertEquals(agentConfig1x.toString(), agentCapabilities.toString());
     } catch (NotFoundException e) {
       fail();
     }
@@ -304,14 +1054,17 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(0, service.getKnownAgents().size());
 
     Properties cap1 = new Properties();
-    cap1.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "key", "value");
-    cap1.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "key");
+    cap1.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "key", "value");
+    cap1.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "key");
+    cap1.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
     Properties cap2 = new Properties();
-    cap2.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "foo", "bar");
-    cap2.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "foo");
+    cap2.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "foo", "bar");
+    cap2.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "foo");
+    cap2.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
     Properties cap3 = new Properties();
-    cap3.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "bam", "bam");
-    cap3.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "bam");
+    cap3.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "bam", "bam");
+    cap3.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "bam");
+    cap3.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     // Setup the two agents and persist them
     service.setAgentState("sticky1", IDLE);
@@ -322,11 +1075,11 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("sticky3", cap3);
 
     // Make sure they're set right
-    assertEquals(cap1, service.getAgentCapabilities("sticky1"));
+    assertEquals(cap1.toString(), service.getAgentCapabilities("sticky1").toString());
     assertEquals(IDLE, service.getAgent("sticky1").getState());
-    assertEquals(cap2, service.getAgentCapabilities("sticky2"));
+    assertEquals(cap2.toString(), service.getAgentCapabilities("sticky2").toString());
     assertEquals(CAPTURING, service.getAgent("sticky2").getState());
-    assertEquals(cap3, service.getAgentCapabilities("sticky3"));
+    assertEquals(cap3.toString(), service.getAgentCapabilities("sticky3").toString());
     assertEquals(UPLOADING, service.getAgent("sticky3").getState());
     try {
       service.getAgentCapabilities("sticky4");
@@ -344,11 +1097,11 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(3, service.getKnownAgents().size());
 
     // The agents should still be there
-    assertEquals(cap1, service.getAgentCapabilities("sticky1"));
+    assertEquals(cap1.toString(), service.getAgentCapabilities("sticky1").toString());
     assertEquals(IDLE, service.getAgent("sticky1").getState());
-    assertEquals(cap2, service.getAgentCapabilities("sticky2"));
+    assertEquals(cap2.toString(), service.getAgentCapabilities("sticky2").toString());
     assertEquals(CAPTURING, service.getAgent("sticky2").getState());
-    assertEquals(cap3, service.getAgentCapabilities("sticky3"));
+    assertEquals(cap3.toString(), service.getAgentCapabilities("sticky3").toString());
     assertEquals(UPLOADING, service.getAgent("sticky3").getState());
     try {
       service.getAgentCapabilities("sticky4");

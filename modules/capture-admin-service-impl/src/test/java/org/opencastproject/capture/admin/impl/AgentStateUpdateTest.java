@@ -32,6 +32,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Properties;
+
 public class AgentStateUpdateTest {
 
   private Agent agent = null;
@@ -39,7 +41,7 @@ public class AgentStateUpdateTest {
 
   @Before
   public void setUp() throws InterruptedException {
-    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "", null);
+    agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "", new Properties());
     Assert.assertNotNull(agent);
     Thread.sleep(5);
     asu = new AgentStateUpdate(agent);

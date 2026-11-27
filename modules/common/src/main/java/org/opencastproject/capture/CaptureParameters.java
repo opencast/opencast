@@ -27,6 +27,11 @@ package org.opencastproject.capture;
  */
 public interface CaptureParameters {
 
+  /** Added by Opencast internally, this will appear in your agent properties and tell you which agent version
+   * Opencast thinks you are running.  This will be a '1' for pre-CA API 2.x agents, and '2' for CA API 2.x agents.
+   */
+  String AGENT_VERSION = "opencast.agent.version";
+
   /** Agent configuration property indicating how the agent was registered */
   String AGENT_REGISTRATION_TYPE = "org.opencastproject.registration.type";
 
@@ -35,6 +40,98 @@ public interface CaptureParameters {
 
   /** The key for the workflow definition, if any, in the capture properties attached to the iCal event */
   String INGEST_WORKFLOW_DEFINITION = "org.opencastproject.workflow.definition";
+
+  /** The key for the capture agent vendor's name */
+  String VENDOR_NAME = "vendor.name";
+
+  /** The key for the capture agent's model */
+  String VENDOR_MODEL = "vendor.model";
+
+  /** The key for the capture agent's firmware information */
+  String VENDOR_FIRMWARE = "vendor.firmware";
+
+  /** The key for the capture agent's hardware information */
+  String VENDOR_HARDWARE = "vendor.hardware";
+
+  /** A binary flag indicating whether the device can capture locally */
+  String CAPTURE_LOCAL_CAPABLE = "capture.local.capable";
+
+  /**
+   * A binary flag indicating that the device can start recording in a paused state.  This would prime any local
+   * encoding pipelines, but *not* start actually storing data locally until a manual, vendor specific start signal
+   * (ie, button press, or some other vendor specific input) occurs.
+   * <br/>
+   * This key is used by the agent to indicate to Opencast whether it supports starting in a paused state (true), or not
+   * (false).
+   */
+  String CAPTURE_LOCAL_CANSTARTPAUSED = "capture.local.canstartpaused";
+
+  /**
+   * A binary flag indicating that the device should start recording locally at the beginning of the event, or wait for
+   * a manual, vendor specific start (ie, button press, or some other vendor specific input).
+   * <br/>
+   * This key is used by the scheduling system to indicate to the agent whether it should start in a paused state
+   * (true), or start capturing immediately (false).
+   */
+  String CAPTURE_LOCAL_AUTOSTART = "capture.local.autostart";
+
+  /** A binary flag indicating whether the device supports streaming as it captures */
+  String CAPTURE_STREAM_CAPABLE = "capture.stream.capable";
+
+  /**
+   * A binary flag indicating that the device can start streaming in a paused state.  This would prime any local
+   * encoding pipelines, and output a but *not* start actually storing data locally until a manual, vendor specific
+   * start signal (ie, button press, or some other vendor specific input) occurs.
+   * <br/>
+   * This key is used by the agent to indicate to Opencast whether it supports starting in a paused state (true), or not
+   * (false).
+   */
+  String CAPTURE_STREAM_CANSTARTPAUSED = "capture.stream.canstartpaused";
+
+  /**
+   * A binary flag indicating that the device should start streaming its capture at the beginning of the event, or wait
+   * for a manual, vendor specific start (ie, button press, or some other vendor specific input).
+   * <br/>
+   * This key is used by the scheduling system to indicate to the agent whether it should start in a paused state (0),
+   * or start capturing immediately (1).
+   */
+  String CAPTURE_STREAM_AUTOSTART = "capture.stream.autostart";
+
+  /** A comma delimited list of bitrates and frame sizes supported by the CA's streaming system. */
+  String CAPTURE_STREAM_CONFIGURATION = "capture.stream.configuration";
+
+  /**
+   * The default configuration that should be displayed to the user.  This must match one of the configurations listed
+   * in the {@link CAPTURE_STREAM_CONFIGURATION}, and will cause a registration failure if it does not.  In the case
+   * that an agent receives calendaring data with a selected configuration which does not lie within its options, it
+   * must fall back to using its default configuration.
+   */
+  String CAPTURE_STREAM_CONFIGURATION_DEFAULT = "capture.stream.configuration.default";
+
+  /** A command delimited list of PTZ positions supported by the CA. */
+  String CAPTURE_DEVICE_POSITIONS = "capture.device.positions";
+
+  /**
+   * The default position that should be displayed to the user.  This must match one of the positions listed
+   * in the {@link CAPTURE_DEVICE_POSITIONS}, and will cause a registration failure if it does not.  In the case
+   * that an agent receives calendaring data with a selected positions which does not lie within its options, it
+   * must fall back to using its default position.
+   */
+  String CAPTURE_DEVICE_POSITIONS_DEFAULT = "capture.device.positions.default";
+
+  /** A comma delimited list of frame composition options supported by the CA. */
+  String CAPTURE_DEVICE_CONTENT = "capture.device.content";
+
+  /**
+   * The default content config that should be displayed to the user.  This must match one of the content configs listed
+   * in the {@link CAPTURE_DEVICE_CONTENT}, and will cause a registration failure if it does not.  In the case
+   * that an agent receives calendaring data with a selected content config which does not lie within its options, it
+   * must fall back to using its default content config.
+   */
+  String CAPTURE_DEVICE_CONTENT_DEFAULT = "capture.device.content.default";
+
+  /** The vendor specific extension prefix for anything a CA might need that's not otherwise defined */
+  String CAPTURE_EXTENSION_PREFIX = "X-";
 
   /** A comma delimited list of the friendly names for capturing devices */
   String CAPTURE_DEVICE_NAMES = "capture.device.names";

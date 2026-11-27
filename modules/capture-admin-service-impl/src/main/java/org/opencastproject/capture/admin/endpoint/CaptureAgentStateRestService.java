@@ -394,6 +394,11 @@ public class CaptureAgentStateRestService {
           logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
         }
         return Response.ok(gson.toJson(caps)).type(MediaType.APPLICATION_JSON).build();
+      } catch (IllegalArgumentException e) {
+        // This happens when you register an agent which supports neither local capture, nor streaming.
+        // See AgentImpl's set2xAgentConfiguration method for details and reasoning
+        logger.warn("Invalid capture agent registration attempted by agent {}", agentName);
+        return Response.serverError().status(Response.Status.BAD_REQUEST).build();
       } catch (JsonSyntaxException e) {
         logger.debug("Exception when deserializing capabilities: {}", e.getMessage());
         return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
