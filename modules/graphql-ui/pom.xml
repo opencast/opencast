@@ -12,7 +12,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <nodejs.version>v20.10.0</nodejs.version>
     <ui.include.resource>/ui=-target/classes/</ui.include.resource>
   </properties>
   <profiles>
@@ -75,7 +74,6 @@
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
             <configuration>
-              <nodeVersion>${nodejs.version}</nodeVersion>
               <installDirectory>target</installDirectory>
             </configuration>
             <executions>
