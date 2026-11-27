@@ -1,0 +1,3 @@
+Opencast no longer writes to its configuration directory at runtime. Previously, Karaf created `etc/jetty.xml` and
+`etc/jetty-web.xml` on the first start, which made Opencast fail to start with a read-only configuration directory.
+These files are now part of the distribution, and the configuration directory can be read-only.
