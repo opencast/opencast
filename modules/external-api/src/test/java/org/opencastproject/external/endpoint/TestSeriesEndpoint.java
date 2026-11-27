@@ -21,7 +21,6 @@
 package org.opencastproject.external.endpoint;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
@@ -49,6 +48,7 @@ import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Arrays;
 
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
@@ -67,6 +67,12 @@ import javax.ws.rs.Path;
 @Path("")
 @Ignore
 public class TestSeriesEndpoint extends SeriesEndpoint {
+
+  private static Capture<SeriesSearchQuery> capturedQuery;
+
+  public static SeriesSearchQuery getCapturedQuery() {
+    return capturedQuery.getValue();
+  }
 
   @SuppressWarnings("unchecked")
   public TestSeriesEndpoint() throws Exception {
@@ -127,7 +133,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     replay(searchResult);
 
     OpenSearchIndex opensearchIndex = createMock(OpenSearchIndex.class);
-    expect(opensearchIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);
+    capturedQuery = EasyMock.newCapture();
+    expect(opensearchIndex.getByQuery(EasyMock.capture(capturedQuery))).andStubReturn(searchResult);
     expect(opensearchIndex.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", org, user)).andStubReturn(
             Optional.of(series1));
     expect(opensearchIndex.getSeries("unknown-series-id", org, user)).andStubReturn(Optional.empty());

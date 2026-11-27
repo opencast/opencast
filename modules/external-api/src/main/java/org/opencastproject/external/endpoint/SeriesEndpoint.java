@@ -1498,8 +1498,9 @@ public class SeriesEndpoint {
     SeriesSearchQuery q = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
     q.withLimit(count);
     q.withOffset(offset);
-    if (edit != null) {
-      q.withEdit(edit);
+    if (Boolean.TRUE.equals(edit)) {
+      q.withoutActions();
+      q.withAction(Permissions.Action.WRITE);
     }
     if (StringUtils.isNotEmpty(text)) {
       q.withText(fuzzyMatch.booleanValue(), text);
