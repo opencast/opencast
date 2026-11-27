@@ -62,7 +62,7 @@ jobs:
           key: ${{ runner.os }}-mvnw-${{ hashFiles('mvnw', '.mvn/wrapper/maven-wrapper.properties') }}
 
       - name: setup java
-        uses: actions/setup-java@v6.2.0
+        uses: actions/setup-java@v6.3.0
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
