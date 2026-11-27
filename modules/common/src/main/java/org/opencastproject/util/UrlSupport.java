@@ -27,7 +27,6 @@ import static org.opencastproject.util.data.functions.Strings.asStringNull;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,37 +47,6 @@ public final class UrlSupport {
   public static URI uri(String uri) {
     try {
       return new URI(uri);
-    } catch (Exception e) {
-      return chuck(e);
-    }
-  }
-
-  /** URL constructor function without checked exceptions. */
-  public static URL url(String url) {
-    try {
-      return new URL(url);
-    } catch (Exception e) {
-      return chuck(e);
-    }
-  }
-
-  /** URL constructor function without checked exceptions. */
-  public static URL url(String protocol, String host, int port) {
-    try {
-      return new URL(protocol, host, port, "/");
-    } catch (Exception e) {
-      return chuck(e);
-    }
-  }
-
-  /**
-   * URL constructor function without checked exceptions.
-   *
-   * @see URL
-   */
-  public static URL url(URL context, String spec) {
-    try {
-      return new URL(context, spec);
     } catch (Exception e) {
       return chuck(e);
     }

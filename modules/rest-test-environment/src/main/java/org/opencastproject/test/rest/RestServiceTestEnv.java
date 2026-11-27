@@ -23,8 +23,6 @@ package org.opencastproject.test.rest;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.util.UrlSupport;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -86,7 +83,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class RestServiceTestEnv {
   private Server server;
 
-  private URL baseUrl = null;
+  private String baseUrl = null;
   private final ResourceConfig cfg;
 
   private static final Logger logger = LoggerFactory.getLogger(RestServiceTestEnv.class);
@@ -108,7 +105,7 @@ public final class RestServiceTestEnv {
     if (baseUrl == null) {
       throw new RuntimeException("Server not yet started");
     }
-    return UrlSupport.url(baseUrl, path).toString();
+    return path.startsWith("/") ? baseUrl + path : baseUrl + "/" + path;
   }
 
   /**
@@ -130,7 +127,7 @@ public final class RestServiceTestEnv {
           ServletContextHandler context = new ServletContextHandler(server, "/");
           context.addServlet(jerseyServlet, "/*");
           server.start();
-          baseUrl = UrlSupport.url("http", "127.0.0.1", port);
+          baseUrl = "http://127.0.0.1:" + port;
           return;
         } catch (IOException e) {
           logger.error("Couldn't bind server to port {}. Retrying with new port...", port, e);

@@ -1,0 +1,6 @@
+The `source-url-watermark` option of the `composite` workflow operation is now parsed as a URI. A local watermark
+URL like `file:///srv/watermark images/logo.png`, which contains spaces or other characters that are not allowed
+in URIs, was accepted before but now makes the operation fail. Encode such characters instead, e.g.
+`file:///srv/watermark%20images/logo.png`. Values starting with `http` are not affected.
+
+There are no database schema or search index changes.

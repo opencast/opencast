@@ -61,7 +61,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -194,9 +193,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       if (compositeSettings.getSourceUrlWatermark().startsWith("http")) {
         urlAttachment.setURI(UrlSupport.uri(compositeSettings.getSourceUrlWatermark()));
       } else {
-        InputStream in = null;
-        try {
-          in = UrlSupport.url(compositeSettings.getSourceUrlWatermark()).openStream();
+        try (InputStream in = URI.create(compositeSettings.getSourceUrlWatermark()).toURL().openStream()) {
           URI imageUrl = workspace.putInCollection(COLLECTION, compositeSettings.getWatermarkIdentifier() + "."
                   + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()), in);
           urlAttachment.setURI(imageUrl);
@@ -204,8 +201,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
           logger.warn("Unable to read watermark source url {}", compositeSettings.getSourceUrlWatermark(), e);
           throw new WorkflowOperationException("Unable to read watermark source url "
                   + compositeSettings.getSourceUrlWatermark(), e);
-        } finally {
-          IOUtils.closeQuietly(in);
         }
       }
       watermarkAttachment = Optional.ofNullable(urlAttachment);
