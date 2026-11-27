@@ -380,7 +380,7 @@ public class IncidentServiceEndpoint {
 
     try {
       Incident incident = svc.storeIncident(job, timestamp, code, severity, map, list);
-      String uri = UrlSupport.concat(serverUrl, serviceUrl, Long.toString(incident.getId()), ".xml");
+      String uri = UrlSupport.concat(serverUrl, serviceUrl, incident.getId() + ".xml");
       return Response.created(new URI(uri)).entity(new JaxbIncident(incident)).build();
     } catch (IllegalStateException e) {
       return Response.status(Status.CONFLICT).build();

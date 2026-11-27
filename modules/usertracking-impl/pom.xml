@@ -88,6 +88,11 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -98,6 +103,8 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
+            <!-- JAX-RS runtime needed by tests -->
+            <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-server</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

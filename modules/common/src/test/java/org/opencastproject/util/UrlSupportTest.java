@@ -35,12 +35,40 @@ public class UrlSupportTest {
     assertEquals("first/second", UrlSupport.concat("first/", "//second"));
     assertEquals("/first/second", UrlSupport.concat("/first/", "//second"));
     assertEquals("/first", UrlSupport.concat("/", "first"));
-    assertEquals("/first/", UrlSupport.concat("/", "first/", true));
-    assertEquals("/first/", UrlSupport.concat("/", "first", true));
-    assertEquals("first/second/", UrlSupport.concat("first", "second", true));
-    assertEquals("first/second/", UrlSupport.concat("first", "second//", true));
+    assertEquals("/first/", UrlSupport.concat("/", "first/"));
     assertEquals("first/second/third", UrlSupport.concat("first", "second//", "third"));
     assertEquals("http://localhost:8080/first/second", UrlSupport.concat("http://localhost:8080", "first", "second"));
+    assertEquals("http://localhost:8080/files", UrlSupport.concat("http://localhost:8080/", "/files"));
+    assertEquals("http://localhost:8080/", UrlSupport.concat("http://localhost:8080", "/"));
+    assertEquals("first", UrlSupport.concat("first"));
+  }
+
+  @Test
+  public void testConcatIgnoresEmptyParts() {
+    assertEquals("a", UrlSupport.concat("", "a"));
+    assertEquals("a", UrlSupport.concat("a", ""));
+    assertEquals("a/b", UrlSupport.concat("a", "", "b"));
+    assertEquals("a/b", UrlSupport.concat("a", null, "b"));
+    assertEquals("a", UrlSupport.concat(null, "a"));
+    assertEquals("", UrlSupport.concat("", ""));
+    assertEquals("", UrlSupport.concat());
+  }
+
+  @Test
+  public void testConcatOnlyTouchesBoundaries() {
+    assertEquals("http://a//b/c", UrlSupport.concat("http://a//b", "c"));
+    assertEquals("http://host/p/a//b", UrlSupport.concat("http://host/p", "a//b"));
+    assertEquals("http://host/p/x?u=http://other//path", UrlSupport.concat("http://host/p", "x?u=http://other//path"));
+    // Leading slashes of the first and trailing slashes of the last part are kept
+    assertEquals("//a/b", UrlSupport.concat("//a", "b"));
+    assertEquals("a/b//", UrlSupport.concat("a", "b//"));
+  }
+
+  @Test
+  public void testUri() {
+    assertEquals(URI.create("http://localhost:8080/events/5/comment"),
+        UrlSupport.uri("http://localhost:8080/", "/events", 5, "comment"));
+    assertEquals(URI.create("http://localhost:8080/events"), UrlSupport.uri("http://localhost:8080", null, "events"));
   }
 
   private static String withoutQueryAndFragment(String uri) {

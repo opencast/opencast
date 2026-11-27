@@ -59,6 +59,8 @@ public class OaiPmhServerTest {
     assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080//oaipmh/"), "/oaipmh"));
     assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh/default"), "/oaipmh"));
     assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh/default/"), "/oaipmh"));
+    assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080/oaipmh//default"), "/oaipmh"));
+    assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh//default"), "/oaipmh"));
     assertEquals(Optional.of("oai"), repositoryId(req("http://localhost:8080//oai/default"), "/oaipmh"));
     assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh/default/more/path"),
         "/oaipmh"));

@@ -21,6 +21,8 @@
 
 package org.opencastproject.usertracking.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -35,13 +37,16 @@ import org.opencastproject.usertracking.endpoint.UserTrackingRestService;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
+import java.net.URI;
 import java.util.Dictionary;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.Response;
 
 public class UserTrackingRestServiceTest {
 
@@ -93,8 +98,16 @@ public class UserTrackingRestServiceTest {
     HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
     EasyMock.expect(request.getSession()).andReturn(session).anyTimes();
     EasyMock.expect(request.getRemoteAddr()).andReturn(REMOTE_IP).anyTimes();
+    EasyMock.expect(request.getHeader("User-Agent")).andReturn(null).anyTimes();
     EasyMock.replay(session, request);
     return request;
+  }
+
+  @Test
+  public void testAddFootprintReturnsLocationOfAction() {
+    Response response = service.addFootprint("mp", "1", "2", "FOOTPRINT", "true", getMockHttpSession());
+    assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    assertEquals(URI.create("http://www.example.org:8080/usertracking/action/4.xml"), response.getLocation());
   }
 
 }

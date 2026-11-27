@@ -53,11 +53,6 @@ public final class Strings {
     return a != null ? Optional.of(a.toString()) : NONE;
   }
 
-  /** Return <code>a.toString()</code> or <code>&lt;null&gt;</code> if argument is null. */
-  public static String asStringNull(Object a) {
-    return a != null ? a.toString() : "<null>";
-  }
-
   /** Convert a string into a long if possible. */
   public static Optional<Double> toDouble(String s) {
     try {
