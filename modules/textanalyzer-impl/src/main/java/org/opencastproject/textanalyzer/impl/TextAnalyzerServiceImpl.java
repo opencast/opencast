@@ -91,7 +91,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /** List of available operations on jobs */
   private enum Operation {
     Extract
-  };
+  }
 
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "ocrtext";

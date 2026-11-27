@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.userdirectory;
 
 import static org.opencastproject.userdirectory.InMemoryUserAndRoleProvider.PROVIDER_NAME;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.mediapackage.XmlElement;
@@ -59,7 +58,7 @@ public interface KeywordAnnotation extends XmlElement {
    */
   enum Type {
     main, secondary, other
-  };
+  }
 
   /**
    * Returns the keyword.

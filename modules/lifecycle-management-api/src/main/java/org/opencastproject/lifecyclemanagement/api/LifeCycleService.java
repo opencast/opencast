@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.api;
 
 import org.opencastproject.opensearch.api.SearchIndexException;

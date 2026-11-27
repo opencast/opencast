@@ -67,7 +67,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Component(
         property = {
-                "service.description=Lti User Login"
+            "service.description=Lti User Login"
         },
         immediate = true,
         service = { LtiLaunchAuthenticationHandler.class }

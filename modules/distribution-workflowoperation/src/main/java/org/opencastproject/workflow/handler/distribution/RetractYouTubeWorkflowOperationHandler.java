@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.workflow.handler.distribution;
 
 import org.opencastproject.job.api.Job;

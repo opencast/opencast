@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
@@ -72,8 +71,8 @@ import javax.xml.transform.stream.StreamSource;
  * Default implementation for a media media package.
  */
 @XmlType(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org", propOrder = { "title", "series",
-        "seriesTitle", "creators", "contributors", "subjects", "license", "language", "tracks", "catalogs",
-        "attachments", "publications" })
+    "seriesTitle", "creators", "contributors", "subjects", "license", "language", "tracks", "catalogs",
+    "attachments", "publications" })
 @XmlRootElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public final class MediaPackageImpl implements MediaPackage {

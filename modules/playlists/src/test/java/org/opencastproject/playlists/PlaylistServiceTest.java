@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.playlists;
 
 import static org.easymock.EasyMock.createNiceMock;

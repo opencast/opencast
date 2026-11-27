@@ -102,7 +102,7 @@ public interface ComposerService {
    *       The composite track dimension
    * @param option
    *        upper track element from mediapackage (optional)
-   * @param lowerLaidOutElement  
+   * @param lowerLaidOutElement
    *        lower track element from mediapackage
    * @param watermarkOption
    *        watermark element (optional)
@@ -353,7 +353,7 @@ public interface ComposerService {
 
   /**
    * Encodes a track to set of media targets as defined by a list of encoding profiles
-   * 
+   *
    * @param track
    *          - video or audio track
    * @param profileIds

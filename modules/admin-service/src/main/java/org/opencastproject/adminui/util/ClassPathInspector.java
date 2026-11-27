@@ -40,7 +40,7 @@ public class ClassPathInspector implements PathInspector {
   private Bundle bundle;
 
   public ClassPathInspector() {
-  };
+  }
 
   public ClassPathInspector(Bundle bundle) {
     this.bundle = bundle;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.metadata.dublincore;
 
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.index.service.catalog.adapter;
 
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;

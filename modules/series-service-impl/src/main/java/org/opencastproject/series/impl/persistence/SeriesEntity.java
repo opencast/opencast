@@ -140,8 +140,8 @@ public class SeriesEntity {
   @CollectionTable(name = "oc_series_elements", uniqueConstraints = {
       @UniqueConstraint(name = "UNQ_series_elements", columnNames = {"series", "organization", "type"})
       }, joinColumns = {
-      @JoinColumn(name = "series", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
+          @JoinColumn(name = "series", referencedColumnName = "id", nullable = false),
+          @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
   protected Map<String, byte[]> elements;
 
   @Embedded

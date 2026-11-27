@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.kernel.security;
 
 import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;

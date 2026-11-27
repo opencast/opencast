@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.opensearch.index.objects.event;
 
 public class EventSearchQueryField<T> {

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.liveschedule.api;
 
 public class LiveScheduleException extends Exception {

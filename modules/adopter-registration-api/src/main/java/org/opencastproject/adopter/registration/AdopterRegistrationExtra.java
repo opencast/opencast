@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.adopter.registration;
 
 import javax.persistence.Column;

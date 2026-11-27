@@ -148,8 +148,8 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   @Activate
   protected void activate(ComponentContext cc) {
     tempStorageDir = StringUtils.isNotBlank(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
-      ? new File(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
-      : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ZIP_ARCHIVE_TEMP_DIR);
+        ? new File(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
+        : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ZIP_ARCHIVE_TEMP_DIR);
 
     // create directory
     try {

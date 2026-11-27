@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.silencedetection.api;
 
 import javax.xml.bind.annotation.XmlAccessType;

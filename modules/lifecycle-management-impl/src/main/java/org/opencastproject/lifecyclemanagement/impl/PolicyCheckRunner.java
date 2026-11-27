@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl;
 
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.userdirectory.brightspace.client.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;

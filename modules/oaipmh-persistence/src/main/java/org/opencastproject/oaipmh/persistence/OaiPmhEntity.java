@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -111,7 +112,7 @@ public class OaiPmhEntity {
 
   /**
    * Returns media package id.
-   * 
+   *
    * @return media package id
    */
   public String getMediaPackageId() {
@@ -120,7 +121,7 @@ public class OaiPmhEntity {
 
   /**
    * Sets media package id. Id length limit is 128 charachters.
-   * 
+   *
    * @param mediaPackageId
    */
   public void setMediaPackageId(String mediaPackageId) {
@@ -153,7 +154,7 @@ public class OaiPmhEntity {
 
   /**
    * Sets the deletion flag
-   * 
+   *
    * @param deleted
    *          the deletion flag
    */
@@ -171,7 +172,7 @@ public class OaiPmhEntity {
 
   /**
    * Sets the series identifier
-   * 
+   *
    * @param series
    *          the series identifier
    */
@@ -189,7 +190,7 @@ public class OaiPmhEntity {
 
   /**
    * Returns serialized media package.
-   * 
+   *
    * @return serialized media package
    */
   public String getMediaPackageXML() {
@@ -198,7 +199,7 @@ public class OaiPmhEntity {
 
   /**
    * Sets serialized media package
-   * 
+   *
    * @param mediaPackageXML
    */
   public void setMediaPackageXML(String mediaPackageXML) {
@@ -215,7 +216,7 @@ public class OaiPmhEntity {
 
   /**
    * Sets the repository id
-   * 
+   *
    * @param repositoryId
    */
   public void setRepositoryId(String repositoryId) {

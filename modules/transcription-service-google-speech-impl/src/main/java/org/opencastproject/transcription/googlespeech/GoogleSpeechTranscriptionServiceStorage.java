@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.googlespeech;
 
 import org.apache.hc.client5.http.classic.methods.HttpDelete;

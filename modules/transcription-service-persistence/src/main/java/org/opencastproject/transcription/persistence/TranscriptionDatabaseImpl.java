@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.persistence;
 
 import org.opencastproject.db.DBSession;

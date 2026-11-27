@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning.provider.impl;
 
 import org.opencastproject.security.api.SecurityService;

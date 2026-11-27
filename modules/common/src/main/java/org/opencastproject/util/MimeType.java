@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util;
 
 import org.slf4j.Logger;

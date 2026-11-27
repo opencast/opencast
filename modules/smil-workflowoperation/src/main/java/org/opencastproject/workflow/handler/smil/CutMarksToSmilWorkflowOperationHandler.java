@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.smil;
 
 import org.opencastproject.job.api.JobContext;

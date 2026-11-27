@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.event.comment.persistence;
 
 import org.opencastproject.event.comment.EventComment;

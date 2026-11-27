@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
 /**
@@ -29,7 +28,7 @@ public interface SearchResult<T> {
 
   /**
    * Returns the individual items of this search result.
-   * 
+   *
    * @return the search result items
    */
   SearchResultItem<T>[] getItems();
@@ -37,7 +36,7 @@ public interface SearchResult<T> {
   /**
    * Returns the total number of appearances of the search criteria in the search result, spread over
    * <code>getDocumentCount</code> number of documents.
-   * 
+   *
    * @return the overall number of hits
    */
   long getHitCount();
@@ -47,7 +46,7 @@ public interface SearchResult<T> {
    * <p>
    * Note that this number might not match the size of the array as returned by {@link #getItems()}, which is likely to
    * be limited by the value returned by {@link #getLimit()}.
-   * 
+   *
    * @return the number of documents containing the hits
    */
   long getDocumentCount();
@@ -55,7 +54,7 @@ public interface SearchResult<T> {
   /**
    * Returns the number of items in this search result, possibly limited with respect to the total number of result
    * items by <code>offset</code> and <code>limit</code>.
-   * 
+   *
    * @return the total number of hits.
    * @see #getOffset()
    * @see #getLimit()
@@ -64,14 +63,14 @@ public interface SearchResult<T> {
 
   /**
    * Get the offset within the search result or <code>-1</code> if no limit has been specified.
-   * 
+   *
    * @return the offset
    */
   long getOffset();
 
   /**
    * Returns the limit of this search results or <code>-1</code> if no limit has been specified.
-   * 
+   *
    * @return the limit
    */
   long getLimit();
@@ -81,14 +80,14 @@ public interface SearchResult<T> {
    * <code>offset</code> and the page size <code>limit</code>.
    * <p>
    * Note that the page size is one-based
-   * 
+   *
    * @return the page number
    */
   long getPage();
 
   /**
    * Returns the search time in milliseconds.
-   * 
+   *
    * @return the time
    */
   long getSearchTime();

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.scheduler.impl;
 
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;

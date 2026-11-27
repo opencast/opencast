@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.email.template.api;
 
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -25,7 +26,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 public interface EmailTemplateService {
   /**
    * Apply the template to the workflow instance.
-   * 
+   *
    * @param templateName
    *          template name
    * @param templateContent

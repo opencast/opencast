@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.distribution.streaming.wowza;
 
 import static java.lang.String.format;
@@ -176,7 +177,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
   /** List of available operations on jobs */
   private enum Operation {
     Distribute, Retract
-  };
+  }
 
   /** The load on the system introduced by creating a distribute job */
   public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;

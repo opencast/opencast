@@ -35,7 +35,7 @@ public @interface RestParameter {
     NO_PARAMETER, // This is a special type to represent that there is no parameter. We need this because java
                   // annotation cannot be set to null.
     BOOLEAN, FILE, STRING, TEXT, INTEGER, FLOAT, LONG
-  };
+  }
 
   /**
    * @return a name of the parameter.

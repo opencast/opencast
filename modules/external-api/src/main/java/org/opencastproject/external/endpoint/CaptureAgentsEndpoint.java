@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.endpoint;
 
 import static org.opencastproject.external.util.CaptureAgentUtils.generateJsonAgent;

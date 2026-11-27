@@ -98,7 +98,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
   private static final String SAME_CODEC = "same-codec";
   enum SourceType {
     None, PrefixedFile, NumberedFile
-  };
+  }
 
 
   /** The logging facility */

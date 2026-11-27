@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.caption.impl;
 
 import org.opencastproject.caption.api.IllegalTimeFormatException;

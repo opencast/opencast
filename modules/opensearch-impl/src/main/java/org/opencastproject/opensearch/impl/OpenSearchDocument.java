@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.impl;
 
 import org.opencastproject.opensearch.api.Language;

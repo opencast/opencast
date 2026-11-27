@@ -33,7 +33,7 @@ public class EventCommentDatabaseException extends Exception {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public EventCommentDatabaseException(Throwable cause) {

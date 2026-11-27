@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning.verifier.impl;
 
 import org.opencastproject.security.urlsigning.verifier.UrlSigningVerifier;

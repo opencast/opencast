@@ -56,7 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface IndexService {
   enum Source {
     ARCHIVE, WORKFLOW, SCHEDULE
-  };
+  }
 
   enum SourceType {
     UPLOAD, UPLOAD_LATER, SCHEDULE_SINGLE, SCHEDULE_MULTIPLE

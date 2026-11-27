@@ -64,7 +64,7 @@ public interface VideoText extends MovingRegion {
   /** Video text type */
   enum Type {
     superimposed, scene
-  };
+  }
 
   /**
    * Sets the segment identifier.

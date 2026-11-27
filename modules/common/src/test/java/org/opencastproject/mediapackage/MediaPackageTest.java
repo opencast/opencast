@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage;
 
 import static io.restassured.path.xml.XmlPath.from;

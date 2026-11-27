@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl.persistence;
 
 import static org.opencastproject.db.Queries.namedQuery;
@@ -58,7 +59,7 @@ import javax.persistence.criteria.Root;
     immediate = true,
     service = { LifeCycleDatabaseService.class },
     property = {
-      "service.description=LifeCycle Database Service"
+        "service.description=LifeCycle Database Service"
     })
 public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   /**

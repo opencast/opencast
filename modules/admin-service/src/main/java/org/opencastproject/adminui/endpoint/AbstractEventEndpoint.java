@@ -1671,18 +1671,18 @@ public abstract class AbstractEventEndpoint {
       name = "bulkupdate",
       description = "Update all of the given events at once",
       restParameters = {
-        @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT,
-            description = "The list of groups with events and fields to update.")
+          @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT,
+              description = "The list of groups with events and fields to update.")
       }, responses = {
-        @RestResponse(description = "All events have been updated successfully.",
-            responseCode = HttpServletResponse.SC_OK),
-        @RestResponse(description = "Could not parse update instructions.",
-            responseCode = HttpServletResponse.SC_BAD_REQUEST),
-        @RestResponse(description = "Field updating metadata or scheduling information. Some events may have been "
-            + "updated. Details are available in the response body.",
-            responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-        @RestResponse(description = "The events in the response body were not found. No events were updated.",
-            responseCode = HttpServletResponse.SC_NOT_FOUND)
+          @RestResponse(description = "All events have been updated successfully.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Could not parse update instructions.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Field updating metadata or scheduling information. Some events may have been "
+              + "updated. Details are available in the response body.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
+          @RestResponse(description = "The events in the response body were not found. No events were updated.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
       },
       returnDescription = "In case of success, no content is returned. In case of errors while updating the metadata "
           + "or scheduling information, the errors are returned. In case events were not found, their ids are returned")

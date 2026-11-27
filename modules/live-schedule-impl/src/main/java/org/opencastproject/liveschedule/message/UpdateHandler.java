@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;

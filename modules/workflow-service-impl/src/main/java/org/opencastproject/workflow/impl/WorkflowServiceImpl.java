@@ -151,8 +151,8 @@ import java.util.stream.Collectors;
  */
 @Component(
     property = {
-      "service.description=Workflow Service",
-      "service.pid=org.opencastproject.workflow.impl.WorkflowServiceImpl"
+        "service.description=Workflow Service",
+        "service.pid=org.opencastproject.workflow.impl.WorkflowServiceImpl"
     },
     immediate = true,
     service = { WorkflowService.class, WorkflowServiceImpl.class, IndexProducer.class }

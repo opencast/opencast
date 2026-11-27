@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.scheduler.impl.persistence;
 
 import java.util.Date;

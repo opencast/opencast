@@ -38,7 +38,7 @@ public final class FiltersUtils {
 
   /**
    * Create a new {@link ResourceListFilter} following the parameters given
-   * 
+   *
    * @param value
    *          The value of the filter wrapped in an {@link Optional}. Can be {@link Optional#empty()}
    * @param name

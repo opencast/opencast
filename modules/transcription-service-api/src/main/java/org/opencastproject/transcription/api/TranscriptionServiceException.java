@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.api;
 
 public class TranscriptionServiceException extends Exception {

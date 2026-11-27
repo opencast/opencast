@@ -50,7 +50,7 @@ public final class SeriesItem implements MessageItem, Serializable {
 
   public enum Type {
     UpdateCatalog, UpdateElement, UpdateAcl, Delete
-  };
+  }
 
   /**
    * @param series

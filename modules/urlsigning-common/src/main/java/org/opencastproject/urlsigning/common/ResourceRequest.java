@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.urlsigning.common;
 
 /**
@@ -26,7 +27,7 @@ package org.opencastproject.urlsigning.common;
 public class ResourceRequest {
   public enum Status {
     BadRequest, Forbidden, Gone, Ok
-  };
+  }
 
   /** The query string parameter key of the organization used to request resource. */
   public static final String ENCRYPTION_ID_KEY = "keyId";

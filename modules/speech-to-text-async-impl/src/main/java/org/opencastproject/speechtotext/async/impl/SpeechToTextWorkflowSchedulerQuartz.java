@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.speechtotext.async.impl;
 
 import static org.opencastproject.speechtotext.async.api.SpeechToTextAsyncTracker.JOBS_WORKFLOW_CONFIGURATION;

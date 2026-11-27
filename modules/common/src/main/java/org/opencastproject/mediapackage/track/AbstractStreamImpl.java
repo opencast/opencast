@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage.track;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;

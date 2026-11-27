@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.server;
 
 import static java.lang.String.format;
@@ -635,11 +636,12 @@ public abstract class OaiPmhRepository {
     /** Get a metadata provider from a resumption token. */
     private final Function<String, Optional<MetadataProvider>> getMetadataProviderFromToken =
         new Function<String, Optional<MetadataProvider>>() {
-      @Override
-      public Optional<MetadataProvider> apply(String token) {
-        return getSavedQuery(token).flatMap(resumableQuery -> getMetadataProvider(resumableQuery.getMetadataPrefix()));
-      }
-    };
+          @Override
+          public Optional<MetadataProvider> apply(String token) {
+            return getSavedQuery(token)
+                .flatMap(resumableQuery -> getMetadataProvider(resumableQuery.getMetadataPrefix()));
+          }
+        };
 
     /** Get the metadata prefix lazily. */
     private Supplier<String> getMetadataPrefix(final Params p) {
@@ -682,7 +684,7 @@ public abstract class OaiPmhRepository {
       }
     }
 
-    private class BadResumptionTokenException extends RuntimeException {
+    private final class BadResumptionTokenException extends RuntimeException {
     }
   }
 }

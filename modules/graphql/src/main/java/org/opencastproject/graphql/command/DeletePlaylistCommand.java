@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.graphql.command;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.editor.remote;
 
 import org.opencastproject.editor.api.EditingData;

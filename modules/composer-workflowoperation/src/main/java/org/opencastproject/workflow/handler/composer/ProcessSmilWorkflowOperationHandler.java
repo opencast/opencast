@@ -163,7 +163,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     public List<String> getSmilTrackList() {
       return smilTracks;
     }
-  };
+  }
 
   // To return both params from a function that checks all the jobs
   private class ResultTally {

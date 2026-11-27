@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.job.api;
 
 import static org.easymock.EasyMock.createNiceMock;

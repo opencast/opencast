@@ -29,22 +29,14 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .COPY_NUMBER_PREFIX_PROPERTY;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .MAX_NUMBER_PROPERTY;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .NUMBER_PROPERTY;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .PROPERTY_NAMESPACES_PROPERTY;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .SET_TITLE;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .SOURCE_FLAVORS_PROPERTY;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .SOURCE_TAGS_PROPERTY;
-import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler
-    .TARGET_TAGS_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.COPY_NUMBER_PREFIX_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.MAX_NUMBER_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.NUMBER_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.PROPERTY_NAMESPACES_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.SET_TITLE;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.SOURCE_FLAVORS_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.SOURCE_TAGS_PROPERTY;
+import static org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler.TARGET_TAGS_PROPERTY;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.timelinepreviews.ffmpeg;
 
 import static org.junit.Assert.assertEquals;

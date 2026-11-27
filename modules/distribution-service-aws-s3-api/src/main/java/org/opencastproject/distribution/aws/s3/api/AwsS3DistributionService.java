@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.distribution.aws.s3.api;
 
 import org.opencastproject.distribution.api.DownloadDistributionService;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.index.objects.event;
 
 import org.opencastproject.opensearch.impl.IndexSchema;

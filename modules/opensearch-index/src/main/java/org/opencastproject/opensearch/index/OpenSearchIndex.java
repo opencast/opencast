@@ -74,7 +74,7 @@ import javax.xml.bind.Unmarshaller;
  */
 @Component(
         property = {
-                "service.description=OpenSearch Index"
+            "service.description=OpenSearch Index"
         },
         service = { OpenSearchIndex.class }
 )

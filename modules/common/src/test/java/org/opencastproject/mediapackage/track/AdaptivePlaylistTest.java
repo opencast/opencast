@@ -629,7 +629,7 @@ public class AdaptivePlaylistTest {
 
   /**
    * Repubbed tracks are multileveled and wrongly referenced. It should be correctly fixed.
-   * 
+   *
    * @throws Exception
    */
   @Test

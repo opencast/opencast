@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.composer.impl;
 
 import static org.easymock.EasyMock.anyBoolean;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.security.api.Organization;

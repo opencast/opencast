@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.message.broker.api;
 
 import java.io.Serializable;

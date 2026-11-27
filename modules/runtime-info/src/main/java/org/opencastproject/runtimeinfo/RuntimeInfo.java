@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.runtimeinfo;
 
 import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;

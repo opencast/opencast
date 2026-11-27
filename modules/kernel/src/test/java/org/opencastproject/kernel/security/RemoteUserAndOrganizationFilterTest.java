@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.kernel.security;
 
 import org.opencastproject.security.api.DefaultOrganization;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence;
 
 /**
@@ -32,7 +33,7 @@ public class OaiPmhDatabaseException extends Exception {
 
   /**
    * Create exception with a message.
-   * 
+   *
    * @param message
    */
   public OaiPmhDatabaseException(String message) {
@@ -41,7 +42,7 @@ public class OaiPmhDatabaseException extends Exception {
 
   /**
    * Create exception with a cause.
-   * 
+   *
    * @param cause
    */
   public OaiPmhDatabaseException(Throwable cause) {
@@ -50,7 +51,7 @@ public class OaiPmhDatabaseException extends Exception {
 
   /**
    * Create exception with a message and a cause.
-   * 
+   *
    * @param message
    * @param cause
    */

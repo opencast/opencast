@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.api.util;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.requests;
 
 import static java.util.Objects.requireNonNull;

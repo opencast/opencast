@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.speechtotext.async.api;
 
 public class SpeechToTextAsyncException extends Exception {

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.distribution.aws.s3.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;

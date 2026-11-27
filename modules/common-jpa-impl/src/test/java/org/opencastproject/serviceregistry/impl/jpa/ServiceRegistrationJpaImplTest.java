@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.impl.jpa;
 
 import static org.junit.Assert.assertEquals;

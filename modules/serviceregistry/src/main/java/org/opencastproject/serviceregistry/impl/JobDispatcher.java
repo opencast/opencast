@@ -694,11 +694,11 @@ public class JobDispatcher {
 
     private final Function<ServiceRegistration, HostRegistration> toHostRegistration =
         new Function<ServiceRegistration, HostRegistration>() {
-      @Override
-      public HostRegistration apply(ServiceRegistration s) {
-        return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
-      }
-    };
+          @Override
+          public HostRegistration apply(ServiceRegistration s) {
+            return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
+          }
+        };
 
     private final Function<HostRegistration, Float> toMaxLoad = new Function<HostRegistration, Float>() {
       @Override

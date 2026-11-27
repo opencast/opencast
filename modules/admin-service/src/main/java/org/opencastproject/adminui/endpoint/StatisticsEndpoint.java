@@ -84,9 +84,9 @@ import javax.ws.rs.core.Response;
     title = "statistics façade service",
     abstractText = "Provides statistics",
     notes = {"This service provides statistics."
-      + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-      + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-      + "DO NOT use this for integration of third-party applications.<em>"})
+            + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+            + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+            + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
     immediate = true,
     service = StatisticsEndpoint.class,
@@ -151,7 +151,7 @@ public class StatisticsEndpoint {
               + "resource type is missing", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If the current user is not authorized to perform this action",
               responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-    })
+      })
   public Response getProviders(@QueryParam("resourceType") final String resourceTypeStr) {
     ResourceType resourceType;
     try {
@@ -217,10 +217,10 @@ public class StatisticsEndpoint {
               type = RestParameter.Type.TEXT)
       },
       responses = {
-        @RestResponse(description = "Returns the statistical data for the given resource type as JSON",
-            responseCode = HttpServletResponse.SC_OK),
-        @RestResponse(description = "If the current user is not authorized to perform this action",
-            responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+          @RestResponse(description = "Returns the statistical data for the given resource type as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If the current user is not authorized to perform this action",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
       })
   public Response getProviderData(@FormParam("data") String data) {
     if (StringUtils.isBlank(data)) {

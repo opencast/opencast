@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.crop;
 
 import org.opencastproject.crop.impl.CropServiceImpl;

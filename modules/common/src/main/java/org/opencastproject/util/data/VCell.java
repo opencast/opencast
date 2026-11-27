@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.data;
 
 import static org.opencastproject.util.RequireUtil.notNull;

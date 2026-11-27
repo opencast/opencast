@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.util.XmlSafeParser;
@@ -56,7 +55,7 @@ public class Mpeg7Parser extends DefaultHandler {
   /** The current parser state */
   enum ParserState {
     Document, MultimediaContent, Segment, VideoText
-  };
+  }
 
   /**
    * Number formatter, used to deal with relevance values in a locale

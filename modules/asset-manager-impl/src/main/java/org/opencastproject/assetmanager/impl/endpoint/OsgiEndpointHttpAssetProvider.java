@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.impl.endpoint;
 
 import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
@@ -55,8 +56,8 @@ import java.util.Optional;
  */
 @Component(
     property = {
-    "service.description=HttpAssetProvider for the AssetManager",
-    "assetmanager.service.path=/assets"
+        "service.description=HttpAssetProvider for the AssetManager",
+        "assetmanager.service.path=/assets"
     },
     immediate = true,
     service = { HttpAssetProvider.class }

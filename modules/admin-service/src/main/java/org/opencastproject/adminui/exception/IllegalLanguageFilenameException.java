@@ -23,9 +23,9 @@ package org.opencastproject.adminui.exception;
 
 /**
  * This checked exception indicates that a file which is supposed to contain a translation was not named correctly.
- * 
+ *
  * @author ademasi
- * 
+ *
  */
 public class IllegalLanguageFilenameException extends Exception {
 
@@ -33,7 +33,7 @@ public class IllegalLanguageFilenameException extends Exception {
 
   /**
    * Constructor without cause.
-   * 
+   *
    * @param message
    */
   public IllegalLanguageFilenameException(String message) {
@@ -42,7 +42,7 @@ public class IllegalLanguageFilenameException extends Exception {
 
   /**
    * Full fledged constructor.
-   * 
+   *
    * @param message
    * @param cause
    */

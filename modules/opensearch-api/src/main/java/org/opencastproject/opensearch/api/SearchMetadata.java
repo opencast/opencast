@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
 import java.util.List;
@@ -33,14 +32,14 @@ public interface SearchMetadata<T> {
 
   /**
    * Returns the name of this metadata item.
-   * 
+   *
    * @return the name
    */
   String getName();
 
   /**
    * Adds <code>value</code> to the list of language neutral values.
-   * 
+   *
    * @param language
    *          the language
    * @param v
@@ -51,21 +50,21 @@ public interface SearchMetadata<T> {
   /**
    * Returns the values for this metadata item, mapped to their respective
    * languages.
-   * 
+   *
    * @return the localized values
    */
   Map<Language, List<T>> getLocalizedValues();
 
   /**
    * Returns <code>true</code> if this metadata item has been localized.
-   * 
+   *
    * @return <code>true</code> if the metadata item is localized
    */
   boolean isLocalized();
 
   /**
    * Adds <code>value</code> to the list of language neutral values.
-   * 
+   *
    * @param v
    *          the value
    */
@@ -75,7 +74,7 @@ public interface SearchMetadata<T> {
    * Returns a list of all all non-localized values. In order to retrieve
    * localized values for this metadata field, use {@link #getLocalizedValues()}
    * .
-   * 
+   *
    * @return the list of language neutral values
    */
   List<T> getValues();
@@ -83,7 +82,7 @@ public interface SearchMetadata<T> {
   /**
    * Returns the first value of the available values or <code>null</code> if no
    * value is available.
-   * 
+   *
    * @return the first value
    * @see #getValues()
    */

@@ -27,15 +27,15 @@ import java.util.List;
 
 /**
  * A simple folder inspection utility.
- * 
+ *
  * @author ademasi
- * 
+ *
  */
 public interface PathInspector {
 
   /**
    * Lists all files in a directory (path), if it exists and is readable.
-   * 
+   *
    * @param languageFileFolder
    * @return A list of all filenames in a directory.
    * @throws IllegalPathException

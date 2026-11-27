@@ -63,7 +63,7 @@ import javax.xml.stream.XMLStreamWriter;
         name = "comment",
         namespace = IndexObject.INDEX_XML_NAMESPACE,
         propOrder = {
-                "id", "reason", "text", "resolvedStatus"
+            "id", "reason", "text", "resolvedStatus"
         }
 )
 @XmlRootElement(name = "comment", namespace = IndexObject.INDEX_XML_NAMESPACE)

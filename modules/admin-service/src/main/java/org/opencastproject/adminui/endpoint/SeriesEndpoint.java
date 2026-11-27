@@ -614,20 +614,20 @@ public class SeriesEndpoint {
               isRequired = true,
               type = STRING,
               description = "The path of the page you want information about"
-      )},
+          )},
       responses = {
-              @RestResponse(
-                  responseCode = SC_OK,
-                  description = "Data about the given page in Tobira. Note that this does not mean the page exists!"),
-              @RestResponse(
-                  responseCode = SC_NOT_FOUND,
-                  description = "Nonexistent `path`"),
-              @RestResponse(
-                  responseCode = SC_BAD_REQUEST,
-                  description = "missing `path`"),
-              @RestResponse(
-                  responseCode = SC_SERVICE_UNAVAILABLE,
-                  description = "Tobira is not configured (correctly)")
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "Data about the given page in Tobira. Note that this does not mean the page exists!"),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Nonexistent `path`"),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "missing `path`"),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "Tobira is not configured (correctly)")
       })
   public Response getTobiraPage(@QueryParam("path") String path) throws IOException, InterruptedException {
     if (path == null) {

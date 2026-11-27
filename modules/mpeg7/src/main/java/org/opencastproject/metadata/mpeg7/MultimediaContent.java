@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.mpeg7;
 
 import org.opencastproject.mediapackage.XmlElement;
@@ -36,7 +35,7 @@ public interface MultimediaContent<T extends MultimediaContentType> extends XmlE
    */
   enum Type {
     VideoType, AudioType, AudioVisualType
-  };
+  }
 
   /**
    * Returns the multimedia content type.

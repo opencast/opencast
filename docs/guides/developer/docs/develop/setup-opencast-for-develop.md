@@ -240,21 +240,19 @@ To use it in IntelliJ, follow these steps:
     1. Go to settings → Tools → Checkstyle
     2. Click on the plus icon
     3. Add a description
-    4. Select “Use a local Checkstyle file“
-    5. Fill the blanks:
-        - checkstyle.header.file: `/docs/checkstyle/checkstyle-header.txt`
+    4. Select “Use a local Checkstyle file“ and choose `docs/checkstyle/opencast-checkstyle.xml`
 
 To use the plugin, you can run manually the check-style plugin through the menu View → Tool Windows → Checkstyle.
 
 #### Automatic Code Formatting
 
 Some of the style rules are not just checked but fixed automatically by the
-[Spotless](https://github.com/diffplug/spotless) Maven plugin, above all the import order, which is
-tedious to get right by hand. Spotless runs as part of every build, before Checkstyle, so a normal
+[Spotless](https://github.com/diffplug/spotless) Maven plugin, above all the import order and the
+license header, which are tedious to get right by hand. Spotless runs as part of every build, before Checkstyle, so a normal
 
     ./mvnw install
 
-will silently repair the imports of the modules it builds. You can also run it on its own, either
+will silently repair the Java sources of the modules it builds. You can also run it on its own, either
 for the whole repository or for single modules:
 
     ./mvnw spotless:apply
@@ -267,14 +265,18 @@ be merged.
 What Spotless takes care of:
 
 - the import order and grouping, including the removal of unused imports
-- a final newline at the end of every file
+- the license header from `docs/checkstyle/opencast-header.txt`, followed by a single blank line
+- trailing whitespace
+- Unix line endings and a final newline at the end of every file
 
-Everything else, including the license header and the indentation, is only checked by Checkstyle and
-still has to be written correctly by hand.
+It also rejects star imports (`import foo.*;`), which it cannot fix on its own.
+
+Everything else, including the indentation, is only checked by Checkstyle and still has to be
+written correctly by hand.
 
 One limitation worth knowing: Spotless reads imports line by line and cannot handle a single import
-statement wrapped over two lines. Should you ever need such an import, add the file to the
-`<excludes>` of the plugin configuration in the root `pom.xml`.
+statement wrapped over two lines. Never wrap imports, even if they are longer than 120 characters;
+Checkstyle does not apply the line length limit to them.
 
 
 

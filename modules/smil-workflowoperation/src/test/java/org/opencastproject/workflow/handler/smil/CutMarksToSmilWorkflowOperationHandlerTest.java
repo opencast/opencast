@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.smil;
 
 import org.opencastproject.mediapackage.Catalog;

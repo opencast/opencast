@@ -48,7 +48,7 @@ import javax.persistence.NoResultException;
  */
 @Component(
         property = {
-                "service.description=Workflow Service Database"
+            "service.description=Workflow Service Database"
         },
         immediate = true,
         service = { WorkflowServiceDatabase.class }

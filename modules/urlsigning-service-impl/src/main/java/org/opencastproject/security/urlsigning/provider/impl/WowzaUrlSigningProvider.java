@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.security.urlsigning.provider.impl;
 
 import org.opencastproject.security.api.SecurityService;
@@ -88,8 +89,8 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
 
       /*
         For backward compatibility, but i can not see how this could work.
-        According to the documentation 
-        "https://www.wowza.com/docs/how-to-protect-streaming-using-securetoken-in-wowza-streaming-engine" 
+        According to the documentation
+        "https://www.wowza.com/docs/how-to-protect-streaming-using-securetoken-in-wowza-streaming-engine"
         if you using token v1 we need a TEA implimentation.
       */
       if ("rtmp".equals((uri.getScheme()))) {

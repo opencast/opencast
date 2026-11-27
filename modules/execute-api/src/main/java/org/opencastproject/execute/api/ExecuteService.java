@@ -78,7 +78,7 @@ public interface ExecuteService {
    * create an output file with the name {@code outFileName} and a
    * {@link org.opencastproject.mediapackage.MediaPackageElement} will be created with the
    * {@link org.opencastproject.mediapackage.MediaPackageElement.Type} indicated by the argument {@code type}.
-   * 
+   *
    * @param exec
    *          The command to be executed by this method
    * @param args
@@ -107,7 +107,7 @@ public interface ExecuteService {
    * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}. This method
    * accepts a {@link org.opencastproject.mediapackage.MediaPackage} as an argument, and elements within that
    * MediaPackage may be referenced in the argument list by using certain placeholders.
-   * 
+   *
    * @param exec
    *          The command to be executed by this method
    * @param args

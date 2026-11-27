@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.search.api;
 
 import org.opencastproject.job.api.Job;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.common;
 
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_13_0;

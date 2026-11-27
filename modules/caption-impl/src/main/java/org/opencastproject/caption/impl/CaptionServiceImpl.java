@@ -102,7 +102,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /** List of available operations on jobs */
   private enum Operation {
     Convert, ConvertWithLanguage
-  };
+  }
 
   /** The collection name */
   public static final String COLLECTION = "captions";

@@ -191,7 +191,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Returns true if the series with the given identifier contains an element with the given type.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -204,7 +204,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Adds or updates a series element in the series service database.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -219,7 +219,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Deletes an element of a given type from a series
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -232,7 +232,7 @@ public interface SeriesServiceDatabase {
 
   /**
    * Returns the data of a series element.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -246,7 +246,7 @@ public interface SeriesServiceDatabase {
   /**
    * Returns all elements of a series or an empty map if the series does not contain any elements. The key of the map
    * marks the element type.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @return a map of series elements or {@code Opt.none()} if no such series exists

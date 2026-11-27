@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.usertracking.endpoint;
 
 import org.opencastproject.usertracking.api.Stats;

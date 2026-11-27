@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.assetmanager.storage.impl.fs;
 
 import static org.opencastproject.util.IoSupport.file;
@@ -55,8 +56,8 @@ import javax.naming.ConfigurationException;
 
 @Component(
     property = {
-    "service.description=File system based asset store",
-    "store.type=local-filesystem"
+        "service.description=File system based asset store",
+        "store.type=local-filesystem"
     },
     immediate = true,
     service = { AssetStore.class, StorageUsage.class }

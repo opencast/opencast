@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.util;
 
 import org.opencastproject.oaipmh.server.ResumableQuery;

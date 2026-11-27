@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.waveform.ffmpeg;
 
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -143,7 +144,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** List of available operations on jobs */
   enum Operation {
     Waveform
-  };
+  }
 
   /** The waveform job load */
   private float waveformJobLoad = DEFAULT_WAVEFORM_JOB_LOAD;

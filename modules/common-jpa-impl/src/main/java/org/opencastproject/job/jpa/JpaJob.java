@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.job.jpa;
 
 import static org.opencastproject.job.api.Job.FailureReason.NONE;
@@ -250,7 +251,7 @@ public class JpaJob {
   private JpaJob rootJob = null;
 
   @OneToMany(mappedBy = "parentJob", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REFRESH,
-          CascadeType.MERGE })
+      CascadeType.MERGE })
   private List<JpaJob> childJobs;
 
   @Transient

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.cleanup;
 
 import org.apache.commons.io.FileUtils;

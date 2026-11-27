@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.index.service.util.JSONUtils.mapToJsonObject;

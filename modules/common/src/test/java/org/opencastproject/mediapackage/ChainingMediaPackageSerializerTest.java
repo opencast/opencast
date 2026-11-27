@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.mediapackage;
 
 import static org.easymock.EasyMock.anyObject;

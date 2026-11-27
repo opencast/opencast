@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.dictionary.api;
 
 import org.opencastproject.metadata.mpeg7.Textual;

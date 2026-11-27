@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.event.handler;
 
 import static org.opencastproject.util.OsgiUtil.getOptCfg;

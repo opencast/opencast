@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.runtimeinfo.rest;
 
 import static org.junit.Assert.assertEquals;

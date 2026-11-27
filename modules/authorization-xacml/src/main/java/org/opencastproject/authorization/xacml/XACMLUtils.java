@@ -103,7 +103,7 @@ public final class XACMLUtils {
    * <p>
    * Only rules which follow the structure of those created by {@link #getXacml(MediaPackage, AccessControlList)} may be
    * successfully parsed. All other rules are ignored.
-   * 
+   *
    * @param xacml
    *          the XACML to parse
    * @return the ACL, never {@code null}

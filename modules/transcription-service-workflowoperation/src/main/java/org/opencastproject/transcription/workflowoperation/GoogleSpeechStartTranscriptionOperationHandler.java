@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.workflowoperation;
 
 import org.opencastproject.job.api.Job;

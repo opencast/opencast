@@ -107,13 +107,13 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
   /** List of available operations on jobs */
   private enum Operation {
     Segment
-  };
+  }
 
-  private class Chapter {
+  private final class Chapter {
     protected double start;
     protected double end;
     protected Optional<String> title;
-  };
+  }
 
   /** Path to the executable */
   protected String binary;

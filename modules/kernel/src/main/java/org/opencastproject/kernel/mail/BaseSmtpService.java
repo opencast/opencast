@@ -44,7 +44,7 @@ public class BaseSmtpService {
   /** The mode */
   protected enum Mode {
     production, test
-  };
+  }
 
   /** Parameter prefix common to all "mail" properties */
   protected static final String OPT_MAIL_PREFIX = "mail.";

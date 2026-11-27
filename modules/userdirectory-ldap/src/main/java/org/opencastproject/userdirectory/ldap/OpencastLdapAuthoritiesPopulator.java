@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.userdirectory.ldap;
 
 import org.opencastproject.security.api.Organization;

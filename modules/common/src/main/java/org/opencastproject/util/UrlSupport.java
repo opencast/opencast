@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util;
 
 import static org.opencastproject.util.data.functions.Misc.chuck;

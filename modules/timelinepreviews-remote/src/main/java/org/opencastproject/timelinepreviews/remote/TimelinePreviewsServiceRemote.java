@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.timelinepreviews.remote;
 
 import org.opencastproject.job.api.Job;

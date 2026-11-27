@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
 import java.util.Collection;
@@ -32,11 +31,11 @@ public interface SearchTerms<T extends Object> {
   /** The search quantifier */
   enum Quantifier {
     All, Any
-  };
+  }
 
   /**
    * Adds a term to this list of terms.
-   * 
+   *
    * @param term
    *          the new term
    */
@@ -44,7 +43,7 @@ public interface SearchTerms<T extends Object> {
 
   /**
    * Returns the terms.
-   * 
+   *
    * @return the terms
    */
   Collection<T> getTerms();
@@ -52,7 +51,7 @@ public interface SearchTerms<T extends Object> {
   /**
    * Returns <code>true</code> if <code>term</code> is contained in the list of
    * terms.
-   * 
+   *
    * @param term
    *          the term
    * @return <code>true</code> if <code>term</code> is contained
@@ -61,14 +60,14 @@ public interface SearchTerms<T extends Object> {
 
   /**
    * Returns the number of terms.
-   * 
+   *
    * @return the number of terms
    */
   int size();
 
   /**
    * Returns this group's quantifier.
-   * 
+   *
    * @return the quantifier
    */
   Quantifier getQuantifier();

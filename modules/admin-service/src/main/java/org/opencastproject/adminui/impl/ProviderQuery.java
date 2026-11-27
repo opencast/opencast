@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.adminui.impl;
 
 import org.opencastproject.statistics.api.DataResolution;

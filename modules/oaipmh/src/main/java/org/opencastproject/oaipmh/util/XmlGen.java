@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.util;
 
 import static org.opencastproject.util.IoSupport.withResource;

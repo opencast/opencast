@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage.track;
 
 import org.opencastproject.util.EnumSupport;

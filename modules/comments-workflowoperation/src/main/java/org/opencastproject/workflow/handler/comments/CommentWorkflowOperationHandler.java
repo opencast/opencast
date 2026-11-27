@@ -75,7 +75,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   public enum Operation {
     create, resolve, delete
-  };
+  }
 
   /**
    * {@inheritDoc}

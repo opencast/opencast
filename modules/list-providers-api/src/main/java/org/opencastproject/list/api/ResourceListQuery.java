@@ -31,7 +31,7 @@ public interface ResourceListQuery {
 
   /**
    * Returns all the {@link ResourceListFilter} set for the query.
-   * 
+   *
    * @return all the query filters
    */
   List<ResourceListFilter<?>> getFilters();
@@ -39,7 +39,7 @@ public interface ResourceListQuery {
   /**
    * Returns all the available {@link ResourceListFilter} filters with this query. The objects returned in the list are
    * simple instance without any filter value set.
-   * 
+   *
    * @return all the available filters
    */
   List<ResourceListFilter<?>> getAvailableFilters();
@@ -55,28 +55,28 @@ public interface ResourceListQuery {
 
   /**
    * Returns the limit for the resource query
-   * 
+   *
    * @return the list limit
    */
   Optional<Integer> getLimit();
 
   /**
    * Returns the offset for the resource query
-   * 
+   *
    * @return the list offset
    */
   Optional<Integer> getOffset();
 
   /**
    * Returns the name of the field by which the list should be sorted
-   * 
+   *
    * @return the name of the field to use to sort the list
    */
   Optional<String> getSortBy();
 
   /**
    * Returns if the given filter is or not set
-   * 
+   *
    * @param name
    *          the filter name
    * @return true if set

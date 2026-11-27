@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.external.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.oaipmh.persistence;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;

@@ -201,14 +201,14 @@ public abstract class BundleInfoRestEndpoint {
           + "host is actually gone! The database will be automatically rebuilt when Opencast on that host is "
           + "(re)started.",
           restParameters = {
-                  @RestParameter(
-                          name = "host",
-                          description = "The name of the host to clear",
-                          isRequired = true,
-                          type = RestParameter.Type.STRING,
-                          defaultValue = "") },
+              @RestParameter(
+                      name = "host",
+                      description = "The name of the host to clear",
+                      isRequired = true,
+                      type = RestParameter.Type.STRING,
+                      defaultValue = "") },
           responses = {
-                  @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_NO_CONTENT) },
+              @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_NO_CONTENT) },
           returnDescription = "No data is returned.")
   public Response clearHost(@QueryParam("host") String host) {
     logger.debug("Removing tracked bundles of host: {}", host);

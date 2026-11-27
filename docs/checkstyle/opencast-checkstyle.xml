@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="Checker">
-  <!-- Check for license header                                 -->
-  <!-- See http://checkstyle.sourceforge.net/config_header.html -->
-  <module name="Header">
-    <property name="headerFile" value="${checkstyle.header.file}"/>
-    <property name="ignoreLines" value="3"/>
-    <property name="fileExtensions" value="java, js"/>
-    <property name="severity" value="error" />
-  </module>
+  <!-- Note that the license header, trailing whitespace, star imports and the final newline used to be
+       checked here as well.  All of them are now handled by the spotless-maven-plugin (see the root
+       pom.xml), which does not just report them but fixes them. -->
 
   <!-- Checks whether spaces are used as opposed to tabs                    -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html#FileTabCharacter -->
@@ -28,13 +23,6 @@
     <property name="offCommentFormat" value="// CHECKSTYLE:OFF checkstyle:(.*)"/>
     <property name="onCommentFormat" value="// CHECKSTYLE:ON checkstyle:(.*)"/>
     <property name="checkFormat" value="$1"/>
-  </module>
-
-  <!-- Checks whether files end with a new line.                        -->
-  <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
-  <module name="NewlineAtEndOfFile">
-    <property name="lineSeparator" value="lf"/>
-    <property name="severity" value="error" />
   </module>
 
   <!-- Checks that property files contain the same keys.         -->
@@ -86,9 +74,6 @@
 
     <!-- Checks for imports                              -->
     <!-- See http://checkstyle.sf.net/config_imports.html -->
-    <module name="AvoidStarImport">
-      <property name="severity" value="error" />
-    </module>
     <module name="IllegalImport" /> <!-- defaults to sun.* packages -->
     <module name="RedundantImport">
       <property name="severity" value="error" />
@@ -289,13 +274,6 @@
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <module name="ArrayTypeStyle">
-      <property name="severity" value="error" />
-    </module>
-    <module name="Regexp">
-      <property name="format" value="[ \t]+$" />
-      <property name="message" value="Line has trailing spaces." />
-      <property name="illegalPattern" value="true" />
-      <property name="ignoreComments" value="true" />
       <property name="severity" value="error" />
     </module>
     <module name="UpperEll">

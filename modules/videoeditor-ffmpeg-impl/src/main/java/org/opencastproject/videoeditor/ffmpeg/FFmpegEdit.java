@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.videoeditor.ffmpeg;
 
 import org.opencastproject.util.IoSupport;

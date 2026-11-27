@@ -110,11 +110,11 @@ public class UserIdRoleProvider implements RoleProvider {
 
   public static boolean isSanitize() {
     return sanitize;
-  };
+  }
 
   public static String getUserRolePrefix() {
     return userRolePrefix;
-  };
+  }
 
   public static String getUserIdRole(String userName) {
     if (sanitize) {

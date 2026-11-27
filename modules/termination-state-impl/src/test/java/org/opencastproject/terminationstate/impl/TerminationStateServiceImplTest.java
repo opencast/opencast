@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.terminationstate.impl;
 
 import org.opencastproject.job.api.Job;

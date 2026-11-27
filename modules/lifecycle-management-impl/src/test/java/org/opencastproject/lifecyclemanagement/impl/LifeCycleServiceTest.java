@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.lifecyclemanagement.impl;
 
 import static org.easymock.EasyMock.createNiceMock;

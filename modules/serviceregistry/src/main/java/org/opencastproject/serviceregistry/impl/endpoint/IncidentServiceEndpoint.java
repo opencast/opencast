@@ -113,9 +113,9 @@ import javax.ws.rs.core.Response.Status;
     })
 @Component(
     property = {
-      "service.description=Incident Service REST Endpoint",
-      "opencast.service.type=org.opencastproject.incident",
-      "opencast.service.path=/incidents"
+        "service.description=Incident Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.incident",
+        "opencast.service.path=/incidents"
     },
     immediate = true,
     service = { IncidentServiceEndpoint.class }
@@ -173,10 +173,10 @@ public class IncidentServiceEndpoint {
       description = "Returns the job incidents with the given identifiers.",
       returnDescription = "Returns the job incidents.",
       pathParameters = {
-         @RestParameter(name = "type", isRequired = true,
-             description = "The media type of the response [xml|json]",
-             defaultValue = "xml",
-             type = Type.STRING)},
+          @RestParameter(name = "type", isRequired = true,
+              description = "The media type of the response [xml|json]",
+              defaultValue = "xml",
+              type = Type.STRING)},
       restParameters = {
           @RestParameter(name = "id", isRequired = true, description = "The job identifiers.", type = Type.INTEGER),
           @RestParameter(name = "format", isRequired = false,
@@ -236,8 +236,8 @@ public class IncidentServiceEndpoint {
               type = Type.STRING)
       },
       responses = {
-             @RestResponse(responseCode = SC_OK, description = "The job incident."),
-             @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this identifier was found.")
+          @RestResponse(responseCode = SC_OK, description = "The job incident."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this identifier was found.")
       })
   public Response getIncidentsOfJobAsTree(
           @Context HttpServletRequest request,
@@ -278,8 +278,8 @@ public class IncidentServiceEndpoint {
               defaultValue = "xml",
               type = Type.STRING)},
       responses = {
-         @RestResponse(responseCode = SC_OK, description = "The job incident."),
-         @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this identifier was found.")
+          @RestResponse(responseCode = SC_OK, description = "The job incident."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this identifier was found.")
       })
   public Response getIncident(@PathParam("id") final long incidentId, @PathParam("type") final String type)
           throws NotFoundException {

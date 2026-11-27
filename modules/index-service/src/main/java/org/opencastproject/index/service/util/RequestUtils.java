@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.index.service.util;
 
 import org.opencastproject.list.api.DefaultResourceListQuery;

@@ -93,7 +93,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component(immediate = true, service = {
     TranscriptionService.class, MicrosoftAzureTranscriptionService.class }, property = {
-    "service.description=Microsoft Azure Transcription Service", "provider=microsoft.azure" })
+        "service.description=Microsoft Azure Transcription Service", "provider=microsoft.azure" })
 public class MicrosoftAzureTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
   private static final Logger logger = LoggerFactory.getLogger(MicrosoftAzureTranscriptionService.class);

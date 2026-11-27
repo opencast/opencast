@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.amberscript.endpoint;
 
 import org.opencastproject.job.api.JobProducer;
