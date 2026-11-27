@@ -45,7 +45,11 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XProperties;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.api.services.youtube.model.Caption;
 import com.google.api.services.youtube.model.Playlist;
+import com.google.api.services.youtube.model.PlaylistItem;
+import com.google.api.services.youtube.model.PlaylistItemListResponse;
+import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.google.api.services.youtube.model.Video;
 
 import org.apache.commons.lang3.StringUtils;
@@ -81,14 +85,14 @@ import java.util.stream.Collectors;
  */
 @Component(
     immediate = true,
-    service = { ManagedService.class,YouTubePublicationService.class },
+    service = { ManagedService.class, YouTubePublicationService.class, YouTubeAPIVersion3Service.class },
     property = {
         "service.description=Publication Service (YouTube API Version 3)"
     }
 )
 public class YouTubeV3PublicationServiceImpl
     extends AbstractJobProducer
-    implements YouTubePublicationService, ManagedService {
+    implements YouTubePublicationService, ManagedService, YouTubeAPIVersion3Service {
 
   /** The load on the system introduced by creating a publish job */
   public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 0.1f;
@@ -671,4 +675,109 @@ public class YouTubeV3PublicationServiceImpl
       }
     }
   }
+
+  /*
+   * This component also implements YouTubeAPIVersion3Service, purely delegating to youTubeService, so that OSGi
+   * can declare it as a provider of that service (Felix's resolver requires a real Provide-Capability generated
+   * from an assignable @Component, it will not resolve a reference against a service registered manually at
+   * runtime). This lets other components (namely the synchronous playlist REST endpoints) obtain a @Reference to
+   * the very same already-authenticated YouTube API client used by publish()/process(), instead of creating and
+   * authenticating a second one.
+   */
+
+  @Override
+  public void initialize(final ClientCredentials credentials) throws IOException {
+    youTubeService.initialize(credentials);
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return youTubeService.isInitialized();
+  }
+
+  @Override
+  public Video getVideoById(final String videoId) throws IOException {
+    return youTubeService.getVideoById(videoId);
+  }
+
+  @Override
+  public Playlist getMyPlaylistByTitle(final String title) throws IOException {
+    return youTubeService.getMyPlaylistByTitle(title);
+  }
+
+  @Override
+  public PlaylistListResponse getMyPlaylists(final String pageToken, final long maxResults) throws IOException {
+    return youTubeService.getMyPlaylists(pageToken, maxResults);
+  }
+
+  @Override
+  public PlaylistItemListResponse getPlaylistItems(
+      final String playlistId, final String pageToken, final long maxResults) throws IOException {
+    return youTubeService.getPlaylistItems(playlistId, pageToken, maxResults);
+  }
+
+  @Override
+  public Video addVideoToMyChannel(final VideoUpload videoUpload) throws IOException {
+    return youTubeService.addVideoToMyChannel(videoUpload);
+  }
+
+  @Override
+  public void setThumbnail(final String videoId, final File thumbnail, final String mimeType) throws IOException {
+    youTubeService.setThumbnail(videoId, thumbnail, mimeType);
+  }
+
+  @Override
+  public PlaylistItem addPlaylistItem(final String playlistId, final String videoId) throws IOException {
+    return youTubeService.addPlaylistItem(playlistId, videoId);
+  }
+
+  @Override
+  public Playlist createPlaylist(final String title, final String description,
+      final YouTubeAPIVersion3Service.PrivacyStatus privacyStatus, final String... tags) throws IOException {
+    return youTubeService.createPlaylist(title, description, privacyStatus, tags);
+  }
+
+  @Override
+  public Playlist createPlaylistWithPrivacyStatus(
+      final String title, final String description, final String privacyStatus) throws IOException {
+    return youTubeService.createPlaylistWithPrivacyStatus(title, description, privacyStatus);
+  }
+
+  @Override
+  public Playlist getPlaylistById(final String playlistId) throws IOException {
+    return youTubeService.getPlaylistById(playlistId);
+  }
+
+  @Override
+  public Playlist updatePlaylist(final String playlistId, final String title, final String description)
+          throws IOException {
+    return youTubeService.updatePlaylist(playlistId, title, description);
+  }
+
+  @Override
+  public PlaylistItem findPlaylistItem(final String playlistId, final String videoId) throws IOException {
+    return youTubeService.findPlaylistItem(playlistId, videoId);
+  }
+
+  @Override
+  public void removeMyVideo(final String videoId) throws Exception {
+    youTubeService.removeMyVideo(videoId);
+  }
+
+  @Override
+  public void removeVideoFromPlaylist(final String playlistId, final String videoId) throws IOException {
+    youTubeService.removeVideoFromPlaylist(playlistId, videoId);
+  }
+
+  @Override
+  public void removeMyPlaylist(final String playlistId) throws IOException {
+    youTubeService.removeMyPlaylist(playlistId);
+  }
+
+  @Override
+  public Caption addCaptions(final String videoId, final File file, final String language, final String name)
+          throws IOException {
+    return youTubeService.addCaptions(videoId, file, language, name);
+  }
+
 }
