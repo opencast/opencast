@@ -138,7 +138,7 @@ public class UIConfigRest {
   }
 
   @GET
-  @Path("{component}/{filename : .+}")
+  @Path("{component}/{filename:.+}")
   @Produces(MediaType.WILDCARD)
   @RestQuery(name = "getConfigFile",
       description = "Returns the requested configuration file (json, css, etc..)",
