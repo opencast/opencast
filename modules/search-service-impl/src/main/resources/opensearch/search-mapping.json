@@ -121,8 +121,7 @@
       }
     },
     "deleted": {
-      "type": "date",
-      "null_value": "null"
+      "type": "date"
     },
     "live": {
       "type": "boolean"
