@@ -51,6 +51,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -93,6 +95,9 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
 
+  /** Name of the configuration option that enables regex matching. */
+  public static final String CHECK_REGEX_PROPERTY = "check-regex";
+
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
@@ -132,6 +137,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     List<MediaPackageElementFlavor> configuredTargetFlavor = tagsAndFlavors.getTargetFlavors();
     ConfiguredTagsAndFlavors.TargetTags configuredTargetTags = tagsAndFlavors.getTargetTags();
     boolean copy = BooleanUtils.toBoolean(currentOperation.getConfiguration(COPY_PROPERTY));
+    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX_PROPERTY));
 
     SimpleElementSelector elementSelector = new SimpleElementSelector();
     for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
@@ -139,6 +145,15 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     }
     for (String tag : configuredSourceTags) {
       elementSelector.addTag(tag);
+    }
+
+    Pattern pattern = null;
+    if (configuredCheckRegex) {
+      try {
+        pattern = Pattern.compile(configuredMatchValue);
+      } catch (PatternSyntaxException e) {
+        logger.warn("Skipping regex check due to invalid regex: '{}': {}", configuredMatchValue, e.getMessage());
+      }
     }
 
     // Find Catalog
@@ -160,6 +175,26 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
           }
         } else {
           foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
+        }
+
+        // As a final step, we check for a regex match if none has been found so far,
+        // allowing the default checker to do their job.
+        if (configuredCheckRegex && !foundValue && !values.isEmpty() && pattern != null) {
+          // We need to check each value to ensure it matches the Regex.
+          for (int i = 0; i < values.size(); i++) {
+            String valueString = values.get(i).getValue();
+            // If any of the values match the Regex, we consider it as found.
+            // We don't care about those that don't match here!
+            if (pattern.matcher(valueString).matches()) {
+              foundValue = true;
+              break; // Break out of the inner loop to exit the single-value check.
+            }
+          }
+        }
+
+        // Break out of the outer loop here to prevent foundValue from being overwritten in multi-catalog scenarios.
+        if (foundValue) {
+          break;
         }
       }
 
