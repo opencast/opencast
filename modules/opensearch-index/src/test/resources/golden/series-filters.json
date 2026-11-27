@@ -1,0 +1,146 @@
+{
+  "from": 5,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "acl_permission_write": [
+              "ROLE_X"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "contributors": [
+              "Contributor"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "creator": [
+              "Creator"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "description": [
+              "Description"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "extended_metadata_dublincore/extended_field": [
+              "value"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "language": [
+              "en"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "license": [
+              "CC-BY"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "managed_acl": [
+              "Managed ACL"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "organization": [
+              "mh_default_org"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "organizers": [
+              "Organizer"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "publisher": [
+              "Publisher"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "rights_holder": [
+              "Rights holder"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "subject": [
+              "Subject A",
+              "Subject B"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "theme": [
+              7
+            ]
+          }
+        },
+        {
+          "terms": {
+            "title": [
+              "Title"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "uid": [
+              "series-1"
+            ]
+          }
+        }
+      ],
+      "must": [
+        {
+          "range": {
+            "createdDateTime": {
+              "gte": "2023-11-14T22:13:20Z",
+              "lte": "2024-03-09T16:00:00Z"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "size": 15,
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647
+}

@@ -19,27 +19,29 @@
  *
  */
 
-
 package org.opencastproject.search.api;
 
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.SearchHits;
-
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * One page of results of a search service query.
+ */
 public class SearchResultList {
   private final List<SearchResult> list;
 
   private final long totalhits;
 
-  public SearchResultList(SearchHits hits) {
-    list = Arrays.stream(hits.getHits())
-        .map(SearchHit::getSourceAsMap)
-        .map(SearchResult::rehydrate)
-        .collect(Collectors.toUnmodifiableList());
-    totalhits = hits.getTotalHits().value();
+  /**
+   * Creates a result list.
+   *
+   * @param hits
+   *          the results on this page
+   * @param totalHits
+   *          the total number of results matching the query
+   */
+  public SearchResultList(List<SearchResult> hits, long totalHits) {
+    this.list = List.copyOf(hits);
+    this.totalhits = totalHits;
   }
 
   public List<SearchResult> getHits() {

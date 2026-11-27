@@ -1488,7 +1488,7 @@ public class IndexServiceImpl implements IndexService {
       logger.debug("Didn't find event with id {}", id);
       return Optional.empty();
     }
-    return Optional.of(result.getItems()[0].getSource());
+    return Optional.of(result.getItems().get(0));
   }
 
   @Override

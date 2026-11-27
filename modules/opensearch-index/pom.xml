@@ -14,6 +14,11 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.opensearch.client</groupId>
+      <artifactId>opensearch-java</artifactId>
+      <version>${opensearch-java.version}</version>
+    </dependency>
     <!-- osgi support -->
     <dependency>
       <groupId>org.osgi</groupId>
@@ -82,16 +87,6 @@
       <scope>compile</scope>
     </dependency>
     <!-- opensearch -->
-    <dependency>
-      <groupId>org.opensearch</groupId>
-      <artifactId>opensearch</artifactId>
-      <version>${opensearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opensearch</groupId>
-      <artifactId>opensearch-core</artifactId>
-      <version>${opensearch.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>

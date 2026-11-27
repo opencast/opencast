@@ -110,7 +110,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
@@ -3412,8 +3411,7 @@ public abstract class AbstractEventEndpoint {
       throw new WebApplicationException(e);
     }
 
-    for (SearchResultItem<Event> item : results.getItems()) {
-      Event source = item.getSource();
+    for (Event source : results.getItems()) {
       source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
       List<EventComment> comments = null;
       if (optGetComments.isPresent() && optGetComments.get()) {

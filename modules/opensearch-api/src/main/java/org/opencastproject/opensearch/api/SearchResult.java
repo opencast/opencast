@@ -19,78 +19,93 @@
  *
  */
 
-
 package org.opencastproject.opensearch.api;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * A result as returned by a search operation.
+ * One page of results as returned by a search operation.
+ *
+ * @param <T>
+ *          the type of the returned documents
  */
-public interface SearchResult<T> {
+public final class SearchResult<T> {
+
+  private final List<T> items;
+  private final long hitCount;
+  private final long offset;
+  private final long limit;
 
   /**
-   * Returns the individual items of this search result.
-   * 
-   * @return the search result items
+   * Creates a search result.
+   *
+   * @param items
+   *          the documents on this page
+   * @param hitCount
+   *          the total number of documents matching the query, independent of offset and limit
+   * @param offset
+   *          the offset of the query
+   * @param limit
+   *          the limit of the query
    */
-  SearchResultItem<T>[] getItems();
+  public SearchResult(List<T> items, long hitCount, long offset, long limit) {
+    this.items = Collections.unmodifiableList(items);
+    this.hitCount = hitCount;
+    this.offset = offset;
+    this.limit = limit;
+  }
 
   /**
-   * Returns the total number of appearances of the search criteria in the search result, spread over
-   * <code>getDocumentCount</code> number of documents.
-   * 
-   * @return the overall number of hits
+   * Creates an empty search result.
    */
-  long getHitCount();
+  public static <T> SearchResult<T> empty() {
+    return new SearchResult<>(List.of(), 0, 0, 0);
+  }
 
   /**
-   * Returns the total number of items in the search result.
-   * <p>
-   * Note that this number might not match the size of the array as returned by {@link #getItems()}, which is likely to
-   * be limited by the value returned by {@link #getLimit()}.
-   * 
-   * @return the number of documents containing the hits
+   * Returns the documents on this page of the search result.
+   *
+   * @return the documents
    */
-  long getDocumentCount();
+  public List<T> getItems() {
+    return items;
+  }
 
   /**
-   * Returns the number of items in this search result, possibly limited with respect to the total number of result
-   * items by <code>offset</code> and <code>limit</code>.
-   * 
-   * @return the total number of hits.
-   * @see #getOffset()
-   * @see #getLimit()
+   * Returns the total number of documents matching the query, independent of offset and limit.
+   *
+   * @return the number of hits
    */
-  long getPageSize();
+  public long getHitCount() {
+    return hitCount;
+  }
 
   /**
-   * Get the offset within the search result or <code>-1</code> if no limit has been specified.
-   * 
+   * Returns the number of documents on this page.
+   *
+   * @return the page size
+   */
+  public long getPageSize() {
+    return items.size();
+  }
+
+  /**
+   * Returns the offset of the query.
+   *
    * @return the offset
    */
-  long getOffset();
+  public long getOffset() {
+    return offset;
+  }
 
   /**
-   * Returns the limit of this search results or <code>-1</code> if no limit has been specified.
-   * 
+   * Returns the limit of the query.
+   *
    * @return the limit
    */
-  long getLimit();
-
-  /**
-   * Returns the page of the current result items within the complete search result. This number is influenced by the
-   * <code>offset</code> and the page size <code>limit</code>.
-   * <p>
-   * Note that the page size is one-based
-   * 
-   * @return the page number
-   */
-  long getPage();
-
-  /**
-   * Returns the search time in milliseconds.
-   * 
-   * @return the time
-   */
-  long getSearchTime();
+  public long getLimit() {
+    return limit;
+  }
 
 }

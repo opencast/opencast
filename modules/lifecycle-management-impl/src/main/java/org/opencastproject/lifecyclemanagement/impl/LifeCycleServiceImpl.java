@@ -39,7 +39,6 @@ import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
@@ -78,6 +77,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Component(
     property = {
@@ -530,8 +530,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       // Run query
       results = index.getByQuery(query);
 
-      for (SearchResultItem<Event> item : results.getItems()) {
-        Event source = item.getSource();
+      for (Event source : results.getItems()) {
         eventsList.add(source);
       }
 
@@ -559,6 +558,13 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     return allEvents;
   }
 
+  /** Filters which directly translate to a condition on the index field of the same name */
+  private static final Set<String> FIELD_FILTERS = Set.of(
+      EventIndexSchema.TITLE, EventIndexSchema.DESCRIPTION, EventIndexSchema.PRESENTER, EventIndexSchema.CONTRIBUTOR,
+      EventIndexSchema.SUBJECT, EventIndexSchema.LOCATION, EventIndexSchema.SERIES_NAME, EventIndexSchema.LANGUAGE,
+      EventIndexSchema.SOURCE, EventIndexSchema.CREATED, EventIndexSchema.CREATOR, EventIndexSchema.PUBLISHER,
+      EventIndexSchema.LICENSE);
+
   /**
    * Add arguments to a query for the index
    * @param query The query the arguments should be added to
@@ -566,55 +572,31 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   private void addFiltersToQuery(EventSearchQuery query, Map<String, EventSearchQueryField<String>> filters) {
     for (String name : filters.keySet()) {
+      final EventSearchQueryField<String> filter = filters.get(name);
+      if (FIELD_FILTERS.contains(name)) {
+        query.withField(name, filter.getValue(), filter.getType(), filter.isMust());
+        continue;
+      }
       switch (name) {
-        case EventIndexSchema.UID -> query.withIdentifier(filters.get(name).getValue());
-        case EventIndexSchema.TITLE -> query.withTitle(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.DESCRIPTION -> query.withDescription(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.PRESENTER -> query.withPresenter(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.CONTRIBUTOR-> query.withContributor(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.SUBJECT -> query.withSubject(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.LOCATION -> query.withLocation(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case "isPartOf" -> query.withSeriesId(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.SERIES_NAME -> query.withSeriesName(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.LANGUAGE -> query.withLanguage(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.SOURCE -> query.withSource(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.CREATED -> query.withCreated(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.CREATOR -> query.withCreator(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.PUBLISHER -> query.withPublisher(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.LICENSE -> query.withLicense(
-            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.RIGHTS -> query.withRights(filters.get(name).getValue());
-        case EventIndexSchema.START_DATE -> query.withStartDate(
-            filters.get(name).getValue(), filters.get(name).getType());
+        case EventIndexSchema.UID -> query.withIdentifier(filter.getValue());
+        case "isPartOf" -> query.withField(EventIndexSchema.SERIES_ID, filter.getValue(), filter.getType(),
+            filter.isMust());
+        case EventIndexSchema.RIGHTS -> query.withRights(filter.getValue());
+        case EventIndexSchema.START_DATE, EventIndexSchema.END_DATE -> query.withField(name, filter.getValue(),
+            filter.getType(), true);
 
         case "start_date_range" -> {
-          Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name).getValue());
+          Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filter.getValue());
           query.withStartFrom(fromAndToCreationRange.getA());
           query.withStartTo(fromAndToCreationRange.getB());
         }
         case "start_date_relative" -> {
-          Period period = Period.parse(filters.get(name).getValue());
+          Period period = Period.parse(filter.getValue());
           LocalDateTime now = LocalDateTime.now();
           LocalDateTime relative = now.plus(period);
-          query.withStartDate(relative.atZone(ZoneId.systemDefault()).toInstant().toString(),
-              filters.get(name).getType());
+          query.withField(EventIndexSchema.START_DATE,
+              relative.atZone(ZoneId.systemDefault()).toInstant().toString(), filter.getType(), true);
         }
-
-        case EventIndexSchema.END_DATE -> query.withEndDate(
-            filters.get(name).getValue(), filters.get(name).getType());
 
         default -> logger.warn("Filter " + name + " is not supported");
       }
@@ -665,8 +647,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     // Run query
     SearchResult<Series> results = index.getByQuery(query);
 
-    for (SearchResultItem<Series> item : results.getItems()) {
-      Series source = item.getSource();
+    for (Series source : results.getItems()) {
       seriesList.add(source);
     }
 

@@ -22,7 +22,7 @@
 package org.opencastproject.graphql.datafetcher;
 
 import org.opencastproject.graphql.type.input.SearchOrder;
-import org.opencastproject.opensearch.api.SearchQuery;
+import org.opencastproject.opensearch.index.objects.AbstractIndexQuery;
 
 import graphql.schema.DataFetchingEnvironment;
 
@@ -30,14 +30,15 @@ public abstract class OpenSearchDataFetcher<T> extends ParameterDataFetcher<T> {
 
   public static final int DEFAULT_PAGE_SIZE = 20;
 
-  protected <E extends SearchQuery> E addPaginationParams(E query, final DataFetchingEnvironment environment) {
+  protected <E extends AbstractIndexQuery<E>> E addPaginationParams(E query,
+      final DataFetchingEnvironment environment) {
     query.withLimit(parseParam("limit", DEFAULT_PAGE_SIZE, environment))
         .withOffset(parseParam("offset", 0, environment));
 
     return query;
   }
 
-  protected <E extends SearchQuery> E addOrderByParams(E query, final DataFetchingEnvironment environment) {
+  protected <E extends AbstractIndexQuery<E>> E addOrderByParams(E query, final DataFetchingEnvironment environment) {
     SearchOrder order = parseObjectParam("orderBy", SearchOrder.class, environment);
     if (order != null) {
       query.withSortOrder(order.getField(), order.getDirection().getOrder());
@@ -45,7 +46,7 @@ public abstract class OpenSearchDataFetcher<T> extends ParameterDataFetcher<T> {
     return query;
   }
 
-  protected <E extends SearchQuery> E addQueryParams(E query, final DataFetchingEnvironment environment) {
+  protected <E extends AbstractIndexQuery<E>> E addQueryParams(E query, final DataFetchingEnvironment environment) {
     if (environment.containsArgument("query")) {
       query.withText(parseParam("query", null, environment));
     }

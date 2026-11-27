@@ -66,9 +66,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
-import org.opencastproject.opensearch.api.SearchResultItem;
-import org.opencastproject.opensearch.impl.SearchResultImpl;
-import org.opencastproject.opensearch.impl.SearchResultItemImpl;
+import org.opencastproject.opensearch.api.SearchResult;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -508,16 +506,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Event deletableEvent = createEvent("deletableid", "deletable", Source.ARCHIVE);
     Event undeletableEvent = createEvent("undeletableid", "undeletable", Source.ARCHIVE);
 
-    SearchResultItem[] list = new SearchResultItem[3];
-    list[0] = new SearchResultItemImpl<>(1, event);
-    list[1] = new SearchResultItemImpl<>(1, event2);
-    list[2] = new SearchResultItemImpl<>(1, event3);
-
-    SearchResultImpl<Event> eventSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
-    EasyMock.expect(eventSearchResult.getHitCount()).andReturn(3L).anyTimes();
-    EasyMock.expect(eventSearchResult.getPageSize()).andReturn(3L).anyTimes();
-    EasyMock.expect(eventSearchResult.getItems()).andReturn(list).anyTimes();
-    EasyMock.replay(eventSearchResult);
+    SearchResult<Event> eventSearchResult = new SearchResult<>(List.of(event, event2, event3), 3, 0, 0);
 
     OpenSearchIndex searchIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)

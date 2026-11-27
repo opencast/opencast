@@ -35,7 +35,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
@@ -46,7 +45,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -116,15 +114,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     series1.addOrganizer("Niklas Vogler");
     series1.setAccessPolicy(IOUtils.toString(TestSeriesEndpoint.class.getResourceAsStream("/series1-acl.json"), UTF_8));
 
-    SearchResultItem<Series> searchResultItem1 = EasyMock.createNiceMock(SearchResultItem.class);
-    expect(searchResultItem1.getSource()).andStubReturn(series1);
-    replay(searchResultItem1);
-
-    SearchResultItem<Series>[] searchResultItems = Arrays.array(searchResultItem1);
-
-    SearchResult<Series> searchResult = createNiceMock(SearchResult.class);
-    expect(searchResult.getItems()).andStubReturn(searchResultItems);
-    replay(searchResult);
+    SearchResult<Series> searchResult = new SearchResult<>(List.of(series1), 1, 0, 0);
 
     OpenSearchIndex opensearchIndex = createMock(OpenSearchIndex.class);
     expect(opensearchIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);

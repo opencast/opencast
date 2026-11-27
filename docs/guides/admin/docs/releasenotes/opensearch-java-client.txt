@@ -1,0 +1,23 @@
+Opencast now uses the opensearch-java client to talk to OpenSearch. The high-level and low-level REST clients it used
+before are deprecated. This also removes the OpenSearch server library and Lucene from Opencast, which were only
+needed by the old client.
+
+This changes the OpenSearch configuration:
+
+- `etc/custom.properties`: The options `org.opencastproject.opensearch.server.hostname`,
+  `org.opencastproject.opensearch.server.scheme` and `org.opencastproject.opensearch.server.port` are replaced by
+  `org.opencastproject.opensearch.server.url`, e.g. `https://opensearch.example.com:9200`. You can now list the URLs
+  of multiple nodes of an OpenSearch cluster, separated by commas. Opencast distributes its requests over these nodes
+  and skips nodes which are not reachable.
+- `etc/org.opencastproject.opensearch.index.OpenSearchIndex.cfg`: The options `max.retry.attempts.get`,
+  `max.retry.attempts.update`, `retry.waiting.period.get` and `retry.waiting.period.update` are replaced by
+  `max.retry.attempts` and `retry.waiting.period`. They now apply to all requests to OpenSearch, including the ones of
+  the search service, which did not retry failed requests before. Only temporary failures are retried: connection
+  problems, timeouts, too many requests and server errors.
+
+If you have set any of the old options, migrate them to the new ones. The OpenSearch index does not start as long as
+any of the old options are still set. The index mappings do not change, so no index rebuild is necessary.
+
+LifeCycle Management (beta): If a policy has several wildcard, greater-than or less-than filters on the same field,
+events now have to match all of them. Before, only the filter listed last was used. This affects, for example, a
+policy with both a `start_date` and a `start_date_relative` filter of type `GREATER_THAN`.

@@ -24,7 +24,6 @@ package org.opencastproject.search.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static org.opencastproject.opensearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
 import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
@@ -37,6 +36,7 @@ import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.search.api.SearchServiceQuery;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.search.impl.SearchServiceIndex;
 import org.opencastproject.security.api.Role;
@@ -52,18 +52,12 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.util.requests.SortCriterion.Order;
 
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.opensearch.common.unit.Fuzziness;
-import org.opensearch.index.query.MultiMatchQueryBuilder;
-import org.opensearch.index.query.Operator;
-import org.opensearch.index.query.QueryBuilders;
-import org.opensearch.search.SearchHit;
-import org.opensearch.search.builder.SearchSourceBuilder;
-import org.opensearch.search.sort.SortOrder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -194,38 +188,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("offset")   String  offset
   ) throws SearchException {
 
-    final var org = securityService.getOrganization().getId();
-    final var type = SearchService.IndexEntryType.Series.name();
-    final var query = QueryBuilders.boolQuery()
-        .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
-        .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
-        .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
-    final var user = securityService.getUser();
-    if (!SecurityUtil.isAdmin(user, securityService.getOrganization())) {
-      query.filter(QueryBuilders.termsQuery(
-          SearchResult.INDEX_ACL + ".read",
-          user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
-      ));
-    }
+    final var query = new SearchServiceQuery(securityService.getOrganization().getId(),
+        SearchService.IndexEntryType.Series);
+    restrictToReadableEntries(query);
 
     if (StringUtils.isNotEmpty(id)) {
-      query.must(QueryBuilders.idsQuery().addIds(id));
+      query.withId(id);
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION,  1.2f);
-      // Search-as-you-type generates useful subfields for autocompletion, we should use it
-      // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
-      queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
-      queryBuilder.operator(Operator.AND);
-      queryBuilder.fuzziness(Fuzziness.AUTO);
-      queryBuilder.fuzzyTranspositions(true);
-      query.minimumShouldMatch(1);
-      query.should(queryBuilder);
+      query.withText(text);
     }
 
     var size = NumberUtils.toInt(limit, 20);
@@ -235,40 +207,21 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .entity("Limit and offset may not be negative.")
           .build();
     }
-    var searchSource = new SearchSourceBuilder()
-        .query(query)
-        .from(from)
-        .size(size);
+    query.withOffset(from).withLimit(size);
 
-    if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort.toLowerCase());
-      var validSort = Arrays.asList("identifier", "title", "contributor", "creator", "created", "modified")
-              .contains(sortParam[0]);
-      var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
-      if (sortParam.length > 2 || !validSort || !validOrder) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .entity("Invalid sort parameter")
-            .build();
-      }
-      var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      if ("modified".equals(sortParam[0])) {
-        searchSource.sort(sortParam[0], order);
-      } else {
-        searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
-      }
+    if (StringUtils.isNotEmpty(sort)
+        && !addSortOrder(query, sort, "identifier", "title", "contributor", "creator", "created", "modified")) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Invalid sort parameter")
+          .build();
     }
 
-    searchSource.sort("_score", SortOrder.DESC);
-    // Used to stabilize the sort order of results with the same score.
-    searchSource.sort("_doc", SortOrder.ASC);
-
-    var hits = searchIndex.search(searchSource).getHits();
-    var result = Arrays.stream(hits.getHits())
-        .map(SearchHit::getSourceAsMap)
+    var hits = searchIndex.search(query);
+    var result = hits.documents().stream()
         .peek(hit -> hit.remove(SearchResult.TYPE))
         .collect(Collectors.toList());
 
-    var total = hits.getTotalHits().value();
+    var total = hits.total();
     var json = gson.toJsonTree(Map.of(
         "offset", from,
         "total", total,
@@ -373,17 +326,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .build();
     }
     final var org = securityService.getOrganization().getId();
-    final var type = SearchService.IndexEntryType.Episode.name();
 
     boolean snameNotFound = false;
     List<String> series = Collections.emptyList();
     if (StringUtils.isNotEmpty(seriesName)) {
-      var seriesSearchSource = new SearchSourceBuilder().query(QueryBuilders.boolQuery()
-          .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
-          .filter(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Series))
-          .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)))
-          .must(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".title", seriesName)));
-      series = searchService.search(seriesSearchSource).getHits().stream()
+      var seriesQuery = new SearchServiceQuery(org, SearchService.IndexEntryType.Series)
+          .withSeriesTitle(seriesName);
+      series = searchService.search(seriesQuery).getHits().stream()
           .map(h -> h.getDublinCore().getFirst(DublinCore.PROPERTY_IDENTIFIER))
           .collect(Collectors.toList());
       //If there is no series matching the sname provided
@@ -392,56 +341,24 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    var user = securityService.getUser();
-    var admin = SecurityUtil.isAdmin(user, securityService.getOrganization());
-    var query = QueryBuilders.boolQuery()
-        .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
-        .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
-        .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
-    if (!admin) {
-      query.filter(QueryBuilders.termsQuery(
-          SearchResult.INDEX_ACL + ".read",
-          user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
-      ));
-    }
+    var query = new SearchServiceQuery(org, SearchService.IndexEntryType.Episode);
+    var admin = !restrictToReadableEntries(query);
 
     if (StringUtils.isNotEmpty(id)) {
-      query.must(QueryBuilders.idsQuery().addIds(id));
+      query.withId(id);
     }
 
     if (StringUtils.isNotEmpty(seriesId)) {
       series = Collections.singletonList(seriesId);
     }
-    if (!series.isEmpty()) {
-      if (series.size() == 1) {
-        query.must(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".isPartOf", series.get(0)));
-      } else {
-        var seriesQuery = QueryBuilders.boolQuery();
-        for (var sid : series) {
-          seriesQuery.should(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".isPartOf", sid));
-        }
-        query.must(seriesQuery);
-      }
-    }
+    query.withSeriesIds(series);
 
     if (live != null) {
-      query.must(QueryBuilders.termQuery("live", live));
+      query.withLive(live);
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION,  1.2f);
-      // Search-as-you-type generates useful subfields for autocompletion, we should use it
-      // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
-      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
-      queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
-      queryBuilder.operator(Operator.AND);
-      queryBuilder.fuzziness(Fuzziness.AUTO);
-      queryBuilder.fuzzyTranspositions(true);
-      query.minimumShouldMatch(1);
-      query.should(queryBuilder);
+      query.withText(text);
     }
 
     logger.debug("limit: {}, offset: {}", limit, offset);
@@ -458,39 +375,21 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .entity("Only admins are allowed to request more than 250 items.")
           .build();
     }
+    query.withOffset(from).withLimit(size);
 
-    var searchSource = new SearchSourceBuilder()
-        .query(query)
-        .from(from)
-        .size(size);
-
-    if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort.toLowerCase());
-      var validSort = Arrays.asList("title", "contributor", "creator", "created", "modified").contains(sortParam[0]);
-      var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
-      if (sortParam.length > 2 || !validSort || !validOrder) {
-        return Response.status(Response.Status.BAD_REQUEST)
-            .entity("Invalid sort parameter")
-            .build();
-      }
-      var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      if ("modified".equals(sortParam[0])) {
-        searchSource.sort(sortParam[0], order);
-      } else {
-        searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
-      }
+    if (StringUtils.isNotEmpty(sort)
+        && !addSortOrder(query, sort, "title", "contributor", "creator", "created", "modified")) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Invalid sort parameter")
+          .build();
     }
-
-    searchSource.sort("_score", SortOrder.DESC);
-    // Used to stabilize the sort order of results with the same score.
-    searchSource.sort("_doc", SortOrder.ASC);
 
     List<Map<String, Object>> result = null;
     long total = 0;
     if (snameNotFound) {
       result = Collections.emptyList();
     } else {
-      SearchResultList hits = searchService.search(searchSource);
+      SearchResultList hits = searchService.search(query);
       result = hits.getHits().stream()
           .map(SearchResult::dehydrateForREST)
           .collect(Collectors.toList());
@@ -543,6 +442,41 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /**
+   * Restrict the query to entries the current user may read, unless the user is an administrator.
+   *
+   * @return whether the query has been restricted
+   */
+  private boolean restrictToReadableEntries(SearchServiceQuery query) {
+    var user = securityService.getUser();
+    if (SecurityUtil.isAdmin(user, securityService.getOrganization())) {
+      return false;
+    }
+    query.withReadRoles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+    return true;
+  }
+
+  /**
+   * Add the sort order defined by a sort parameter like {@code title desc} to the query.
+   *
+   * @return false if the sort parameter is invalid
+   */
+  private static boolean addSortOrder(SearchServiceQuery query, String sort, String... allowedFields) {
+    var sortParam = StringUtils.split(sort.toLowerCase());
+    var validSort = Arrays.asList(allowedFields).contains(sortParam[0]);
+    var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
+    if (sortParam.length > 2 || !validSort || !validOrder) {
+      return false;
+    }
+    var order = sortParam.length > 1 && "desc".equals(sortParam[1]) ? Order.Descending : Order.Ascending;
+    if ("modified".equals(sortParam[0])) {
+      query.sortBy(SearchServiceQuery.SORT_MODIFIED, order);
+    } else {
+      query.sortBy(SearchResult.DUBLINCORE + "." + sortParam[0], order);
+    }
+    return true;
   }
 
   /**

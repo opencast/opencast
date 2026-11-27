@@ -40,7 +40,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
@@ -264,13 +263,12 @@ public class WorkflowServiceImplTest {
       Assert.fail(e.getMessage());
     }
 
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[0]).anyTimes();
+    SearchResult result = SearchResult.empty();
 
     final OpenSearchIndex index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.replay(result, index);
+    EasyMock.replay(index);
 
     service.setIndex(index);
   }

@@ -46,11 +46,12 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -275,21 +276,13 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     return series;
   }
 
-  @SuppressWarnings("unchecked")
-  private SearchResultItem<Event>[] createEvents(int readyCount) {
-    SearchResultItem<Event>[] eventitems = new SearchResultItem[readyCount];
-    int total = 1;
+  private List<Event> createEvents(int readyCount) {
+    List<Event> events = new ArrayList<>();
     String orgId = new DefaultOrganization().getId();
     for (int i = 0; i < readyCount; i++) {
-      Event readyEvent = new Event(Integer.toString(i + total), orgId);
-      SearchResultItem<Event> eventItem = EasyMock.createMock(SearchResultItem.class);
-      EasyMock.expect(eventItem.getSource()).andReturn(readyEvent);
-      EasyMock.replay(eventItem);
-      eventitems[total - 1] = eventItem;
-      total++;
+      events.add(new Event(Integer.toString(i + 1), orgId));
     }
-
-    return eventitems;
+    return events;
   }
 
   @SuppressWarnings({ "unchecked" })
@@ -304,62 +297,17 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     time = DateTimeSupport.fromUTC("2014-04-29T14:35:50Z");
     Series series3 = createSeries("3", "title 3", "contributor 3", "organizer 3", time, null);
 
-    SearchResultItem<Series> item1 = EasyMock.createMock(SearchResultItem.class);
-    EasyMock.expect(item1.getSource()).andReturn(series1).anyTimes();
-
-    SearchResultItem<Series> item2 = EasyMock.createMock(SearchResultItem.class);
-    EasyMock.expect(item2.getSource()).andReturn(series2).anyTimes();
-
-    SearchResultItem<Series> item3 = EasyMock.createMock(SearchResultItem.class);
-    EasyMock.expect(item3.getSource()).andReturn(series3).anyTimes();
-
-    SearchResultItem<Series>[] ascSeriesItems = new SearchResultItem[3];
-    ascSeriesItems[0] = item1;
-    ascSeriesItems[1] = item2;
-    ascSeriesItems[2] = item3;
-
-    SearchResultItem<Series>[] descSeriesItems = new SearchResultItem[3];
-    descSeriesItems[0] = item3;
-    descSeriesItems[1] = item2;
-    descSeriesItems[2] = item1;
-
-    // final SearchResultItem<Event>[] eventItems1 = new SearchResultItem[0];
-    final SearchResultItem<Event>[] eventItems1 = createEvents(1);
-
-    // Setup the events for series 2
-    final SearchResultItem<Event>[] eventItems2 = new SearchResultItem[0];
-
-    // Setup the events for series 3
-    final SearchResultItem<Event>[] eventItems3 = createEvents(0);
+    // Setup the events for series 1, 2 and 3
+    final List<Event> eventItems1 = createEvents(1);
+    final List<Event> eventItems2 = List.of();
+    final List<Event> eventItems3 = createEvents(0);
 
     // Setup series search results
-    final SearchResult<Series> ascSeriesSearchResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(ascSeriesSearchResult.getItems()).andReturn(ascSeriesItems);
-    EasyMock.expect(ascSeriesSearchResult.getHitCount()).andReturn((long) ascSeriesItems.length);
-    EasyMock.expect(ascSeriesSearchResult.getDocumentCount()).andReturn((long) ascSeriesItems.length);
-    EasyMock.expect(ascSeriesSearchResult.getSearchTime()).andReturn(0L);
-    final SearchResult<Series> descSeriesSearchResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(descSeriesSearchResult.getItems()).andReturn(descSeriesItems);
-    EasyMock.expect(descSeriesSearchResult.getHitCount()).andReturn((long) descSeriesItems.length);
-    EasyMock.expect(descSeriesSearchResult.getDocumentCount()).andReturn((long) descSeriesItems.length);
-    EasyMock.expect(descSeriesSearchResult.getSearchTime()).andReturn(0L);
-    // Create an empty search result.
-    final SearchResult<Series> emptySearchResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(emptySearchResult.getPageSize()).andReturn(0L).anyTimes();
-    EasyMock.expect(emptySearchResult.getDocumentCount()).andReturn(0L);
-    EasyMock.expect(emptySearchResult.getSearchTime()).andReturn(0L);
-    // Create a single search result for series 1.
-    final SearchResult<Series> oneSearchResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(oneSearchResult.getPageSize()).andReturn(1L).anyTimes();
-    EasyMock.expect(oneSearchResult.getItems()).andReturn(new SearchResultItem[] { item1 }).anyTimes();
-    EasyMock.expect(oneSearchResult.getDocumentCount()).andReturn(1L);
-    EasyMock.expect(oneSearchResult.getSearchTime()).andReturn(0L);
-    // Create a single search result for series 2.
-    final SearchResult<Series> twoSearchResult = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(twoSearchResult.getPageSize()).andReturn(1L).anyTimes();
-    EasyMock.expect(twoSearchResult.getItems()).andReturn(new SearchResultItem[] { item2 }).anyTimes();
-    EasyMock.expect(twoSearchResult.getDocumentCount()).andReturn(2L);
-    EasyMock.expect(twoSearchResult.getSearchTime()).andReturn(0L);
+    final SearchResult<Series> ascSeriesSearchResult = new SearchResult<>(List.of(series1, series2, series3), 3, 0, 0);
+    final SearchResult<Series> descSeriesSearchResult = new SearchResult<>(List.of(series3, series2, series1), 3, 0, 0);
+    final SearchResult<Series> emptySearchResult = SearchResult.empty();
+    final SearchResult<Series> oneSearchResult = new SearchResult<>(List.of(series1), 1, 0, 0);
+    final SearchResult<Series> twoSearchResult = new SearchResult<>(List.of(series2), 1, 0, 0);
 
     opensearchIndex = EasyMock.createMock(OpenSearchIndex.class);
 
@@ -380,38 +328,39 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
               @Override
               public SearchResult<Series> answer() throws Throwable {
+                final SeriesSearchQuery q = captureSeriesSearchQuery.getValue();
                 if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getIdentifier().length == 1) {
-                  if ("1".equals(captureSeriesSearchQuery.getValue().getIdentifier()[0])) {
+                        && q.getFilterValues(SeriesIndexSchema.UID).size() == 1) {
+                  if ("1".equals(q.getFilterValues(SeriesIndexSchema.UID).iterator().next())) {
                     return oneSearchResult;
-                  } else if ("2".equals(captureSeriesSearchQuery.getValue().getIdentifier()[0])) {
+                  } else if ("2".equals(q.getFilterValues(SeriesIndexSchema.UID).iterator().next())) {
                     return twoSearchResult;
                   } else {
                     return emptySearchResult;
                   }
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesContributorsSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.CONTRIBUTORS) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesContributorsSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.CONTRIBUTORS) == Order.Descending) {
                   return descSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesDateSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.CREATED_DATE_TIME) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesDateSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.CREATED_DATE_TIME) == Order.Descending) {
                   return descSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesOrganizersSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.ORGANIZERS) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesOrganizersSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.ORGANIZERS) == Order.Descending) {
                   return descSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesTitleSortOrder() == Order.Ascending) {
+                        && q.getSortOrder(SeriesIndexSchema.TITLE) == Order.Ascending) {
                   return ascSeriesSearchResult;
                 } else if (captureSeriesSearchQuery.hasCaptured()
-                        && captureSeriesSearchQuery.getValue().getSeriesTitleSortOrder() == Order.Descending) {
+                        && q.getSortOrder(SeriesIndexSchema.TITLE) == Order.Descending) {
 
                   return descSeriesSearchResult;
                 } else {
@@ -426,64 +375,57 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
               @Override
               public SearchResult<Event> answer() throws Throwable {
-                SearchResult<Event> eventsSearchResult = EasyMock.createMock(SearchResult.class);
+                final EventSearchQuery q = captureEventSearchQuery.getValue();
+                List<Event> events = List.of();
                 if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && !("RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState()))
-                        && !("INSTANTIATED".equals(captureEventSearchQuery.getValue().getWorkflowState()))) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "1".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && !(q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING"))
+                        && !(q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("INSTANTIATED"))) {
                   // Setup events search results
-                  EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems1).anyTimes();
-                  EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems1.length).anyTimes();
+                  events = eventItems1;
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && "INSTANTIATED".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "1".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("INSTANTIATED")) {
                   // Setup events search results
-                  EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems2).anyTimes();
-                  EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems2.length).anyTimes();
+                  events = eventItems2;
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && "RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "1".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING")) {
                   // Setup events search results
-                  EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems2).anyTimes();
-                  EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems2.length).anyTimes();
+                  events = eventItems2;
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && !("RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState()))) {
+                        && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "2".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && !(q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING"))) {
                   // Setup events search results
-                  EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems2).anyTimes();
-                  EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems2.length).anyTimes();
+                  events = eventItems2;
                 } else if (captureEventSearchQuery.hasCaptured()
-                    && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "3".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())) {
+                    && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "3".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())) {
                   // Setup events search results
-                  EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems3).anyTimes();
-                  EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems3.length).anyTimes();
+                  events = eventItems3;
                 } else if (captureEventSearchQuery.hasCaptured()
-                    && 1 == (captureEventSearchQuery.getValue().getSeriesId().size())
-                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId().get(0).getValue())
-                        && "RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
+                    && 1 == (q.getFilterValues(EventIndexSchema.SERIES_ID).size())
+                        && "2".equals(q.getFilterValues(EventIndexSchema.SERIES_ID).iterator().next())
+                        && q.getFilterValues(EventIndexSchema.WORKFLOW_STATE).contains("RUNNING")) {
                   // Setup events search results
-                  EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems3).anyTimes();
-                  EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems3.length).anyTimes();
+                  events = eventItems3;
                 } else {
                   if (!captureEventSearchQuery.hasCaptured()) {
                     Assert.fail("Haven't captured an event search query yet.");
                   } else {
-                    logger.info("IDs for search query" + captureEventSearchQuery.getValue().getSeriesId());
+                    logger.info("IDs for search query" + q.getFilterValues(EventIndexSchema.SERIES_ID));
                     Assert.fail("Tried to get an event collection that doesn't exist.");
                   }
                 }
-                EasyMock.replay(eventsSearchResult);
-                return eventsSearchResult;
+                return new SearchResult<>(events, events.size(), 0, 0);
               }
             }).anyTimes();
 
-    EasyMock.replay(opensearchIndex, item1, item2, item3, ascSeriesSearchResult, descSeriesSearchResult,
-            emptySearchResult, oneSearchResult, twoSearchResult);
+    EasyMock.replay(opensearchIndex);
   }
 
 }

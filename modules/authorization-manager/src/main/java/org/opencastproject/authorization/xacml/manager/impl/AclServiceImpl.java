@@ -26,7 +26,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -185,8 +184,8 @@ public final class AclServiceImpl implements AclService {
       return;
     }
 
-    for (SearchResultItem<Series> seriesItem : result.getItems()) {
-      String seriesId = seriesItem.getSource().getIdentifier();
+    for (Series seriesItem : result.getItems()) {
+      String seriesId = seriesItem.getIdentifier();
 
       Function<Optional<Series>, Optional<Series>> updateFunction = (Optional<Series> seriesOpt) -> {
         if (seriesOpt.isPresent() && seriesOpt.get().getManagedAcl().equals(currentAclName)) {
@@ -235,8 +234,8 @@ public final class AclServiceImpl implements AclService {
       return;
     }
 
-    for (SearchResultItem<Event> eventItem : result.getItems()) {
-      String eventId = eventItem.getSource().getIdentifier();
+    for (Event eventItem : result.getItems()) {
+      String eventId = eventItem.getIdentifier();
 
       Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
         if (eventOpt.isPresent() && eventOpt.get().getManagedAcl().equals(currentAclName)) {

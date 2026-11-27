@@ -264,7 +264,7 @@ public class SchedulerServiceImplTest {
     ComponentContext componentContext = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
 
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    SearchResult result = SearchResult.empty();
 
     index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
@@ -272,7 +272,7 @@ public class SchedulerServiceImplTest {
 
     handler = EasyMock.createNiceMock(SchedulerUpdateHandler.class);
 
-    EasyMock.replay(authorizationService, index, result, handler,
+    EasyMock.replay(authorizationService, index, handler,
             extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
     schedSvc = new SchedulerServiceImpl();
@@ -1483,7 +1483,7 @@ public class SchedulerServiceImplTest {
     currentUser = usersList.get(0);
     currentOrg = currentUser.getOrganization();
 
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    SearchResult result = SearchResult.empty();
 
     EasyMock.reset(index);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
@@ -1491,7 +1491,7 @@ public class SchedulerServiceImplTest {
     expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
             EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class))).andReturn(Optional.empty())
         .times(orgList.size());
-    EasyMock.replay(index, result);
+    EasyMock.replay(index);
     schedSvc.setIndex(index);
 
     schedSvc.repopulate(null);

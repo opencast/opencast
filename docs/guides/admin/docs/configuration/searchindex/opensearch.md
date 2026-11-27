@@ -55,11 +55,21 @@ Opencast's OpenSearch settings can be found in the `etc/custom.properties` confi
 
 Relevant configuration keys are:
 
-* `org.opencastproject.opensearch.server.hostname`
-* `org.opencastproject.opensearch.server.scheme`
-* `org.opencastproject.opensearch.server.port`
+* `org.opencastproject.opensearch.server.url`
 * `org.opencastproject.opensearch.username`
 * `org.opencastproject.opensearch.password`
+
+If your OpenSearch cluster consists of multiple nodes, you can list the URLs of several nodes, separated by commas:
+
+```properties
+org.opencastproject.opensearch.server.url=https://opensearch1.example.com:9200,https://opensearch2.example.com:9200
+```
+
+Each URL consists of scheme, host and port only, paths are not supported.
+All nodes have to belong to the same cluster. Opencast sends each request to one of the nodes and distributes the
+requests over all of them. If a node cannot be reached, Opencast sends the request to the next node and skips the
+unreachable one until it is back. The cluster itself takes care of distributing the data, so make sure to configure
+replicas in OpenSearch if you want to be able to lose a node without losing data.
 
 
 Optional Configuration
@@ -69,10 +79,8 @@ Additional settings can be configured in `org.opencastproject.opensearch.index.O
 
 * `index.indentifier`
 * `index.name`
-* `max.retry.attempts.get`
-* `max.retry.attempts.update`
-* `retry.waiting.period.get`
-* `retry.waiting.period.update`
+* `max.retry.attempts`
+* `retry.waiting.period`
 * `retry.delay.on.startup`
 
 The identifier defines which index opencast is looking for.
@@ -82,10 +90,11 @@ the base name with an _ (e.g. `opencast_event`).
 If an index doesn't exist, Opencast will create it.
 The name is used for logging purposes only.
 
-The max retry attempts and the waiting periods will be used in case of an exception, e.g. if there are too many
-concurrent requests or OpenSearch is temporarily unavailable.
-The retry behavior can be configured differently for get and update/delete requests.
-This way you can set more retry attempts for updates because of the more serious consequences if those requests fail.
+The max retry attempts and the waiting period will be used if a request fails temporarily, i.e. if OpenSearch cannot be
+reached, the connection breaks or times out, or OpenSearch reports a timeout, too many concurrent requests or a server
+error like being temporarily unavailable.
+They apply to all requests to OpenSearch, including the ones of the search service.
+Other errors, e.g. requests OpenSearch rejects as malformed, are never retried.
 The waiting period is used to not overwhelm OpenSearch with retry requests, making the problem worse.
 By default, no retry will be attempted.
 

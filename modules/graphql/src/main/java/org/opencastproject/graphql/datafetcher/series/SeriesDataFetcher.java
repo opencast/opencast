@@ -64,10 +64,10 @@ public class SeriesDataFetcher implements ContextDataFetcher<GqlSeries> {
           new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
           .withIdentifier(seriesId)
       );
-      if (result.getDocumentCount() == 0) {
+      if (result.getPageSize() == 0) {
         return null;
-      } else if (result.getDocumentCount() == 1) {
-        return new GqlSeries(result.getItems()[0].getSource());
+      } else if (result.getPageSize() == 1) {
+        return new GqlSeries(result.getItems().get(0));
       }
       throw new GraphQLRuntimeException(
           "Multiple series found with the same identifier",

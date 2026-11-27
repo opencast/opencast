@@ -52,10 +52,7 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchQuery;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.impl.SearchResultImpl;
-import org.opencastproject.opensearch.impl.SearchResultItemImpl;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -816,12 +813,7 @@ public class IndexServiceImplTest {
     String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation),
         StandardCharsets.UTF_8);
 
-    SearchQuery query = EasyMock.createMock(SearchQuery.class);
-    EasyMock.expect(query.getLimit()).andReturn(100);
-    EasyMock.expect(query.getOffset()).andReturn(0);
-    EasyMock.replay(query);
-
-    SearchResult<Event> result = new SearchResultImpl<>(query, 0, 0);
+    SearchResult<Event> result = new SearchResult<>(List.of(), 0, 0, 100);
 
     OpenSearchIndex abstractIndex = EasyMock.createMock(OpenSearchIndex.class);
     EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
@@ -896,13 +888,7 @@ public class IndexServiceImplTest {
     String eventId = "event-1";
     Event event = new Event(eventId, org);
     event.setTitle("Test Event 1");
-    SearchQuery query = EasyMock.createMock(SearchQuery.class);
-    EasyMock.expect(query.getLimit()).andReturn(100);
-    EasyMock.expect(query.getOffset()).andReturn(0);
-    EasyMock.replay(query);
-    SearchResultItemImpl<Event> searchResultItem = new SearchResultItemImpl<>(1.0, event);
-    SearchResultImpl<Event> searchResult = new SearchResultImpl<>(query, 0, 0);
-    searchResult.addResultItem(searchResultItem);
+    SearchResult<Event> searchResult = new SearchResult<>(List.of(event), 1, 0, 100);
     SecurityService securityService = setupSecurityService(username, org);
     OpenSearchIndex index = EasyMock.createMock(OpenSearchIndex.class);
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()

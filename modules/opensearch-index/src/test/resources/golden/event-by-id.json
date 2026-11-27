@@ -1,0 +1,36 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "organization": [
+              "mh_default_org"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "uid": [
+              "event-1"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "size": 2147483647,
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ],
+  "track_total_hits": 2147483647
+}

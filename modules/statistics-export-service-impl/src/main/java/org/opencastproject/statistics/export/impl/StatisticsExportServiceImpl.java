@@ -29,9 +29,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.opensearch.api.SearchIndexException;
-import org.opencastproject.opensearch.api.SearchQuery;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -368,23 +366,23 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
     final StatisticsProvider eventProvider = statisticsService.getProvider(eventProviderId)
         .orElseThrow(() -> new IllegalStateException(
             "The configured provider " + eventProviderId + " is not available."));
-    EventSearchQuery query = (EventSearchQuery) new EventSearchQuery(securityService.getOrganization().getId(),
+    EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withSeriesId(resourceId).withLimit(limit).withOffset(offset);
     for (Map.Entry<String, String> filter: filters.entrySet()) {
-      query = (EventSearchQuery) applyFilter(filter.getKey(), filter.getValue(), query);
+      query = applyFilter(filter.getKey(), filter.getValue(), query);
     }
 
     final SearchResult<Event> result = index.getByQuery(query);
     boolean first = offset == 0;
-    for (SearchResultItem<Event> currentEvent : result.getItems()) {
+    for (Event currentEvent : result.getItems()) {
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(eventProvider,
-          currentEvent.getSource().getIdentifier(), from, to, dataResolution, zoneId);
+          currentEvent.getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
         this.printFullEventData(printer, dataEvent, dataResolution,
-            currentEvent.getSource().getIdentifier(), zoneId, first);
+            currentEvent.getIdentifier(), zoneId, first);
       } else {
-        printData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(),
-                currentEvent.getSource().getTitle(), zoneId, first);
+        printData(printer, dataEvent, dataResolution, currentEvent.getIdentifier(),
+                currentEvent.getTitle(), zoneId, first);
       }
       first = false;
     }
@@ -437,22 +435,22 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
     final StatisticsProvider eventProvider = statisticsService.getProvider(eventProviderId)
         .orElseThrow(() -> new IllegalStateException(
             "The configured provider " + eventProviderId + " is not available."));
-    EventSearchQuery query = (EventSearchQuery) new EventSearchQuery(securityService.getOrganization().getId(),
+    EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withLimit(limit).withOffset(offset);
     for (Map.Entry<String, String> filter: filters.entrySet()) {
-      query = (EventSearchQuery) applyFilter(filter.getKey(), filter.getValue(), query);
+      query = applyFilter(filter.getKey(), filter.getValue(), query);
     }
     final SearchResult<Event> result = index.getByQuery(query);
     boolean first = offset == 0;
-    for (SearchResultItem<Event> currentEvent : result.getItems()) {
+    for (Event currentEvent : result.getItems()) {
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(eventProvider,
-              currentEvent.getSource().getIdentifier(), from, to, dataResolution, zoneId);
+              currentEvent.getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
         this.printFullEventData(printer, dataEvent, dataResolution,
-            currentEvent.getSource().getIdentifier(), zoneId, first);
+            currentEvent.getIdentifier(), zoneId, first);
       } else {
-        printData(printer, dataEvent, dataResolution, currentEvent.getSource().getIdentifier(),
-                currentEvent.getSource().getTitle(), zoneId, first);
+        printData(printer, dataEvent, dataResolution, currentEvent.getIdentifier(),
+                currentEvent.getTitle(), zoneId, first);
       }
       first = false;
     }
@@ -484,22 +482,22 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
         .orElseThrow(() -> new IllegalStateException(
             "The configured provider " + seriesProviderId + " is not available."));
 
-    SeriesSearchQuery query = (SeriesSearchQuery) new SeriesSearchQuery(securityService.getOrganization().getId(),
+    SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
             securityService.getUser()).withLimit(limit).withOffset(offset);
     for (Map.Entry<String, String> filter: filters.entrySet()) {
-      query = (SeriesSearchQuery) applyFilter(filter.getKey(), filter.getValue(), query);
+      query = applyFilter(filter.getKey(), filter.getValue(), query);
     }
     final SearchResult<Series> result = index.getByQuery(query);
     boolean first = offset == 0;
-    for (SearchResultItem<Series> currentSeries : result.getItems()) {
+    for (Series currentSeries : result.getItems()) {
       final TimeSeries dataEvent = statisticsService.getTimeSeriesData(seriesProvider,
-              currentSeries.getSource().getIdentifier(), from, to, dataResolution, zoneId);
+              currentSeries.getIdentifier(), from, to, dataResolution, zoneId);
       if (fullMetadata) {
         this.printFullSeriesData(printer, dataEvent, dataResolution,
-            currentSeries.getSource().getIdentifier(), zoneId, first);
+            currentSeries.getIdentifier(), zoneId, first);
       } else {
-        printData(printer, dataEvent, dataResolution, currentSeries.getSource().getIdentifier(),
-                currentSeries.getSource().getTitle(), zoneId, first);
+        printData(printer, dataEvent, dataResolution, currentSeries.getIdentifier(),
+                currentSeries.getTitle(), zoneId, first);
       }
       first = false;
     }
@@ -616,7 +614,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
             .collect(Collectors.toList());
   }
 
-  private static SearchQuery applyFilter(final String name, final String value, final EventSearchQuery query) {
+  private static EventSearchQuery applyFilter(final String name, final String value, final EventSearchQuery query) {
     if ("presenters".equals(name)) {
       return query.withPresenter(value);
     } else if ("creator".equals(name)) {
@@ -660,7 +658,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService {
     }
   }
 
-  private static SearchQuery applyFilter(final String name, final String value, final SeriesSearchQuery query) {
+  private static SeriesSearchQuery applyFilter(final String name, final String value, final SeriesSearchQuery query) {
     if ("contributors".equals(name)) {
       return query.withContributor(value);
     } else if ("creator".equals(name)) {

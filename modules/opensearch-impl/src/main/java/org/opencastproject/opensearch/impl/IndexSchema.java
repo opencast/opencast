@@ -30,6 +30,9 @@ public interface IndexSchema {
   /** Version field name */
   String VERSION = "version";
 
+  /** Field holding the serialized object */
+  String OBJECT = "object";
+
   /** Extension for sort field names */
   String SORT_FIELD_NAME_EXTENSION = ".sort";
 

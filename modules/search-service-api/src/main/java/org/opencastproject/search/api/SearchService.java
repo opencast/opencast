@@ -31,7 +31,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.opensearch.search.builder.SearchSourceBuilder;
 
 import java.util.Collection;
 
@@ -147,14 +146,14 @@ public interface SearchService {
   MediaPackage get(String mediaPackageId) throws NotFoundException, SearchException, UnauthorizedException;
 
   /**
-   * Searches the index based on a {@link SearchSourceBuilder}'s query
+   * Searches the index.
    *
-   * @param searchSource
-   *          The {@link SearchSourceBuilder} defining the search query
+   * @param query
+   *          The query to run
    * @return
    *          A {@link SearchResultList} of the search's results
    * @throws SearchException
    *          If an error occurs while searching the index.
    */
-  SearchResultList search(SearchSourceBuilder searchSource) throws SearchException;
+  SearchResultList search(SearchServiceQuery query) throws SearchException;
 }

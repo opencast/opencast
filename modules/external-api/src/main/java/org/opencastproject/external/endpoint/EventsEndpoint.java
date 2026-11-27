@@ -77,7 +77,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.IndexObject;
 import org.opencastproject.opensearch.index.objects.event.Event;
@@ -1125,10 +1124,8 @@ public class EventsEndpoint {
           throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
 
-        SearchResultItem<Event>[] items = results.getItems();
         List<IndexObject> events = new ArrayList<>();
-        for (SearchResultItem<Event> item : items) {
-          Event source = item.getSource();
+        for (Event source : results.getItems()) {
           source.updatePreview(previewSubtype);
           events.add(source);
         }
@@ -1213,10 +1210,8 @@ public class EventsEndpoint {
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
 
-      SearchResultItem<Event>[] items = results.getItems();
       List<IndexObject> events = new ArrayList<>();
-      for (SearchResultItem<Event> item : items) {
-        Event source = item.getSource();
+      for (Event source : results.getItems()) {
         source.updatePreview(previewSubtype);
         events.add(source);
       }

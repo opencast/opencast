@@ -55,7 +55,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.Series;
@@ -364,7 +363,7 @@ public class SeriesEndpoint {
         query.withAction(Permissions.Action.WRITE);
       }
 
-      logger.trace("Using Query: " + query.toString());
+      logger.trace("Using Query: {}", query);
 
       SearchResult<Series> result = opensearchIndex.getByQuery(query);
       final boolean includeAcl = (withAcl != null && withAcl);
@@ -379,8 +378,7 @@ public class SeriesEndpoint {
   private Response queryResultToJson(SearchResult<Series> result, boolean includeAcl, ApiVersion requestedVersion) {
     JsonArray seriesArray = new JsonArray();
 
-    for (SearchResultItem<Series> item : result.getItems()) {
-      final Series s = item.getSource();
+    for (Series s : result.getItems()) {
       JsonArray subjects;
       if (s.getSubject() == null) {
         subjects = new JsonArray();
@@ -1548,9 +1546,6 @@ public class SeriesEndpoint {
     SeriesSearchQuery q = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
     q.withLimit(count);
     q.withOffset(offset);
-    if (edit != null) {
-      q.withEdit(edit);
-    }
     if (StringUtils.isNotEmpty(text)) {
       q.withText(fuzzyMatch.booleanValue(), text);
     }

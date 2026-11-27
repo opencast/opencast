@@ -1,0 +1,47 @@
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "modified": {
+              "gte": 1700000000000
+            }
+          }
+        },
+        {
+          "term": {
+            "org": {
+              "value": "mh_default_org"
+            }
+          }
+        },
+        {
+          "term": {
+            "type": {
+              "value": "Episode"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "size": 51,
+  "sort": [
+    {
+      "modified": {
+        "order": "asc"
+      }
+    },
+    {
+      "_score": {
+        "order": "desc"
+      }
+    },
+    {
+      "_doc": {
+        "order": "asc"
+      }
+    }
+  ]
+}

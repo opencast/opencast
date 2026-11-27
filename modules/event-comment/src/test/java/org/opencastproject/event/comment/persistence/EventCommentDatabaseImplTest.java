@@ -31,7 +31,6 @@ import static org.opencastproject.event.comment.persistence.EventCommentDatabase
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.opensearch.api.SearchResult;
-import org.opencastproject.opensearch.api.SearchResultItem;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
@@ -79,14 +78,7 @@ public class EventCommentDatabaseImplTest {
     EasyMock.expect(event.getIdentifier()).andReturn(EVENT_1_ID).anyTimes();
     EasyMock.replay(event);
 
-    SearchResultItem resultItem = EasyMock.createMock(SearchResultItem.class);
-    EasyMock.expect(resultItem.getSource()).andReturn(event).anyTimes();
-    EasyMock.replay(resultItem);
-
-    SearchResult result = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(result.getDocumentCount()).andReturn(1L).anyTimes();
-    EasyMock.expect(result.getItems()).andReturn(new SearchResultItem[]{ resultItem }).anyTimes();
-    EasyMock.replay(result);
+    SearchResult<Event> result = new SearchResult<>(List.of(event), 1, 0, 0);
 
     OpenSearchIndex index = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(index.getIndexName()).andReturn("adminui").anyTimes();
