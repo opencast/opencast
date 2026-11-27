@@ -1,0 +1,10 @@
+The default workflows `fast` and `partial-publish` now retry a failed `publish-engage` operation once
+before failing. Both workflows set `max-attempts: 2` on `publish-engage`, but without a
+`retry-strategy` this had no effect: a failed operation was never retried, and since Opencast 21.0 this
+combination also logs a warning on every workflow run. The operation now additionally sets
+`retry-strategy: retry`, so `max-attempts` takes effect as intended and the warning is gone.
+
+If you use customized copies of these workflows, or other workflows that set `max-attempts` without a
+`retry-strategy`, you may want to apply the same change. Otherwise `max-attempts` stays without effect.
+
+There are no database schema or search index changes.

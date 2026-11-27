@@ -24,6 +24,7 @@ package org.opencastproject.ingest.endpoint;
 import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.ingest.api.MediaFetchException;
 import org.opencastproject.ingest.impl.IngestServiceImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -595,6 +596,48 @@ public class IngestRestServiceTest {
     String period = "start=2024-01-01T00:00:00Z; end=2024-01-01T01:00:00Z; scheme=W3C-DTF;";
     Response response = restService.addMediaPackage(newMockRequestWithDate("temporal", period), null);
     Assert.assertNotEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testAddMediaPackageTrackFromUnfetchableUrlIsBadRequest() throws Exception {
+    restService.setIngestService(unfetchableIngestService());
+    String mpx = MediaPackageParser.getAsXml(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
+            .createNew());
+    Response response = restService.addMediaPackageTrack("https://example.org/av.mov", "presenter/source", null, mpx);
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assert.assertTrue(((String) response.getEntity()).contains("https://example.org/av.mov"));
+  }
+
+  @Test
+  public void testAddMediaPackageWithUnfetchableMediaUriIsBadRequest() throws Exception {
+    restService.setIngestService(unfetchableIngestService());
+    StringBuilder requestBody = new StringBuilder();
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"flavor\"\r\n");
+    requestBody.append("\r\npresenter/source\r\n");
+    requestBody.append("-----1234\r\n");
+    requestBody.append("Content-Disposition: form-data; name=\"mediaUri\"\r\n");
+    requestBody.append("\r\nhttps://example.org/av.mov\r\n");
+    requestBody.append("-----1234");
+    HttpServletRequest request = new MockHttpServletRequest(requestBody.toString().getBytes("UTF-8"),
+            "multipart/form-data; boundary=---1234");
+
+    Response response = restService.addMediaPackage(request, null);
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    Assert.assertTrue(((String) response.getEntity()).contains("https://example.org/av.mov"));
+  }
+
+  /** An ingest service which is unable to fetch any track from a URL */
+  private IngestService unfetchableIngestService() throws Exception {
+    IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
+    EasyMock.expect(ingestService.createMediaPackage())
+            .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew()).anyTimes();
+    EasyMock.expect(ingestService.addTrack(EasyMock.anyObject(URI.class),
+            EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(), EasyMock.anyObject()))
+            .andThrow(new MediaFetchException(URI.create("https://example.org/av.mov"), "No route to host", null))
+            .anyTimes();
+    EasyMock.replay(ingestService);
+    return ingestService;
   }
 
   private HttpServletRequest newMockRequestWithDate(String field, String value) throws Exception {

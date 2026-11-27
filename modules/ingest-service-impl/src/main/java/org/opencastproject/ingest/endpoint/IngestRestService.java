@@ -28,6 +28,7 @@ import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.ingest.api.MediaFetchException;
 import org.opencastproject.ingest.impl.IngestServiceImpl;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.EName;
@@ -384,7 +385,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Media package not valid or content not fetchable",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       },
       returnDescription = "")
@@ -402,6 +404,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
+    } catch (MediaFetchException e) {
+      return fetchFailed(e);
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage track", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -452,7 +456,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Media package not valid or content not fetchable",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       },
       returnDescription = "")
@@ -468,6 +473,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
       mp = ingestService.addPartialTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), startTime, mp);
       return Response.ok(mp).build();
+    } catch (MediaFetchException e) {
+      return fetchFailed(e);
     } catch (Exception e) {
       logger.warn("Unable to add partial track", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -520,7 +527,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Media package not valid or content not fetchable",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       },
       returnDescription = "")
@@ -539,6 +547,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       MediaPackage resultingMediaPackage = ingestService.addCatalog(new URI(url),
               MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(resultingMediaPackage).build();
+    } catch (MediaFetchException e) {
+      return fetchFailed(e);
     } catch (Exception e) {
       logger.warn("Unable to add catalog", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -591,7 +601,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Media package not valid or content not fetchable",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       },
       returnDescription = "")
@@ -609,6 +620,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       mp = ingestService.addAttachment(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
+    } catch (MediaFetchException e) {
+      return fetchFailed(e);
     } catch (Exception e) {
       logger.warn("Unable to add attachment", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -1167,6 +1180,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return badRequest(e.getMessage(), e);
     } catch (IllegalStateException e) {
       return Response.status(Status.CONFLICT).entity(e.getMessage()).build();
+    } catch (MediaFetchException e) {
+      return fetchFailed(e);
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
@@ -1754,6 +1769,17 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.serverError().build();
     }
     return Response.ok(mediaPackage).build();
+  }
+
+  /**
+   * Content could not be fetched from a URL the client specified. That is a problem of the request, not of Opencast, so
+   * there is no need for a stack trace.
+   */
+  private Response fetchFailed(final MediaFetchException e) {
+    logger.warn(e.getMessage());
+    return Response.status(Status.BAD_REQUEST)
+        .entity(e.getMessage())
+        .build();
   }
 
   /**
