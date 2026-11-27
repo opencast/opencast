@@ -65,7 +65,7 @@ public final class JsonConvTest {
     logger.info(json);
     JsonPath jp = from(json);
     assertEquals(4, ((Map) jp.get()).size());
-    assertEquals(new Integer(1), jp.get("id"));
+    assertEquals(Integer.valueOf(1), jp.get("id"));
     assertEquals("default_org", jp.get("organizationId"));
     assertEquals("Public", jp.get("name"));
     assertEquals(1, ((List) jp.get("acl.ace")).size());
@@ -77,7 +77,7 @@ public final class JsonConvTest {
     JsonPath jp = from(json);
     logger.info(json);
     assertEquals(2, ((Map) jp.get()).size());
-    assertEquals(new Integer(1), jp.get("id"));
+    assertEquals(Integer.valueOf(1), jp.get("id"));
     assertEquals("Public", jp.get("name"));
   }
 

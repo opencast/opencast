@@ -232,7 +232,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED).anyTimes();
     EasyMock.expect(job.getDateCreated()).andReturn(new Date()).anyTimes();
     EasyMock.expect(job.getDateStarted()).andReturn(new Date()).anyTimes();
-    EasyMock.expect(job.getQueueTime()).andReturn(new Long(s)).anyTimes();
+    EasyMock.expect(job.getQueueTime()).andReturn(Long.valueOf(s)).anyTimes();
     EasyMock.replay(job);
     return job;
   }

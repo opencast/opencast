@@ -238,7 +238,7 @@ public class LiveScheduleServiceImplTest {
   }
 
   private void assertLiveTrack(Track liveTrack, long duration, int height, int width) {
-    Assert.assertEquals(new Long(duration), liveTrack.getDuration());
+    Assert.assertEquals(Long.valueOf(duration), liveTrack.getDuration());
     Assert.assertEquals(mimeType, liveTrack.getMimeType());
     Assert.assertEquals(true, liveTrack.isLive());
     Assert.assertEquals(1, liveTrack.getStreams().length);
@@ -258,7 +258,7 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED).anyTimes();
     EasyMock.expect(job.getDateCreated()).andReturn(new Date()).anyTimes();
     EasyMock.expect(job.getDateStarted()).andReturn(new Date()).anyTimes();
-    EasyMock.expect(job.getQueueTime()).andReturn(new Long(0)).anyTimes();
+    EasyMock.expect(job.getQueueTime()).andReturn(Long.valueOf(0)).anyTimes();
     EasyMock.replay(job);
     return job;
   }
