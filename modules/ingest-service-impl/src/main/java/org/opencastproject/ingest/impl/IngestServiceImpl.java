@@ -32,6 +32,7 @@ import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.ingest.api.MediaFetchException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -509,7 +510,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     ZipArchiveInputStream zis = null;
-    UploadInputStream upload = new UploadInputStream(zipStream);
+    SourceInputStream upload = new SourceInputStream(zipStream);
     Set<String> collectionFilenames = new HashSet<>();
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
@@ -697,7 +698,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding track {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
+      URI newUrl = addDownloadToRepo(job, mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -795,7 +796,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding partial track {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
+      URI newUrl = addDownloadToRepo(job, mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
       job.setStatus(Job.Status.FINISHED);
@@ -860,7 +861,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding catalog {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
+      URI newUrl = addDownloadToRepo(job, mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -1106,7 +1107,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
-      URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
+      URI newUrl = addDownloadToRepo(job, mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -1702,6 +1703,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     logger.info("Successfully discarded media package {}", mp);
   }
 
+  /**
+   * Downloads content from a URI specified by a client and stores it in the working file repository.
+   *
+   * If the content cannot be fetched, the client is to blame, e.g. because it specified a host which is not reachable.
+   * That is no reason to consider this service unhealthy, so the job is marked as failed because of its data.
+   */
+  private URI addDownloadToRepo(Job job, MediaPackage mp, String elementId, URI uri) throws IOException {
+    try {
+      return addContentToRepo(mp, elementId, uri);
+    } catch (MediaFetchException e) {
+      job.setStatus(Job.Status.FAILED, Job.FailureReason.DATA);
+      throw e;
+    }
+  }
+
+  /**
+   * Downloads content from a URI and stores it in the working file repository.
+   *
+   * @throws MediaFetchException
+   *           if the content cannot be fetched from the URI
+   * @throws IOException
+   *           if storing the content fails
+   */
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
     HttpResponse response = null;
@@ -1710,20 +1734,24 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
 
-        if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
-          // NB: We're creating a new client here with *different* auth than the system auth creds
-          externalHttpClient = getAuthedHttpClient();
-          get.setHeader("X-Requested-Auth", downloadAuthMethod);
-          if ("Basic".equals(downloadAuthMethod) && downloadAuthForceBasic) {
-            String auth = downloadUser + ":" + downloadPassword;
-            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
-            String authHeader = "Basic " + new String(encodedAuth);
-            get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        try {
+          if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
+            // NB: We're creating a new client here with *different* auth than the system auth creds
+            externalHttpClient = getAuthedHttpClient();
+            get.setHeader("X-Requested-Auth", downloadAuthMethod);
+            if ("Basic".equals(downloadAuthMethod) && downloadAuthForceBasic) {
+              String auth = downloadUser + ":" + downloadPassword;
+              byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.ISO_8859_1));
+              String authHeader = "Basic " + new String(encodedAuth);
+              get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            }
+            response = externalHttpClient.execute(get);
+          } else {
+            // httpClient checks internally to see if it should be sending the default auth, or not.
+            response = httpClient.execute(get);
           }
-          response = externalHttpClient.execute(get);
-        } else {
-          // httpClient checks internally to see if it should be sending the default auth, or not.
-          response = httpClient.execute(get);
+        } catch (IOException e) {
+          throw new MediaFetchException(uri, e);
         }
 
         if (null == response) {
@@ -1734,14 +1762,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         int httpStatusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCode != 200) {
-          throw new IOException(uri + " returns http " + httpStatusCode);
+          throw new MediaFetchException(uri, "Server responded with HTTP status " + httpStatusCode, null);
         }
-        in = response.getEntity().getContent();
+        try {
+          in = response.getEntity().getContent();
+        } catch (IOException e) {
+          throw new MediaFetchException(uri, e);
+        }
         //If it does not start with file, or we're in test mode (ie, to allow arbitrary file:// access)
       } else if (!uri.toString().startsWith("file") || testMode) {
-        in = uri.toURL().openStream();
+        try {
+          in = uri.toURL().openStream();
+        } catch (IOException e) {
+          throw new MediaFetchException(uri, e);
+        }
       } else {
-        throw new IOException("Refusing to fetch files from the local filesystem");
+        throw new MediaFetchException(uri, "Refusing to fetch files from the local filesystem", null);
       }
       String fileName = FilenameUtils.getName(uri.getPath());
       if (isBlank(FilenameUtils.getExtension(fileName))) {
@@ -1749,9 +1785,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       if (isBlank(FilenameUtils.getExtension(fileName))) {
-        throw new IOException("No filename extension found: " + fileName);
+        throw new MediaFetchException(uri, "No filename extension found: " + fileName, null);
       }
-      return addContentToRepo(mp, elementId, fileName, in);
+      SourceInputStream source = new SourceInputStream(in);
+      try {
+        return addContentToRepo(mp, elementId, fileName, source);
+      } catch (IOException e) {
+        if (source.readFailed) {
+          throw new MediaFetchException(uri, e);
+        }
+        throw e;
+      }
     } finally {
       if (in != null) {
         in.close();
@@ -1769,6 +1813,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     Header header = response.getFirstHeader("Content-Disposition");
+    if (header == null) {
+      return null;
+    }
     ContentDisposition contentDisposition = new ContentDisposition(header.getValue());
     return contentDisposition.getParameter("filename");
   }
@@ -1781,7 +1828,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   private URI addUploadToRepo(Job job, MediaPackage mp, String elementId, String filename, InputStream upload)
           throws IOException {
-    UploadInputStream in = new UploadInputStream(upload);
+    SourceInputStream in = new SourceInputStream(upload);
     try {
       return addContentToRepo(mp, elementId, filename, in);
     } catch (IOException e) {
@@ -1798,11 +1845,14 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return workingFileRepository.put(mp.getIdentifier().toString(), elementId, filename, progressInputStream);
   }
 
-  /** An upload stream which remembers whether reading from it failed, as opposed to processing what was read. */
-  private static final class UploadInputStream extends ProxyInputStream {
+  /**
+   * A stream of content from an upload or download which remembers whether reading from it failed, as opposed to
+   * processing what was read.
+   */
+  private static final class SourceInputStream extends ProxyInputStream {
     private volatile boolean readFailed = false;
 
-    UploadInputStream(InputStream in) {
+    SourceInputStream(InputStream in) {
       super(in);
     }
 
