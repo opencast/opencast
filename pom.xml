@@ -68,7 +68,7 @@
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
     <rest-assured.version>6.0.1</rest-assured.version>
     <spotless.version>3.10.3</spotless.version>
-    <spring.version>5.3.39</spring.version>
+    <spring.version>6.2.19</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
     <!-- ServiceMix OSGi rebuild of ${spring-security.version}, used for the Spring Security bundles which
          Karaf's spring-security feature does not include (CAS, LDAP). Keep both versions and the
