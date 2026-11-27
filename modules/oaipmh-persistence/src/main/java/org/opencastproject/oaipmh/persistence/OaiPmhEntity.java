@@ -87,7 +87,7 @@ public class OaiPmhEntity {
 
   /** Serialized media package */
   @Lob
-  @Column(name = "mediapackage_xml", length = 65535, nullable = false)
+  @Column(name = "mediapackage_xml", nullable = false)
   private String mediaPackageXML;
 
   /** List of serialized media package element entities */

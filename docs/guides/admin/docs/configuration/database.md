@@ -162,6 +162,11 @@ If you want to use OAI-PMH, you must create the necessary table manually.
 Use the following code to generate the OAI-PMH database table on MariaDB.
 PostgreSQL is not yet supported.
 
+Note that the table intentionally uses `CHARSET=utf8` rather than the `utf8mb4` used elsewhere in this guide: on
+older MariaDB defaults (`innodb_default_row_format=compact`), `utf8mb4`'s larger per-character size pushes the
+combined primary key (`mp_id` + `repo_id` + `organization`) past InnoDB's key-prefix limit, failing with
+`ERROR 1071: Specified key was too long` (see [#2352](https://github.com/opencast/opencast/issues/2352)).
+
 ```sql
 CREATE TABLE oc_oaipmh (
   mp_id VARCHAR(128) NOT NULL,
@@ -170,7 +175,7 @@ CREATE TABLE oc_oaipmh (
   series_id VARCHAR(128),
   deleted tinyint(1) DEFAULT '0',
   modification_date DATETIME DEFAULT NULL,
-  mediapackage_xml TEXT(65535) NOT NULL,
+  mediapackage_xml LONGTEXT NOT NULL,
   PRIMARY KEY (mp_id, repo_id, organization),
   CONSTRAINT UNQ_oc_oaipmh UNIQUE (modification_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
