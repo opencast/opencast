@@ -33,11 +33,11 @@ import org.opencastproject.util.UrlSupport;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -61,7 +61,7 @@ public class OsgiAclServiceRestEndpointTest {
   private String privateAcl
       = "{\"acl\": {\"ace\": {\"allow\":false, \"action\":\"read\", \"role\":\"SERIES_10_INSTRUCTOR\" }}}";
 
-  @Before
+  @BeforeEach
   public void setUpTest() throws Exception {
     publicAclId = extractAclId(given().formParam("name", "Public").formParam("acl", publicAcl).expect().statusCode(OK)
         .when().post(host("/acl")));
@@ -70,7 +70,7 @@ public class OsgiAclServiceRestEndpointTest {
         .statusCode(OK).when().post(host("/acl")));
   }
 
-  @After
+  @AfterEach
   public void tearDownTest() {
     given().pathParam("aclId", publicAclId).when().delete(host("/acl/{aclId}"));
     given().pathParam("aclId", privateAclId).when().delete(host("/acl/{aclId}"));
@@ -319,12 +319,12 @@ public class OsgiAclServiceRestEndpointTest {
 
   private static final RestServiceTestEnv env = testEnvForClasses(TestRestService.class, NotFoundExceptionMapper.class);
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     env.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     env.tearDownServer();
   }

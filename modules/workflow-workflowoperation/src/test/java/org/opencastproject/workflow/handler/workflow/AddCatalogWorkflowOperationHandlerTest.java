@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -35,11 +37,10 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.InputStream;
@@ -52,10 +53,10 @@ public class AddCatalogWorkflowOperationHandlerTest {
   private WorkflowInstance instance;
   private WorkflowOperationInstance operation;
 
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @TempDir
+  private File temporaryFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     operationHandler = new AddCatalogWorkflowOperationHandler();
 
@@ -76,7 +77,7 @@ public class AddCatalogWorkflowOperationHandlerTest {
     final Capture<InputStream> inStream = EasyMock.newCapture();
     EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.eq(catalogName),
                                   EasyMock.capture(inStream))).andAnswer(() -> {
-                                    final File file = temporaryFolder.newFile();
+                                    final File file = File.createTempFile("junit", null, temporaryFolder);
                                     FileUtils.copyInputStreamToFile(inStream.getValue(), file);
                                     return file.toURI();
                                   }).anyTimes();
@@ -97,17 +98,17 @@ public class AddCatalogWorkflowOperationHandlerTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
 
     // checks
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage mp = result.getMediaPackage();
 
-    Assert.assertEquals(mp.getCatalogs().length, 1);
+    Assertions.assertEquals(mp.getCatalogs().length, 1);
 
-    Assert.assertEquals(mp.getCatalogs()[0].getTags().length, 2);
-    Assert.assertEquals(mp.getCatalogs()[0].getTags()[0], "tag1");
-    Assert.assertEquals(mp.getCatalogs()[0].getTags()[1], "tag2");
+    Assertions.assertEquals(mp.getCatalogs()[0].getTags().length, 2);
+    Assertions.assertEquals(mp.getCatalogs()[0].getTags()[0], "tag1");
+    Assertions.assertEquals(mp.getCatalogs()[0].getTags()[1], "tag2");
 
-    Assert.assertEquals(mp.getCatalogs()[0].getFlavor(),
+    Assertions.assertEquals(mp.getCatalogs()[0].getFlavor(),
                         MediaPackageElementFlavor.parseFlavor("flavor/test"));
   }
 
@@ -121,26 +122,26 @@ public class AddCatalogWorkflowOperationHandlerTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
 
     // checks
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage mp = result.getMediaPackage();
 
-    Assert.assertEquals(mp.getCatalogs().length, 1);
+    Assertions.assertEquals(mp.getCatalogs().length, 1);
 
-    Assert.assertEquals(mp.getCatalogs()[0].getTags().length, 0);
+    Assertions.assertEquals(mp.getCatalogs()[0].getTags().length, 0);
 
-    Assert.assertEquals(mp.getCatalogs()[0].getFlavor(),
+    Assertions.assertEquals(mp.getCatalogs()[0].getFlavor(),
                         MediaPackageElementFlavor.parseFlavor("flavor/test"));
   }
 
   @Test
-  public void testNoFlavorFail() throws WorkflowOperationException {
+  public void testNoFlavorFail() {
     // setup
     operation.setConfiguration("catalog-flavor", "");
     operation.setConfiguration("catalog-type-collision-behavior", "keep");
 
-    // execution
-    Assert.assertThrows(WorkflowOperationException.class, () -> operationHandler.start(instance, null));
+    assertThrows(WorkflowOperationException.class, () ->
+        operationHandler.start(instance, null));
   }
 
   @Test
@@ -155,11 +156,11 @@ public class AddCatalogWorkflowOperationHandlerTest {
     result = operationHandler.start(instance, null);
 
     // checks
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage mp = result.getMediaPackage();
 
-    Assert.assertEquals(2, mp.getCatalogs().length);
+    Assertions.assertEquals(2, mp.getCatalogs().length);
   }
 
   @Test
@@ -173,11 +174,11 @@ public class AddCatalogWorkflowOperationHandlerTest {
     WorkflowOperationResult result = operationHandler.start(instance, null);
 
     // checks
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage mp = result.getMediaPackage();
 
-    Assert.assertEquals(mp.getCatalogs().length, 1);
+    Assertions.assertEquals(mp.getCatalogs().length, 1);
   }
 
   @Test
@@ -188,7 +189,8 @@ public class AddCatalogWorkflowOperationHandlerTest {
 
     // execution
     var result = operationHandler.start(instance, null);
-    instance.setMediaPackage(result.getMediaPackage()); // Would usually be done by the workflow service
-    Assert.assertThrows(WorkflowOperationException.class, () -> operationHandler.start(instance, null));
+    instance.setMediaPackage(result.getMediaPackage());
+    assertThrows(WorkflowOperationException.class, () ->
+        operationHandler.start(instance, null));
   }
 }

@@ -21,8 +21,8 @@
 
 package org.opencastproject.transcription.microsoft.azure.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrasesTest {
 
@@ -30,7 +30,7 @@ public class MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrasesTest {
   public void splitCueTextValid() {
     String text = "aaa bbbbbb ccccccccc ddd eeeee ffffffff. ggggg hhh iiiiiii jjjjjjjj.";
     String[] splitText = MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrases.splitCueText(text, 10);
-    Assert.assertNotNull(splitText);
+    Assertions.assertNotNull(splitText);
     String[] expected = new String[] {
         "aaa bbbbbb",
         "ccccccccc",
@@ -40,28 +40,28 @@ public class MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrasesTest {
         "iiiiiii",
         "jjjjjjjj."
     };
-    Assert.assertArrayEquals(expected, splitText);
+    Assertions.assertArrayEquals(expected, splitText);
   }
 
   @Test
   public void splitCueTextUnsplittable() {
     String text = "aaabbbbbbcccccccccdddeeeee";
     String[] splitText = MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrases.splitCueText(text, 10);
-    Assert.assertNotNull(splitText);
+    Assertions.assertNotNull(splitText);
     String[] expected = new String[] {
         "aaabbbbbbc",
         "ccccccccdd",
         "deeeee"
     };
-    Assert.assertArrayEquals(expected, splitText);
+    Assertions.assertArrayEquals(expected, splitText);
   }
 
   @Test
   public void splitCueTextInvalid() {
     String text = "";
     String[] splitText = MicrosoftAzureSpeechTranscriptionJsonRecognizedPhrases.splitCueText(text, 10);
-    Assert.assertNotNull(splitText);
+    Assertions.assertNotNull(splitText);
     String[] expected = new String[0];
-    Assert.assertArrayEquals(expected, splitText);
+    Assertions.assertArrayEquals(expected, splitText);
   }
 }

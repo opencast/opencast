@@ -22,17 +22,17 @@
 package org.opencastproject.util;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -73,8 +73,8 @@ public class ZipUtilTest {
   private File dummieFile;
   private File bigFile;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * Added as part of the fix for MH-1809 WARNING: Changes in the files to zip would change the resulting zip size. If
@@ -86,9 +86,9 @@ public class ZipUtilTest {
 
   private static final Logger logger = LoggerFactory.getLogger(ZipUtilTest.class);
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    baseDir = testFolder.newFolder();
+    baseDir = Files.createTempDirectory(testFolder.toPath(), "junit").toFile();
     srcDir = new File(baseDir, srcDirName);
     nestedSrcDir = new File(srcDir, nestedSrcDirName);
     srcFile = new File(srcDir, srcFileName);
@@ -99,10 +99,10 @@ public class ZipUtilTest {
     bigFile = new File(srcDir, over4GBFileName);
 
     // Set up the source and destination directories
-    Assert.assertTrue(baseDir.isDirectory() || baseDir.mkdirs());
-    Assert.assertTrue(srcDir.isDirectory() || srcDir.mkdir());
-    Assert.assertTrue(srcDir.isDirectory() || nestedSrcDir.mkdir());
-    Assert.assertTrue(destDir.isDirectory() || destDir.mkdir());
+    Assertions.assertTrue(baseDir.isDirectory() || baseDir.mkdirs());
+    Assertions.assertTrue(srcDir.isDirectory() || srcDir.mkdir());
+    Assertions.assertTrue(srcDir.isDirectory() || nestedSrcDir.mkdir());
+    Assertions.assertTrue(destDir.isDirectory() || destDir.mkdir());
 
     // Copy the source files from the classpath to the source dir
     FileUtils.copyURLToFile(this.getClass().getResource("/av.mov"), srcFile);
@@ -111,7 +111,7 @@ public class ZipUtilTest {
 
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.forceDelete(baseDir);
   }
@@ -128,7 +128,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip((String[]) null, destFile.getCanonicalPath(), true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when input String array is null");
-        Assert.fail("Zip should fail when input String array is null");
+        Assertions.fail("Zip should fail when input String array is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input String array (String, String): OK");
       }
@@ -138,7 +138,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), null, nestedSrcFile.getCanonicalPath() },
                 destFile.getCanonicalPath(), true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input filename is null");
-        Assert.fail("Zip should fail when any input filename is null");
+        Assertions.fail("Zip should fail when any input filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input filename (String, String): OK");
       }
@@ -149,7 +149,7 @@ public class ZipUtilTest {
                 new String[] { srcFile.getCanonicalPath(), dummieFile.getCanonicalPath(),
                         nestedSrcFile.getCanonicalPath() }, destFile.getCanonicalPath(), true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input filename does not exist");
-        Assert.fail("Zip should fail when any input filename does not exist");
+        Assertions.fail("Zip should fail when any input filename does not exist");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting non-existing input filename (String, String): OK");
       }
@@ -159,7 +159,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() }, (String) null, true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination filename is null");
-        Assert.fail("Zip should fail when destination filename is null");
+        Assertions.fail("Zip should fail when destination filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination filename (String, String): OK");
       }
@@ -169,7 +169,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() }, "", true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination filename is empty");
-        Assert.fail("Zip should fail when destination filename is empty");
+        Assertions.fail("Zip should fail when destination filename is empty");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting empty destination filename (String, String): OK");
       }
@@ -179,7 +179,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() },
                 sampleZip.getCanonicalPath(), true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination filename already exists");
-        Assert.fail("Zip should fail when destination filename already exists");
+        Assertions.fail("Zip should fail when destination filename already exists");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting existing destination filename (String, String): OK");
       }
@@ -189,14 +189,15 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() },
                 dummieFile.getCanonicalPath(), true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when the destination filename does not represent a zip file");
-        Assert.fail("Zip should fail when the destination filename does not represent a zip file");
+        Assertions.fail("Zip should fail when the destination filename does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination filename not representing a valid zip file (String, String): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + " instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + " instead: " + e.getMessage());
     }
 
   }
@@ -213,7 +214,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip((String[]) null, destFile, true, 0);
         logger.error("Zip should fail when input String array is null");
-        Assert.fail("Zip should fail when input String array is null");
+        Assertions.fail("Zip should fail when input String array is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input File array (String, File): OK");
       }
@@ -223,7 +224,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), null, nestedSrcFile.getCanonicalPath() }, destFile,
                 true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input filename is null");
-        Assert.fail("Zip should fail when any input filename is null");
+        Assertions.fail("Zip should fail when any input filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input filename (String, File): OK");
       }
@@ -234,7 +235,7 @@ public class ZipUtilTest {
                 new String[] { srcFile.getCanonicalPath(), dummieFile.getCanonicalPath(),
                         nestedSrcFile.getCanonicalPath() }, destFile, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input filename does not exist");
-        Assert.fail("Zip should fail when any input filename does not exist");
+        Assertions.fail("Zip should fail when any input filename does not exist");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting non-existing input filename (String, File): OK");
       }
@@ -244,7 +245,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() }, (File) null, true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination File is null");
-        Assert.fail("Zip should fail when destination File is null");
+        Assertions.fail("Zip should fail when destination File is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination File (String, File): OK");
       }
@@ -254,7 +255,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() }, sampleZip, true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination file already exists");
-        Assert.fail("Zip should fail when destination file already exists");
+        Assertions.fail("Zip should fail when destination file already exists");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting existing destination File (String, File): OK");
       }
@@ -264,14 +265,15 @@ public class ZipUtilTest {
         ZipUtil.zip(new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath() }, dummieFile, true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when the destination File does not represent a zip file");
-        Assert.fail("Zip should fail when the destination File does not represent a zip file");
+        Assertions.fail("Zip should fail when the destination File does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination File not representing a valid zip file (String, File): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + " instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + " instead: " + e.getMessage());
     }
 
   }
@@ -288,7 +290,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip((File[]) null, destFile.getCanonicalPath(), true, ZipUtil.DEFAULT_COMPRESSION);
         logger.error("Zip should fail when input File array is null");
-        Assert.fail("Zip should fail when input File array is null");
+        Assertions.fail("Zip should fail when input File array is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input File array (File, String): OK");
       }
@@ -298,7 +300,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new File[] { srcFile, null, nestedSrcFile }, destFile.getCanonicalPath(), true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input file is null");
-        Assert.fail("Zip should fail when any input file is null");
+        Assertions.fail("Zip should fail when any input file is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input filename (File, String): OK");
       }
@@ -308,7 +310,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new File[] { srcFile, dummieFile, nestedSrcFile }, destFile.getCanonicalPath(), true,
                 ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input file does not exist");
-        Assert.fail("Zip should fail when any input file does not exist");
+        Assertions.fail("Zip should fail when any input file does not exist");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting non-existing input filename (File, String): OK");
       }
@@ -317,7 +319,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, (String) null, true, ZipUtil.DEFAULT_COMPRESSION);
         logger.error("Zip should fail when destination filename is null");
-        Assert.fail("Zip should fail when destination filename is null");
+        Assertions.fail("Zip should fail when destination filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination filename (File, String): OK");
       }
@@ -326,7 +328,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, "", true, ZipUtil.DEFAULT_COMPRESSION);
         logger.error("Zip should fail when destination filename is empty");
-        Assert.fail("Zip should fail when destination filename is empty");
+        Assertions.fail("Zip should fail when destination filename is empty");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting empty destination filename (File, String): OK");
       }
@@ -336,7 +338,7 @@ public class ZipUtilTest {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, sampleZip.getCanonicalPath(), true,
                 ZipUtil.DEFAULT_COMPRESSION);
         logger.error("Zip should fail when destination filename already exists");
-        Assert.fail("Zip should fail when destination filename already exists");
+        Assertions.fail("Zip should fail when destination filename already exists");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting existing destination File (File, String): OK");
       }
@@ -346,14 +348,15 @@ public class ZipUtilTest {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, dummieFile.getCanonicalPath(), true,
                 ZipUtil.DEFAULT_COMPRESSION);
         logger.error("Zip should fail when the destination filename does not represent a zip file");
-        Assert.fail("Zip should fail when the destination filename does not represent a zip file");
+        Assertions.fail("Zip should fail when the destination filename does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination filename not representing a valid zip file (File, String): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + " instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + " instead: " + e.getMessage());
     }
 
   }
@@ -370,7 +373,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip((File[]) null, destFile, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when input File array is null");
-        Assert.fail("Zip should fail when input File array is null");
+        Assertions.fail("Zip should fail when input File array is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input File array (File, File): OK");
       }
@@ -379,7 +382,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, null, nestedSrcFile }, destFile, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input file is null");
-        Assert.fail("Zip should fail when any input file is null");
+        Assertions.fail("Zip should fail when any input file is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input filename (File, File): OK");
       }
@@ -388,7 +391,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, dummieFile, nestedSrcFile }, destFile, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when any input file does not exist");
-        Assert.fail("Zip should fail when any input file does not exist");
+        Assertions.fail("Zip should fail when any input file does not exist");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting non-existing input filename (File, File): OK");
       }
@@ -397,7 +400,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, (File) null, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination File is null");
-        Assert.fail("Zip should fail when destination File is null");
+        Assertions.fail("Zip should fail when destination File is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination File (File, File): OK");
       }
@@ -406,7 +409,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, sampleZip, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when destination File already exists");
-        Assert.fail("Zip should fail when destination File already exists");
+        Assertions.fail("Zip should fail when destination File already exists");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting existing destination File (File, File): OK");
       }
@@ -415,14 +418,15 @@ public class ZipUtilTest {
       try {
         ZipUtil.zip(new File[] { srcFile, nestedSrcFile }, dummieFile, true, ZipUtil.NO_COMPRESSION);
         logger.error("Zip should fail when the destination File does not represent a zip file");
-        Assert.fail("Zip should fail when the destination File does not represent a zip file");
+        Assertions.fail("Zip should fail when the destination File does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination File not representing a valid zip file (File, File): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + " instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + " instead: " + e.getMessage());
     }
 
   }
@@ -439,15 +443,15 @@ public class ZipUtilTest {
     File test = ZipUtil.zip(
             new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath(),
                     nestedSrcDir.getCanonicalPath() }, destFile.getCanonicalPath(), false, ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(2, zip.size());
+    Assertions.assertEquals(2, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
       while (entries.hasMoreElements()) {
         ZipEntry entry = entries.nextElement();
-        Assert.assertTrue(names.contains(entry.getName()));
+        Assertions.assertTrue(names.contains(entry.getName()));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -469,15 +473,15 @@ public class ZipUtilTest {
     File test = ZipUtil.zip(
             new String[] { srcFile.getCanonicalPath(), nestedSrcFile.getCanonicalPath(),
                     nestedSrcDir.getCanonicalPath() }, destFile, false, ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(2, zip.size());
+    Assertions.assertEquals(2, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
       while (entries.hasMoreElements()) {
         ZipEntry entry = entries.nextElement();
-        Assert.assertTrue(names.contains(entry.getName()));
+        Assertions.assertTrue(names.contains(entry.getName()));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -498,15 +502,15 @@ public class ZipUtilTest {
 
     File test = ZipUtil.zip(new File[] { srcFile, nestedSrcFile, nestedSrcDir }, destFile.getCanonicalPath(), false,
             ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(2, zip.size());
+    Assertions.assertEquals(2, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
       while (entries.hasMoreElements()) {
         ZipEntry entry = entries.nextElement();
-        Assert.assertTrue(names.contains(entry.getName()));
+        Assertions.assertTrue(names.contains(entry.getName()));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -527,15 +531,15 @@ public class ZipUtilTest {
 
     File test = ZipUtil.zip(new File[] { srcFile, nestedSrcFile, nestedSrcDir }, destFile, false,
             ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(2, zip.size());
+    Assertions.assertEquals(2, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
       while (entries.hasMoreElements()) {
         ZipEntry entry = entries.nextElement();
-        Assert.assertTrue(names.contains(entry.getName()));
+        Assertions.assertTrue(names.contains(entry.getName()));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -561,9 +565,9 @@ public class ZipUtilTest {
     }
 
     File test = ZipUtil.zip(filenames, destFile.getCanonicalPath(), true, ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(3, zip.size());
+    Assertions.assertEquals(3, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
@@ -571,7 +575,7 @@ public class ZipUtilTest {
         ZipEntry entry = entries.nextElement();
         // The 'replace' method is used because the filesystem directory separator may not be the same as the Zip
         // files's
-        Assert.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
+        Assertions.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -597,9 +601,9 @@ public class ZipUtilTest {
     }
 
     File test = ZipUtil.zip(filenames, destFile, true, ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(3, zip.size());
+    Assertions.assertEquals(3, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
@@ -607,7 +611,7 @@ public class ZipUtilTest {
         ZipEntry entry = entries.nextElement();
         // The 'replace' method is used because the filesystem directory separator may not be the same as the Zip
         // files's
-        Assert.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
+        Assertions.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -628,9 +632,9 @@ public class ZipUtilTest {
     names.add(nestedSrcDirName + File.separator + nestedSrcFileName);
 
     File test = ZipUtil.zip(srcDir.listFiles(), destFilePath, true, ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(3, zip.size());
+    Assertions.assertEquals(3, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
@@ -638,7 +642,7 @@ public class ZipUtilTest {
         ZipEntry entry = entries.nextElement();
         // The 'replace' method is used because the filesystem directory separator may not be the same as the Zip
         // files's
-        Assert.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
+        Assertions.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -659,9 +663,9 @@ public class ZipUtilTest {
     names.add(nestedSrcDirName + File.separator + nestedSrcFileName);
 
     File test = ZipUtil.zip(srcDir.listFiles(), destFile, true, ZipUtil.NO_COMPRESSION);
-    Assert.assertTrue(test.exists());
+    Assertions.assertTrue(test.exists());
     ZipFile zip = new ZipFile(test);
-    Assert.assertEquals(3, zip.size());
+    Assertions.assertEquals(3, zip.size());
     Enumeration<? extends ZipEntry> entries = zip.entries();
 
     try {
@@ -669,7 +673,7 @@ public class ZipUtilTest {
         ZipEntry entry = entries.nextElement();
         // The 'replace' method is used because the filesystem directory separator may not be the same as the Zip
         // files's
-        Assert.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
+        Assertions.assertTrue(names.contains(entry.getName().replace('/', File.separatorChar)));
       }
     } catch (AssertionError ae) {
       zip.close();
@@ -691,7 +695,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip((String) null, destFile.getCanonicalPath());
         logger.error("Unzip should fail when input filename is null");
-        Assert.fail("Unzip should fail when input filename is null");
+        Assertions.fail("Unzip should fail when input filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input filename (String, String): OK");
       }
@@ -700,7 +704,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip("", destFile.getCanonicalPath());
         logger.error("Unzip should fail when input filename is empty");
-        Assert.fail("Unzip should fail when input filename is empty");
+        Assertions.fail("Unzip should fail when input filename is empty");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting empty input filename (String, String): OK");
       }
@@ -709,7 +713,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip.getCanonicalPath(), (String) null);
         logger.error("Unzip should fail when destination filename is null");
-        Assert.fail("Unzip should fail when destination filename is null");
+        Assertions.fail("Unzip should fail when destination filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination filename (String, String): OK");
       }
@@ -718,7 +722,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip.getCanonicalPath(), "");
         logger.error("Unzip should fail when destination filename is empty");
-        Assert.fail("Unzip should fail when destination filename is empty");
+        Assertions.fail("Unzip should fail when destination filename is empty");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting empty destination filename (String, String): OK");
       }
@@ -727,7 +731,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(dummieFile.getCanonicalPath(), destFile.getCanonicalPath());
         logger.error("Unzip should fail when the input filename doesn't exists");
-        Assert.fail("Unzip should fail when the input filename doesn't exists");
+        Assertions.fail("Unzip should fail when the input filename doesn't exists");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting existing input filename (String, String): OK");
       }
@@ -736,7 +740,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(srcFile.getCanonicalPath(), destFile.getCanonicalPath());
         logger.error("Unzip should fail when the input filename does not represent a zip file");
-        Assert.fail("Unzip should fail when the input filename does not represent a zip file");
+        Assertions.fail("Unzip should fail when the input filename does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting input filename not representing a valid zip file (String, String): OK");
       }
@@ -745,14 +749,15 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip.getCanonicalPath(), srcFile.getCanonicalPath());
         logger.error("Unzip should fail when the destination filename does not represent a directory");
-        Assert.fail("Unzip should fail when the destination filename does not represent a directory");
+        Assertions.fail("Unzip should fail when the destination filename does not represent a directory");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination filename not representing a directory (String, String): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + "instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + "instead: " + e.getMessage());
     }
 
   }
@@ -769,7 +774,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip((String) null, destFile);
         logger.error("Unzip should fail when input filename is null");
-        Assert.fail("Unzip should fail when input filename is null");
+        Assertions.fail("Unzip should fail when input filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input filename (String, File): OK");
       }
@@ -778,7 +783,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip("", destFile);
         logger.error("Unzip should fail when input filename is empty");
-        Assert.fail("Unzip should fail when input filename is empty");
+        Assertions.fail("Unzip should fail when input filename is empty");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting empty input filename (String, File): OK");
       }
@@ -787,7 +792,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(dummieFile.getCanonicalPath(), destFile);
         logger.error("Unzip should fail when the input filename doesn't exists");
-        Assert.fail("Unzip should fail when the input filename doesn't exists");
+        Assertions.fail("Unzip should fail when the input filename doesn't exists");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting existing input filename (String, File): OK");
       }
@@ -796,7 +801,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip.getCanonicalPath(), (File) null);
         logger.error("Unzip should fail when destination filename is null");
-        Assert.fail("Unzip should fail when destination filename is null");
+        Assertions.fail("Unzip should fail when destination filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination filename (String, File): OK");
       }
@@ -805,7 +810,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(srcFile.getCanonicalPath(), destFile);
         logger.error("Unzip should fail when the input filename does not represent a zip file");
-        Assert.fail("Unzip should fail when the input filename does not represent a zip file");
+        Assertions.fail("Unzip should fail when the input filename does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting input filename not representing a valid zip file (String, File): OK");
       }
@@ -814,14 +819,15 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip.getCanonicalPath(), srcFile);
         logger.error("Unzip should fail when the destination File does not represent a directory");
-        Assert.fail("Unzip should fail when the destination File does not represent a directory");
+        Assertions.fail("Unzip should fail when the destination File does not represent a directory");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination File not representing a directory (String, File): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + "instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + "instead: " + e.getMessage());
     }
 
   }
@@ -838,7 +844,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip((File) null, destFile.getCanonicalPath());
         logger.error("Unzip should fail when input File is null");
-        Assert.fail("Unzip should fail when input File is null");
+        Assertions.fail("Unzip should fail when input File is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input File (File, String): OK");
       }
@@ -847,7 +853,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(dummieFile, destFile.getCanonicalPath());
         logger.error("Unzip should fail when input File doesn't exist");
-        Assert.fail("Unzip should fail when input File doesn't exist");
+        Assertions.fail("Unzip should fail when input File doesn't exist");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting non-existing input File (File, String): OK");
       }
@@ -856,7 +862,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip, (String) null);
         logger.error("Unzip should fail when destination filename is null");
-        Assert.fail("Unzip should fail when destination filename is null");
+        Assertions.fail("Unzip should fail when destination filename is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination filename (File, String): OK");
       }
@@ -865,7 +871,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip.getCanonicalPath(), "");
         logger.error("Unzip should fail when destination filename is empty");
-        Assert.fail("Unzip should fail when destination filename is empty");
+        Assertions.fail("Unzip should fail when destination filename is empty");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting empty destination filename (File, String): OK");
       }
@@ -874,7 +880,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(srcFile, destFile.getCanonicalPath());
         logger.error("Unzip should fail when the input File does not represent a zip file");
-        Assert.fail("Unzip should fail when the input File does not represent a zip file");
+        Assertions.fail("Unzip should fail when the input File does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting input File not representing a valid zip file (File, String): OK");
       }
@@ -883,14 +889,15 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip, srcFile.getCanonicalPath());
         logger.error("Unzip should fail when the destination filename does not represent a directory");
-        Assert.fail("Unzip should fail when the destination filename does not represent a directory");
+        Assertions.fail("Unzip should fail when the destination filename does not represent a directory");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination filename not representing a directory (File, String): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + "instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + "instead: " + e.getMessage());
     }
 
   }
@@ -907,7 +914,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip((File) null, destFile);
         logger.error("Unzip should fail when input File is null");
-        Assert.fail("Unzip should fail when input File is null");
+        Assertions.fail("Unzip should fail when input File is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null input File (File, File): OK");
       }
@@ -916,7 +923,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(dummieFile, destFile);
         logger.error("Unzip should fail when input File doesn't exist");
-        Assert.fail("Unzip should fail when input File doesn't exist");
+        Assertions.fail("Unzip should fail when input File doesn't exist");
       } catch (FileNotFoundException e) {
         logger.debug("Detecting non-existing input File (File, File): OK");
       }
@@ -925,7 +932,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip, (File) null);
         logger.error("Unzip should fail when destination File is null");
-        Assert.fail("Unzip should fail when destination File is null");
+        Assertions.fail("Unzip should fail when destination File is null");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting null destination File (File, File): OK");
       }
@@ -934,7 +941,7 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(srcFile, destFile);
         logger.error("Unzip should fail when the input File does not represent a zip file");
-        Assert.fail("Unzip should fail when the input File does not represent a zip file");
+        Assertions.fail("Unzip should fail when the input File does not represent a zip file");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting input File not representing a valid zip file (File, File): OK");
       }
@@ -943,14 +950,15 @@ public class ZipUtilTest {
       try {
         ZipUtil.unzip(sampleZip, srcFile);
         logger.error("Unzip should fail when the destination File does not represent a directory");
-        Assert.fail("Unzip should fail when the destination File does not represent a directory");
+        Assertions.fail("Unzip should fail when the destination File does not represent a directory");
       } catch (IllegalArgumentException e) {
         logger.debug("Detecting destination File not representing a directory (File, File): OK");
       }
 
     } catch (Exception e) {
       logger.error("Another exception was expected, but got {} instead: {}", e.getClass().getName(), e.getMessage());
-      Assert.fail("Another exception was expected, but got " + e.getClass().getName() + "instead: " + e.getMessage());
+      Assertions.fail("Another exception was expected, but got " + e.getClass().getName()
+          + "instead: " + e.getMessage());
     }
 
   }
@@ -970,7 +978,7 @@ public class ZipUtilTest {
     try {
       while (entries.hasMoreElements()) {
         ZipEntry entry = entries.nextElement();
-        Assert.assertTrue(new File(destDir, entry.getName()).exists());
+        Assertions.assertTrue(new File(destDir, entry.getName()).exists());
       }
     } catch (AssertionError ae) {
       test.close();

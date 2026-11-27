@@ -24,16 +24,16 @@ package org.opencastproject.capture.admin.impl;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingState;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RecordingStateUpdateTest {
   private Recording recording = null;
   private RecordingStateUpdate rsu = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws InterruptedException {
     final long lastHeardFrom = System.currentTimeMillis();
     recording = new Recording() {
@@ -57,13 +57,13 @@ public class RecordingStateUpdateTest {
         return "test";
       }
     };
-    Assert.assertNotNull(recording);
+    Assertions.assertNotNull(recording);
     Thread.sleep(5);
     rsu = new RecordingStateUpdate(recording);
-    Assert.assertNotNull(rsu);
+    Assertions.assertNotNull(rsu);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     recording = null;
     rsu = null;
@@ -71,10 +71,10 @@ public class RecordingStateUpdateTest {
 
   @Test
   public void correctInformation() {
-    Assert.assertEquals("test", rsu.getId());
-    Assert.assertEquals(RecordingState.CAPTURING, rsu.getState());
+    Assertions.assertEquals("test", rsu.getId());
+    Assertions.assertEquals(RecordingState.CAPTURING, rsu.getState());
     if (rsu.getTimeSinceLastUpdate() <= 1) {
-      Assert.fail("Invalid update time in recording state update");
+      Assertions.fail("Invalid update time in recording state update");
     }
   }
 
@@ -82,9 +82,9 @@ public class RecordingStateUpdateTest {
   // This is a stupid test, but it gets us up to 100%...
   public void blank() {
     rsu = new RecordingStateUpdate();
-    Assert.assertNotNull(rsu);
-    Assert.assertNull(rsu.getId());
-    Assert.assertNull(rsu.getState());
-    Assert.assertNull(rsu.getTimeSinceLastUpdate());
+    Assertions.assertNotNull(rsu);
+    Assertions.assertNull(rsu.getId());
+    Assertions.assertNull(rsu.getState());
+    Assertions.assertNull(rsu.getTimeSinceLastUpdate());
   }
 }

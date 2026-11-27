@@ -22,7 +22,8 @@
 package org.opencastproject.coverimage.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.xmlmatchers.XmlMatchers.hasXPath;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
@@ -30,7 +31,7 @@ import org.opencastproject.coverimage.CoverImageException;
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xmlmatchers.namespace.SimpleNamespaceContext;
@@ -52,25 +53,28 @@ public class CoverImageServiceTest {
   /**
    * Tests {@link AbstractCoverImageService#parseXsl(String)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testParseXslNull() throws Exception {
-    AbstractCoverImageService.parseXsl(null);
+    assertThrows(IllegalArgumentException.class, () ->
+        AbstractCoverImageService.parseXsl(null));
   }
 
   /**
    * Tests {@link AbstractCoverImageService#parseXsl(String)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testParseXslBlankString() throws Exception {
-    AbstractCoverImageService.parseXsl(null);
+    assertThrows(IllegalArgumentException.class, () ->
+        AbstractCoverImageService.parseXsl(null));
   }
 
   /**
    * Tests {@link AbstractCoverImageService#parseXsl(String)}
    */
-  @Test(expected = CoverImageException.class)
+  @Test
   public void testParseXslInvalidXsl() throws Exception {
-    AbstractCoverImageService.parseXsl("this is not a valid XSL string");
+    assertThrows(CoverImageException.class, () ->
+        AbstractCoverImageService.parseXsl("this is not a valid XSL string"));
   }
 
   /**
@@ -96,28 +100,33 @@ public class CoverImageServiceTest {
   /**
    * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTransformSvgNullSvg() throws Exception {
-    Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
-    AbstractCoverImageService.transformSvg(null, new InputSource(), doc, 0, 0, null);
+    assertThrows(IllegalArgumentException.class, () -> {
+      Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
+      AbstractCoverImageService.transformSvg(null, new InputSource(), doc, 0, 0, null);
+    });
   }
 
 
   /**
    * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTransformSvgNullXmlSource() throws Exception {
-    Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
-    AbstractCoverImageService.transformSvg(new StreamResult(), null, doc, 0, 0, null);
+    assertThrows(IllegalArgumentException.class, () -> {
+      Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder().newDocument();
+      AbstractCoverImageService.transformSvg(new StreamResult(), null, doc, 0, 0, null);
+    });
   }
 
   /**
    * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)}
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testTransformSvgNullXslDoc() throws Exception {
-    AbstractCoverImageService.transformSvg(new StreamResult(), new InputSource(), null, 0, 0, null);
+    assertThrows(IllegalArgumentException.class, () ->
+        AbstractCoverImageService.transformSvg(new StreamResult(), new InputSource(), null, 0, 0, null));
   }
 
   /**

@@ -21,16 +21,15 @@
 
 package org.opencastproject.assetmanager.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.easymock.EasyMock;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.osgi.framework.BundleContext;
 
 import java.io.File;
@@ -48,8 +47,8 @@ public class AssetStoreDirectoryTest {
   private static final String STORAGE_DIR = AssetStoreDirectory.CONFIG_STORAGE_DIR;
   private static final String PREFIX_LENGTH = AssetStoreDirectory.CONFIG_PREFIX_LENGTH_SUFFIX;
 
-  @Rule
-  public TemporaryFolder tmpFolder = new TemporaryFolder();
+  @TempDir
+  private File tmpFolder;
 
   @Test
   public void testPrefix() {
@@ -78,7 +77,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testMediaPackageDir() {
-    final Path root = tmpFolder.getRoot().toPath().toAbsolutePath();
+    final Path root = tmpFolder.toPath().toAbsolutePath();
     assertEquals(root.resolve("org").resolve("Abc-123"),
         new AssetStoreDirectory(root.toString(), 0).mediaPackageDir("org", "Abc-123"));
     assertEquals(root.resolve("org").resolve("a").resolve("Abc-123"),
@@ -89,7 +88,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testDeletionLimit() {
-    final Path root = tmpFolder.getRoot().toPath().toAbsolutePath();
+    final Path root = tmpFolder.toPath().toAbsolutePath();
     assertEquals(root.resolve("org"), new AssetStoreDirectory(root.toString(), 0).deletionLimit("org", "abc"));
     assertEquals(root.resolve("org").resolve("ab"),
         new AssetStoreDirectory(root.toString(), 2).deletionLimit("org", "abc"));
@@ -97,7 +96,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testNormalizedPath() {
-    final File root = tmpFolder.getRoot();
+    final File root = tmpFolder;
     assertEquals(root.getAbsolutePath(), new AssetStoreDirectory(root.getPath() + "/./sub/..", 0).getPath());
     assertThrows(IllegalArgumentException.class, () -> new AssetStoreDirectory(root.getPath(), -1));
   }
@@ -143,7 +142,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testMarkerIsWrittenForEmptyDirectory() throws Exception {
-    final File root = tmpFolder.newFolder();
+    final File root = Files.createTempDirectory(tmpFolder.toPath(), "junit").toFile();
     final AssetStoreDirectory directory = new AssetStoreDirectory(root.getPath(), 2);
     assertEquals(Optional.empty(), directory.readMarker());
 
@@ -159,7 +158,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testMarkerIgnoresMountPointDirectories() throws Exception {
-    final File root = tmpFolder.newFolder();
+    final File root = Files.createTempDirectory(tmpFolder.toPath(), "junit").toFile();
     assertTrue(new File(root, "lost+found").mkdir());
     assertTrue(new File(root, ".snapshot").mkdir());
     assertTrue(new File(root, "some-file").createNewFile());
@@ -170,7 +169,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testMarkerMismatch() throws Exception {
-    final File root = tmpFolder.newFolder();
+    final File root = Files.createTempDirectory(tmpFolder.toPath(), "junit").toFile();
     new AssetStoreDirectory(root.getPath(), 2).verifyOrWriteMarker();
 
     assertThrows(ConfigurationException.class, () -> new AssetStoreDirectory(root.getPath(), 3).verifyOrWriteMarker());
@@ -179,7 +178,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testMarkerForLegacyData() throws Exception {
-    final File root = tmpFolder.newFolder();
+    final File root = Files.createTempDirectory(tmpFolder.toPath(), "junit").toFile();
     assertTrue(new File(root, "mh_default_org/some-media-package/0").mkdirs());
 
     // Existing data without a marker file is in the flat layout
@@ -192,7 +191,7 @@ public class AssetStoreDirectoryTest {
 
   @Test
   public void testInvalidMarker() throws Exception {
-    final File root = tmpFolder.newFolder();
+    final File root = Files.createTempDirectory(tmpFolder.toPath(), "junit").toFile();
     final AssetStoreDirectory directory = new AssetStoreDirectory(root.getPath(), 0);
 
     Files.writeString(new File(root, AssetStoreDirectory.MARKER_FILE).toPath(), "");

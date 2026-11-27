@@ -30,8 +30,8 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
@@ -43,9 +43,9 @@ public class TrackSupportTest {
     t.addStream(new AudioStreamImpl("audio-1"));
     t.addStream(new VideoStreamImpl("video-1"));
     t.addStream(new SubtitleStreamImpl("subtitle-1"));
-    Assert.assertEquals(1, TrackSupport.byType(t.getStreams(), AudioStream.class).length);
-    Assert.assertEquals(1, TrackSupport.byType(t.getStreams(), VideoStream.class).length);
-    Assert.assertEquals(1, TrackSupport.byType(t.getStreams(), SubtitleStreamImpl.class).length);
-    Assert.assertEquals(3, TrackSupport.byType(t.getStreams(), Stream.class).length);
+    Assertions.assertEquals(1, TrackSupport.byType(t.getStreams(), AudioStream.class).length);
+    Assertions.assertEquals(1, TrackSupport.byType(t.getStreams(), VideoStream.class).length);
+    Assertions.assertEquals(1, TrackSupport.byType(t.getStreams(), SubtitleStreamImpl.class).length);
+    Assertions.assertEquals(3, TrackSupport.byType(t.getStreams(), Stream.class).length);
   }
 }

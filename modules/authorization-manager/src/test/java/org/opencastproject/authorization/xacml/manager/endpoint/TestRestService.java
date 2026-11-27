@@ -58,7 +58,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Optional;
 
@@ -68,7 +68,7 @@ import javax.ws.rs.Path;
 // use base path /test to prevent conflicts with the production service
 @Path("/test")
 // put @Ignore here to prevent maven surefire from complaining about missing test methods
-@Ignore
+@Disabled
 public class TestRestService extends AbstractAclServiceRestEndpoint {
 
   // Declare this dependency static since the TestRestService gets instantiated multiple times.

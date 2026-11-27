@@ -32,9 +32,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class ExecuteServiceImplTest {
   private static String configKey1;
   private static String configKey2;
 
-  @BeforeClass
+  @BeforeAll
   public static void prepareTest() throws URISyntaxException, NotFoundException, IOException,
           ServiceRegistryException {
     // Get the base directory
@@ -116,7 +116,7 @@ public class ExecuteServiceImplTest {
 
     try {
       executor.doProcess(params, (MediaPackageElement) null, null, null);
-      Assert.fail("The input element should never be null");
+      Assertions.fail("The input element should never be null");
     } catch (NullPointerException e) {
       // This exception is expected
     }
@@ -132,7 +132,7 @@ public class ExecuteServiceImplTest {
 
     String result = executor.doProcess(params, element, null, null);
 
-    Assert.assertEquals(result, "");
+    Assertions.assertEquals(result, "");
   }
 
   @Test
@@ -145,7 +145,7 @@ public class ExecuteServiceImplTest {
     String result = executor.doProcess(params, mp, null, null);
 
     // If it doesn't get a file not found, it is ok
-    Assert.assertEquals(result, "");
+    Assertions.assertEquals(result, "");
   }
 
   @Test
@@ -158,6 +158,6 @@ public class ExecuteServiceImplTest {
     String result = executor.doProcess(params, mp, null, null);
 
     // If it doesn't get a file not found, it is ok
-    Assert.assertEquals(result, "");
+    Assertions.assertEquals(result, "");
   }
 }

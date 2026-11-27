@@ -51,9 +51,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,7 +73,7 @@ public class OaiPmhPublicationServiceImplTest {
   private OaiPmhPublicationServiceImpl service = null;
   private ServiceRegistryInMemoryImpl serviceRegistry = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     mp = MediaPackageSupport.loadFromClassPath("/mediapackage.xml");
     mp2 = MediaPackageSupport.loadFromClassPath("/mediapackage2.xml");
@@ -166,23 +166,23 @@ public class OaiPmhPublicationServiceImplTest {
     Job j = service.publish(mp, "default",
             Set.of("catalog-1", "catalog-2", "track-1"), Set.of("track-1"), true);
 
-    Assert.assertSame(dummyJob, j);
+    Assertions.assertSame(dummyJob, j);
     List<String> jobArgs = jobArgsCapture.getValue();
     // test job arguments
-    Assert.assertEquals(5, jobArgs.size());
-    Assert.assertTrue(jobArgs.get(0).contains("<mediapackage "));
-    Assert.assertEquals("default", jobArgs.get(1));
+    Assertions.assertEquals(5, jobArgs.size());
+    Assertions.assertTrue(jobArgs.get(0).contains("<mediapackage "));
+    Assertions.assertEquals("default", jobArgs.get(1));
     String downloadDistributionIdsArg = jobArgs.get(2);
-    Assert.assertNotNull(downloadDistributionIdsArg);
-    Assert.assertTrue(downloadDistributionIdsArg.contains("catalog-1"));
-    Assert.assertTrue(downloadDistributionIdsArg.contains("catalog-2"));
-    Assert.assertTrue(downloadDistributionIdsArg.contains("track-1"));
+    Assertions.assertNotNull(downloadDistributionIdsArg);
+    Assertions.assertTrue(downloadDistributionIdsArg.contains("catalog-1"));
+    Assertions.assertTrue(downloadDistributionIdsArg.contains("catalog-2"));
+    Assertions.assertTrue(downloadDistributionIdsArg.contains("track-1"));
     String streamingDistributionIdsArg = jobArgs.get(3);
-    Assert.assertNotNull(streamingDistributionIdsArg);
-    Assert.assertTrue(!streamingDistributionIdsArg.contains("catalog-1"));
-    Assert.assertTrue(!streamingDistributionIdsArg.contains("catalog-2"));
-    Assert.assertTrue(streamingDistributionIdsArg.contains("track-1"));
-    Assert.assertTrue(BooleanUtils.toBoolean(jobArgs.get(4)));
+    Assertions.assertNotNull(streamingDistributionIdsArg);
+    Assertions.assertTrue(!streamingDistributionIdsArg.contains("catalog-1"));
+    Assertions.assertTrue(!streamingDistributionIdsArg.contains("catalog-2"));
+    Assertions.assertTrue(streamingDistributionIdsArg.contains("track-1"));
+    Assertions.assertTrue(BooleanUtils.toBoolean(jobArgs.get(4)));
   }
 
   @Test
@@ -199,12 +199,12 @@ public class OaiPmhPublicationServiceImplTest {
 
     Job j = service.retract(mp2, "default");
 
-    Assert.assertSame(dummyJob, j);
+    Assertions.assertSame(dummyJob, j);
     // test job arguments
     List<String> jobArgs = jobArgsCapture.getValue();
-    Assert.assertEquals(2, jobArgs.size());
-    Assert.assertTrue(jobArgs.get(0).contains("<mediapackage "));
-    Assert.assertEquals("default", jobArgs.get(1));
+    Assertions.assertEquals(2, jobArgs.size());
+    Assertions.assertTrue(jobArgs.get(0).contains("<mediapackage "));
+    Assertions.assertEquals("default", jobArgs.get(1));
   }
 
   @Test
@@ -223,14 +223,14 @@ public class OaiPmhPublicationServiceImplTest {
     Set<String> tagsSet = Set.of("archive", "other");
     Job j = service.updateMetadata(mp, "default", flavorsSet, tagsSet, true);
 
-    Assert.assertSame(dummyJob, j);
+    Assertions.assertSame(dummyJob, j);
     // test job arguments
     List<String> jobArgs = jobArgsCapture.getValue();
-    Assert.assertEquals(5, jobArgs.size());
-    Assert.assertTrue(jobArgs.get(0).contains("<mediapackage "));
-    Assert.assertEquals("default", jobArgs.get(1));
-    Assert.assertEquals(StringUtils.join(flavorsSet, OaiPmhPublicationServiceImpl.SEPARATOR), jobArgs.get(2));
-    Assert.assertEquals(StringUtils.join(tagsSet, OaiPmhPublicationServiceImpl.SEPARATOR), jobArgs.get(3));
-    Assert.assertTrue(Boolean.valueOf(jobArgs.get(4)));
+    Assertions.assertEquals(5, jobArgs.size());
+    Assertions.assertTrue(jobArgs.get(0).contains("<mediapackage "));
+    Assertions.assertEquals("default", jobArgs.get(1));
+    Assertions.assertEquals(StringUtils.join(flavorsSet, OaiPmhPublicationServiceImpl.SEPARATOR), jobArgs.get(2));
+    Assertions.assertEquals(StringUtils.join(tagsSet, OaiPmhPublicationServiceImpl.SEPARATOR), jobArgs.get(3));
+    Assertions.assertTrue(Boolean.valueOf(jobArgs.get(4)));
   }
 }

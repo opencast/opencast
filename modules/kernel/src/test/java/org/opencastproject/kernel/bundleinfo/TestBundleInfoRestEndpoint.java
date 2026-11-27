@@ -21,12 +21,12 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestBundleInfoRestEndpoint extends BundleInfoRestEndpoint {
   private final BundleInfoDb db = BundleInfoRestEndpointTest.bundleInfo;
 

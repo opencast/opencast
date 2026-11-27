@@ -20,6 +20,7 @@
  */
 package org.opencastproject.transcription.googlespeech;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -67,10 +68,10 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -120,7 +121,7 @@ public class GoogleSpeechTranscriptionServiceTest {
   private Dictionary<String, Object> props = new Hashtable<String, Object>();
   private ComponentContext cc;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -220,7 +221,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     service.setSmtpService(smtpService);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -248,30 +249,32 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
-    Assert.assertEquals("https://speech.googleapis.com/v1/speech:longrunningrecognize",
+    Assertions.assertEquals("https://speech.googleapis.com/v1/speech:longrunningrecognize",
             capturedPost.getValue().getUri().toString());
 
     TranscriptionJobControl j = database.findByJob(JOB_ID);
-    Assert.assertNotNull(j);
-    Assert.assertEquals(MP_ID, j.getMediaPackageId());
-    Assert.assertEquals(TRACK_ID, j.getTrackId());
-    Assert.assertEquals(TranscriptionJobControl.Status.InProgress.name(), j.getStatus());
+    Assertions.assertNotNull(j);
+    Assertions.assertEquals(MP_ID, j.getMediaPackageId());
+    Assertions.assertEquals(TRACK_ID, j.getTrackId());
+    Assertions.assertEquals(TranscriptionJobControl.Status.InProgress.name(), j.getStatus());
   }
 
-  @Test(expected = TranscriptionServiceException.class)
+  @Test
   public void testCreateRecognitionsJobErrors() throws Exception {
-    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
-    EasyMock.replay(workspace);
+    assertThrows(TranscriptionServiceException.class, () -> {
+      EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
+      EasyMock.replay(workspace);
 
-    ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
-    EasyMock.replay(response);
+      ClassicHttpResponse response = EasyMock.createNiceMock(ClassicHttpResponse.class);
+      EasyMock.replay(response);
 
-    Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
-    EasyMock.replay(httpClient);
+      Capture<HttpPost> capturedPost = Capture.newInstance();
+      EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
+          .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+      EasyMock.replay(httpClient);
 
-    service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
+      service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"), LANGUAGE_CODE);
+    });
   }
 
   @Test
@@ -293,13 +296,13 @@ public class GoogleSpeechTranscriptionServiceTest {
     long after = System.currentTimeMillis();
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
-    Assert.assertNotNull(job.getDateCompleted());
-    Assert.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
+    Assertions.assertNotNull(job.getDateCompleted());
+    Assertions.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
     // Check if results were saved into a collection
-    Assert.assertEquals(GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
-    Assert.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
+    Assertions.assertEquals(GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
+    Assertions.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
   }
 
   @Test
@@ -313,9 +316,9 @@ public class GoogleSpeechTranscriptionServiceTest {
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
-    Assert.assertNull(job.getDateCompleted());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assertions.assertNull(job.getDateCompleted());
 
   }
 
@@ -349,17 +352,17 @@ public class GoogleSpeechTranscriptionServiceTest {
     service.getAndSaveJobResults(JOB_ID);
     long after = System.currentTimeMillis();
     // Check if correct url was invoked
-    Assert.assertEquals(RESULT_URL + JOB_ID,
+    Assertions.assertEquals(RESULT_URL + JOB_ID,
             capturedGet.getValue().getUri().toString());
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
-    Assert.assertNotNull(job.getDateCompleted());
-    Assert.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.TranscriptionComplete.name(), job.getStatus());
+    Assertions.assertNotNull(job.getDateCompleted());
+    Assertions.assertTrue(before <= job.getDateCompleted().getTime() && job.getDateCompleted().getTime() <= after);
     // Check if results were saved into a collection
-    Assert.assertEquals(GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
-    Assert.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
+    Assertions.assertEquals(GoogleSpeechTranscriptionService.TRANSCRIPT_COLLECTION, capturedCollection.getValue());
+    Assertions.assertEquals(JOB_ID + ".json", capturedFileName.getValue());
   }
 
   @Test
@@ -374,10 +377,10 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     String token = service.refreshAccessToken(CLIENT_ID, CLIENT_SECRET, CLIENT_TOKEN);
-    Assert.assertEquals("client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET
+    Assertions.assertEquals("client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET
             + "&refresh_token=" + CLIENT_TOKEN + "&grant_type=refresh_token",
             capturedPost.getValue().getUri().getQuery());
-    Assert.assertEquals("-1", token);
+    Assertions.assertEquals("-1", token);
   }
 
   @Test
@@ -394,7 +397,7 @@ public class GoogleSpeechTranscriptionServiceTest {
     try {
       service.getAndSaveJobResults(JOB_ID);
     } catch (TranscriptionServiceException e) {
-      Assert.assertEquals(503, e.getCode());
+      Assertions.assertEquals(503, e.getCode());
     }
   }
 
@@ -417,9 +420,9 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(workspace);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null, Track.TYPE);
-    Assert.assertEquals("captions", mpe.getFlavor().getType());
-    Assert.assertEquals("google-speech-json", mpe.getFlavor().getSubtype());
-    Assert.assertEquals(uri.toString(), mpe.getURI().toString());
+    Assertions.assertEquals("captions", mpe.getFlavor().getType());
+    Assertions.assertEquals("google-speech-json", mpe.getFlavor().getSubtype());
+    Assertions.assertEquals(uri.toString(), mpe.getURI().toString());
   }
 
   @Test
@@ -455,9 +458,9 @@ public class GoogleSpeechTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID, Track.TYPE);
-    Assert.assertEquals("captions", mpe.getFlavor().getType());
-    Assert.assertEquals("google-speech-json", mpe.getFlavor().getSubtype());
-    Assert.assertEquals(uri.toString(), mpe.getURI().toString());
+    Assertions.assertEquals("captions", mpe.getFlavor().getType());
+    Assertions.assertEquals("google-speech-json", mpe.getFlavor().getSubtype());
+    Assertions.assertEquals(uri.toString(), mpe.getURI().toString());
   }
 
   @Test
@@ -477,13 +480,13 @@ public class GoogleSpeechTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if only one mp has a workflow created for it
-    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assertions.assertEquals(1, capturedMpIds.getValue().size());
     // And if it was the correct one
-    Assert.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
+    Assertions.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
     // Check if status in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
   }
 
   @Test
@@ -521,16 +524,16 @@ public class GoogleSpeechTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals(RESULT_URL + JOB_ID,
+    Assertions.assertEquals(RESULT_URL + JOB_ID,
             capturedGet.getValue().getUri().toString());
     // Check if only one mp has a workflow created for it
-    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assertions.assertEquals(1, capturedMpIds.getValue().size());
     // And if it was the correct one
-    Assert.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
+    Assertions.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
     // Check if status in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
-    Assert.assertNotNull(job);
-    Assert.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
+    Assertions.assertNotNull(job);
+    Assertions.assertEquals(TranscriptionJobControl.Status.Closed.name(), job.getStatus());
   }
 
   private Capture<Set<String>> mockAssetManagerAndWorkflow(String wfDefId, boolean wfStarted)

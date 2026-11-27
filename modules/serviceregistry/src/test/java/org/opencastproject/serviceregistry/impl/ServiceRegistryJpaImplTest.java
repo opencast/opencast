@@ -21,8 +21,8 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -56,14 +56,12 @@ import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -114,13 +112,12 @@ public class ServiceRegistryJpaImplTest {
   private static final long JOB_BARRIER_TIMEOUT = 100L; //in ms
   private static final long DISPATCH_START_DELAY = 10L; //in ms
 
-  @Rule public TestWatcher watcher = new TestWatcher() {
-      protected void starting(Description description) {
-      logger.info("Test '{}' is about to start ...", description.getMethodName());
-    }
-  };
+  @BeforeEach
+  public void logTestStart(TestInfo testInfo) {
+    logger.info("Test '{}' is about to start ...", testInfo.getDisplayName());
+  }
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpOnce() throws Exception {
     // Setup JPA context
     setUpEntityManagerFactory();
@@ -131,7 +128,7 @@ public class ServiceRegistryJpaImplTest {
     setUpServiceRegistryJpaImpl();
   }
 
-  @Before
+  @BeforeEach
   public void cleanBeforeEach() throws ServiceRegistryException, NotFoundException, ConfigurationException {
     logger.debug("start clean before each");
     // reset the scheduledExecutor
@@ -161,7 +158,7 @@ public class ServiceRegistryJpaImplTest {
     logger.debug("end clean before each");
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDownAfterAll() throws ServiceRegistryException {
     logger.debug("About to deactivate after all tests");
     serviceRegistryJpaImpl.deactivate();
@@ -256,7 +253,7 @@ public class ServiceRegistryJpaImplTest {
       serviceRegistryJpaImpl.activate(null, new HashMap<>());
       jobDispatcher.activate(cc);
     } catch (ConfigurationException e) {
-      Assert.fail("Job dispatcher activation failed" + e);
+      Assertions.fail("Job dispatcher activation failed" + e);
     }
   }
 
@@ -321,9 +318,10 @@ public class ServiceRegistryJpaImplTest {
     }
   }
 
-  @Test(expected = NotFoundException.class)
+  @Test
   public void testDeleteJobInvalidJobId() throws Exception {
-    serviceRegistryJpaImpl.removeJobs(Collections.singletonList(1L));
+    assertThrows(NotFoundException.class, () ->
+        serviceRegistryJpaImpl.removeJobs(Collections.singletonList(1L)));
   }
 
   @Test
@@ -352,9 +350,9 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not receive a timeout exception");
+      Assertions.fail("Did not receive a timeout exception");
     } catch (Exception e) {
-      Assert.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
+      Assertions.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
     }
   }
 
@@ -366,9 +364,9 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not receive a timeout exception");
+      Assertions.fail("Did not receive a timeout exception");
     } catch (Exception e) {
-      Assert.assertEquals(0, jobDispatcher.dispatchPriorityList.size());
+      Assertions.assertEquals(0, jobDispatcher.dispatchPriorityList.size());
     } finally {
       // extra clean up
       serviceRegistryJpaImpl.unRegisterService(TEST_SERVICE_3, TEST_HOST);
@@ -383,9 +381,9 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not receive a timeout exception");
+      Assertions.fail("Did not receive a timeout exception");
     } catch (Exception e) {
-      Assert.assertEquals(0, jobDispatcher.dispatchPriorityList.size());
+      Assertions.assertEquals(0, jobDispatcher.dispatchPriorityList.size());
     } finally {
       logger.debug("end testHostsBeingRemovedFromPriorityList");
     }
@@ -400,7 +398,7 @@ public class ServiceRegistryJpaImplTest {
     launchDispatcherOnce(false);
     try {
       barrier.waitForJobs(JOB_BARRIER_TIMEOUT);
-      Assert.fail("Did not receive a timeout exception");
+      Assertions.fail("Did not receive a timeout exception");
     } catch (Exception e) {
       logger.debug("job1: '{}'", serviceRegistryJpaImpl.getJob(testJob.getId()));
       logger.debug("job2: '{}'", serviceRegistryJpaImpl.getJob(testJob2.getId()));
@@ -409,20 +407,20 @@ public class ServiceRegistryJpaImplTest {
       }
       // Mock http client always returns 503 for this path so it won't be dispatched anyway
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
-      Assert.assertTrue("First job should not have a processing host",
-          StringUtils.isBlank(testJob.getProcessingHost()));
-      Assert.assertEquals("First job is queued", Job.Status.QUEUED, testJob.getStatus());
+      Assertions.assertTrue(StringUtils.isBlank(testJob.getProcessingHost()),
+          "First job should not have a processing host");
+      Assertions.assertEquals(Job.Status.QUEUED, testJob.getStatus(), "First job is queued");
 
       // Mock http client always returns 204 for this path, but it should not be dispatched
       // because the host is in the dispatchPriorityList
       testJob2 = serviceRegistryJpaImpl.getJob(testJob2.getId());
-      Assert.assertTrue("Second job should not have a processing host",
-          StringUtils.isBlank(testJob2.getProcessingHost()));
-      Assert.assertEquals("Second job is queued", Job.Status.QUEUED, testJob2.getStatus());
+      Assertions.assertTrue(StringUtils.isBlank(testJob2.getProcessingHost()),
+          "Second job should not have a processing host");
+      Assertions.assertEquals(Job.Status.QUEUED, testJob2.getStatus(), "Second job is queued");
 
-      Assert.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
+      Assertions.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
       String blockingHost = jobDispatcher.dispatchPriorityList.get(testJob2.getId());
-      Assert.assertEquals(TEST_HOST, blockingHost);
+      Assertions.assertEquals(TEST_HOST, blockingHost);
     } finally {
       logger.debug("end testIgnoreHostsInPriorityList");
     }
@@ -436,22 +434,22 @@ public class ServiceRegistryJpaImplTest {
     k.setStatus(Status.RUNNING);
     serviceRegistryJpaImpl.updateJob(k);
     SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoadsQuery().apply(emf.createEntityManager());
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a,
-            hostloads.get(TEST_HOST).getCurrentLoad()), hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a,
-            hostloads.get(TEST_HOST).getCurrentLoad()), hostloads.get(TEST_HOST).getCurrentLoad() - a < 0.1f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b,
-            hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
-            hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b >= 0.0f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b,
-            hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
-            hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b < 0.1f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c,
-            hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
-            hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c >= 0.0f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c,
-            hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
-            hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c < 0.1f);
+    Assertions.assertTrue(hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f,
+        String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()));
+    Assertions.assertTrue(hostloads.get(TEST_HOST).getCurrentLoad() - a < 0.1f,
+        String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()));
+    Assertions.assertTrue(hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b >= 0.0f,
+            String.format("Host load is incorrect, should be %f, is %f", b,
+            hostloads.get(TEST_HOST_OTHER).getCurrentLoad()));
+    Assertions.assertTrue(hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b < 0.1f,
+            String.format("Host load is incorrect, should be %f, is %f", b,
+            hostloads.get(TEST_HOST_OTHER).getCurrentLoad()));
+    Assertions.assertTrue(hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c >= 0.0f,
+            String.format("Host load is incorrect, should be %f, is %f", c,
+            hostloads.get(TEST_HOST_THIRD).getCurrentLoad()));
+    Assertions.assertTrue(hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c < 0.1f,
+            String.format("Host load is incorrect, should be %f, is %f", c,
+            hostloads.get(TEST_HOST_THIRD).getCurrentLoad()));
   }
 
   @Test
@@ -495,7 +493,7 @@ public class ServiceRegistryJpaImplTest {
     Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
     job.setStatus(Job.Status.FAILED);
     Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
-    Assert.assertNotNull(updatedJob.getDateCompleted());
+    Assertions.assertNotNull(updatedJob.getDateCompleted());
   }
 
   @Test
@@ -503,8 +501,8 @@ public class ServiceRegistryJpaImplTest {
     Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
     job.setStatus(Job.Status.FINISHED);
     Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
-    Assert.assertNotNull(updatedJob.getDateCompleted());
-    Assert.assertNotNull(updatedJob.getRunTime());
+    Assertions.assertNotNull(updatedJob.getDateCompleted());
+    Assertions.assertNotNull(updatedJob.getRunTime());
   }
 
   @Test
@@ -517,7 +515,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.updateJob(job);
 
     ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.NORMAL, service.getServiceState());
+    Assertions.assertEquals(ServiceState.NORMAL, service.getServiceState());
   }
 
   @Test
@@ -536,7 +534,7 @@ public class ServiceRegistryJpaImplTest {
     job.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job);
     ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, service.getServiceState());
 
     // second job takes service to error state
     Job job2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
@@ -545,7 +543,7 @@ public class ServiceRegistryJpaImplTest {
     job2.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job2);
     service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.ERROR, service.getServiceState());
+    Assertions.assertEquals(ServiceState.ERROR, service.getServiceState());
   }
 
   @Test
@@ -564,7 +562,7 @@ public class ServiceRegistryJpaImplTest {
     job.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job);
     ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, service.getServiceState());
 
     // error state isn't entered
     Job job2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
@@ -573,7 +571,7 @@ public class ServiceRegistryJpaImplTest {
     job2.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job2);
     service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, service.getServiceState());
   }
 
   @Test
@@ -595,7 +593,7 @@ public class ServiceRegistryJpaImplTest {
     job.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job);
     ServiceRegistration service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.WARNING, service.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, service.getServiceState());
 
     Job job2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, new ArrayList(
             Arrays.asList("a", "b", "c")), null, true, null, 1.0f);
@@ -603,7 +601,7 @@ public class ServiceRegistryJpaImplTest {
     job2.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job2);
     service = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE, TEST_HOST);
-    Assert.assertEquals(ServiceState.ERROR, service.getServiceState());
+    Assertions.assertEquals(ServiceState.ERROR, service.getServiceState());
 
     // but not for the configured service
     Job job3 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_PATH, new ArrayList(
@@ -612,7 +610,7 @@ public class ServiceRegistryJpaImplTest {
     job3.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job3);
     ServiceRegistration service2 = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE_2, TEST_HOST);
-    Assert.assertEquals(ServiceState.WARNING, service2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, service2.getServiceState());
 
     Job job4 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_PATH, new ArrayList(
             Arrays.asList("a", "b", "c")), null, true, null, 1.0f);
@@ -620,7 +618,7 @@ public class ServiceRegistryJpaImplTest {
     job4.setProcessingHost(TEST_HOST);
     serviceRegistryJpaImpl.updateJob(job4);
     service2 = serviceRegistryJpaImpl.getServiceRegistration(TEST_SERVICE_2, TEST_HOST);
-    Assert.assertEquals(ServiceState.WARNING, service2.getServiceState());
+    Assertions.assertEquals(ServiceState.WARNING, service2.getServiceState());
   }
 
   @Test
@@ -631,7 +629,7 @@ public class ServiceRegistryJpaImplTest {
     Date dateCompleted = updatedJob.getDateCompleted();
     Long runTime = updatedJob.getRunTime();
     updatedJob = serviceRegistryJpaImpl.updateJob(updatedJob);
-    Assert.assertEquals(dateCompleted, updatedJob.getDateCompleted());
-    Assert.assertEquals(runTime, updatedJob.getRunTime());
+    Assertions.assertEquals(dateCompleted, updatedJob.getDateCompleted());
+    Assertions.assertEquals(runTime, updatedJob.getRunTime());
   }
 }

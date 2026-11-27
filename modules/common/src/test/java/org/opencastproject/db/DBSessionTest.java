@@ -21,15 +21,16 @@
 
 package org.opencastproject.db;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.db.Queries.namedQuery;
 
 import org.eclipse.persistence.exceptions.DatabaseException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,12 +42,12 @@ import javax.persistence.RollbackException;
 public class DBSessionTest {
   private DBSession db;
 
-  @Before
+  @BeforeEach
   public void before() {
     db = newDBSession("test");
   }
 
-  @After
+  @AfterEach
   public void after() {
     db.close();
   }
@@ -83,11 +84,12 @@ public class DBSessionTest {
     db.execTx(EntityManager::close);
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testException() {
-    db.execTx((Consumer<EntityManager>) em -> {
-      throw new RuntimeException("error");
-    });
+    assertThrows(RuntimeException.class, () ->
+        db.execTx((Consumer<EntityManager>) em -> {
+          throw new RuntimeException("error");
+        }));
   }
 
   @Test
@@ -122,7 +124,7 @@ public class DBSessionTest {
       // nested transaction. if transaction propagation would fail a duplicate key exception would be thrown
       return save(dto);
     });
-    assertEquals("dto value", "B", db.execTx(namedQuery.findById(TestDto.class, id)).getValue());
+    assertEquals("B", db.execTx(namedQuery.findById(TestDto.class, id)).getValue(), "dto value");
   }
 
   private long save(TestDto dto) {

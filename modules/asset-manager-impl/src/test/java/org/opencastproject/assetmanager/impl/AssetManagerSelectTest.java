@@ -23,9 +23,9 @@ package org.opencastproject.assetmanager.impl;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.Availability;
@@ -39,7 +39,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,15 +61,16 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     assertThat("Snapshot should belong to the default organization",
                snapshot.getOrganizationId(), equalTo(DefaultOrganization.DEFAULT_ORGANIZATION_ID));
     final Optional<Asset> asset = am.getAsset(version, mp.getIdentifier().toString(), mpe.getIdentifier());
-    assertTrue("Asset should be found", asset.isPresent());
-    assertEquals("Media package element part of the asset ID should equal the element's ID",
-                 mpe.getIdentifier(), asset.get().getId().getMediaPackageElementId());
-    assertEquals("Mime types should equal", mpe.getMimeType(), asset.get().getMimeType().get());
-    assertFalse("Asset should not be found", am.getAsset(version, "id", "id").isPresent());
+    assertTrue(asset.isPresent(), "Asset should be found");
+    assertEquals(mpe.getIdentifier(),
+                 asset.get().getId().getMediaPackageElementId(),
+                 "Media package element part of the asset ID should equal the element's ID");
+    assertEquals(mpe.getMimeType(), asset.get().getMimeType().get(), "Mime types should equal");
+    assertFalse(am.getAsset(version, "id", "id").isPresent(), "Asset should not be found");
     // try to find the catalog of the media package by checksum
     final MediaPackage mpCopy = MediaPackageSupport.copy(mp);
     am.calcChecksumsForMediaPackageElements(AssetManagerImpl.assetsOnly(mpCopy));
-    assertEquals("Media package should be set up with a single catalog", 1, mpCopy.getCatalogs().length);
+    assertEquals(1, mpCopy.getCatalogs().length, "Media package should be set up with a single catalog");
   }
 
   @Test
@@ -78,14 +79,14 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     final MediaPackageElement mpe = mkCatalog();
     mp1.add(mpe);
     am.takeSnapshot(OWNER, mp1);
-    assertEquals("No properties should be found",
-        0, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+    assertEquals(0,
+        am.selectProperties(mp1.getIdentifier().toString(), null).size(), "No properties should be found");
 
     logger.info("Set property on first episode");
     am.setProperty(Property.mk(PropertyId.mk(mp1.getIdentifier().toString(), "org.opencastproject.service", "count"),
         Value.mk(10L)));
-    assertEquals("One property should be found",
-        1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+    assertEquals(1,
+        am.selectProperties(mp1.getIdentifier().toString(), null).size(), "One property should be found");
 
     logger.info("Add another media package with some properties of the same namespace");
     final MediaPackage mp2 = mkMediaPackage(mkCatalog());
@@ -97,15 +98,17 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.takeSnapshot(OWNER, mkMediaPackage(mkCatalog()));
 
 
-    assertEquals("One property should be found",
-        1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
-    assertEquals("Three properties should be found",
-        3, am.selectProperties(mp2.getIdentifier().toString(), null).size());
+    assertEquals(1,
+        am.selectProperties(mp1.getIdentifier().toString(), null).size(), "One property should be found");
+    assertEquals(3,
+        am.selectProperties(mp2.getIdentifier().toString(), null).size(), "Three properties should be found");
 
-    assertEquals("One property should be found",
-        1, am.selectProperties(mp1.getIdentifier().toString(), "org.opencastproject.service").size());
-    assertEquals("Three properties should be found",
-        3, am.selectProperties(mp2.getIdentifier().toString(), p.getNamespace()).size());
+    assertEquals(1,
+        am.selectProperties(mp1.getIdentifier().toString(), "org.opencastproject.service").size(),
+        "One property should be found");
+    assertEquals(3,
+        am.selectProperties(mp2.getIdentifier().toString(), p.getNamespace()).size(),
+        "Three properties should be found");
   }
 
   @Test
@@ -118,10 +121,10 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
         Value.mk("value-2")));
     {
       List<Property> properties = am.selectProperties(mp.getIdentifier().toString(), "namespace-1");
-      assertEquals("One property should be returned", 1, properties.size());
-      assertEquals("Property of namespace-1 should be returned",
-                   PropertyId.mk(mp.getIdentifier().toString(), "namespace-1", "prop-1"),
-          properties.stream().findFirst().get().getId());
+      assertEquals(1, properties.size(), "One property should be returned");
+      assertEquals(PropertyId.mk(mp.getIdentifier().toString(), "namespace-1", "prop-1"),
+                   properties.stream().findFirst().get().getId(),
+          "Property of namespace-1 should be returned");
     }
   }
 
@@ -132,8 +135,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
 
     List<Snapshot> snapshots = am.getSnapshotsById(mp1.getIdentifier().toString());
     List<Property> properties = am.selectProperties(mp1.getIdentifier().toString(), null);
-    assertEquals("One snapshot should be found", 1, snapshots.size());
-    assertEquals("No properties should be found", 0, properties.size());
+    assertEquals(1, snapshots.size(), "One snapshot should be found");
+    assertEquals(0, properties.size(), "No properties should be found");
 
   }
 
@@ -145,8 +148,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.takeSnapshot(OWNER, mp1);
     am.takeSnapshot(OWNER, mp1);
     am.takeSnapshot(OWNER, mp1);
-    assertEquals("4 records should be found",
-        4, am.getSnapshotsById(mp1.getIdentifier().toString()).size());
+    assertEquals(4,
+        am.getSnapshotsById(mp1.getIdentifier().toString()).size(), "4 records should be found");
 
     final Version latest;
     List<Snapshot> descSnapshots = am.getSnapshotsByIdOrderedByVersion(mp1.getIdentifier().toString(), false);
@@ -155,12 +158,12 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     List<Snapshot> ascSnapshots = am.getSnapshotsByIdOrderedByVersion(mp1.getIdentifier().toString(), true);
     first = ascSnapshots.get(0).getVersion();
 
-    assertTrue("The first version should be older", first.isOlder(latest));
-    assertTrue("The last version should be younger", latest.isYounger(first));
-    assertFalse("The versions should not be equal", latest.equals(first));
+    assertTrue(first.isOlder(latest), "The first version should be older");
+    assertTrue(latest.isYounger(first), "The last version should be younger");
+    assertFalse(latest.equals(first), "The versions should not be equal");
 
-    assertEquals("4 records should be found", 4, descSnapshots.size());
-    assertEquals("4 records should be found", 4, ascSnapshots.size());
+    assertEquals(4, descSnapshots.size(), "4 records should be found");
+    assertEquals(4, ascSnapshots.size(), "4 records should be found");
   }
 
   @Test
@@ -315,9 +318,9 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
         mp1.getIdentifier().toString(), start, end, true);
     first = ascSnapshots.get(0).getVersion();
 
-    assertTrue("The first version should be older", first.isOlder(latest));
-    assertTrue("The last version should be younger", latest.isYounger(first));
-    assertFalse("The versions should not be equal", latest.equals(first));
+    assertTrue(first.isOlder(latest), "The first version should be older");
+    assertTrue(latest.isYounger(first), "The last version should be younger");
+    assertFalse(latest.equals(first), "The versions should not be equal");
   }
 
 }

@@ -35,7 +35,7 @@ import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ import java.util.Optional;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestAclEndpoint extends AclEndpoint {
 
   public TestAclEndpoint() throws Exception {

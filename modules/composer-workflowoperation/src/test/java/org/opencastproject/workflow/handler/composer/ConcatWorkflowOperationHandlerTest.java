@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.composer;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -49,9 +51,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ public class ConcatWorkflowOperationHandlerTest {
   private static final String PROFILE_ID = "concat";
   private static final String ENCODED_TRACK_ID = "concatenated-workflow-operation-test-encode-track-id";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -138,8 +140,8 @@ public class ConcatWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+    Assertions.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
   }
 
   @Test
@@ -163,8 +165,8 @@ public class ConcatWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+    Assertions.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
   }
 
   @Test
@@ -184,7 +186,7 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   @Test
@@ -204,19 +206,22 @@ public class ConcatWorkflowOperationHandlerTest {
     createTestFrameRateWithValue("part-1", videoStreams[0].getFrameRate());
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testFrameRateInvalidDigitPartValue() throws Exception {
-    createTestFrameRateWithValue("part-10", Float.MAX_VALUE);
+    assertThrows(WorkflowOperationException.class, () ->
+        createTestFrameRateWithValue("part-10", Float.MAX_VALUE));
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testFrameRateInvalidPartValue() throws Exception {
-    createTestFrameRateWithValue("part-foo", Float.MAX_VALUE);
+    assertThrows(WorkflowOperationException.class, () ->
+        createTestFrameRateWithValue("part-foo", Float.MAX_VALUE));
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testFrameRateInvalidValue() throws Exception {
-    createTestFrameRateWithValue("foo", Float.MAX_VALUE);
+    assertThrows(WorkflowOperationException.class, () ->
+        createTestFrameRateWithValue("foo", Float.MAX_VALUE));
   }
 
   protected void createTestFrameRateWithValue(String frameRateValue, float expectedFrameRateValue) throws Exception {
@@ -240,8 +245,8 @@ public class ConcatWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+    Assertions.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
   }
 
   @Test
@@ -266,8 +271,8 @@ public class ConcatWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+    Assertions.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
   }
 
   @Test
@@ -286,7 +291,7 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   @Test
@@ -307,7 +312,7 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
   }
 
   @Test
@@ -325,13 +330,13 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
 
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracks = mpNew.getTracks(MediaPackageElementFlavor.parseFlavor("presenter/concat"));
-    Assert.assertEquals(1, tracks.length);
-    Assert.assertArrayEquals(StringUtils.split(targetTags, ","), tracks[0].getTags());
+    Assertions.assertEquals(1, tracks.length);
+    Assertions.assertArrayEquals(StringUtils.split(targetTags, ","), tracks[0].getTags());
   }
 
 
@@ -354,8 +359,8 @@ public class ConcatWorkflowOperationHandlerTest {
     // check track metadata
     MediaPackage mpNew = result.getMediaPackage();
     Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
-    Assert.assertArrayEquals(StringUtils.split(targetTags, ","), trackEncoded.getTags());
+    Assertions.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
+    Assertions.assertArrayEquals(StringUtils.split(targetTags, ","), trackEncoded.getTags());
   }
 
   @Test
@@ -378,41 +383,45 @@ public class ConcatWorkflowOperationHandlerTest {
     MediaPackage mpNew = result.getMediaPackage();
     Track[] tracks = mpNew.getTracks(MediaPackageElementFlavor.parseFlavor("presenter/concat"));
     Track trackEncoded = tracks[0]; // mpNew.getTrack(ENCODED_TRACK_ID);
-    Assert.assertArrayEquals(StringUtils.split(targetTags, ","), trackEncoded.getTags());
+    Assertions.assertArrayEquals(StringUtils.split(targetTags, ","), trackEncoded.getTags());
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testConcatNumberedPrefixedFiles() throws Exception {
-    setMockups();
+    assertThrows(WorkflowOperationException.class, () -> {
+      setMockups();
 
-    // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put("source-flavor-part-0", "presentation/source");
-    configurations.put("source-flavor-numbered-files", "*/source");
-    configurations.put("target-flavor", "presenter/concat");
-    configurations.put("encoding-profile", "concat");
-    configurations.put("output-resolution", "1900x1080");
+      // operation configuration
+      Map<String, String> configurations = new HashMap<String, String>();
+      configurations.put("source-flavor-part-0", "presentation/source");
+      configurations.put("source-flavor-numbered-files", "*/source");
+      configurations.put("target-flavor", "presenter/concat");
+      configurations.put("encoding-profile", "concat");
+      configurations.put("output-resolution", "1900x1080");
 
-    // run the operation handler
-    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+      // run the operation handler
+      WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+      Assertions.assertEquals(Action.SKIP, result.getAction());
+    });
   }
 
-  @Test(expected = WorkflowOperationException.class)
+  @Test
   public void testConcatNumberedTaggedFiles() throws Exception {
-    setMockups();
+    assertThrows(WorkflowOperationException.class, () -> {
+      setMockups();
 
-    // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put("source-tags-part-1", "part1");
-    configurations.put("source-flavor-numbered-files", "*/source");
-    configurations.put("target-flavor", "presenter/concat");
-    configurations.put("encoding-profile", "concat");
-    configurations.put("output-resolution", "1900x1080");
+      // operation configuration
+      Map<String, String> configurations = new HashMap<String, String>();
+      configurations.put("source-tags-part-1", "part1");
+      configurations.put("source-flavor-numbered-files", "*/source");
+      configurations.put("target-flavor", "presenter/concat");
+      configurations.put("encoding-profile", "concat");
+      configurations.put("output-resolution", "1900x1080");
 
-    // run the operation handler
-    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+      // run the operation handler
+      WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+      Assertions.assertEquals(Action.SKIP, result.getAction());
+    });
   }
 
   @Test
@@ -429,7 +438,7 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(Action.SKIP, result.getAction());
+    Assertions.assertEquals(Action.SKIP, result.getAction());
   }
 
   private void setMockups() throws EncoderException, MediaPackageException {

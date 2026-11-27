@@ -32,10 +32,10 @@ import com.mchange.v2.c3p0.DataSources;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -61,7 +61,7 @@ public class AwsAssetDatabaseImplTest {
   private static final String AWS_VERSION_1 = "mnop";
   private static final String AWS_VERSION_2 = "qrst";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     long currentTime = System.currentTimeMillis();
     storage = Paths.get("target", "db" + currentTime + ".h2.db").toString();
@@ -77,7 +77,7 @@ public class AwsAssetDatabaseImplTest {
     database.activate(cc);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws SQLException {
     database.deactivate(cc);
     DataSources.destroy(pooledDataSource);
@@ -90,10 +90,10 @@ public class AwsAssetDatabaseImplTest {
     database.storeMapping(path, "archive_path/" + ASSET1_ID, AWS_VERSION_1);
 
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals("archive_path/" + ASSET1_ID, mapping.getObjectKey());
-    Assert.assertEquals(AWS_VERSION_1, mapping.getObjectVersion());
-    Assert.assertNull(mapping.getDeletionDate());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals("archive_path/" + ASSET1_ID, mapping.getObjectKey());
+    Assertions.assertEquals(AWS_VERSION_1, mapping.getObjectVersion());
+    Assertions.assertNull(mapping.getDeletionDate());
   }
 
   @Test
@@ -102,16 +102,16 @@ public class AwsAssetDatabaseImplTest {
     database.storeMapping(path, "archive_path/" + ASSET1_ID, AWS_VERSION_1);
 
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
+    Assertions.assertNotNull(mapping);
 
     database.deleteMapping(path);
     // Mapping row is not deleted, but findMapping should not find it
     mapping = database.findMapping(path);
-    Assert.assertNull(mapping);
+    Assertions.assertNull(mapping);
     // Mapping should have its deletion date set
     List<AwsAssetMapping> mappings = database.findAllByMediaPackage(MP_ID);
-    Assert.assertEquals(1, mappings.size());
-    Assert.assertNotNull(mappings.get(0).getDeletionDate());
+    Assertions.assertEquals(1, mappings.size());
+    Assertions.assertNotNull(mappings.get(0).getDeletionDate());
   }
 
   @Test
@@ -120,10 +120,10 @@ public class AwsAssetDatabaseImplTest {
     database.storeMapping(path, "archive_path/" + ASSET1_ID, AWS_VERSION_1);
 
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals("archive_path/" + ASSET1_ID, mapping.getObjectKey());
-    Assert.assertEquals(AWS_VERSION_1, mapping.getObjectVersion());
-    Assert.assertNull(mapping.getDeletionDate());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals("archive_path/" + ASSET1_ID, mapping.getObjectKey());
+    Assertions.assertEquals(AWS_VERSION_1, mapping.getObjectVersion());
+    Assertions.assertNull(mapping.getDeletionDate());
   }
 
   @Test
@@ -135,10 +135,10 @@ public class AwsAssetDatabaseImplTest {
     database.storeMapping(path, "archive_path/" + ASSET1_ID, AWS_VERSION_1);
 
     List<AwsAssetMapping> mappings = database.findMappingsByKey("archive_path/" + ASSET1_ID);
-    Assert.assertEquals(2, mappings.size());
+    Assertions.assertEquals(2, mappings.size());
     AwsAssetMapping m1 = mappings.get(0);
     AwsAssetMapping m2 = mappings.get(1);
-    Assert.assertTrue(
+    Assertions.assertTrue(
         (ASSET1_ID.equals(m1.getMediaPackageElementId()) && ASSET2_ID.equals(m2.getMediaPackageElementId()))
             || (ASSET2_ID.equals(m1.getMediaPackageElementId()) && ASSET1_ID.equals(m2.getMediaPackageElementId())));
   }
@@ -158,8 +158,8 @@ public class AwsAssetDatabaseImplTest {
     path = new StoragePath(ORG, MP_ID, new VersionImpl(2L), null);
 
     List<AwsAssetMapping> mappings = database.findMappingsByMediaPackageAndVersion(path);
-    Assert.assertEquals(1, mappings.size());
-    Assert.assertEquals(2L, mappings.get(0).getVersion().longValue());
+    Assertions.assertEquals(1, mappings.size());
+    Assertions.assertEquals(2L, mappings.get(0).getVersion().longValue());
   }
 
   @Test
@@ -177,16 +177,16 @@ public class AwsAssetDatabaseImplTest {
     path = new StoragePath(ORG, MP_ID, null, null);
 
     List<AwsAssetMapping> mappings = database.findMappingsByMediaPackageAndVersion(path);
-    Assert.assertEquals(3, mappings.size());
+    Assertions.assertEquals(3, mappings.size());
     // Store versions found in order
     TreeSet<Long> versions = new TreeSet<Long>();
     versions.add(mappings.get(0).getVersion());
     versions.add(mappings.get(1).getVersion());
     versions.add(mappings.get(2).getVersion());
-    Assert.assertEquals(3, versions.size());
+    Assertions.assertEquals(3, versions.size());
     long count = 1;
     for (long v : versions) {
-      Assert.assertEquals(count++, v);
+      Assertions.assertEquals(count++, v);
     }
   }
 
@@ -213,6 +213,6 @@ public class AwsAssetDatabaseImplTest {
     // Search by media package
     List<AwsAssetMapping> mappings = database.findAllByMediaPackage(MP_ID);
     // Deleted assets should also be returned
-    Assert.assertEquals(4, mappings.size());
+    Assertions.assertEquals(4, mappings.size());
   }
 }

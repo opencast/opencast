@@ -21,8 +21,8 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
@@ -53,10 +53,10 @@ import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -88,7 +88,7 @@ public class JobTest {
   private ServiceRegistrationJpaImpl regType2Remotehost = null;
   private DBSession db;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     final EntityManagerFactory emf = newEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT);
     db = newDBSession(emf);
@@ -124,7 +124,7 @@ public class JobTest {
     regType2Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, REMOTEHOST, PATH);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     serviceRegistry.unRegisterService(JOB_TYPE_1, LOCALHOST);
     serviceRegistry.unRegisterService(JOB_TYPE_1, REMOTEHOST);
@@ -138,7 +138,7 @@ public class JobTest {
     // Start a job, but don't allow it to be dispatched
     Job job = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 4.0f);
 
-    Assert.assertNotNull(job.getUri());
+    Assertions.assertNotNull(job.getUri());
 
     Job jobFromDb = serviceRegistry.getJob(job.getId());
     assertEquals(Status.INSTANTIATED, jobFromDb.getStatus());
@@ -158,7 +158,7 @@ public class JobTest {
     job = serviceRegistry.updateJob(job);
 
     jobFromDb = serviceRegistry.getJob(job.getId());
-    Assert.assertNotNull(jobFromDb.getUri());
+    Assertions.assertNotNull(jobFromDb.getUri());
     assertEquals(job.getPayload(), jobFromDb.getPayload());
   }
 
@@ -207,7 +207,7 @@ public class JobTest {
     List<Job> jobs = serviceRegistry.getActiveJobs();
     assertEquals(2, jobs.size());
 
-    long jobId = jobs.get(0).getId();
+    long jobId = jobs.getFirst().getId();
     for (Status status : Status.values()) {
       job = serviceRegistry.getJob(jobId);
       job.setStatus(status);
@@ -462,7 +462,7 @@ public class JobTest {
     serviceRegistry.registerService(jobType, url, PATH);
     hosts = serviceRegistry.getServiceRegistrationsByLoad(jobType);
     assertEquals(1, hosts.size());
-    assertEquals(url, hosts.get(0).getHost());
+    assertEquals(url, hosts.getFirst().getHost());
 
     // set the handler to be in maintenance mode
     serviceRegistry.setMaintenanceStatus(url, true);
@@ -494,7 +494,7 @@ public class JobTest {
     serviceRegistry.registerService(receiptType, url, PATH);
     hosts = serviceRegistry.getServiceRegistrationsByLoad("type1");
     assertEquals(1, hosts.size());
-    assertEquals(url, hosts.get(0).getHost());
+    assertEquals(url, hosts.getFirst().getHost());
 
     // set the host to be in maintenance mode
     serviceRegistry.setMaintenanceStatus(url, true);
@@ -524,8 +524,8 @@ public class JobTest {
     String marshalledJob = JobParser.toXml(new JaxbJob(job));
     Job unmarshalledJob = JobParser.parseJob(marshalledJob);
 
-    assertEquals("json from unmarshalled job should remain unchanged", StringUtils.trim(payload),
-            StringUtils.trim(unmarshalledJob.getPayload()));
+    assertEquals(StringUtils.trim(payload), StringUtils.trim(unmarshalledJob.getPayload()),
+            "json from unmarshalled job should remain unchanged");
   }
 
   @Test
@@ -539,8 +539,8 @@ public class JobTest {
     String marshalledJob = JobParser.toXml(new JaxbJob(job));
     Job unmarshalledJob = JobParser.parseJob(marshalledJob);
 
-    assertEquals("xml from unmarshalled job should remain unchanged", StringUtils.trim(payload),
-            StringUtils.trim(unmarshalledJob.getPayload()));
+    assertEquals(StringUtils.trim(payload), StringUtils.trim(unmarshalledJob.getPayload()),
+            "xml from unmarshalled job should remain unchanged");
   }
 
   @Test
@@ -549,28 +549,28 @@ public class JobTest {
     String arg2 = "<some>xml</some>";
     Job job = serviceRegistry.createJob(JOB_TYPE_1, "some_operation", Arrays.asList(arg1, arg2));
     Job jobFromDb = serviceRegistry.getJob(job.getId());
-    Assert.assertNotNull("No arguments persisted in job", jobFromDb.getArguments());
-    assertEquals("Wrong number of arguments persisted", 2, jobFromDb.getArguments().size());
-    assertEquals("Arguments not persisted in order", arg1, jobFromDb.getArguments().get(0));
-    assertEquals("Arguments not persisted in order", arg2, jobFromDb.getArguments().get(1));
+    Assertions.assertNotNull(jobFromDb.getArguments(), "No arguments persisted in job");
+    assertEquals(2, jobFromDb.getArguments().size(), "Wrong number of arguments persisted");
+    assertEquals(arg1, jobFromDb.getArguments().get(0), "Arguments not persisted in order");
+    assertEquals(arg2, jobFromDb.getArguments().get(1), "Arguments not persisted in order");
   }
 
   @Test
   public void testVersionIncrements() throws Exception {
     Job job = serviceRegistry.createJob(JOB_TYPE_1, "some_operation", null, null, false);
-    assertEquals("Newly created jobs should have a version of 1", 1, job.getVersion());
+    assertEquals(1, job.getVersion(), "Newly created jobs should have a version of 1");
 
     job = serviceRegistry.getJob(job.getId());
     job.setPayload("update1");
     job = serviceRegistry.updateJob(job);
     job = serviceRegistry.getJob(job.getId());
-    assertEquals("Updated job should have a version of 2", 2, job.getVersion());
+    assertEquals(2, job.getVersion(), "Updated job should have a version of 2");
 
     job = serviceRegistry.getJob(job.getId());
     job.setPayload("update2");
     job = serviceRegistry.updateJob(job);
     job = serviceRegistry.getJob(job.getId());
-    assertEquals("Updated job should have a version of 3", 3, job.getVersion());
+    assertEquals(3, job.getVersion(), "Updated job should have a version of 3");
   }
 
   @Test
@@ -593,12 +593,12 @@ public class JobTest {
     job = serviceRegistry.getJob(job.getId());
 
     // Ensure that the job version is higher than the snapshot we loaded from the database
-    assertTrue("Version not incremented", job.getVersion() > jobFromDb.getVersion());
+    assertTrue(job.getVersion() > jobFromDb.getVersion(), "Version not incremented");
 
     // Try to modify and save the outdated reference
     try {
       jobFromDb = serviceRegistry.updateJob(jobFromDb);
-      Assert.fail();
+      Assertions.fail();
     } catch (Exception e) {
       // do nothinng
     }
@@ -617,15 +617,15 @@ public class JobTest {
     job = serviceRegistry.updateJob(job);
 
     // Ensure that we get the job back from the service in its running state
-    assertEquals("Job should be running", Status.RUNNING, serviceRegistry.getJob(job.getId()).getStatus());
+    assertEquals(Status.RUNNING, serviceRegistry.getJob(job.getId()).getStatus(), "Job should be running");
 
     // Now unregister regType1Host1, and the job should go back to queued
     serviceRegistry.unRegisterService(regType1Localhost.getServiceType(), regType1Localhost.getHost());
 
     // Ensure that the job is queued now
-    assertEquals("Job should be queued", Status.RESTART, serviceRegistry.getJob(job.getId()).getStatus());
-    Assert.assertNull("Job's processing service should be null", serviceRegistry.getJob(job.getId())
-            .getProcessingHost());
+    assertEquals(Status.RESTART, serviceRegistry.getJob(job.getId()).getStatus(), "Job should be queued");
+    Assertions.assertNull(serviceRegistry.getJob(job.getId())
+            .getProcessingHost(), "Job's processing service should be null");
   }
 
   @Test
@@ -652,9 +652,9 @@ public class JobTest {
     serviceRegistry.unRegisterService(JOB_TYPE_1, LOCALHOST);
 
     // Ensure that the job is once again queued, so it can be dispatched to a server ready to accept it
-    assertEquals("Job should be queued", Status.RESTART, serviceRegistry.getJob(job.getId()).getStatus());
-    Assert.assertNull("Job should have no associated processor", serviceRegistry.getJob(job.getId())
-            .getProcessingHost());
+    assertEquals(Status.RESTART, serviceRegistry.getJob(job.getId()).getStatus(), "Job should be queued");
+    Assertions.assertNull(serviceRegistry.getJob(job.getId())
+            .getProcessingHost(), "Job should have no associated processor");
   }
 
   @Test
@@ -673,9 +673,9 @@ public class JobTest {
     serviceRegistry.unregisterHost(LOCALHOST);
 
     // Ensure that the job is once again queued, so it can be dispatched to a server ready to accept it
-    assertEquals("Job should be queued", Status.RESTART, serviceRegistry.getJob(job.getId()).getStatus());
-    Assert.assertNull("Job should have no associated processor", serviceRegistry.getJob(job.getId())
-            .getProcessingHost());
+    assertEquals(Status.RESTART, serviceRegistry.getJob(job.getId()).getStatus(), "Job should be queued");
+    Assertions.assertNull(serviceRegistry.getJob(job.getId())
+            .getProcessingHost(), "Job should have no associated processor");
   }
 
   @Test

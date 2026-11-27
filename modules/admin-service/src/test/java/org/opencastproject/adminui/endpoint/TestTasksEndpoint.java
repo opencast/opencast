@@ -68,7 +68,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -84,7 +84,7 @@ import java.util.function.Function;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestTasksEndpoint extends TasksEndpoint {
 
   private final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "tasksendpointtest");

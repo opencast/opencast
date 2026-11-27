@@ -28,7 +28,7 @@ import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
 
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import java.util.Map;
 import javax.ws.rs.Path;
 
 @Path("")
-@Ignore
+@Disabled
 public class TestListProviderEndpoint extends ListProviderEndpoint {
 
   public TestListProviderEndpoint() throws Exception {

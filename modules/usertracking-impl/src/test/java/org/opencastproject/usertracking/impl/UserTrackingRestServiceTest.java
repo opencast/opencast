@@ -34,7 +34,7 @@ import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.UserTrackingRestService;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -52,7 +52,7 @@ public class UserTrackingRestServiceTest {
 
   private UserTrackingRestService service;
 
-  @Before
+  @BeforeEach
   public void setUp() throws UserTrackingException {
     SecurityService security = EasyMock.createMock(SecurityService.class);
     EasyMock.expect(security.getUser())

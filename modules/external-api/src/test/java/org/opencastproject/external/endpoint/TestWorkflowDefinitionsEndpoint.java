@@ -32,12 +32,12 @@ import org.opencastproject.workflow.api.WorkflowService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestWorkflowDefinitionsEndpoint extends WorkflowDefinitionsEndpoint {
 
   public TestWorkflowDefinitionsEndpoint() throws Exception {

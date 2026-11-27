@@ -36,8 +36,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -111,10 +111,10 @@ public class CropWorkflowOperationHandlerTest {
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
     MediaPackage mediaPackage = result.getMediaPackage();
     Track[] tracks = mediaPackage.getTracks();
-    Assert.assertEquals(2, tracks.length);
+    Assertions.assertEquals(2, tracks.length);
     Track trackCropped = tracks[1];
-    Assert.assertEquals("presenter/delivery", trackCropped.getFlavor().toString());
-    Assert.assertArrayEquals(targetTags.split("\\W"), trackCropped.getTags());
+    Assertions.assertEquals("presenter/delivery", trackCropped.getFlavor().toString());
+    Assertions.assertArrayEquals(targetTags.split("\\W"), trackCropped.getTags());
   }
 
   @Test
@@ -126,8 +126,8 @@ public class CropWorkflowOperationHandlerTest {
     configurations.put("source-flavor", "presentation/source");
 
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
-    Assert.assertNull(result.getMediaPackage());
+    Assertions.assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    Assertions.assertNull(result.getMediaPackage());
   }
 
 

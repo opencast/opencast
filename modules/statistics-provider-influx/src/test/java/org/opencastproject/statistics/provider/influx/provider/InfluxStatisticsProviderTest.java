@@ -21,14 +21,14 @@
 
 package org.opencastproject.statistics.provider.influx.provider;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.util.data.Tuple;
 
 import com.google.common.collect.Ordering;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -28,10 +28,10 @@ import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
@@ -39,14 +39,14 @@ public class AgentTest {
   private Agent agent = null;
   private Long time = 0L;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     agent = new AgentImpl("test", DefaultOrganization.DEFAULT_ORGANIZATION_ID, IDLE, "http://localhost/", null);
-    Assert.assertNotNull(agent);
+    Assertions.assertNotNull(agent);
     time = agent.getLastHeardFrom();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     agent = null;
     time = 0L;
@@ -54,25 +54,25 @@ public class AgentTest {
 
   @Test
   public void correctInformation() {
-    Assert.assertEquals("test", agent.getName());
-    Assert.assertEquals(IDLE, agent.getState());
-    Assert.assertEquals("http://localhost/", agent.getUrl());
+    Assertions.assertEquals("test", agent.getName());
+    Assertions.assertEquals(IDLE, agent.getState());
+    Assertions.assertEquals("http://localhost/", agent.getUrl());
   }
 
   @Test
   public void changedInformation() throws InterruptedException {
-    Assert.assertEquals("test", agent.getName());
-    Assert.assertEquals(IDLE, agent.getState());
-    Assert.assertEquals(time, agent.getLastHeardFrom());
+    Assertions.assertEquals("test", agent.getName());
+    Assertions.assertEquals(IDLE, agent.getState());
+    Assertions.assertEquals(time, agent.getLastHeardFrom());
 
     Thread.sleep(1);
     agent.setState(CAPTURING);
 
-    Assert.assertEquals("test", agent.getName());
-    Assert.assertEquals(CAPTURING, agent.getState());
+    Assertions.assertEquals("test", agent.getName());
+    Assertions.assertEquals(CAPTURING, agent.getState());
     Thread.sleep(1);
     if (agent.getLastHeardFrom() <= time || agent.getLastHeardFrom() > System.currentTimeMillis()) {
-      Assert.fail("Invalid checkin time");
+      Assertions.fail("Invalid checkin time");
     }
   }
 
@@ -86,10 +86,10 @@ public class AgentTest {
     agent.setConfiguration(configuration);
 
     Properties capabilities = agent.getCapabilities();
-    Assert.assertEquals("CAMERA", capabilities.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
-    Assert.assertEquals("/dev/video0",
+    Assertions.assertEquals("CAMERA", capabilities.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+    Assertions.assertEquals("/dev/video0",
         capabilities.getProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src"));
-    Assert.assertFalse("A key merely containing the device prefix must not become a capability",
-        capabilities.containsKey("legacy." + CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src"));
+    Assertions.assertFalse(capabilities.containsKey("legacy." + CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA.src"),
+        "A key merely containing the device prefix must not become a capability");
   }
 }

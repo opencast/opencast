@@ -25,8 +25,8 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
@@ -51,36 +51,36 @@ public class RedirectEndpointTest {
   public void testPostRedirectGet() {
     String target = "/studio";
     Response response = endpoint.get(target, uriInfo);
-    Assert.assertEquals(303, response.getStatus());
+    Assertions.assertEquals(303, response.getStatus());
     String expected = uriInfo.getBaseUri().resolve(target).toString();
-    Assert.assertEquals(response.getLocation().toString(), expected);
+    Assertions.assertEquals(response.getLocation().toString(), expected);
   }
 
   /** Test `POST /redirect/get` with missing target */
   @Test
   public void testPostRedirectGetMissingTarget() {
     Response response = endpoint.get(null, uriInfo);
-    Assert.assertEquals(400, response.getStatus());
+    Assertions.assertEquals(400, response.getStatus());
   }
 
   /** Test `POST /redirect/get` with invalid target */
   @Test
   public void testPostRedirectGetInvalidTarget() {
     Response response = endpoint.get("/%", uriInfo);
-    Assert.assertEquals(400, response.getStatus());
+    Assertions.assertEquals(400, response.getStatus());
   }
 
   /** Test `POST /redirect/get` with a non-relative target */
   @Test
   public void testPostRedirectGetNonRelativeTarget() {
     Response response = endpoint.get("https://opencast.org", uriInfo);
-    Assert.assertEquals(400, response.getStatus());
+    Assertions.assertEquals(400, response.getStatus());
   }
 
   /** Test `POST /redirect/get` with a target that has its own scheme but no authority */
   @Test
   public void testPostRedirectGetOpaqueTarget() {
     Response response = endpoint.get("javascript:alert(1)", uriInfo);
-    Assert.assertEquals(400, response.getStatus());
+    Assertions.assertEquals(400, response.getStatus());
   }
 }

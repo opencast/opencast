@@ -21,20 +21,20 @@
 
 package org.opencastproject.kernel.rest;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class JsonpTest {
 
   @Test
   public void testCallbackSafety() {
     // Some good ones
-    Assert.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("GoodCallback").matches());
-    Assert.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("GoodCallback1").matches());
-    Assert.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("Good1Callback").matches());
-    Assert.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("Object.GoodCallback").matches());
+    Assertions.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("GoodCallback").matches());
+    Assertions.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("GoodCallback1").matches());
+    Assertions.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("Good1Callback").matches());
+    Assertions.assertTrue(JsonpFilter.SAFE_PATTERN.matcher("Object.GoodCallback").matches());
 
     // Some bad ones
-    Assert.assertFalse(JsonpFilter.SAFE_PATTERN.matcher("alert(document.cookie)").matches());
+    Assertions.assertFalse(JsonpFilter.SAFE_PATTERN.matcher("alert(document.cookie)").matches());
   }
 }

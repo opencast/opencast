@@ -21,11 +21,12 @@
 
 package org.opencastproject.userdirectory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -41,8 +42,8 @@ import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashSet;
@@ -57,7 +58,7 @@ public class JpaUserProviderTest {
   private JpaOrganization org2 = null;
   private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
     org2 = new JpaOrganization("org2", "org2", "127.0.0.1", 80, "admin", "anon", null);
@@ -88,8 +89,8 @@ public class JpaUserProviderTest {
     assertEquals(user.getOrganization(), loadUser.getOrganization());
     assertEquals(user.getRoles(), loadUser.getRoles());
 
-    assertNull("Loading 'does not exist' should return null", provider.loadUser("does not exist"));
-    assertNull("Loading 'does not exist' should return null", provider.loadUser("user1", org2.getId()));
+    assertNull(provider.loadUser("does not exist"), "Loading 'does not exist' should return null");
+    assertNull(provider.loadUser("user1", org2.getId()), "Loading 'does not exist' should return null");
 
     loadUser = provider.loadUser("user1", org1.getId());
     assertNotNull(loadUser);
@@ -105,7 +106,7 @@ public class JpaUserProviderTest {
     JpaUser adminUser = createUserWithRoles(org1, "admin1", SecurityConstants.GLOBAL_ADMIN_ROLE);
     provider.addUser(adminUser);
     User loadedUser = provider.loadUser(adminUser.getUsername());
-    assertNotNull("The currently added user isn't loaded as expected", loadedUser);
+    assertNotNull(loadedUser, "The currently added user isn't loaded as expected");
     assertEquals(adminUser.getUsername(), loadedUser.getUsername());
     assertEquals(adminUser.getRoles(), loadedUser.getRoles());
   }
@@ -115,7 +116,7 @@ public class JpaUserProviderTest {
     JpaUser newUser = createUserWithRoles(org1, "org_admin2", org1.getAdminRole());
     provider.addUser(newUser);
     User loadedUser = provider.loadUser(newUser.getUsername());
-    assertNotNull("The currently added user isn't loaded as expected", loadedUser);
+    assertNotNull(loadedUser, "The currently added user isn't loaded as expected");
     assertEquals(newUser.getUsername(), loadedUser.getUsername());
     assertEquals(newUser.getRoles(), loadedUser.getRoles());
   }
@@ -127,36 +128,42 @@ public class JpaUserProviderTest {
     JpaUser newUser = createUserWithRoles(org1, "org_admin2", org1.getAdminRole());
     provider.addUser(newUser);
     User loadedUser = provider.loadUser(newUser.getUsername());
-    assertNotNull("The currently added user isn't loaded as expected", loadedUser);
+    assertNotNull(loadedUser, "The currently added user isn't loaded as expected");
     assertEquals(newUser.getUsername(), loadedUser.getUsername());
     assertEquals(newUser.getRoles(), loadedUser.getRoles());
   }
 
-  @Test(expected = UnauthorizedException.class)
+  @Test
   public void testAddUserWithGlobalAdminRoleNotAllowedAsNonAdminUser() throws Exception {
-    provider.setSecurityService(mockSecurityServiceWithUser(
-            createUserWithRoles(org1, "user1", "ROLE_USER")));
-    JpaUser newUser = createUserWithRoles(org1, "admin2", SecurityConstants.GLOBAL_ADMIN_ROLE);
-    provider.addUser(newUser);
-    fail("The current user shouldn't able to create an global admin user.");
+    assertThrows(UnauthorizedException.class, () -> {
+      provider.setSecurityService(mockSecurityServiceWithUser(
+          createUserWithRoles(org1, "user1", "ROLE_USER")));
+      JpaUser newUser = createUserWithRoles(org1, "admin2", SecurityConstants.GLOBAL_ADMIN_ROLE);
+      provider.addUser(newUser);
+      fail("The current user shouldn't able to create an global admin user.");
+    });
   }
 
-  @Test(expected = UnauthorizedException.class)
+  @Test
   public void testAddUserWithGlobalAdminRoleNotAllowedAsOrgAdmin() throws Exception {
-    provider.setSecurityService(mockSecurityServiceWithUser(
-            createUserWithRoles(org1, "org1_admin", org1.getAdminRole())));
-    JpaUser newUser = createUserWithRoles(org1, "admin2", SecurityConstants.GLOBAL_ADMIN_ROLE);
-    provider.addUser(newUser);
-    fail("The current user shouldn't able to create an global admin user.");
+    assertThrows(UnauthorizedException.class, () -> {
+      provider.setSecurityService(mockSecurityServiceWithUser(
+          createUserWithRoles(org1, "org1_admin", org1.getAdminRole())));
+      JpaUser newUser = createUserWithRoles(org1, "admin2", SecurityConstants.GLOBAL_ADMIN_ROLE);
+      provider.addUser(newUser);
+      fail("The current user shouldn't able to create an global admin user.");
+    });
   }
 
-  @Test(expected = UnauthorizedException.class)
+  @Test
   public void testAddUserWithOrgAdminRoleNotAllowedAsNonAdminUser() throws Exception {
-    provider.setSecurityService(mockSecurityServiceWithUser(
-            createUserWithRoles(org1, "user1", "ROLE_USER")));
-    JpaUser newUser = createUserWithRoles(org1, "org_admin2", org1.getAdminRole());
-    provider.addUser(newUser);
-    fail("The current user shouldn't able to create an global admin user.");
+    assertThrows(UnauthorizedException.class, () -> {
+      provider.setSecurityService(mockSecurityServiceWithUser(
+          createUserWithRoles(org1, "user1", "ROLE_USER")));
+      JpaUser newUser = createUserWithRoles(org1, "org_admin2", org1.getAdminRole());
+      provider.addUser(newUser);
+      fail("The current user shouldn't able to create an global admin user.");
+    });
   }
 
   @Test
@@ -187,24 +194,26 @@ public class JpaUserProviderTest {
       provider.deleteUser("user1", user1.getOrganization().getId());
       fail("Should throw a NotFoundException");
     } catch (NotFoundException e) {
-      assertTrue("User not found.", true);
+      assertTrue(true, "User not found.");
     }
   }
 
-  @Test(expected = UnauthorizedException.class)
-  public void testDeleteUserNotAllowedAsNonAdmin() throws UnauthorizedException, Exception {
-    JpaUser adminUser = createUserWithRoles(org1, "admin", "ROLE_ADMIN");
-    JpaUser nonAdminUser = createUserWithRoles(org1, "user1", "ROLE_USER");
-    try {
-      provider.addUser(adminUser);
-      provider.addUser(nonAdminUser);
-    } catch (UnauthorizedException ex) {
-      fail("The user shuld be created");
-    }
+  @Test
+  public void testDeleteUserNotAllowedAsNonAdmin() throws Exception {
+    assertThrows(UnauthorizedException.class, () -> {
+      JpaUser adminUser = createUserWithRoles(org1, "admin", "ROLE_ADMIN");
+      JpaUser nonAdminUser = createUserWithRoles(org1, "user1", "ROLE_USER");
+      try {
+        provider.addUser(adminUser);
+        provider.addUser(nonAdminUser);
+      } catch (UnauthorizedException ex) {
+        fail("The user shuld be created");
+      }
 
-    provider.setSecurityService(mockSecurityServiceWithUser(nonAdminUser));
-    provider.deleteUser(adminUser.getUsername(), org1.getId());
-    fail("An non admin user may not delete an admin user");
+      provider.setSecurityService(mockSecurityServiceWithUser(nonAdminUser));
+      provider.deleteUser(adminUser.getUsername(), org1.getId());
+      fail("An non admin user may not delete an admin user");
+    });
   }
 
   @Test
@@ -236,7 +245,7 @@ public class JpaUserProviderTest {
       provider.updateUser(updateUser);
       fail("Should throw a NotFoundException");
     } catch (NotFoundException e) {
-      assertTrue("User not found.", true);
+      assertTrue(true, "User not found.");
     }
 
   }
@@ -287,9 +296,9 @@ public class JpaUserProviderTest {
 
     // The provider is not authoritative for these roles
     assertEquals(
-        "There should be no roles",
         0,
-        IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size()
+        IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size(),
+        "There should be no roles"
     );
   }
 
@@ -307,7 +316,7 @@ public class JpaUserProviderTest {
     provider.addUser(userThree);
     provider.addUser(userFour);
 
-    assertEquals("There should be two roles", 4, IteratorUtils.toList(provider.getUsers()).size());
+    assertEquals(4, IteratorUtils.toList(provider.getUsers()).size(), "There should be two roles");
   }
 
   @Test
@@ -343,16 +352,16 @@ public class JpaUserProviderTest {
 
     // Provider not authoritative for these roles
     assertEquals(
-        "There should be zero roles",
         0,
-        IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size()
+        IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size(),
+        "There should be zero roles"
     );
 
     List<String> rolesForUser = provider.getRolesForUser("user1").stream()
             .map(Role::getName)
             .sorted()
             .collect(Collectors.toList());
-    assertEquals("There should be two roles", 2, rolesForUser.size());
+    assertEquals(2, rolesForUser.size(), "There should be two roles");
     assertEquals("ROLE_ONE", rolesForUser.get(0));
     assertEquals("ROLE_TWO", rolesForUser.get(1));
   }

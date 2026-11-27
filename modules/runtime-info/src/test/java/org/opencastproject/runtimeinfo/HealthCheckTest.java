@@ -31,9 +31,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class HealthCheckTest {
   private ServiceRegistrationJpaImpl serviceReg1;
   private ServiceRegistrationJpaImpl serviceReg2;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     ServiceRegistry serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
     hostRegistration = new HostRegistrationJpaImpl(
@@ -76,7 +76,7 @@ public class HealthCheckTest {
     // Test pass
     String json = runtimeInfo.getHealth(response);
     JsonObject j = (JsonObject) JsonParser.parseString(json);
-    Assert.assertEquals("pass", j.get("status").getAsString());
+    Assertions.assertEquals("pass", j.get("status").getAsString());
   }
 
   @Test
@@ -88,25 +88,25 @@ public class HealthCheckTest {
     serviceReg1.setServiceState(ServiceState.WARNING);
     String json = runtimeInfo.getHealth(response);
     JsonObject j = (JsonObject) JsonParser.parseString(json);
-    Assert.assertEquals("warn", j.get("status").getAsString());
+    Assertions.assertEquals("warn", j.get("status").getAsString());
     JsonObject checks = (JsonObject) j.get("checks");
-    Assert.assertNotNull(checks);
+    Assertions.assertNotNull(checks);
     JsonArray serviceStates = (JsonArray) checks.get("service:states");
-    Assert.assertEquals(1, serviceStates.size());
+    Assertions.assertEquals(1, serviceStates.size());
     JsonObject serviceState = (JsonObject) serviceStates.get(0);
-    Assert.assertEquals("WARNING", serviceState.get("observedValue").getAsString());
+    Assertions.assertEquals("WARNING", serviceState.get("observedValue").getAsString());
 
     // test warn service ERROR
     serviceReg2.setServiceState(ServiceState.ERROR);
     json = runtimeInfo.getHealth(response);
     j = (JsonObject) JsonParser.parseString(json);
-    Assert.assertEquals("warn", j.get("status").getAsString());
+    Assertions.assertEquals("warn", j.get("status").getAsString());
     checks = (JsonObject) j.get("checks");
-    Assert.assertNotNull(checks);
+    Assertions.assertNotNull(checks);
     serviceStates = (JsonArray) checks.get("service:states");
-    Assert.assertEquals(2, serviceStates.size());
+    Assertions.assertEquals(2, serviceStates.size());
     serviceState = (JsonObject) serviceStates.get(1);
-    Assert.assertEquals("ERROR", serviceState.get("observedValue").getAsString());
+    Assertions.assertEquals("ERROR", serviceState.get("observedValue").getAsString());
   }
 
   @Test
@@ -118,22 +118,22 @@ public class HealthCheckTest {
     hostRegistration.setMaintenanceMode(true);
     String json = runtimeInfo.getHealth(response);
     JsonObject j = (JsonObject) JsonParser.parseString(json);
-    Assert.assertEquals("fail", j.get("status").getAsString());
+    Assertions.assertEquals("fail", j.get("status").getAsString());
     JsonArray notes = (JsonArray) j.get("notes");
-    Assert.assertNotNull(notes);
-    Assert.assertEquals(1, notes.size());
-    Assert.assertTrue(notes.get(0).toString().contains("maintenance"));
+    Assertions.assertNotNull(notes);
+    Assertions.assertEquals(1, notes.size());
+    Assertions.assertTrue(notes.get(0).toString().contains("maintenance"));
 
 
     // disabled
     hostRegistration.setActive(false);
     json = runtimeInfo.getHealth(response);
     j = (JsonObject) JsonParser.parseString(json);
-    Assert.assertEquals("fail", j.get("status").getAsString());
+    Assertions.assertEquals("fail", j.get("status").getAsString());
     notes = (JsonArray) j.get("notes");
-    Assert.assertNotNull(notes);
-    Assert.assertEquals(1, notes.size());
-    Assert.assertTrue(notes.get(0).toString().contains("disabled"));
+    Assertions.assertNotNull(notes);
+    Assertions.assertEquals(1, notes.size());
+    Assertions.assertTrue(notes.get(0).toString().contains("disabled"));
   }
 
 }

@@ -38,10 +38,10 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -57,12 +57,12 @@ public class ImportWorkflowPropertiesWOHTest {
 
   private Path tmpPropsFile;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     tmpPropsFile = Files.createTempFile("workflow-properties", ".xml");
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     Files.deleteIfExists(tmpPropsFile);
   }
@@ -102,14 +102,14 @@ public class ImportWorkflowPropertiesWOHTest {
     WorkflowOperationResult result = woh.start(wi, null);
     Map<String, String> properties = result.getProperties();
 
-    Assert.assertTrue(properties.containsKey("chapter"));
-    Assert.assertEquals("true", properties.get("chapter"));
+    Assertions.assertTrue(properties.containsKey("chapter"));
+    Assertions.assertEquals("true", properties.get("chapter"));
 
-    Assert.assertTrue(properties.containsKey("presenter_position"));
-    Assert.assertEquals("left", properties.get("presenter_position"));
+    Assertions.assertTrue(properties.containsKey("presenter_position"));
+    Assertions.assertEquals("left", properties.get("presenter_position"));
 
-    Assert.assertTrue(properties.containsKey("cover_marker_in_s"));
-    Assert.assertEquals("30.674", properties.get("cover_marker_in_s"));
+    Assertions.assertTrue(properties.containsKey("cover_marker_in_s"));
+    Assertions.assertEquals("30.674", properties.get("cover_marker_in_s"));
 
     verify(wi);
   }

@@ -28,9 +28,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaUser;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,7 +47,7 @@ public class UsersListProviderTest {
   private User user3;
   private User user4;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     users = new ArrayList<User>();
@@ -110,26 +110,26 @@ public class UsersListProviderTest {
   @Test
   public void testListSimple() throws ListProviderException {
     Map<String, String> list = usersListProvider.getList(UsersListProvider.NAME_ONLY, null);
-    Assert.assertTrue(list.containsKey(user1.getName()));
-    Assert.assertTrue(list.containsKey(user2.getName()));
-    Assert.assertTrue(list.containsKey(user3.getName()));
-    Assert.assertEquals(3, list.size());
+    Assertions.assertTrue(list.containsKey(user1.getName()));
+    Assertions.assertTrue(list.containsKey(user2.getName()));
+    Assertions.assertTrue(list.containsKey(user3.getName()));
+    Assertions.assertEquals(3, list.size());
 
     list = usersListProvider.getList(UsersListProvider.USERNAME, null);
-    Assert.assertTrue(list.containsKey(user1.getUsername()));
-    Assert.assertTrue(list.containsKey(user2.getUsername()));
-    Assert.assertTrue(list.containsKey(user3.getUsername()));
-    Assert.assertTrue(list.containsKey(user4.getUsername()));
-    Assert.assertEquals(4, list.size());
+    Assertions.assertTrue(list.containsKey(user1.getUsername()));
+    Assertions.assertTrue(list.containsKey(user2.getUsername()));
+    Assertions.assertTrue(list.containsKey(user3.getUsername()));
+    Assertions.assertTrue(list.containsKey(user4.getUsername()));
+    Assertions.assertEquals(4, list.size());
 
     list = usersListProvider.getList(UsersListProvider.EMAIL_ONLY, null);
-    Assert.assertTrue(list.containsKey(user1.getEmail()));
-    Assert.assertTrue(list.containsKey(user4.getEmail()));
-    Assert.assertEquals(2, list.size());
+    Assertions.assertTrue(list.containsKey(user1.getEmail()));
+    Assertions.assertTrue(list.containsKey(user4.getEmail()));
+    Assertions.assertEquals(2, list.size());
 
     list = usersListProvider.getList(UsersListProvider.USERDIRECTORY_ONLY, null);
-    Assert.assertTrue(list.containsKey(user1.getProvider()));
-    Assert.assertEquals(1, list.size());
+    Assertions.assertTrue(list.containsKey(user1.getProvider()));
+    Assertions.assertEquals(1, list.size());
   }
 
   @Test
@@ -137,11 +137,11 @@ public class UsersListProviderTest {
     DefaultResourceListQuery query = new DefaultResourceListQuery();
     query.setLimit(0);
     query.setOffset(0);
-    Assert.assertEquals(4, usersListProvider.getList(UsersListProvider.USERNAME, query).size());
+    Assertions.assertEquals(4, usersListProvider.getList(UsersListProvider.USERNAME, query).size());
     query.setOffset(3);
-    Assert.assertEquals(1, usersListProvider.getList(UsersListProvider.USERNAME, query).size());
+    Assertions.assertEquals(1, usersListProvider.getList(UsersListProvider.USERNAME, query).size());
     query.setOffset(0);
     query.setLimit(1);
-    Assert.assertEquals(1, usersListProvider.getList(UsersListProvider.USERNAME, query).size());
+    Assertions.assertEquals(1, usersListProvider.getList(UsersListProvider.USERNAME, query).size());
   }
 }

@@ -23,8 +23,8 @@ package org.opencastproject.adminui.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.test.rest.NotFoundExceptionMapper;
@@ -37,10 +37,10 @@ import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,12 +57,12 @@ public class ThemesEndpointTest {
   private Long foundId = 1L;
   private Long notFoundId = 10L;
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }
@@ -177,10 +177,10 @@ public class ThemesEndpointTest {
             .get(rt.host("/{themeId}/usage.json")).asString();
     JsonObject series = (JsonParser.parseString(result).getAsJsonObject());
     JsonArray seriesArr = series.getAsJsonArray("series");
-    Assert.assertEquals(3, seriesArr.size());
+    Assertions.assertEquals(3, seriesArr.size());
     JsonObject series1 = seriesArr.get(0).getAsJsonObject();
-    Assert.assertEquals("Series1Id", series1.get("id").getAsString());
-    Assert.assertEquals("Series 1 Title", series1.get("title").getAsString());
+    Assertions.assertEquals("Series1Id", series1.get("id").getAsString());
+    Assertions.assertEquals("Series 1 Title", series1.get("title").getAsString());
   }
 
   @Test

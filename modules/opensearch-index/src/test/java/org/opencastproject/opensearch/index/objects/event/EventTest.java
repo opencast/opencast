@@ -22,10 +22,10 @@
 package org.opencastproject.opensearch.index.objects.event;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -35,8 +35,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +96,7 @@ public class EventTest {
 
   private final String defaultOrganization = new DefaultOrganization().getId();
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     // Setup presenter collection
     presenters.add(presenter1);

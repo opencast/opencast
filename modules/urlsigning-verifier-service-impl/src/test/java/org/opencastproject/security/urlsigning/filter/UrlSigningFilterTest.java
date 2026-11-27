@@ -31,8 +31,8 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class UrlSigningFilterTest {
   private String key = "TheFullKey";
   private String clientIp = "10.0.0.1";
 
-  @Before
+  @BeforeEach
   public void setUp() {
     matchAllProperties = new HashMap<>();
     matchAllProperties.put(UrlSigningFilter.URL_REGEX_PREFIX + ".foo", ".*");

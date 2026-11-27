@@ -21,16 +21,18 @@
 
 package org.opencastproject.security.api;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
-import org.custommonkey.xmlunit.XMLAssert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -48,7 +50,7 @@ public class RoleParsingTest {
 
   private JAXBContext jaxbContext;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     jaxbContext = JAXBContext.newInstance(JaxbRole.class);
   }
@@ -62,10 +64,13 @@ public class RoleParsingTest {
 
     String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(ROLE_XML_FILE), "UTF-8");
 
-    Diff diff = new Diff(expectedOutput, writer.toString());
     /* We don't care about ordering. */
-    diff.overrideElementQualifier(new ElementNameAndTextQualifier());
-    XMLAssert.assertXMLEqual(diff, true);
+    Diff diff = DiffBuilder.compare(expectedOutput)
+        .withTest(writer.toString())
+        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+        .checkForSimilar()
+        .build();
+    assertFalse(diff.hasDifferences(), diff.toString());
   }
 
   @Test

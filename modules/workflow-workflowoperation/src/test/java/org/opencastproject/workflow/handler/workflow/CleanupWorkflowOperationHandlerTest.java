@@ -46,9 +46,9 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -71,7 +71,7 @@ public class CleanupWorkflowOperationHandlerTest {
   private CleanupWorkflowOperationHandler cleanupWOH = null;
   private List<URI> deletedFilesURIs = new ArrayList<>();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     cleanupWOH = new CleanupWorkflowOperationHandler();
 
@@ -176,21 +176,21 @@ public class CleanupWorkflowOperationHandlerTest {
             mp.getIdentifier().toString(), cat2.getIdentifier(), "security.xml"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
-    Assert.assertEquals("Media package should contain at least tree elements", 3, mp.getElements().length);
+    Assertions.assertEquals(3, mp.getElements().length, "Media package should contain at least tree elements");
     SimpleElementSelector elementSelector = new SimpleElementSelector();
     elementSelector.addFlavor("*/source");
-    Assert.assertFalse("Media package doesn't contain an element with a preserved flavor '*/source'",
-            elementSelector.select(mp, false).isEmpty());
+    Assertions.assertFalse(elementSelector.select(mp, false).isEmpty(),
+            "Media package doesn't contain an element with a preserved flavor '*/source'");
     elementSelector = new SimpleElementSelector();
     elementSelector.addFlavor("smil/trimmed");
-    Assert.assertFalse("Media package doesn't contain an element with a preserved flavor 'smil/trimmed'",
-            elementSelector.select(mp, false).isEmpty());
+    Assertions.assertFalse(elementSelector.select(mp, false).isEmpty(),
+            "Media package doesn't contain an element with a preserved flavor 'smil/trimmed'");
     elementSelector = new SimpleElementSelector();
     elementSelector.addFlavor("security/*");
-    Assert.assertFalse("Media package doesn't contain an element with a preserved flavor 'security/*'",
-            elementSelector.select(mp, false).isEmpty());
+    Assertions.assertFalse(elementSelector.select(mp, false).isEmpty(),
+            "Media package doesn't contain an element with a preserved flavor 'security/*'");
 
-    Assert.assertEquals("At least one file wasn't deleted on remote repository", 3, deletedFilesURIs.size());
+    Assertions.assertEquals(3, deletedFilesURIs.size(), "At least one file wasn't deleted on remote repository");
   }
 
   @Test
@@ -228,21 +228,21 @@ public class CleanupWorkflowOperationHandlerTest {
             "security", mp.getIdentifier().toString(), cat2.getIdentifier(), "security.xml"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
-    Assert.assertEquals("Media package should contain at least tree elements", 3, mp.getElements().length);
+    Assertions.assertEquals(3, mp.getElements().length, "Media package should contain at least tree elements");
     SimpleElementSelector elementSelector = new SimpleElementSelector();
     elementSelector.addFlavor("*/source");
-    Assert.assertFalse("Media package doesn't contain an element with a preserved flavor '*/source'",
-            elementSelector.select(mp, false).isEmpty());
+    Assertions.assertFalse(elementSelector.select(mp, false).isEmpty(),
+            "Media package doesn't contain an element with a preserved flavor '*/source'");
     elementSelector = new SimpleElementSelector();
     elementSelector.addFlavor("smil/trimmed");
-    Assert.assertFalse("Media package doesn't contain an element with a preserved flavor 'smil/trimmed'",
-            elementSelector.select(mp, false).isEmpty());
+    Assertions.assertFalse(elementSelector.select(mp, false).isEmpty(),
+            "Media package doesn't contain an element with a preserved flavor 'smil/trimmed'");
     elementSelector = new SimpleElementSelector();
     elementSelector.addFlavor("security/*");
-    Assert.assertFalse("Media package doesn't contain an element with a preserved flavor 'security/*'",
-            elementSelector.select(mp, false).isEmpty());
+    Assertions.assertFalse(elementSelector.select(mp, false).isEmpty(),
+            "Media package doesn't contain an element with a preserved flavor 'security/*'");
 
-    Assert.assertEquals("At least one file wasn't deleted on remote repository", 3, deletedFilesURIs.size());
+    Assertions.assertEquals(3, deletedFilesURIs.size(), "At least one file wasn't deleted on remote repository");
   }
 
   @Test
@@ -258,8 +258,8 @@ public class CleanupWorkflowOperationHandlerTest {
             "asset", mp.getIdentifier().toString(), track1.getIdentifier(), "track.mp4"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
-    Assert.assertEquals("Media package shouldn't contain any elements", 0, mp.getElements().length);
-    Assert.assertEquals("One file wasn't deleted on remote repository", 1, deletedFilesURIs.size());
+    Assertions.assertEquals(0, mp.getElements().length, "Media package shouldn't contain any elements");
+    Assertions.assertEquals(1, deletedFilesURIs.size(), "One file wasn't deleted on remote repository");
   }
 
   @Test
@@ -275,8 +275,8 @@ public class CleanupWorkflowOperationHandlerTest {
             "asset", mp.getIdentifier().toString(), track1.getIdentifier(), "track.mp4"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
-    Assert.assertEquals("Media package shouldn't contain any elements", 0, mp.getElements().length);
-    Assert.assertEquals("Delete on remote repository not allowed", 0, deletedFilesURIs.size());
+    Assertions.assertEquals(0, mp.getElements().length, "Media package shouldn't contain any elements");
+    Assertions.assertEquals(0, deletedFilesURIs.size(), "Delete on remote repository not allowed");
   }
 
   @Test
@@ -292,8 +292,8 @@ public class CleanupWorkflowOperationHandlerTest {
             mp.getIdentifier().toString(), track1.getIdentifier(), 0, "track.mp4"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
-    Assert.assertEquals("Media package shouldn't contain any elements", 0, mp.getElements().length);
-    Assert.assertEquals("Delete on remote repository not allowed", 0, deletedFilesURIs.size());
+    Assertions.assertEquals(0, mp.getElements().length, "Media package shouldn't contain any elements");
+    Assertions.assertEquals(0, deletedFilesURIs.size(), "Delete on remote repository not allowed");
   }
 
   /** This class should cache all URIs that are passed to mocked {@link TrustedHttpClient} execute method */

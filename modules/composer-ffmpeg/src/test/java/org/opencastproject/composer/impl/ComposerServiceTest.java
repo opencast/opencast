@@ -22,10 +22,10 @@
 package org.opencastproject.composer.impl;
 
 import static org.easymock.EasyMock.capture;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -62,12 +62,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -120,7 +120,7 @@ public class ComposerServiceTest {
   /** Encoding profile scanner */
   private EncodingProfileScanner profileScanner;
 
-  @BeforeClass
+  @BeforeAll
   public static void testForFFmpeg() {
     try {
       Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
@@ -137,10 +137,10 @@ public class ComposerServiceTest {
     return new File(ComposerServiceTest.class.getResource(path).toURI());
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Skip tests if FFmpeg is not installed
-    Assume.assumeTrue(ffmpegInstalled);
+    Assumptions.assumeTrue(ffmpegInstalled);
 
     // Create video only file
     File f = getFile("/video.mp4");
@@ -197,7 +197,7 @@ public class ComposerServiceTest {
 
     profileScanner = new EncodingProfileScanner();
     File encodingProfile = getFile("/encodingprofiles.properties");
-    assertNotNull("Encoding profile must exist", encodingProfile);
+    assertNotNull(encodingProfile, "Encoding profile must exist");
     profileScanner.install(encodingProfile);
 
     // Finish setting up the mocks
@@ -255,7 +255,7 @@ public class ComposerServiceTest {
     EasyMock.replay(serviceRegistry);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(sourceVideoOnly);
     FileUtils.deleteQuietly(sourceAudioOnly);
@@ -405,10 +405,10 @@ public class ComposerServiceTest {
         // are mixed into the final composite if they exist
 
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
-    Assert.assertNotNull(compositeTrack);
+    Assertions.assertNotNull(compositeTrack);
     inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, compositeTrack);
+    Assertions.assertEquals(inspectedTrack, compositeTrack);
   }
 
   /**
@@ -419,10 +419,10 @@ public class ComposerServiceTest {
     // Some versions of ffmpeg crashes
     Job concat = composerService.concat("concat.work", null, true, sourceAVTSTrack, sourceAVTSTrack);
     Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
-    Assert.assertNotNull(concatTrack);
+    Assertions.assertNotNull(concatTrack);
     inspectedTrack.setIdentifier(concatTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, concatTrack);
+    Assertions.assertEquals(inspectedTrack, concatTrack);
   }
 
   @Test
@@ -462,10 +462,10 @@ public class ComposerServiceTest {
     Job composite = composerService.composite(outputDimension, Optional.ofNullable(lowerLaidOutElement),
         upperLaidOutElement, watermarkOption, "composite.work", "black", "upper");
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
-    Assert.assertNotNull(compositeTrack);
+    Assertions.assertNotNull(compositeTrack);
     inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, compositeTrack);
+    Assertions.assertEquals(inspectedTrack, compositeTrack);
   }
 
   @Test
@@ -524,10 +524,10 @@ public class ComposerServiceTest {
     Job composite = composerService.composite(outputDimension, Optional.ofNullable(lowerLaidOutElement),
         upperLaidOutElement, watermarkOption, "composite.work", "black", "upper");
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
-    Assert.assertNotNull(compositeTrack);
+    Assertions.assertNotNull(compositeTrack);
     inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, compositeTrack);
+    Assertions.assertEquals(inspectedTrack, compositeTrack);
   }
 
   @Test
@@ -546,13 +546,11 @@ public class ComposerServiceTest {
     for (int i = 0; i < 3; i++) {
       BufferedReader bufferedReader = new BufferedReader(new FileReader(testFiles.get(i)));
       Stream<String> stream = bufferedReader.lines();
-      stream.filter(line -> !line.startsWith("#") && !line.trim().isEmpty()).forEach(line -> {
-        Assert.assertTrue(line.startsWith("1234567"));
-      });
+      stream.filter(line -> !line.startsWith("#") && !line.trim().isEmpty()).forEach(line ->
+          Assertions.assertTrue(line.startsWith("1234567")));
       stream = bufferedReader.lines();
-      stream.filter(line -> line.startsWith("#EXT-X-MAP:URI=")).forEach(line -> {
-        Assert.assertTrue(line.startsWith("#EXT-X-MAP:URI=1234567_"));
-      });
+      stream.filter(line -> line.startsWith("#EXT-X-MAP:URI=")).forEach(line ->
+          Assertions.assertTrue(line.startsWith("#EXT-X-MAP:URI=1234567_")));
       bufferedReader.close();
     }
   }
@@ -565,10 +563,10 @@ public class ComposerServiceTest {
     Dimension outputDimension = new Dimension(500, 500);
     Job concat = composerService.concat("concat.work", outputDimension, false, sourceVideoTrack, sourceVideoTrack);
     Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
-    Assert.assertNotNull(concatTrack);
+    Assertions.assertNotNull(concatTrack);
     inspectedTrack.setIdentifier(concatTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, concatTrack);
+    Assertions.assertEquals(inspectedTrack, concatTrack);
   }
 
   /**
@@ -580,10 +578,10 @@ public class ComposerServiceTest {
     Job concat = composerService.concat("concat.work", outputDimension, 20.0f, false, sourceVideoTrack,
         sourceVideoTrack);
     Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
-    Assert.assertNotNull(concatTrack);
+    Assertions.assertNotNull(concatTrack);
     inspectedTrack.setIdentifier(concatTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, concatTrack);
+    Assertions.assertEquals(inspectedTrack, concatTrack);
   }
 
   /**
@@ -593,10 +591,10 @@ public class ComposerServiceTest {
   public void testConcatWithSameCodec() throws Exception {
     Job concat = composerService.concat("concat.work", null, true, sourceVideoTrack, sourceVideoTrack);
     Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
-    Assert.assertNotNull(concatTrack);
+    Assertions.assertNotNull(concatTrack);
     inspectedTrack.setIdentifier(concatTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, concatTrack);
+    Assertions.assertEquals(inspectedTrack, concatTrack);
   }
 
   /**
@@ -626,10 +624,10 @@ public class ComposerServiceTest {
 
     Job imageToVideo = composerService.imageToVideo(attachment, imageToVideoProfile.getIdentifier(), 1L);
     Track imageToVideoTrack = (Track) MediaPackageElementParser.getFromXml(imageToVideo.getPayload());
-    Assert.assertNotNull(imageToVideoTrack);
+    Assertions.assertNotNull(imageToVideoTrack);
 
     inspectedTrack.setIdentifier(imageToVideoTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
-    Assert.assertEquals(inspectedTrack, imageToVideoTrack);
+    Assertions.assertEquals(inspectedTrack, imageToVideoTrack);
   }
 }

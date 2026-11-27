@@ -25,10 +25,10 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
@@ -45,7 +45,7 @@ public class TerminationStateServiceImplTest {
 
   private Scheduler scheduler;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
 
@@ -81,18 +81,18 @@ public class TerminationStateServiceImplTest {
   public void testLifeCyclePolling() throws Exception {
     // change termination state
     service.setState(TerminationStateServiceImpl.TerminationState.WAIT);
-    Assert.assertEquals(TerminationStateServiceImpl.TerminationState.WAIT, service.getState());
+    Assertions.assertEquals(TerminationStateServiceImpl.TerminationState.WAIT, service.getState());
     Thread.sleep(3000);
     String[] trigger = getTriggerNames(TerminationStateServiceImpl.SCHEDULE_GROUP);
-    Assert.assertEquals(1, trigger.length);
-    Assert.assertEquals(TerminationStateServiceImpl.SCHEDULE_JOB_POLLING_TRIGGER, trigger[0]);
+    Assertions.assertEquals(1, trigger.length);
+    Assertions.assertEquals(TerminationStateServiceImpl.SCHEDULE_JOB_POLLING_TRIGGER, trigger[0]);
 
     // complete running jobs
     nRunningJobs = 0L;
     Thread.sleep(3000);
     trigger = getTriggerNames(TerminationStateServiceImpl.SCHEDULE_GROUP);
-    Assert.assertEquals(0, trigger.length);
-    Assert.assertEquals(TerminationStateServiceImpl.TerminationState.READY, service.getState());
+    Assertions.assertEquals(0, trigger.length);
+    Assertions.assertEquals(TerminationStateServiceImpl.TerminationState.READY, service.getState());
   }
 
   private String[] getTriggerNames(String group) throws SchedulerException {
@@ -101,7 +101,7 @@ public class TerminationStateServiceImplTest {
         .toArray(String[]::new);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     service.deactivate();
   }

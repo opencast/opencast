@@ -21,10 +21,10 @@
 
 package org.opencastproject.userdirectory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -42,9 +42,9 @@ import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +56,7 @@ public class JpaGroupRoleProviderTest {
   private static JpaOrganization org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
   private static JpaOrganization org2 = new JpaOrganization("org2", "org2", "127.0.0.1", 80, "admin", "anon", null);
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     JpaUser adminUser = new JpaUser("admin", "pass1", org1, "Admin", "admin@localhost", "opencast", true,
             Set.of(new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
@@ -85,36 +85,38 @@ public class JpaGroupRoleProviderTest {
     provider.addGroup(group);
 
     Group loadGroup = provider.loadGroup("test", org1.getId());
-    Assert.assertNotNull(loadGroup);
-    Assert.assertEquals(loadGroup.getGroupId(), loadGroup.getGroupId());
-    Assert.assertEquals(loadGroup.getName(), loadGroup.getName());
-    Assert.assertEquals(loadGroup.getDescription(), loadGroup.getDescription());
-    Assert.assertEquals(loadGroup.getOrganization(), loadGroup.getOrganization());
-    Assert.assertEquals(loadGroup.getRole(), loadGroup.getRole());
-    Assert.assertEquals(loadGroup.getRoles(), loadGroup.getRoles());
-    Assert.assertEquals(loadGroup.getMembers(), loadGroup.getMembers());
+    Assertions.assertNotNull(loadGroup);
+    Assertions.assertEquals(loadGroup.getGroupId(), loadGroup.getGroupId());
+    Assertions.assertEquals(loadGroup.getName(), loadGroup.getName());
+    Assertions.assertEquals(loadGroup.getDescription(), loadGroup.getDescription());
+    Assertions.assertEquals(loadGroup.getOrganization(), loadGroup.getOrganization());
+    Assertions.assertEquals(loadGroup.getRole(), loadGroup.getRole());
+    Assertions.assertEquals(loadGroup.getRoles(), loadGroup.getRoles());
+    Assertions.assertEquals(loadGroup.getMembers(), loadGroup.getMembers());
 
-    Assert.assertNull("Loading 'does not exist' should return null",
-            provider.loadGroup("does not exist", org1.getId()));
-    Assert.assertNull("Loading 'does not exist' should return null", provider.loadGroup("user1", org2.getId()));
+    Assertions.assertNull(provider.loadGroup("does not exist", org1.getId()),
+            "Loading 'does not exist' should return null");
+    Assertions.assertNull(provider.loadGroup("user1", org2.getId()), "Loading 'does not exist' should return null");
   }
 
-  @Test(expected = UnauthorizedException.class)
-  public void testAddGroupNotAllowedAsNonAdminUser() throws UnauthorizedException {
-    JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
-            Set.of(new JpaRole("ROLE_USER", org1)));
+  @Test
+  public void testAddGroupNotAllowedAsNonAdminUser() {
+    assertThrows(UnauthorizedException.class, () -> {
+      JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
+          Set.of(new JpaRole("ROLE_USER", org1)));
 
-    // Set the security sevice
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
-    EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
-    EasyMock.replay(securityService);
-    provider.setSecurityService(securityService);
+      // Set the security sevice
+      SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+      EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
+      EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
+      EasyMock.replay(securityService);
+      provider.setSecurityService(securityService);
 
-    JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Set.of(
-            new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
-    provider.addGroup(group);
-    fail("The group with admin role should not be created by an non admin user");
+      JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Set.of(
+          new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
+      provider.addGroup(group);
+      fail("The group with admin role should not be created by an non admin user");
+    });
   }
 
   @Test
@@ -168,16 +170,16 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(securityService);
     provider.setSecurityService(securityService);
 
-    assertThrows(UnauthorizedException.class, () -> provider.removeGroup(group.getGroupId()));
+    assertThrows(UnauthorizedException.class, () ->
+        provider.removeGroup(group.getGroupId()));
   }
 
   @Test
   public void testDuplicateGroupCreation() throws IllegalArgumentException, UnauthorizedException, ConflictException {
     // create the group, not exception thrown
     provider.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
-    // try create again and expect a conflict
-    assertThrows(ConflictException.class,
-        () -> provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin"));
+    assertThrows(ConflictException.class, () ->
+        provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin"));
   }
 
   @Test
@@ -194,8 +196,9 @@ public class JpaGroupRoleProviderTest {
   }
 
   @Test
-  public void testCreateGroupWithoutName() throws Exception {
-    assertThrows(IllegalArgumentException.class, () -> provider.createGroup(null, "Test group", null, null));
+  public void testCreateGroupWithoutName() {
+    assertThrows(IllegalArgumentException.class, () ->
+        provider.createGroup(null, "Test group", null, null));
   }
 
   @Test
@@ -224,7 +227,7 @@ public class JpaGroupRoleProviderTest {
     provider.addGroup(group3);
 
     List<Role> rolesForUser = provider.getRolesForUser("admin");
-    Assert.assertEquals("There should be four roles", 6, rolesForUser.size());
+    Assertions.assertEquals(6, rolesForUser.size(), "There should be four roles");
     rolesForUser.contains(new JpaRole(group.getRole(), org1));
     rolesForUser.contains(new JpaRole(group2.getRole(), org1));
   }
@@ -242,7 +245,7 @@ public class JpaGroupRoleProviderTest {
     provider.addGroup(group);
 
     Role role = provider.findRoles("%test%", Role.Target.ALL, 0, 0).next();
-    Assert.assertEquals("ROLE_GROUP_TEST", role.getName());
+    Assertions.assertEquals("ROLE_GROUP_TEST", role.getName());
 
     authorities.clear();
     authorities.add(new JpaRole("ROLE_ASTRO_122_SPRING_2011_STUDENT", org1));
@@ -258,10 +261,10 @@ public class JpaGroupRoleProviderTest {
     JpaGroup group3 = new JpaGroup("test2", org2, "Test2", "Test 2 group", authorities, members);
     provider.addGroup(group3);
 
-    Assert.assertEquals(0, IteratorUtils.toList(provider.findRoles("%PrIn%", Role.Target.ALL, 0, 0)).size());
-    Assert.assertEquals(0, IteratorUtils.toList(provider.findRoles("%PrIn%", Role.Target.ALL, 0, 1)).size());
+    Assertions.assertEquals(0, IteratorUtils.toList(provider.findRoles("%PrIn%", Role.Target.ALL, 0, 0)).size());
+    Assertions.assertEquals(0, IteratorUtils.toList(provider.findRoles("%PrIn%", Role.Target.ALL, 0, 1)).size());
 
-    Assert.assertEquals(2, IteratorUtils.toList(provider.findRoles("%test%", Role.Target.ALL, 0, 2)).size());
+    Assertions.assertEquals(2, IteratorUtils.toList(provider.findRoles("%test%", Role.Target.ALL, 0, 2)).size());
   }
 
   @Test
@@ -282,27 +285,30 @@ public class JpaGroupRoleProviderTest {
     provider.addGroup(group3);
 
     List<Role> groupRoles = provider.getRolesForUser("user");
-    Assert.assertEquals("There should be three groupRoles added to the user",3, groupRoles.size());
-    Assert.assertTrue("GroupRole for group1 should be added", groupRoles.contains(new JpaRole(group1.getRole(), org1)));
-    Assert.assertTrue("GroupRole for group2 should be added", groupRoles.contains(new JpaRole(group2.getRole(), org1)));
-    Assert.assertTrue("GroupRole for group3 should be added", groupRoles.contains(new JpaRole(group3.getRole(), org1)));
+    Assertions.assertEquals(3,groupRoles.size(), "There should be three groupRoles added to the user");
+    Assertions.assertTrue(groupRoles.contains(new JpaRole(group1.getRole(), org1)),
+        "GroupRole for group1 should be added");
+    Assertions.assertTrue(groupRoles.contains(new JpaRole(group2.getRole(), org1)),
+        "GroupRole for group2 should be added");
+    Assertions.assertTrue(groupRoles.contains(new JpaRole(group3.getRole(), org1)),
+        "GroupRole for group3 should be added");
 
     provider.removeMemberFromAllGroups("user", "org1");
 
     groupRoles = provider.getRolesForUser("user");
-    Assert.assertEquals("There should be no more groupRoles for the user",0, groupRoles.size());
-    Assert.assertFalse("GroupRole for group1 should be removed",
-            groupRoles.contains(new JpaRole(group1.getRole(), org1)));
-    Assert.assertFalse("GroupRole for group2 should be removed",
-            groupRoles.contains(new JpaRole(group2.getRole(), org1)));
-    Assert.assertFalse("GroupRole for group3 should be removed",
-            groupRoles.contains(new JpaRole(group3.getRole(), org1)));
+    Assertions.assertEquals(0,groupRoles.size(), "There should be no more groupRoles for the user");
+    Assertions.assertFalse(groupRoles.contains(new JpaRole(group1.getRole(), org1)),
+            "GroupRole for group1 should be removed");
+    Assertions.assertFalse(groupRoles.contains(new JpaRole(group2.getRole(), org1)),
+            "GroupRole for group2 should be removed");
+    Assertions.assertFalse(groupRoles.contains(new JpaRole(group3.getRole(), org1)),
+            "GroupRole for group3 should be removed");
 
     provider.removeMemberFromAllGroups("user", "org1");
 
     groupRoles = provider.getRolesForUser("user");
-    Assert.assertEquals("Make sure there is no issue with users that are not part of any group",
-            0, groupRoles.size());
+    Assertions.assertEquals(0,
+            groupRoles.size(), "Make sure there is no issue with users that are not part of any group");
   }
 
   @Test
@@ -319,7 +325,7 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(userDirectoryService);
     provider.setUserDirectoryService(userDirectoryService);
 
-    Assert.assertTrue(provider.removeMemberFromGroup("test", "user"));
+    Assertions.assertTrue(provider.removeMemberFromGroup("test", "user"));
     EasyMock.verify(userDirectoryService);
   }
 
@@ -337,7 +343,7 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(userDirectoryService);
     provider.setUserDirectoryService(userDirectoryService);
 
-    Assert.assertTrue(provider.addMemberToGroup("test", "user"));
+    Assertions.assertTrue(provider.addMemberToGroup("test", "user"));
     EasyMock.verify(userDirectoryService);
   }
 
@@ -379,9 +385,9 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(userDirectoryService);
     provider.setUserDirectoryService(userDirectoryService);
 
-    Assert.assertThrows(UnauthorizedException.class, () -> provider.removeMemberFromGroup("test", "user"));
-    Assert.assertThrows(UnauthorizedException.class, () -> provider.addMemberToGroup("test", "user2"));
-    Assert.assertThrows(UnauthorizedException.class,
+    Assertions.assertThrows(UnauthorizedException.class, () -> provider.removeMemberFromGroup("test", "user"));
+    Assertions.assertThrows(UnauthorizedException.class, () -> provider.addMemberToGroup("test", "user2"));
+    Assertions.assertThrows(UnauthorizedException.class,
         () -> provider.updateGroup("test", "Test", "Test group", SecurityConstants.GLOBAL_ADMIN_ROLE, "user2"));
 
     assertEquals(Set.of("user"), provider.loadGroup("test", org1.getId()).getMembers());

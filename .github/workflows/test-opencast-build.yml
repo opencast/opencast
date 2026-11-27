@@ -31,12 +31,12 @@ jobs:
   test-opencast:
     strategy:
       matrix:
-        # Java 21 is the supported version. Java 23 is the newest version
-        # the Karaf 4.4.x line runs on. Java 25 needs Karaf 4.5.0 and
-        # should replace 23 once that is released and integrated.
+        # Java 21 is the supported runtime version. Karaf 4.4.x does not run
+        # on Java 25, so the assemblies and the cluster test below only run
+        # with Java 21. Java 25 builds the modules and runs the unit tests.
         java:
           - 21
-          - 23
+          - 25
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-24.04
     steps:

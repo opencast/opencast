@@ -23,7 +23,7 @@ package org.opencastproject.adminui.util;
 
 import org.opencastproject.adminui.exception.IllegalPathException;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-@Ignore
+@Disabled
 public final class TestClassPathInspector extends ClassPathInspector {
 
   @Override

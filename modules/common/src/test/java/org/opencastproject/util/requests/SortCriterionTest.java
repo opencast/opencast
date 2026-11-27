@@ -21,12 +21,13 @@
 
 package org.opencastproject.util.requests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for {@link SortCriterion}
@@ -41,40 +42,43 @@ public class SortCriterionTest {
   /** Test method for {@link SortCriterion#getFieldName()} */
   @Test
   public void testGetFieldName() {
-    Assert.assertEquals("name", orderByNameAsc.getFieldName());
-    Assert.assertEquals("date", orderByDateAsc.getFieldName());
+    Assertions.assertEquals("name", orderByNameAsc.getFieldName());
+    Assertions.assertEquals("date", orderByDateAsc.getFieldName());
   }
 
   /** Test method for {@link SortCriterion#getOrder()} */
   @Test
   public void testGetOrder() {
-    Assert.assertEquals(Order.Ascending, orderByNameAsc.getOrder());
-    Assert.assertEquals(Order.Descending, orderByNameDesc.getOrder());
+    Assertions.assertEquals(Order.Ascending, orderByNameAsc.getOrder());
+    Assertions.assertEquals(Order.Descending, orderByNameDesc.getOrder());
   }
 
   /** Test method for {@link SortCriterion#parse(String)} */
   @Test
   public void testParse() {
-    Assert.assertEquals(orderByNameAsc, SortCriterion.parse("name:ASC"));
-    Assert.assertEquals(orderByDateDesc, SortCriterion.parse("date:DESC"));
+    Assertions.assertEquals(orderByNameAsc, SortCriterion.parse("name:ASC"));
+    Assertions.assertEquals(orderByDateDesc, SortCriterion.parse("date:DESC"));
   }
 
   /** Test method for {@link SortCriterion#parse(String)} */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testParseWithTooManyParts() throws Exception {
-    SortCriterion.parse("name:ASC:first");
+    assertThrows(IllegalArgumentException.class, () ->
+        SortCriterion.parse("name:ASC:first"));
   }
 
   /** Test method for {@link SortCriterion#parse(String)} */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testParseWithOnlyOnePart() throws Exception {
-    SortCriterion.parse("name:");
+    assertThrows(IllegalArgumentException.class, () ->
+        SortCriterion.parse("name:"));
   }
 
   /** Test method for {@link SortCriterion#parse(String)} */
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testParseWithInvalidDirection() throws Exception {
-    SortCriterion.parse("name:ASCDESC");
+    assertThrows(IllegalArgumentException.class, () ->
+        SortCriterion.parse("name:ASCDESC"));
   }
 
   /** Test method for {@link SortCriterion#equals(Object)} */
@@ -86,14 +90,14 @@ public class SortCriterionTest {
   /** Test method for {@link SortCriterion#hashCode()} */
   @Test
   public void testHashCode() {
-    Assert.assertEquals(orderByNameAsc.hashCode(), new SortCriterion("name", Order.Ascending).hashCode());
+    Assertions.assertEquals(orderByNameAsc.hashCode(), new SortCriterion("name", Order.Ascending).hashCode());
   }
 
   /** Test method for {@link SortCriterion#toString()} */
   @Test
   public void testToString() {
-    Assert.assertEquals("name:ASC", orderByNameAsc.toString());
-    Assert.assertEquals("date:DESC", orderByDateDesc.toString());
+    Assertions.assertEquals("name:ASC", orderByNameAsc.toString());
+    Assertions.assertEquals("date:DESC", orderByDateDesc.toString());
   }
 
 }

@@ -30,13 +30,13 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,10 +46,10 @@ public class LoggingWorkflowOperationHandlerTest {
   private WorkflowInstance workflow;
   private WorkflowOperationInstance instance;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = new MediaPackageBuilderImpl();
     MediaPackage mediaPackage = builder.createNew();
@@ -73,13 +73,22 @@ public class LoggingWorkflowOperationHandlerTest {
 
   @Test
   public void testLogToFile() throws Exception {
-    File tempFolder = testFolder.newFolder("logging.test");
+    File tempFolder = newFolder(testFolder, "logging.test");
     EasyMock.expect(instance.getConfiguration("directory")).andReturn(tempFolder.getAbsolutePath()).anyTimes();
     EasyMock.expect(instance.getConfiguration("mediapackage-xml")).andReturn("true").anyTimes();
     EasyMock.expect(instance.getConfiguration("workflowinstance-xml")).andReturn("true").anyTimes();
     EasyMock.replay(workflow, instance);
     operation.start(workflow, null);
-    Assert.assertEquals(3, FileUtils.listFilesAndDirs(tempFolder, TrueFileFilter.TRUE, TrueFileFilter.TRUE).size());
+    Assertions.assertEquals(3, FileUtils.listFilesAndDirs(tempFolder, TrueFileFilter.TRUE, TrueFileFilter.TRUE).size());
+  }
+
+  private static File newFolder(File root, String... subDirs) throws IOException {
+    String subFolder = String.join("/", subDirs);
+    File result = new File(root, subFolder);
+    if (!result.mkdirs()) {
+      throw new IOException("Couldn't create folders " + root);
+    }
+    return result;
   }
 
 }

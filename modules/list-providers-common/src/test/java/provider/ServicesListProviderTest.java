@@ -21,7 +21,7 @@
 
 package provider;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.common.provider.ServicesListProvider;
@@ -32,8 +32,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceState;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class ServicesListProviderTest {
   private static final String SERVICE_TYPE_2 = "type2";
   private static final String SERVICE_TYPE_3 = "type3";
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
 

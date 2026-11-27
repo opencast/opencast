@@ -38,7 +38,7 @@ import org.opencastproject.util.requests.SortCriterion;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,7 +47,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 @Path("")
-@Ignore
+@Disabled
 public class TestLifeCycleManagementEndpoint extends LifeCycleManagementEndpoint {
 
   public TestLifeCycleManagementEndpoint() throws Exception {

@@ -39,12 +39,12 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -58,20 +58,22 @@ public class IngestDownloadServiceTest {
 
   private IngestDownloadServiceImpl service;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * Setup for the Service
    */
-  @Before
+  @BeforeEach
   public void setUp()
           throws IOException, ServiceRegistryException, MediaPackageException, URISyntaxException, NotFoundException {
     service = new IngestDownloadServiceImpl();
 
     Workspace workspace = EasyMock.createMock(Workspace.class);
     EasyMock.expect(workspace.getBaseUri()).andReturn(new URI("http://localhost/")).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andAnswer(() -> testFolder.newFile()).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject()))
+        .andAnswer(() -> File.createTempFile("junit", null, testFolder))
+        .anyTimes();
     EasyMock.expect(
         workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
             .andReturn(new URI("http://local.opencast/xy")).anyTimes();
@@ -119,7 +121,7 @@ public class IngestDownloadServiceTest {
     Job job = service.ingestDownload(mediaPackage, "*/*", "a", true, false);
     mediaPackage = MediaPackageParser.getFromXml(job.getPayload());
     for (MediaPackageElement element: mediaPackage.getElements()) {
-      Assert.assertEquals("http://local.opencast/xy", element.getURI().toString());
+      Assertions.assertEquals("http://local.opencast/xy", element.getURI().toString());
     }
   }
 }

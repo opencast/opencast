@@ -55,11 +55,11 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -102,7 +102,7 @@ public class AwsS3AssetStoreTest {
 
   private AwsS3AssetStore store;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     cc = EasyMock.createNiceMock(ComponentContext.class);
@@ -143,7 +143,7 @@ public class AwsS3AssetStoreTest {
     store.setDatabase(database);
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
   }
 
@@ -162,10 +162,10 @@ public class AwsS3AssetStoreTest {
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
     try {
       store.put(path, Source.mk(uri));
-      Assert.fail("Bucket should not be set up, if we get here then there's something wrong.");
+      Assertions.fail("Bucket should not be set up, if we get here then there's something wrong.");
     } catch (AssetStoreException e) {
       //Verify that the bucket exception code matches
-      Assert.assertEquals(999, ((AmazonServiceException) e.getCause().getCause()).getStatusCode());
+      Assertions.assertEquals(999, ((AmazonServiceException) e.getCause().getCause()).getStatusCode());
     }
   }
 
@@ -185,9 +185,9 @@ public class AwsS3AssetStoreTest {
 
     try {
       store.createAWSBucket();
-      Assert.fail("Exception should have been thrown!");
+      Assertions.fail("Exception should have been thrown!");
     } catch (IllegalStateException e) { }
-    Assert.assertFalse(store.bucketCreated);
+    Assertions.assertFalse(store.bucketCreated);
     EasyMock.verify();
   }
 
@@ -211,9 +211,9 @@ public class AwsS3AssetStoreTest {
 
     try {
       store.createAWSBucket();
-      Assert.fail("Exception should have been thrown!");
+      Assertions.fail("Exception should have been thrown!");
     } catch (IllegalStateException e) { }
-    Assert.assertFalse(store.bucketCreated);
+    Assertions.assertFalse(store.bucketCreated);
     EasyMock.verify();
   }
 
@@ -238,9 +238,9 @@ public class AwsS3AssetStoreTest {
     try {
       store.createAWSBucket();
     } catch (IllegalStateException e) {
-      Assert.fail("Exception should NOT have been thrown!");
+      Assertions.fail("Exception should NOT have been thrown!");
     }
-    Assert.assertTrue(store.bucketCreated);
+    Assertions.assertTrue(store.bucketCreated);
     EasyMock.verify();
   }
 
@@ -269,14 +269,14 @@ public class AwsS3AssetStoreTest {
 
     // Check if mapping saved to db
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertEquals(OBJECT_KEY_1, mapping.getObjectKey());
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals(ORG_ID, mapping.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping.getMediaPackageId());
-    Assert.assertEquals(1L, mapping.getVersion().longValue());
-    Assert.assertEquals(ASSET_ID, mapping.getMediaPackageElementId());
+    Assertions.assertEquals(OBJECT_KEY_1, mapping.getObjectKey());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals(ORG_ID, mapping.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping.getVersion().longValue());
+    Assertions.assertEquals(ASSET_ID, mapping.getMediaPackageElementId());
 
-    Assert.assertEquals(OBJECT_KEY_1, store.getAssetObjectKey(path));
+    Assertions.assertEquals(OBJECT_KEY_1, store.getAssetObjectKey(path));
   }
 
   @Test
@@ -302,12 +302,12 @@ public class AwsS3AssetStoreTest {
       EasyMock.expect(s3Client.setObjectTagging(EasyMock.capture(tags))).andReturn(null).anyTimes();
 
       //Check with AWS that the tags are applied correctly
-      Assert.assertTrue(tags.hasCaptured());
+      Assertions.assertTrue(tags.hasCaptured());
       SetObjectTaggingRequest req = tags.getValue();
-      Assert.assertEquals(BUCKET_NAME, req.getBucketName());
-      Assert.assertEquals(objectKey, req.getKey());
-      Assert.assertEquals("Freezable", req.getTagging().getTagSet().get(0).getKey());
-      Assert.assertEquals("true", req.getTagging().getTagSet().get(0).getValue());
+      Assertions.assertEquals(BUCKET_NAME, req.getBucketName());
+      Assertions.assertEquals(objectKey, req.getKey());
+      Assertions.assertEquals("Freezable", req.getTagging().getTagSet().get(0).getKey());
+      Assertions.assertEquals("true", req.getTagging().getTagSet().get(0).getValue());
 
       tags.reset();
     }
@@ -319,7 +319,7 @@ public class AwsS3AssetStoreTest {
     EasyMock.replay(s3Client, s3Transfer);
     store.put(path, source);
     //Check with AWS that the tags are not applied since this isn't in the allowlist
-    Assert.assertFalse(tags.hasCaptured());
+    Assertions.assertFalse(tags.hasCaptured());
   }
 
   @Test
@@ -352,28 +352,28 @@ public class AwsS3AssetStoreTest {
     store.put(path, source);
 
     //This asset doesn't exist
-    Assert.assertEquals("NONE",
+    Assertions.assertEquals("NONE",
         store.getAssetStorageClass(new StoragePath(ORG_ID, MP_ID, new VersionImpl(0L), ASSET_ID)));
     //This does, test the default
-    Assert.assertEquals(OBJECT_KEY_1, store.getAssetObjectKey(path));
-    Assert.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
+    Assertions.assertEquals(OBJECT_KEY_1, store.getAssetObjectKey(path));
+    Assertions.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
 
     //Set the storage class to the same thing -> should be a noop, and not change the class
     store.modifyAssetStorageClass(path, StorageClass.Standard.toString());
-    Assert.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
+    Assertions.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
 
     //change the storage type to glacier or deep archive
     store.modifyAssetStorageClass(path, StorageClass.Glacier.toString());
-    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+    Assertions.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
 
     //We're in Glacier, which means we have to restore before we can move classes
     store.modifyAssetStorageClass(path, StorageClass.ReducedRedundancy.toString());
-    Assert.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
+    Assertions.assertEquals(StorageClass.Glacier.toString(), store.getAssetStorageClass(path));
     //'Restore' the object.  NB: The mock here is skipping a whole bunch of logic
     store.initiateRestoreAsset(path, Integer.MAX_VALUE);
     //Asset is now in regular S3, sooo...
     store.modifyAssetStorageClass(path, StorageClass.DeepArchive.toString());
-    Assert.assertEquals(StorageClass.DeepArchive.toString(), store.getAssetStorageClass(path));
+    Assertions.assertEquals(StorageClass.DeepArchive.toString(), store.getAssetStorageClass(path));
 
     EasyMock.verify();
   }
@@ -401,7 +401,7 @@ public class AwsS3AssetStoreTest {
     store.put(path, source);
 
     store.modifyAssetStorageClass(path, StorageClass.DeepArchive.toString());
-    Assert.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
+    Assertions.assertEquals(StorageClass.Standard.toString(), store.getAssetStorageClass(path));
 
     EasyMock.verify();
   }
@@ -423,25 +423,25 @@ public class AwsS3AssetStoreTest {
 
     // Copy asset, this should not generate any aws call, just a new mapping in the db
     StoragePath path2 = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID2);
-    Assert.assertTrue(store.copy(path, path2));
+    Assertions.assertTrue(store.copy(path, path2));
 
     // Check if both mappings saved to db
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals(ORG_ID, mapping.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping.getMediaPackageId());
-    Assert.assertEquals(1L, mapping.getVersion().longValue());
-    Assert.assertEquals(ASSET_ID, mapping.getMediaPackageElementId());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals(ORG_ID, mapping.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping.getVersion().longValue());
+    Assertions.assertEquals(ASSET_ID, mapping.getMediaPackageElementId());
 
     AwsAssetMapping mapping2 = database.findMapping(path2);
-    Assert.assertNotNull(mapping2);
-    Assert.assertEquals(ORG_ID, mapping2.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping2.getMediaPackageId());
-    Assert.assertEquals(1L, mapping2.getVersion().longValue());
-    Assert.assertEquals(ASSET_ID2, mapping2.getMediaPackageElementId());
+    Assertions.assertNotNull(mapping2);
+    Assertions.assertEquals(ORG_ID, mapping2.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping2.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping2.getVersion().longValue());
+    Assertions.assertEquals(ASSET_ID2, mapping2.getMediaPackageElementId());
 
     // Check if both have the same AWS object key
-    Assert.assertTrue(mapping.getObjectKey().equals(mapping2.getObjectKey()));
+    Assertions.assertTrue(mapping.getObjectKey().equals(mapping2.getObjectKey()));
   }
 
   @Test
@@ -453,7 +453,7 @@ public class AwsS3AssetStoreTest {
 
     // Try to copy asset, this should return false
     StoragePath path2 = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID2);
-    Assert.assertFalse(store.copy(path, path2));
+    Assertions.assertFalse(store.copy(path, path2));
   }
 
   @Test
@@ -474,7 +474,7 @@ public class AwsS3AssetStoreTest {
     store.put(path, Source.mk(uri));
 
     Optional<InputStream> streamOpt = store.get(path);
-    Assert.assertTrue(streamOpt.isPresent());
+    Assertions.assertTrue(streamOpt.isPresent());
   }
 
   @Test
@@ -484,7 +484,7 @@ public class AwsS3AssetStoreTest {
     StoragePath path = new StoragePath(ORG_ID, MP_ID, new VersionImpl(1L), ASSET_ID);
 
     Optional<InputStream> streamOpt = store.get(path);
-    Assert.assertFalse(streamOpt.isPresent());
+    Assertions.assertFalse(streamOpt.isPresent());
   }
 
   @Test
@@ -512,26 +512,26 @@ public class AwsS3AssetStoreTest {
 
     // Check if mappings were saved to db
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals(ORG_ID, mapping.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping.getMediaPackageId());
-    Assert.assertEquals(1L, mapping.getVersion().longValue());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals(ORG_ID, mapping.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping.getVersion().longValue());
 
     AwsAssetMapping mapping2 = database.findMapping(path2);
-    Assert.assertNotNull(mapping2);
-    Assert.assertEquals(ORG_ID, mapping2.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping2.getMediaPackageId());
-    Assert.assertEquals(2L, mapping2.getVersion().longValue());
+    Assertions.assertNotNull(mapping2);
+    Assertions.assertEquals(ORG_ID, mapping2.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping2.getMediaPackageId());
+    Assertions.assertEquals(2L, mapping2.getVersion().longValue());
 
     // Delete version 1 only
     DeletionSelector versionSelector = DeletionSelector.delete(ORG_ID, MP_ID, new VersionImpl(1L));
-    Assert.assertTrue(store.delete(versionSelector));
+    Assertions.assertTrue(store.delete(versionSelector));
 
     // Check if version1 was deleted but version 2 is still there
-    Assert.assertNull(database.findMapping(path));
+    Assertions.assertNull(database.findMapping(path));
 
     mapping2 = database.findMapping(path2);
-    Assert.assertNotNull(mapping2);
+    Assertions.assertNotNull(mapping2);
   }
 
   @Test
@@ -562,24 +562,24 @@ public class AwsS3AssetStoreTest {
 
     // Check if mappings were saved to db
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals(ORG_ID, mapping.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping.getMediaPackageId());
-    Assert.assertEquals(1L, mapping.getVersion().longValue());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals(ORG_ID, mapping.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping.getVersion().longValue());
 
     AwsAssetMapping mapping2 = database.findMapping(path2);
-    Assert.assertNotNull(mapping2);
-    Assert.assertEquals(ORG_ID, mapping2.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping2.getMediaPackageId());
-    Assert.assertEquals(2L, mapping2.getVersion().longValue());
+    Assertions.assertNotNull(mapping2);
+    Assertions.assertEquals(ORG_ID, mapping2.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping2.getMediaPackageId());
+    Assertions.assertEquals(2L, mapping2.getVersion().longValue());
 
     // Delete without specifying version, both should be deleted
     DeletionSelector mpSelector = DeletionSelector.deleteAll(ORG_ID, MP_ID);
-    Assert.assertTrue(store.delete(mpSelector));
+    Assertions.assertTrue(store.delete(mpSelector));
 
     // Check if both versions were deleted
-    Assert.assertNull(database.findMapping(path));
-    Assert.assertNull(database.findMapping(path2));
+    Assertions.assertNull(database.findMapping(path));
+    Assertions.assertNull(database.findMapping(path2));
   }
 
   // @Test
@@ -601,17 +601,17 @@ public class AwsS3AssetStoreTest {
 
     // Check if mappings were saved to db
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals(ORG_ID, mapping.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping.getMediaPackageId());
-    Assert.assertEquals(1L, mapping.getVersion().longValue());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals(ORG_ID, mapping.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping.getVersion().longValue());
 
     // Delete wrong version
     DeletionSelector versionSelector = DeletionSelector.delete(ORG_ID, MP_ID, new VersionImpl(2L));
     store.delete(versionSelector);
 
     // Check if version 1 is still there
-    Assert.assertNotNull(database.findMapping(path));
+    Assertions.assertNotNull(database.findMapping(path));
   }
 
   @Test
@@ -634,39 +634,39 @@ public class AwsS3AssetStoreTest {
 
     // Copy asset, this should not generate any aws call, just a new mapping in the db
     StoragePath path2 = new StoragePath(ORG_ID, MP_ID2, new VersionImpl(1L), ASSET_ID2);
-    Assert.assertTrue(store.copy(path, path2));
+    Assertions.assertTrue(store.copy(path, path2));
 
     // Check if both mappings saved to db
     AwsAssetMapping mapping = database.findMapping(path);
-    Assert.assertNotNull(mapping);
-    Assert.assertEquals(ORG_ID, mapping.getOrganizationId());
-    Assert.assertEquals(MP_ID, mapping.getMediaPackageId());
-    Assert.assertEquals(1L, mapping.getVersion().longValue());
-    Assert.assertEquals(ASSET_ID, mapping.getMediaPackageElementId());
+    Assertions.assertNotNull(mapping);
+    Assertions.assertEquals(ORG_ID, mapping.getOrganizationId());
+    Assertions.assertEquals(MP_ID, mapping.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping.getVersion().longValue());
+    Assertions.assertEquals(ASSET_ID, mapping.getMediaPackageElementId());
 
     AwsAssetMapping mapping2 = database.findMapping(path2);
-    Assert.assertNotNull(mapping2);
-    Assert.assertEquals(ORG_ID, mapping2.getOrganizationId());
-    Assert.assertEquals(MP_ID2, mapping2.getMediaPackageId());
-    Assert.assertEquals(1L, mapping2.getVersion().longValue());
-    Assert.assertEquals(ASSET_ID2, mapping2.getMediaPackageElementId());
+    Assertions.assertNotNull(mapping2);
+    Assertions.assertEquals(ORG_ID, mapping2.getOrganizationId());
+    Assertions.assertEquals(MP_ID2, mapping2.getMediaPackageId());
+    Assertions.assertEquals(1L, mapping2.getVersion().longValue());
+    Assertions.assertEquals(ASSET_ID2, mapping2.getMediaPackageElementId());
 
     // Check if both have the same AWS object key
-    Assert.assertTrue(mapping.getObjectKey().equals(mapping2.getObjectKey()));
+    Assertions.assertTrue(mapping.getObjectKey().equals(mapping2.getObjectKey()));
 
     // Delete version 1 only, no call to s3Client.deleteObject is expected: the
     // object should not be deleted from s3 because it's linked to by ASSET_ID2
     DeletionSelector versionSelector = DeletionSelector.delete(ORG_ID, MP_ID, new VersionImpl(1L));
-    Assert.assertTrue(store.delete(versionSelector));
+    Assertions.assertTrue(store.delete(versionSelector));
 
     // Check if mp 1, asset 1 was deleted
-    Assert.assertNull(database.findMapping(path));
+    Assertions.assertNull(database.findMapping(path));
     // Check if mp2, asset 2 still there
     mapping2 = database.findMapping(path2);
-    Assert.assertNotNull(mapping2);
+    Assertions.assertNotNull(mapping2);
   }
 
-  @Test @Ignore
+  @Test @Disabled
   public void testAssetRestore() throws Exception {
     //FIXME: Partially implemented, but the poll time is a constant...
     GetObjectTaggingResult gotr = EasyMock.createStrictMock(GetObjectTaggingResult.class);
@@ -708,10 +708,10 @@ public class AwsS3AssetStoreTest {
     //status = store.getAssetRestoreStatusString(path);
 
     EasyMock.verify(s3Client, metadata);
-    Assert.fail("Not done");
+    Assertions.fail("Not done");
   }
 
-  @Test @Ignore
+  @Test @Disabled
   public void testGlacierDirectAccess() throws Exception {
     setupUpload(OBJECT_KEY_1);
     EasyMock.replay(s3Client, s3Transfer);
@@ -720,6 +720,6 @@ public class AwsS3AssetStoreTest {
     store.put(path, source);
     store.modifyAssetStorageClass(path, StorageClass.Glacier.toString());
     Optional<InputStream> stream = store.get(path);
-    Assert.fail("Not done yet");
+    Assertions.fail("Not done yet");
   }
 }

@@ -21,10 +21,10 @@
 
 package org.opencastproject.videosegmenter.ffmpeg;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -62,15 +62,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
@@ -118,8 +118,8 @@ public class VideoSegmenterTest {
   protected File tempFile = null;
   protected File tempFile1 = null;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
   /**
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
@@ -128,7 +128,7 @@ public class VideoSegmenterTest {
    * @throws Exception
    *           if setup fails
    */
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() throws Exception {
     track = TrackImpl.fromURI(VideoSegmenterTest.class.getResource(mediaResource).toURI());
     track.setFlavor(MediaPackageElements.PRESENTATION_SOURCE);
@@ -149,12 +149,12 @@ public class VideoSegmenterTest {
    * @throws Exception
    *           if setup fails
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     mpeg7Service = new Mpeg7CatalogService();
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(new File(track.getURI()));
-    tempFile = testFolder.newFile(getClass().getName() + ".xml");
+    tempFile = newFile(testFolder, getClass().getName() + ".xml");
     EasyMock.expect(
         workspace.putInCollection(
             (String) EasyMock.anyObject(),
@@ -173,7 +173,7 @@ public class VideoSegmenterTest {
     mpeg7Service1 = new Mpeg7CatalogService();
     Workspace workspace1 = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace1.get((URI) EasyMock.anyObject())).andReturn(new File(track1.getURI()));
-    tempFile1 = testFolder.newFile(getClass().getName() + "-1.xml");
+    tempFile1 = newFile(testFolder, getClass().getName() + "-1.xml");
     EasyMock.expect(
         workspace1.putInCollection(
             (String) EasyMock.anyObject(),
@@ -239,7 +239,7 @@ public class VideoSegmenterTest {
     vsegmenter1.absoluteMin = 1;
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(tempFile);
     FileUtils.deleteQuietly(tempFile1);
@@ -258,7 +258,7 @@ public class VideoSegmenterTest {
     Mpeg7Catalog mpeg7 = new Mpeg7CatalogImpl(catalog.getURI().toURL().openStream());
 
     // Is there multimedia content in the mpeg7?
-    assertTrue("Audiovisual content was expected", mpeg7.hasVideoContent());
+    assertTrue(mpeg7.hasVideoContent(), "Audiovisual content was expected");
 
     MultimediaContentType contentType = mpeg7.multimediaContent().next().elements().next();
 
@@ -270,21 +270,21 @@ public class VideoSegmenterTest {
     MediaTime firstSegmentMediaTime = firstSegment.getMediaTime();
     long startTime = firstSegmentMediaTime.getMediaTimePoint().getTimeInMilliseconds();
     long duration = firstSegmentMediaTime.getMediaDuration().getDurationInMilliseconds();
-    assertEquals("Unexpected start time of first segment", 0, startTime);
-    assertEquals("Unexpected duration of first segment", firstSegmentDuration, duration);
+    assertEquals(0, startTime, "Unexpected start time of first segment");
+    assertEquals(firstSegmentDuration, duration, "Unexpected duration of first segment");
 
     // What about the second one?
-    assertTrue("Video is expected to have more than one segment", si.hasNext());
+    assertTrue(si.hasNext(), "Video is expected to have more than one segment");
 
     Segment secondSegment = si.next();
     MediaTime secondSegmentMediaTime = secondSegment.getMediaTime();
     startTime = secondSegmentMediaTime.getMediaTimePoint().getTimeInMilliseconds();
     duration = secondSegmentMediaTime.getMediaDuration().getDurationInMilliseconds();
-    assertEquals("Unexpected start time of second segment", firstSegmentDuration, startTime);
-    assertEquals("Unexpected duration of second segment", secondSegmentDuration, duration);
+    assertEquals(firstSegmentDuration, startTime, "Unexpected start time of second segment");
+    assertEquals(secondSegmentDuration, duration, "Unexpected duration of second segment");
 
     // There should be no third segment
-    assertFalse("Found an unexpected third video segment", si.hasNext());
+    assertFalse(si.hasNext(), "Found an unexpected third video segment");
   }
 
   @Test
@@ -298,8 +298,8 @@ public class VideoSegmenterTest {
     Mpeg7Catalog mpeg7 = new Mpeg7CatalogImpl(catalog.getURI().toURL().openStream());
 
     // Is there multimedia content in the mpeg7?
-    assertTrue("Audiovisual content was expected", mpeg7.hasVideoContent());
-    assertNotNull("Audiovisual content expected", mpeg7.multimediaContent().next().elements().hasNext());
+    assertTrue(mpeg7.hasVideoContent(), "Audiovisual content was expected");
+    assertNotNull(mpeg7.multimediaContent().next().elements().hasNext(), "Audiovisual content expected");
 
     MultimediaContentType contentType = mpeg7.multimediaContent().next().elements().next();
 
@@ -314,7 +314,7 @@ public class VideoSegmenterTest {
       si.next();
     }
     float error = Math.abs((segmentCounter - vsegmenter1.prefNumber) / (float)vsegmenter1.prefNumber);
-    assertTrue("Error of Optimization is too big", error <= vsegmenter1.maxError);
+    assertTrue(error <= vsegmenter1.maxError, "Error of Optimization is too big");
   }
 
   @Test
@@ -344,16 +344,16 @@ public class VideoSegmenterTest {
     Collections.sort(optimizedList);
 
     // check if the errors were calculated correctly and  whether the elements are in the correct order
-    assertEquals("first element of optimized list incorrect",  error3, optimizedList.get(0).getError(), 0.0001f);
-    assertEquals("second element of optimized list incorrect", error1, optimizedList.get(1).getError(), 0.0001f);
-    assertEquals("third element of optimized list incorrect",  error4, optimizedList.get(2).getError(), 0.0001f);
-    assertEquals("fourth element of optimized list incorrect", error2, optimizedList.get(3).getError(), 0.0001f);
-    assertTrue("first error in optimized list is not positive", optimizedList.get(0).getError() >= 0);
-    assertTrue("second error in optimized list is not bigger than first",
-            optimizedList.get(1).getError() > optimizedList.get(0).getError());
-    assertTrue("third error in optimized list is not negative", optimizedList.get(2).getError() < 0);
-    assertTrue("fourth error in optimized list is smaller than third",
-            optimizedList.get(3).getError() > optimizedList.get(2).getError());
+    assertEquals(error3,  optimizedList.get(0).getError(), 0.0001f, "first element of optimized list incorrect");
+    assertEquals(error1, optimizedList.get(1).getError(), 0.0001f, "second element of optimized list incorrect");
+    assertEquals(error4,  optimizedList.get(2).getError(), 0.0001f, "third element of optimized list incorrect");
+    assertEquals(error2, optimizedList.get(3).getError(), 0.0001f, "fourth element of optimized list incorrect");
+    assertTrue(optimizedList.get(0).getError() >= 0, "first error in optimized list is not positive");
+    assertTrue(optimizedList.get(1).getError() > optimizedList.get(0).getError(),
+            "second error in optimized list is not bigger than first");
+    assertTrue(optimizedList.get(2).getError() < 0, "third error in optimized list is not negative");
+    assertTrue(optimizedList.get(3).getError() > optimizedList.get(2).getError(),
+            "fourth error in optimized list is smaller than third");
   }
 
   @Test
@@ -408,19 +408,25 @@ public class VideoSegmenterTest {
 
       vsegmenter.filterSegmentation(segments, track, result, 5000);
 
-      assertEquals("segment merging yields wrong number of segments", prediction[k].length, result.size());
+      assertEquals(prediction[k].length, result.size(), "segment merging yields wrong number of segments");
 
       previous = 0;
       for (int i = 0; i < prediction[k].length; i++) {
         String message = "segment " + i + " in set " + k + " has the wrong start time.";
         String message1 = "segment " + i + " in set " + k + " has the wrong duration.";
-        assertEquals(message, previous, result.get(i).getMediaTime().getMediaTimePoint().getTimeInMilliseconds());
-        assertEquals(message1, prediction[k][i], result.get(i).getMediaTime().getMediaDuration()
-            .getDurationInMilliseconds());
+        assertEquals(previous, result.get(i).getMediaTime().getMediaTimePoint().getTimeInMilliseconds(), message);
+        assertEquals(prediction[k][i], result.get(i).getMediaTime().getMediaDuration()
+            .getDurationInMilliseconds(), message1);
         previous += prediction[k][i];
       }
     }
 
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 
 }

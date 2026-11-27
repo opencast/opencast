@@ -20,13 +20,13 @@
  */
 package org.opencastproject.external.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Response;
 

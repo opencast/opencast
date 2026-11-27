@@ -35,11 +35,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,17 +52,17 @@ public class AclEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestAclEndpoint.class, NotFoundExceptionMapper.class);
 
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
   }
 
@@ -89,7 +89,7 @@ public class AclEndpointTest {
     JsonArray actualArray = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
         .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString()).getAsJsonArray();
 
-    Assert.assertEquals(expectedArray, actualArray);
+    Assertions.assertEquals(expectedArray, actualArray);
   }
 
   @Test
@@ -134,7 +134,7 @@ public class AclEndpointTest {
     JsonArray actualArray = JsonParser.parseString(given().queryParam("limit", limit).queryParam("offset", offset)
         .queryParam("target", target).expect().statusCode(HttpStatus.SC_OK)
         .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString()).getAsJsonArray();
-    Assert.assertEquals(expectedArray, actualArray);
+    Assertions.assertEquals(expectedArray, actualArray);
   }
 
 }

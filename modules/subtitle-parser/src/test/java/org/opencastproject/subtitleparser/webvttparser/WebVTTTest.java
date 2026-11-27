@@ -23,9 +23,9 @@ package org.opencastproject.subtitleparser.webvttparser;
 
 import org.opencastproject.subtitleparser.SubtitleParsingException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +47,7 @@ public class WebVTTTest {
     outputFilePath = new File("target/testoutput/output.vtt").getAbsolutePath();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     if (new File(outputFilePath).exists())  {
       new File(outputFilePath).delete();
@@ -98,15 +98,15 @@ public class WebVTTTest {
   }
 
   private void assertExampleVtt(WebVTTSubtitle subtitle) {
-    Assert.assertEquals(subtitle.getRegions().size(), 2);
-    Assert.assertEquals(subtitle.getStyle().size(), 1);
-    Assert.assertEquals(subtitle.getCues().size(), 4);
+    Assertions.assertEquals(subtitle.getRegions().size(), 2);
+    Assertions.assertEquals(subtitle.getStyle().size(), 1);
+    Assertions.assertEquals(subtitle.getCues().size(), 4);
 
     WebVTTSubtitleCue cue = subtitle.getCues().get(0);
-    Assert.assertNotNull(cue.getCueSettingsList());
-    Assert.assertNotNull(cue.getId());
-    Assert.assertEquals(cue.getLines().size(), 1);
-    Assert.assertEquals(cue.getStartTime(), 0);
+    Assertions.assertNotNull(cue.getCueSettingsList());
+    Assertions.assertNotNull(cue.getId());
+    Assertions.assertEquals(cue.getLines().size(), 1);
+    Assertions.assertEquals(cue.getStartTime(), 0);
   }
 
 }

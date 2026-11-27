@@ -29,9 +29,9 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
@@ -43,8 +43,8 @@ import org.opencastproject.userdirectory.api.UserReferenceProvider;
 import com.nimbusds.jose.JOSEException;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -73,7 +73,7 @@ public abstract class JWTLoginTest {
   protected JWKSetProvider validJwkProvider;
   protected JWKSetProvider invalidJwkProvider;
 
-  @Before
+  @BeforeEach
   public void setUp() throws NoSuchAlgorithmException, JOSEException {
     generator = JWTGenerator.getInstance();
 

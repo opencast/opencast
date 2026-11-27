@@ -38,9 +38,9 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -64,7 +64,7 @@ public class HttpNotificationWorkflowOperationHandlerTest {
   // mock services and objects
   private TrustedHttpClient client = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -104,9 +104,9 @@ public class HttpNotificationWorkflowOperationHandlerTest {
     // run the operation handler
     try {
       getWorkflowOperationResult(mp, configurations);
-      Assert.fail("Operation handler should have thrown an exception!");
+      Assertions.fail("Operation handler should have thrown an exception!");
     } catch (WorkflowOperationException e) {
-      Assert.assertTrue("Exception thrown as expected by the operation handler", true);
+      Assertions.assertTrue(true, "Exception thrown as expected by the operation handler");
     }
 
   }
@@ -153,11 +153,11 @@ public class HttpNotificationWorkflowOperationHandlerTest {
       serverThread.join(5000);
 
       String body = capturedBody.get();
-      Assert.assertNotNull("Request body should have been captured", body);
-      Assert.assertTrue("Request body should contain mediaPackageId parameter",
-              body.contains(HttpNotificationWorkflowOperationHandler.HTTP_PARAM_MEDIAPACKAGE + "="));
-      Assert.assertTrue("Request body should contain the mediapackage identifier",
-              body.contains(mp.getIdentifier().toString()));
+      Assertions.assertNotNull(body, "Request body should have been captured");
+      Assertions.assertTrue(body.contains(HttpNotificationWorkflowOperationHandler.HTTP_PARAM_MEDIAPACKAGE + "="),
+              "Request body should contain mediaPackageId parameter");
+      Assertions.assertTrue(body.contains(mp.getIdentifier().toString()),
+              "Request body should contain the mediapackage identifier");
     }
   }
 

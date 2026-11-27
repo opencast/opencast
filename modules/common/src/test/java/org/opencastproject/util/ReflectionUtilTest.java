@@ -21,10 +21,10 @@
 
 package org.opencastproject.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ReflectionUtilTest {
   @Test

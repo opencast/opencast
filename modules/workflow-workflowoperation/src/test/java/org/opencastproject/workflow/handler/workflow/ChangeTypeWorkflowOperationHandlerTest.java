@@ -37,9 +37,9 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
@@ -61,7 +61,7 @@ public class ChangeTypeWorkflowOperationHandlerTest {
 //  // mock services and objects
 //  private Workspace workspace = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
@@ -92,20 +92,20 @@ public class ChangeTypeWorkflowOperationHandlerTest {
 
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor.toString());
     Attachment[] attachments = mp.getAttachments(newFlavor);
-    Assert.assertTrue(attachments.length == 1);
+    Assertions.assertTrue(attachments.length == 1);
     Track[] tracks = mp.getTracks(newFlavor);
-    Assert.assertTrue(tracks.length == 0);
+    Assertions.assertTrue(tracks.length == 0);
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+    Assertions.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
     attachments = mp.getAttachments(newFlavor);
-    Assert.assertTrue(attachments.length == 0);
+    Assertions.assertTrue(attachments.length == 0);
     tracks = result.getMediaPackage().getTracks(newFlavor);
-    Assert.assertTrue(tracks.length == 1);
+    Assertions.assertTrue(tracks.length == 1);
   }
 
   @Test
@@ -118,21 +118,21 @@ public class ChangeTypeWorkflowOperationHandlerTest {
 
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/source");
     Attachment[] attachments = mp.getAttachments(newFlavor);
-    Assert.assertTrue(attachments.length == 1);
+    Assertions.assertTrue(attachments.length == 1);
     Track[] tracks = mp.getTracks(newFlavor);
-    Assert.assertTrue(tracks.length == 0);
+    Assertions.assertTrue(tracks.length == 0);
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
     newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+    Assertions.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
     attachments = mp.getAttachments(newFlavor);
-    Assert.assertTrue(attachments.length == 1);
+    Assertions.assertTrue(attachments.length == 1);
     tracks = result.getMediaPackage().getTracks(newFlavor);
-    Assert.assertTrue(tracks.length == 0);
+    Assertions.assertTrue(tracks.length == 0);
   }
 
   @Test
@@ -145,20 +145,20 @@ public class ChangeTypeWorkflowOperationHandlerTest {
 
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor.toString());
     Attachment[] attachments = mp.getAttachments(newFlavor);
-    Assert.assertTrue(attachments.length == 1);
+    Assertions.assertTrue(attachments.length == 1);
     Track[] tracks = mp.getTracks(newFlavor);
-    Assert.assertTrue(tracks.length == 0);
+    Assertions.assertTrue(tracks.length == 0);
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assertions.assertEquals(Action.CONTINUE, result.getAction());
 
-    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+    Assertions.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
     attachments = mp.getAttachments(newFlavor);
-    Assert.assertTrue(attachments.length == 1);
+    Assertions.assertTrue(attachments.length == 1);
     tracks = result.getMediaPackage().getTracks(newFlavor);
-    Assert.assertTrue(tracks.length == 0);
+    Assertions.assertTrue(tracks.length == 0);
   }
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)

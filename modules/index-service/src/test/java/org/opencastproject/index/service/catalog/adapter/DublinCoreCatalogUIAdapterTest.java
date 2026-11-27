@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_TITLE_KEY;
@@ -52,10 +52,9 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,10 +115,10 @@ public class DublinCoreCatalogUIAdapterTest {
 
   private DublinCoreMetadataCollection metadata;
 
-  @Rule
-  public TemporaryFolder testFolder = new TemporaryFolder();
+  @TempDir
+  private File testFolder;
 
-  @Before
+  @BeforeEach
   public void setUp() throws URISyntaxException, NotFoundException, IOException, ListProviderException {
     startDateTimeDurationCatalog = new FileInputStream(new File(getClass().getResource(
             "/catalog-adapter/start-date-time-duration.xml").toURI()));
@@ -181,7 +180,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
     eventDublincoreURI = getClass().getResource("/catalog-adapter/dublincore.xml").toURI();
 
-    outputCatalog = testFolder.newFile("out.xml");
+    outputCatalog = newFile(testFolder, "out.xml");
 
     Capture<String> mediapackageIDCapture = EasyMock.newCapture();
     Capture<String> catalogIDCapture = EasyMock.newCapture();
@@ -468,5 +467,11 @@ public class DublinCoreCatalogUIAdapterTest {
     metadata.addField(startDate, "2014-11-01", listProvidersService);
     DublinCoreMetadataUtil.updateDublincoreCatalog(catalog, metadata);
     logger.info("Catalog:" + catalog.toXmlString());
+  }
+
+  private static File newFile(File parent, String child) throws IOException {
+    File result = new File(parent, child);
+    result.createNewFile();
+    return result;
   }
 }

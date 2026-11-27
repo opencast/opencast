@@ -24,10 +24,10 @@ import static java.lang.String.format;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -55,8 +55,8 @@ import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 
@@ -105,7 +105,7 @@ public class WowzaStreamingDistributionServiceTest {
   private static final String port = "10";
   private static final String completeStreamingUrl = "http://example.com:10/path";
 
-  @Before
+  @BeforeEach
   public void before() throws Exception {
     map = new HashMap();
     map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, "/tmp/opencast/streams");
@@ -377,9 +377,9 @@ public class WowzaStreamingDistributionServiceTest {
 
     streamingService.retractSync("channel1", mp, "track-1");
 
-    assertTrue("The SMIL file must be deleted", !smilFile.exists());
-    assertTrue("The file referenced by the SMIL file must be deleted", !referencedFile.exists());
-    assertTrue("A SMIL file named by the element URI must not be deleted", foreignSmil.exists());
+    assertTrue(!smilFile.exists(), "The SMIL file must be deleted");
+    assertTrue(!referencedFile.exists(), "The file referenced by the SMIL file must be deleted");
+    assertTrue(foreignSmil.exists(), "A SMIL file named by the element URI must not be deleted");
   }
 
   /**
@@ -409,8 +409,8 @@ public class WowzaStreamingDistributionServiceTest {
 
     streamingService.retractSync("channel1", mp, "track-1");
 
-    assertTrue("The SMIL file must be deleted", !smilFile.exists());
-    assertTrue("A file outside the distribution directory must not be deleted", escapee.exists());
+    assertTrue(!smilFile.exists(), "The SMIL file must be deleted");
+    assertTrue(escapee.exists(), "A file outside the distribution directory must not be deleted");
   }
 
   /**
@@ -475,7 +475,7 @@ public class WowzaStreamingDistributionServiceTest {
         // expected
       }
     }
-    assertTrue("A file outside the distribution directory must not be deleted", escapee.exists());
+    assertTrue(escapee.exists(), "A file outside the distribution directory must not be deleted");
   }
 
   /**
@@ -503,7 +503,7 @@ public class WowzaStreamingDistributionServiceTest {
     Files.writeString(smilFile.toPath(), smil);
 
     assertTrue(streamingService.distributeSync("channel1", mp, "track-1").isEmpty());
-    assertEquals("The SMIL file must not be overwritten", smil, Files.readString(smilFile.toPath()));
+    assertEquals(smil, Files.readString(smilFile.toPath()), "The SMIL file must not be overwritten");
   }
 
   private void activateStreamingService(File distRoot) throws Exception {

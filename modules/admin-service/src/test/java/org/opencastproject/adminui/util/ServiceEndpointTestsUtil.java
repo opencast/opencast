@@ -25,7 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -42,7 +42,7 @@ public final class ServiceEndpointTestsUtil {
   }
 
   public static void testJSONObjectEquality(JsonObject expected, JsonObject actual) {
-    Assert.assertEquals(expected.size(), actual.size());
+    Assertions.assertEquals(expected.size(), actual.size());
     testSimpleProperty(COUNT, expected, actual);
     testSimpleProperty(TOTAL, expected, actual);
     testSimpleProperty(LIMIT, expected, actual);
@@ -51,14 +51,14 @@ public final class ServiceEndpointTestsUtil {
   }
 
   private static void testSimpleProperty(String key, JsonObject expected, JsonObject actual) {
-    Assert.assertEquals(expected.get(key), actual.get(key));
+    Assertions.assertEquals(expected.get(key), actual.get(key));
   }
 
   private static void testArrayProperty(String key, JsonObject expected, JsonObject actual) {
     JsonArray expectedArray = expected.getAsJsonArray(key);
     JsonArray actualArray = actual.getAsJsonArray(key);
 
-    Assert.assertEquals(expectedArray.size(), actualArray.size());
+    Assertions.assertEquals(expectedArray.size(), actualArray.size());
     JsonObject exObject;
     JsonObject acObject;
 
@@ -66,14 +66,14 @@ public final class ServiceEndpointTestsUtil {
       exObject = expectedArray.get(i).getAsJsonObject();
       acObject = actualArray.get(i).getAsJsonObject();
       Set<String> exEntrySet = exObject.keySet();
-      Assert.assertEquals(exEntrySet.size(), acObject.size());
+      Assertions.assertEquals(exEntrySet.size(), acObject.size());
       Iterator<String> exIter = exEntrySet.iterator();
 
       while (exIter.hasNext()) {
         String item = exIter.next();
         JsonElement exValue = exObject.get(item);
         JsonElement acValue = acObject.get(item);
-        Assert.assertEquals(exValue, acValue);
+        Assertions.assertEquals(exValue, acValue);
       }
     }
   }

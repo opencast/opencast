@@ -20,11 +20,12 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
@@ -58,8 +59,8 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -70,7 +71,7 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
   private Organization org;
   private String examplePlayer = "/paella/ui/watch.html?id=";
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Map<String, String> properties = new HashMap<String, String>();
     properties.put(ConfigurablePublishWorkflowOperationHandler.PLAYER_PROPERTY, examplePlayer);
@@ -79,19 +80,21 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.replay(org);
   }
 
-  @Test(expected = WorkflowOperationException.class)
-  public void testNoChannelIdThrowsException() throws WorkflowOperationException {
-    MediaPackage mediapackage = EasyMock.createNiceMock(MediaPackage.class);
-    WorkflowOperationInstance workflowOperationInstance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
-    WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
-    EasyMock.expect(workflowInstance.getMediaPackage()).andStubReturn(mediapackage);
-    EasyMock.expect(workflowInstance.getCurrentOperation()).andStubReturn(workflowOperationInstance);
-    JobContext jobContext = EasyMock.createNiceMock(JobContext.class);
+  @Test
+  public void testNoChannelIdThrowsException() {
+    assertThrows(WorkflowOperationException.class, () -> {
+      MediaPackage mediapackage = EasyMock.createNiceMock(MediaPackage.class);
+      WorkflowOperationInstance workflowOperationInstance = EasyMock.createNiceMock(WorkflowOperationInstance.class);
+      WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
+      EasyMock.expect(workflowInstance.getMediaPackage()).andStubReturn(mediapackage);
+      EasyMock.expect(workflowInstance.getCurrentOperation()).andStubReturn(workflowOperationInstance);
+      JobContext jobContext = EasyMock.createNiceMock(JobContext.class);
 
-    EasyMock.replay(jobContext, mediapackage, workflowInstance, workflowOperationInstance);
+      EasyMock.replay(jobContext, mediapackage, workflowInstance, workflowOperationInstance);
 
-    ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler();
-    configurePublish.start(workflowInstance, jobContext);
+      ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler();
+      configurePublish.start(workflowInstance, jobContext);
+    });
   }
 
   @Test
@@ -241,9 +244,9 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     WorkflowOperationResult result = configurePublish.start(workflowInstance, jobContext);
     assertNotNull(result.getMediaPackage());
 
-    assertTrue("The publication element has not been added to the mediapackage.", capturePublication.hasCaptured());
-    assertTrue("Some other type of element has been added to the mediapackage instead of the publication element.",
-            capturePublication.getValue().getElementType().equals(MediaPackageElement.Type.Publication));
+    assertTrue(capturePublication.hasCaptured(), "The publication element has not been added to the mediapackage.");
+    assertTrue(capturePublication.getValue().getElementType().equals(MediaPackageElement.Type.Publication),
+            "Some other type of element has been added to the mediapackage instead of the publication element.");
     Publication publication = (Publication) capturePublication.getValue();
     assertEquals(1, publication.getAttachments().length);
     assertNotEquals(attachment.getIdentifier(), publication.getAttachments()[0].getIdentifier());

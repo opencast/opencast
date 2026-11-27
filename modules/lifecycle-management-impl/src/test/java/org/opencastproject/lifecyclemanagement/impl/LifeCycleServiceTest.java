@@ -23,8 +23,8 @@ package org.opencastproject.lifecyclemanagement.impl;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
@@ -51,9 +51,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,7 @@ public class LifeCycleServiceTest {
 
   private AccessControlList acl = new AccessControlList();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Init default policy
     List<LifeCyclePolicyAccessControlEntry> policyAccessControlEntries = new ArrayList<>();
@@ -127,36 +127,34 @@ public class LifeCycleServiceTest {
   public void testPolicyManagement() throws Exception {
     policy = service.createLifeCyclePolicy(policy);
     LifeCyclePolicy policyFromDb = service.getLifeCyclePolicyById(policy.getId());
-    Assert.assertNotNull(policyFromDb);
-    Assert.assertEquals(policy.getTitle(), policyFromDb.getTitle());
+    Assertions.assertNotNull(policyFromDb);
+    Assertions.assertEquals(policy.getTitle(), policyFromDb.getTitle());
 
     policy.setTitle("different title");
     assertTrue(service.updateLifeCyclePolicy(policy));
     policyFromDb = service.getLifeCyclePolicyById(policy.getId());
-    Assert.assertEquals(policy.getTitle(), policyFromDb.getTitle());
+    Assertions.assertEquals(policy.getTitle(), policyFromDb.getTitle());
 
     service.deleteLifeCyclePolicy(policy.getId());
-    Exception exception = assertThrows(NotFoundException.class, () -> {
-      service.getLifeCyclePolicyById(policy.getId());
-    });
+    Exception exception = assertThrows(NotFoundException.class, () ->
+        service.getLifeCyclePolicyById(policy.getId()));
   }
 
   @Test
   public void testTaskManagement() throws Exception {
     task = service.createLifeCycleTask(task);
     LifeCycleTask taskFromDb = service.getLifeCycleTaskById(task.getId());
-    Assert.assertNotNull(taskFromDb);
-    Assert.assertEquals(task.getStatus(), taskFromDb.getStatus());
+    Assertions.assertNotNull(taskFromDb);
+    Assertions.assertEquals(task.getStatus(), taskFromDb.getStatus());
 
     task.setStatus(Status.FINISHED);
     assertTrue(service.updateLifeCycleTask(task));
     taskFromDb = service.getLifeCycleTaskById(task.getId());
-    Assert.assertEquals(task.getStatus(), taskFromDb.getStatus());
+    Assertions.assertEquals(task.getStatus(), taskFromDb.getStatus());
 
     service.deleteLifeCycleTask(task.getId());
-    Exception exception = assertThrows(NotFoundException.class, () -> {
-      service.getLifeCycleTaskById(task.getId());
-    });
+    Exception exception = assertThrows(NotFoundException.class, () ->
+        service.getLifeCycleTaskById(task.getId()));
   }
 
 }

@@ -21,13 +21,13 @@
 
 package org.opencastproject.security.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -46,7 +46,7 @@ public class OrganizationParsingTest {
 
   private JAXBContext jaxbContext;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     jaxbContext = JAXBContext.newInstance(JaxbOrganization.class);
   }
@@ -59,12 +59,12 @@ public class OrganizationParsingTest {
     String[] strings2 = StringUtils.stripEnd(in2, " /").split(" ");
     Arrays.sort(strings1);
     Arrays.sort(strings2);
-    assertEquals("Organization XML not formed as expected - error in number of XML attributes", strings1.length,
-            strings2.length);
+    assertEquals(strings1.length, strings2.length,
+            "Organization XML not formed as expected - error in number of XML attributes");
     for (int i = 0; i < strings1.length; i++) {
       if (!(strings1[i].equals(strings2[i]))) {
-        assertEquals("Organization XML not formed as expected - xml-attributes don't match", "<" + in1 + ">", "<" + in2
-                + ">");
+        assertEquals("<" + in1 + ">", "<" + in2
+                + ">", "Organization XML not formed as expected - xml-attributes don't match");
       }
     }
     return true;
@@ -79,8 +79,8 @@ public class OrganizationParsingTest {
 
     Arrays.sort(strings1);
     Arrays.sort(strings2);
-    assertEquals("Organization XML not formed as expected - error in number of XML tags", strings1.length,
-            strings2.length);
+    assertEquals(strings1.length, strings2.length,
+            "Organization XML not formed as expected - error in number of XML tags");
     for (int i = 0; i < strings1.length; i++) {
       if (!compareXMLattsEqual(strings1[i], strings2[i])) {
         return false;
@@ -118,7 +118,7 @@ public class OrganizationParsingTest {
     String producedOutput = writer.toString();
 
     boolean val = compareXMLTagsEqual(expectedOutput, producedOutput);
-    assertTrue("Organization XML not formed as expected", val);
+    assertTrue(val, "Organization XML not formed as expected");
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
     // CHECKSTYLE:OFF
@@ -136,7 +136,7 @@ public class OrganizationParsingTest {
     String producedOutput = OrganizationParser.toXml(org);
 
     boolean val = compareXMLTagsEqual(expectedOutput, producedOutput);
-    assertTrue("Organization XML not formed as expected", val);
+    assertTrue(val, "Organization XML not formed as expected");
 
     StreamSource streamSource = new StreamSource(new StringReader(producedOutput));
     // CHECKSTYLE:OFF

@@ -21,10 +21,10 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.mediapackage.MediaPackageSupport.containsPathTraversal;
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClassPath;
 import static org.opencastproject.mediapackage.MediaPackageSupport.sanityCheck;
@@ -32,7 +32,7 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.sanityCheck;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringReader;
 import java.util.List;
@@ -47,14 +47,14 @@ import javax.xml.transform.stream.StreamSource;
 public class MediaPackageSupportTest {
   @Test
   public void testSanityCheck() {
-    assertTrue("Media package must pass check", sanityCheck(loadFromClassPath("/manifest.xml")).isEmpty());
+    assertTrue(sanityCheck(loadFromClassPath("/manifest.xml")).isEmpty(), "Media package must pass check");
     // A missing id attribute is completed with a generated identifier, so the package passes
     // the check; identifiers that are empty, '.', '..' or contain path separators cannot be
     // parsed at all (see testParseRejectsUnsafeMediaPackageIdentifiers)
     assertTrue(sanityCheck(loadFromClassPath("/manifest-insane.xml")).isEmpty());
     MediaPackage noId = new MediaPackageImpl();
     noId.setIdentifier(null);
-    assertTrue("A media package without identifier must be reported", sanityCheck(noId).isPresent());
+    assertTrue(sanityCheck(noId).isPresent(), "A media package without identifier must be reported");
   }
 
   @Test
@@ -145,7 +145,7 @@ public class MediaPackageSupportTest {
     mp.setIdentifier(unsafeId("a/b"));
     List<String> errors = sanityCheck(mp).orElseThrow();
     assertEquals(2, errors.size());
-    assertTrue(errors.toString(), errors.stream().allMatch(e -> e.contains("path separators")));
+    assertTrue(errors.stream().allMatch(e -> e.contains("path separators")), errors.toString());
   }
 
   /**

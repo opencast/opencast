@@ -27,9 +27,9 @@ import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionImpl;
 import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -41,7 +41,7 @@ public class OaiPmhSetMatchTest {
   private static String episodeDublincore;
   private static String seriesDublincore;
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() throws IOException {
     episodeDublincore = IOUtils.resourceToString("/episode-dublincore.xml", Charset.forName("UTF-8"));
     seriesDublincore = IOUtils.resourceToString("/series-dublincore.xml", Charset.forName("UTF-8"));
@@ -61,16 +61,16 @@ public class OaiPmhSetMatchTest {
 
     AbstractOaiPmhDatabase oaiPmhDatabase = new OaiPmhDatabaseImpl();
     // Test episode license is CC-BY (should match)
-    Assert.assertTrue(oaiPmhDatabase.matchSetDef(setDef, elements));
+    Assertions.assertTrue(oaiPmhDatabase.matchSetDef(setDef, elements));
 
     ((OaiPmhSetDefinitionImpl)setDef).addFilter("filter2", "dublincore/series",
         OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, "license>CC-BY-SA<");
     // Test episode license is CC-BY and series license is CC-BY-SA (should not match)
-    Assert.assertFalse(oaiPmhDatabase.matchSetDef(setDef, elements));
+    Assertions.assertFalse(oaiPmhDatabase.matchSetDef(setDef, elements));
 
     ((OaiPmhSetDefinitionImpl)setDef).addFilter("filter2", "dublincore/series",
         OaiPmhSetDefinitionFilter.CRITERION_CONTAINS, "license>CC-BY<");
     // Test episode license is CC-BY and series license is CC-BY-SA or CC-BY (should match)
-    Assert.assertTrue(oaiPmhDatabase.matchSetDef(setDef, elements));
+    Assertions.assertTrue(oaiPmhDatabase.matchSetDef(setDef, elements));
   }
 }

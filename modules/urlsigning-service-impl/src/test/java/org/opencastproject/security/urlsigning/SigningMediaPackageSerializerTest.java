@@ -20,11 +20,11 @@
  */
 package org.opencastproject.security.urlsigning;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.util.HashMap;

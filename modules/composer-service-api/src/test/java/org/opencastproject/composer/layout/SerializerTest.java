@@ -21,12 +21,13 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opencastproject.composer.layout.Offset.offset;
 
 import com.google.gson.JsonParser;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SerializerTest {
   @Test
@@ -49,8 +50,9 @@ public class SerializerTest {
             JsonParser.parseString(Serializer.json(hcls).toString()).getAsJsonObject()));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testAccessFailure() {
-    JsonParser.parseString("{\"x\": [1, 2, 3]}").getAsJsonObject().get("x").getAsString();
+    assertThrows(RuntimeException.class, () ->
+        JsonParser.parseString("{\"x\": [1, 2, 3]}").getAsJsonObject().get("x").getAsString());
   }
 }

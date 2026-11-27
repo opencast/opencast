@@ -28,9 +28,9 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -53,7 +53,7 @@ public class LoadComparatorTest {
 
   private final ServiceRegistryJpaImpl serviceRegistry = new ServiceRegistryJpaImpl();
 
-  @After
+  @AfterEach
   public void tearDown() {
     // encodingWorkers/encodingThreshold are static, i.e. shared across every instance and test in this JVM
     ServiceRegistryJpaImpl.encodingWorkers = ServiceRegistryJpaImpl.DEFAULT_ENCODING_WORKERS;
@@ -77,11 +77,11 @@ public class LoadComparatorTest {
   private void assertObeysGeneralContract(Comparator<ServiceRegistration> comparator,
           List<ServiceRegistration> elements) {
     for (ServiceRegistration a : elements) {
-      Assert.assertEquals("not reflexive for " + a.getHost(), 0, comparator.compare(a, a));
+      Assertions.assertEquals(0, comparator.compare(a, a), "not reflexive for " + a.getHost());
       for (ServiceRegistration b : elements) {
         int ab = Integer.signum(comparator.compare(a, b));
         int ba = Integer.signum(comparator.compare(b, a));
-        Assert.assertEquals("not antisymmetric for " + a.getHost() + " and " + b.getHost(), -ab, ba);
+        Assertions.assertEquals(-ab, ba, "not antisymmetric for " + a.getHost() + " and " + b.getHost());
       }
     }
     for (ServiceRegistration a : elements) {
@@ -93,10 +93,10 @@ public class LoadComparatorTest {
           if (comparator.compare(b, c) > 0) {
             continue;
           }
-          Assert.assertTrue(
+          Assertions.assertTrue(
+                  comparator.compare(a, c) <= 0,
                   String.format("not transitive: %s <= %s <= %s, but %s > %s", a.getHost(), b.getHost(),
-                          c.getHost(), a.getHost(), c.getHost()),
-                  comparator.compare(a, c) <= 0);
+                          c.getHost(), a.getHost(), c.getHost()));
         }
       }
     }
@@ -210,7 +210,7 @@ public class LoadComparatorTest {
       List<ServiceRegistration> sorted = serviceRegistry
               .getServiceRegistrationsByLoad(JOB_TYPE, services, hosts, systemLoad);
 
-      Assert.assertEquals(services.size(), sorted.size());
+      Assertions.assertEquals(services.size(), sorted.size());
     }
   }
 }

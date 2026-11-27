@@ -22,17 +22,17 @@
 
 package org.opencastproject.runtimeinfo.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -308,8 +308,9 @@ public class RestDocsAnnotationTest {
               .flatMap(holder -> holder.getEndpoints().stream())
               .findFirst()
               .orElseThrow(() -> new AssertionError("no endpoint was documented for " + methodName));
-      assertEquals("endpoint declared by " + methodName + " must not be documented with a trailing slash",
-              "", endpoint.getPath());
+      assertEquals("",
+              endpoint.getPath(),
+              "endpoint declared by " + methodName + " must not be documented with a trailing slash");
     }
   }
 

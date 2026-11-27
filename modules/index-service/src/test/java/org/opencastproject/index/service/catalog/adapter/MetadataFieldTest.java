@@ -20,12 +20,11 @@
  */
 
 package org.opencastproject.index.service.catalog.adapter;
-
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
@@ -39,8 +38,8 @@ import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -70,7 +69,7 @@ public class MetadataFieldTest {
   private ListProvidersService listProvidersService;
   private final Date testDate = new Date(1415396970000L);
 
-  @Before
+  @BeforeEach
   public void setUp() throws ListProviderException {
     collection.put("key-1", "value-1");
     collection.put("key-2", "value-2");

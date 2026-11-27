@@ -20,8 +20,8 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opencastproject.assetmanager.impl.AssetManagerImpl.READ_ACTION;
 import static org.opencastproject.assetmanager.impl.AssetManagerImpl.WRITE_ACTION;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -46,17 +46,13 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 
 import org.easymock.EasyMock;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-
-@RunWith(JUnitParamsRunner.class)
 public class AssetManagerSecurityTest extends AssetManagerTestBase {
   public static final String ROLE_TEACHER = "ROLE_TEACHER";
   public static final String ROLE_USER = "ROLE_USER";
@@ -131,14 +127,14 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 
   /* -------------------------------------------------------------------------------------------------------------- */
 
-  @Test
-  @Parameters
+  @ParameterizedTest
+  @MethodSource("parametersForTestTakeSnapshot")
   public void testTakeSnapshot(final AccessControlList acl, User user,
       final boolean assertAccess) throws Exception {
     createSnapshot(acl, user, assertAccess);
   }
 
-  private Object parametersForTestTakeSnapshot() {
+  private static Object[] parametersForTestTakeSnapshot() {
     final Organization org = TestOrganization.mkDefault();
     return arrayOf(arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
             TestUser.mk(org, ROLE_USER),
@@ -159,8 +155,8 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
   /**
    * Media package is created under the admin of the default organization.
    */
-  @Test
-  @Parameters
+  @ParameterizedTest
+  @MethodSource("parametersForTestSetAvailabilityAndSetProperty")
   public void testSetAvailabilityAndSetProperty(
       final AccessControlList acl,
       User user,
@@ -190,7 +186,7 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
     });
   }
 
-  private Object parametersForTestSetAvailabilityAndSetProperty() {
+  private static Object[] parametersForTestSetAvailabilityAndSetProperty() {
     final Organization org = TestOrganization.mkDefault();
     return arrayOf(arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
             TestUser.mk(org, ROLE_USER),
@@ -220,8 +216,8 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
   /**
    * Media package is created under the admin of the default organization.
    */
-  @Test
-  @Parameters
+  @ParameterizedTest
+  @MethodSource("parametersForTestGetAsset")
   public void testGetAsset(final AccessControlList acl, User user, boolean assertAccess) throws Exception {
     final Snapshot snapshot = createSnapshot(acl);
     // get an asset of the snapshot
@@ -240,7 +236,7 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
     });
   }
 
-  private Object parametersForTestGetAsset() {
+  private static Object[] parametersForTestGetAsset() {
     final Organization org = TestOrganization.mkDefault();
     return arrayOf(arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
             TestUser.mk(org, ROLE_TEACHER),
@@ -264,7 +260,6 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
             mkDefaultOrgGlobalAdmin(),
             true));
   }
-
 
 
   /* -------------------------------------------------------------------------------------------------------------- */
@@ -386,29 +381,29 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
   }
 
   /** Create a user with admin rights who belongs to the given organization. */
-  private User mkOrgAdmin(Organization org) {
+  private static User mkOrgAdmin(Organization org) {
     return TestUser.mk(org, org.getAdminRole());
   }
 
   /** Create a user with global admin rights who belongs to the default organization. */
-  private User mkDefaultOrgGlobalAdmin() {
+  private static User mkDefaultOrgGlobalAdmin() {
     final Organization org = TestOrganization.mkDefault();
     return TestUser.mk(org, SecurityConstants.GLOBAL_ADMIN_ROLE);
   }
 
   /** Create a user with global admin rights who belongs to the given organization. */
-  private User mkGlobalAdmin(Organization org) {
+  private static User mkGlobalAdmin(Organization org) {
     return TestUser.mk(org, SecurityConstants.GLOBAL_ADMIN_ROLE);
   }
 
-  private AccessControlList acl(AccessControlEntry... ace) {
+  private static AccessControlList acl(AccessControlEntry... ace) {
     return new AccessControlList(ace);
   }
 
   /**
    * Create an allow rule (Opencast only support allow!)
    */
-  private AccessControlEntry ace(String role, String action) {
+  private static AccessControlEntry ace(String role, String action) {
     return new AccessControlEntry(role, action, true);
   }
 

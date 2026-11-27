@@ -21,8 +21,8 @@
 
 package org.opencastproject.util.doc;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,7 +34,7 @@ public class OrganizationTemplateDataTest {
   public void nullPropertiesAreIgnored() {
     Map<String, Object> dataModel = new HashMap<>();
     OrganizationTemplateData.addOrganizationProperties(dataModel, null);
-    Assert.assertTrue(dataModel.isEmpty());
+    Assertions.assertTrue(dataModel.isEmpty());
   }
 
   @Test
@@ -45,8 +45,8 @@ public class OrganizationTemplateDataTest {
 
     OrganizationTemplateData.addOrganizationProperties(dataModel, properties);
 
-    Assert.assertEquals("azure-1", dataModel.get("org_transcriber"));
-    Assert.assertEquals(1, dataModel.size());
+    Assertions.assertEquals("azure-1", dataModel.get("org_transcriber"));
+    Assertions.assertEquals(1, dataModel.size());
   }
 
   @Test
@@ -58,17 +58,17 @@ public class OrganizationTemplateDataTest {
     OrganizationTemplateData.addOrganizationProperties(dataModel, properties);
 
     // The flattened form
-    Assert.assertEquals("http://admin.example.com", dataModel.get("org_org_opencastproject_admin_ui_url"));
+    Assertions.assertEquals("http://admin.example.com", dataModel.get("org_org_opencastproject_admin_ui_url"));
     // The dotted form, as documented in the workflow configuration guide: ${org_org.opencastproject.admin.ui.url}
     Map org = (Map) dataModel.get("org_org");
-    Assert.assertNotNull(org);
+    Assertions.assertNotNull(org);
     Map opencastproject = (Map) org.get("opencastproject");
-    Assert.assertNotNull(opencastproject);
+    Assertions.assertNotNull(opencastproject);
     Map admin = (Map) opencastproject.get("admin");
-    Assert.assertNotNull(admin);
+    Assertions.assertNotNull(admin);
     Map ui = (Map) admin.get("ui");
-    Assert.assertNotNull(ui);
-    Assert.assertEquals("http://admin.example.com", ui.get("url"));
+    Assertions.assertNotNull(ui);
+    Assertions.assertEquals("http://admin.example.com", ui.get("url"));
   }
 
   @Test
@@ -83,9 +83,9 @@ public class OrganizationTemplateDataTest {
     Map org = (Map) dataModel.get("org_org");
     Map opencastproject = (Map) org.get("opencastproject");
     Map adminUi = (Map) ((Map) opencastproject.get("admin")).get("ui");
-    Assert.assertEquals("http://admin.example.com", adminUi.get("url"));
+    Assertions.assertEquals("http://admin.example.com", adminUi.get("url"));
     Map engageUi = (Map) ((Map) opencastproject.get("engage")).get("ui");
-    Assert.assertEquals("http://engage.example.com", engageUi.get("url"));
+    Assertions.assertEquals("http://engage.example.com", engageUi.get("url"));
   }
 
   @Test
@@ -98,12 +98,12 @@ public class OrganizationTemplateDataTest {
     OrganizationTemplateData.addOrganizationProperties(dataModel, properties);
 
     // Both properties keep their flattened form
-    Assert.assertEquals("short-value", dataModel.get("org_a_b"));
-    Assert.assertEquals("long-value", dataModel.get("org_a_b_c"));
+    Assertions.assertEquals("short-value", dataModel.get("org_a_b"));
+    Assertions.assertEquals("long-value", dataModel.get("org_a_b_c"));
     // The nested structure is created by the longer key; the shorter key's dotted form is a map, not its value
     Map orgA = (Map) dataModel.get("org_a");
-    Assert.assertTrue(orgA.get("b") instanceof Map);
-    Assert.assertEquals("long-value", ((Map) orgA.get("b")).get("c"));
+    Assertions.assertTrue(orgA.get("b") instanceof Map);
+    Assertions.assertEquals("long-value", ((Map) orgA.get("b")).get("c"));
   }
 
   @Test
@@ -116,9 +116,9 @@ public class OrganizationTemplateDataTest {
     OrganizationTemplateData.addOrganizationProperties(dataModel, properties);
 
     // Both properties keep their flattened form
-    Assert.assertEquals("/play/", dataModel.get("org_player"));
-    Assert.assertEquals("/m/", dataModel.get("org_player_mobile"));
+    Assertions.assertEquals("/play/", dataModel.get("org_player"));
+    Assertions.assertEquals("/m/", dataModel.get("org_player_mobile"));
     // The undotted property occupies the root with its value, so the longer key has no dotted form
-    Assert.assertEquals(2, dataModel.size());
+    Assertions.assertEquals(2, dataModel.size());
   }
 }

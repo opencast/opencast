@@ -45,7 +45,7 @@ import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -58,7 +58,7 @@ import java.util.Optional;
 import javax.ws.rs.Path;
 
 @Path("/")
-@Ignore
+@Disabled
 public class TestThemesEndpoint extends ThemesEndpoint {
 
   private User user;

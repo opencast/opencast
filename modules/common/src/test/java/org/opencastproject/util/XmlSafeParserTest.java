@@ -21,8 +21,10 @@
 
 package org.opencastproject.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -52,20 +54,24 @@ public class XmlSafeParserTest {
     Document d = db.parse(xmlInput);
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void newDocumentBuilderFactoryUnsafeTest() throws ParserConfigurationException, SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    DocumentBuilder db = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document d = db.parse(xmlInput);
+      DocumentBuilder db = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
+      Document d = db.parse(xmlInput);
+    });
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void newDocumentBuilderFactoryUnsafe2Test() throws ParserConfigurationException, SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    DocumentBuilder db = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
-    Document d = db.parse(xmlInput);
+      DocumentBuilder db = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
+      Document d = db.parse(xmlInput);
+    });
   }
 
   @Test
@@ -84,36 +90,44 @@ public class XmlSafeParserTest {
     sp.getXMLReader().parse(new InputSource(xmlInput));
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void newSAXParserFactoryUnsafeTest() throws ParserConfigurationException, SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
-    sp.parse(xmlInput, new DefaultHandler());
+      SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
+      sp.parse(xmlInput, new DefaultHandler());
+    });
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void newSAXParserFactoryUnsafe2Test() throws ParserConfigurationException, SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
-    sp.parse(xmlInput, new DefaultHandler());
+      SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
+      sp.parse(xmlInput, new DefaultHandler());
+    });
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void newSAXParserFactoryUnsafeTest2() throws ParserConfigurationException, SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
-    sp.getXMLReader().parse(new InputSource(xmlInput));
+      SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
+      sp.getXMLReader().parse(new InputSource(xmlInput));
+    });
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void newSAXParserFactoryUnsafe2Test2() throws ParserConfigurationException, SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
-    sp.getXMLReader().parse(new InputSource(xmlInput));
+      SAXParser sp = XmlSafeParser.newSAXParserFactory().newSAXParser();
+      sp.getXMLReader().parse(new InputSource(xmlInput));
+    });
   }
 
   @Test
@@ -124,20 +138,24 @@ public class XmlSafeParserTest {
     tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
   }
 
-  @Test(expected = TransformerException.class)
-  public void newTransformerFactoryUnsafeTest() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+  @Test
+  public void newTransformerFactoryUnsafeTest() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
-  @Test(expected = TransformerException.class)
-  public void newTransformerFactoryUnsafe2Test() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+  @Test
+  public void newTransformerFactoryUnsafe2Test() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
   @Test
@@ -150,24 +168,28 @@ public class XmlSafeParserTest {
     tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
   }
 
-  @Test(expected = TransformerException.class)
-  public void configureTransformerFactoryUnsafeTest() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+  @Test
+  public void configureTransformerFactoryUnsafeTest() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    // CHECKSTYLE:OFF
-    Transformer tf = XmlSafeParser.configureTransformerFactory(TransformerFactory.newInstance()).newTransformer();
-    // CHECKSTLYE:ON
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      // CHECKSTYLE:OFF
+      Transformer tf = XmlSafeParser.configureTransformerFactory(TransformerFactory.newInstance()).newTransformer();
+      // CHECKSTLYE:ON
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
-  @Test(expected = TransformerException.class)
-  public void configureTransformerFactoryUnsafe2Test() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+  @Test
+  public void configureTransformerFactoryUnsafe2Test() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    // CHECKSTYLE:OFF
-    Transformer tf = XmlSafeParser.configureTransformerFactory(TransformerFactory.newInstance()).newTransformer();
-    // CHECKSTLYE:ON
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      // CHECKSTYLE:OFF
+      Transformer tf = XmlSafeParser.configureTransformerFactory(TransformerFactory.newInstance()).newTransformer();
+      // CHECKSTLYE:ON
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
   @Test
@@ -182,28 +204,32 @@ public class XmlSafeParserTest {
     tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
   }
 
-  @Test(expected = TransformerException.class)
-  public void configureTransformerFactoryInbuiltUnsafeTest() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+  @Test
+  public void configureTransformerFactoryInbuiltUnsafeTest() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    Transformer tf = XmlSafeParser.configureTransformerFactory(
-      // CHECKSTYLE:OFF
-      TransformerFactory.newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null)
+      Transformer tf = XmlSafeParser.configureTransformerFactory(
+          // CHECKSTYLE:OFF
+          TransformerFactory.newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null)
       // CHECKSTLYE:ON
-    ).newTransformer();
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      ).newTransformer();
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
-  @Test(expected = TransformerException.class)
-  public void configureTransformerFactoryInbuiltUnsafe2Test() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+  @Test
+  public void configureTransformerFactoryInbuiltUnsafe2Test() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    Transformer tf = XmlSafeParser.configureTransformerFactory(
-      // CHECKSTYLE:OFF
-      TransformerFactory.newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null)
+      Transformer tf = XmlSafeParser.configureTransformerFactory(
+          // CHECKSTYLE:OFF
+          TransformerFactory.newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null)
       // CHECKSTLYE:ON
-    ).newTransformer();
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      ).newTransformer();
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
   @Test
@@ -218,28 +244,32 @@ public class XmlSafeParserTest {
     tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
   }
 
-  @Test(expected = TransformerException.class)
-  public void configureTransformerFactorySaxonUnsafeTest() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+  @Test
+  public void configureTransformerFactorySaxonUnsafeTest() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    Transformer tf = XmlSafeParser.configureTransformerFactory(
-      // CHECKSTYLE:OFF
-      TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+      Transformer tf = XmlSafeParser.configureTransformerFactory(
+          // CHECKSTYLE:OFF
+          TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
       // CHECKSTLYE:ON
-    ).newTransformer();
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      ).newTransformer();
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
-  @Test(expected = TransformerException.class)
-  public void configureTransformerFactorySaxonUnsafe2Test() throws TransformerException, TransformerConfigurationException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+  @Test
+  public void configureTransformerFactorySaxonUnsafe2Test() {
+    assertThrows(TransformerException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    Transformer tf = XmlSafeParser.configureTransformerFactory(
-      // CHECKSTYLE:OFF
-      TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
+      Transformer tf = XmlSafeParser.configureTransformerFactory(
+          // CHECKSTYLE:OFF
+          TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null)
       // CHECKSTLYE:ON
-    ).newTransformer();
-    tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+      ).newTransformer();
+      tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
+    });
   }
 
   @Test
@@ -249,18 +279,22 @@ public class XmlSafeParserTest {
     Document d = XmlSafeParser.parse(xmlInput);
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void parseUnsafeTest() throws SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
 
-    Document d = XmlSafeParser.parse(xmlInput);
+      Document d = XmlSafeParser.parse(xmlInput);
+    });
   }
 
-  @Test(expected = SAXParseException.class)
+  @Test
   public void parseUnsafe2Test() throws SAXException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
+    assertThrows(SAXParseException.class, () -> {
+      InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
 
-    Document d = XmlSafeParser.parse(xmlInput);
+      Document d = XmlSafeParser.parse(xmlInput);
+    });
   }
 
   @Test
@@ -292,7 +326,7 @@ public class XmlSafeParserTest {
       catched++;
     };
 
-    Assert.assertEquals(catched, 2);
+    Assertions.assertEquals(catched, 2);
 
     d4 = XmlSafeParser.parse(xmlInputSafe2);
   }

@@ -22,8 +22,8 @@ package org.opencastproject.oaipmh.server;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsError;
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsValid;
 import static org.opencastproject.util.IoSupport.withResource;
@@ -62,10 +62,9 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.hamcrest.Matcher;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -80,10 +79,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Source;
 
+@Timeout(value = 5000, unit = TimeUnit.MILLISECONDS)
 public class OaiPmhRepositoryTest {
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhRepositoryTest.class);
   private static final NamespaceContext NS_CTX = OaiPmhNamespaceContext.getContext();
@@ -91,13 +92,9 @@ public class OaiPmhRepositoryTest {
 
   private static final boolean DISABLE_VALIDATION = true;
   private static boolean runValidation = false;
-
-  // CHECKSTYLE:OFF
-  @Rule
-  public Timeout globalTimeout = Timeout.millis(5000);
   // CHECKSTYLE:ON
 
-  @BeforeClass
+  @BeforeAll
   public static void checkHttpConnection() {
     final CloseableHttpClient client = HttpClients.createDefault();
     try {
@@ -247,7 +244,7 @@ public class OaiPmhRepositoryTest {
   ) throws Exception {
     if (runValidation) {
       if (status.isPresent()) {
-        assertTrue("http://validator.oaipmh.com/ reports errors", validate(verb, xmlGen, status.get()));
+        assertTrue(validate(verb, xmlGen, status.get()), "http://validator.oaipmh.com/ reports errors");
       }
     }
     final Document doc = xmlGen.generate();

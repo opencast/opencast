@@ -21,14 +21,15 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.PropertiesUtil;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 import java.util.Dictionary;
@@ -41,7 +42,7 @@ public class CatalogUIAdapterConfigurationTest {
 
   private Dictionary<String, String> configProperties;
 
-  @Before
+  @BeforeEach
   public void setUpClass() throws Exception {
     // Load the config properties
     InputStream in = getClass().getResourceAsStream("/catalog-adapter/event.properties");
@@ -60,10 +61,12 @@ public class CatalogUIAdapterConfigurationTest {
     assertEquals("custom-root-element-name", configuration.getCatalogXmlRootElementName());
   }
 
-  @Test(expected = ConfigurationException.class)
+  @Test
   public void testMissingXmlRootElementName() {
-    configProperties.remove(CatalogUIAdapterConfiguration.KEY_XML_ROOT_ELEMENT_NAME);
-    CatalogUIAdapterConfiguration.loadFromDictionary(configProperties);
+    assertThrows(ConfigurationException.class, () -> {
+      configProperties.remove(CatalogUIAdapterConfiguration.KEY_XML_ROOT_ELEMENT_NAME);
+      CatalogUIAdapterConfiguration.loadFromDictionary(configProperties);
+    });
   }
 
   @Test
@@ -72,17 +75,21 @@ public class CatalogUIAdapterConfigurationTest {
     assertEquals("http://myorg.com/metadata/catalog", configuration.getCatalogXmlRootNamespace());
   }
 
-  @Test(expected = ConfigurationException.class)
+  @Test
   public void testMissingXmlRootNamespace() {
-    configProperties.remove(CatalogUIAdapterConfiguration.KEY_XML_ROOT_ELEMENT_NS_URI);
-    CatalogUIAdapterConfiguration.loadFromDictionary(configProperties);
+    assertThrows(ConfigurationException.class, () -> {
+      configProperties.remove(CatalogUIAdapterConfiguration.KEY_XML_ROOT_ELEMENT_NS_URI);
+      CatalogUIAdapterConfiguration.loadFromDictionary(configProperties);
+    });
   }
 
-  @Test(expected = ConfigurationException.class)
+  @Test
   public void testMissingXmlRootNamespaceBinding() {
-    configProperties.remove("xml.namespaceBinding.root.URI");
-    configProperties.remove("xml.namespaceBinding.root.prefix");
-    CatalogUIAdapterConfiguration.loadFromDictionary(configProperties);
+    assertThrows(ConfigurationException.class, () -> {
+      configProperties.remove("xml.namespaceBinding.root.URI");
+      configProperties.remove("xml.namespaceBinding.root.prefix");
+      CatalogUIAdapterConfiguration.loadFromDictionary(configProperties);
+    });
   }
 
 }

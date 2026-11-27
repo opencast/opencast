@@ -25,10 +25,10 @@ import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,13 +49,13 @@ public class WebVttCaptionConveterTest {
   private String expectedOutput = "WEBVTT\n\n00:00:49.520 --> 00:00:52.961\n" + CAPTION_LINE
           + "1.\n\n00:00:54.123 --> 00:00:56.456\n" + CAPTION_LINE + "2.\n\n";
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     format = new WebVttCaptionConverter();
     outputStream = new ByteArrayOutputStream();
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws IOException {
     IOUtils.closeQuietly(outputStream);
   }
@@ -71,6 +71,6 @@ public class WebVttCaptionConveterTest {
     captionList.add(new CaptionImpl(new TimeImpl(0, 0, 54, 123), new TimeImpl(0, 0, 56, 456), captionLines2));
 
     format.exportCaption(outputStream, captionList, null);
-    Assert.assertTrue(outputStream.toString("UTF-8").equals(expectedOutput));
+    Assertions.assertTrue(outputStream.toString("UTF-8").equals(expectedOutput));
   }
 }

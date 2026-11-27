@@ -26,8 +26,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public class WorkflowConfigurationTest {
     ops.add(op);
     instance.setOperations(ops);
     String xml = XmlWorkflowParser.toXml(instance);
-    Assert.assertTrue(xml.contains("configuration key=\"this\">that</"));
+    Assertions.assertTrue(xml.contains("configuration key=\"this\">that</"));
   }
 
 }

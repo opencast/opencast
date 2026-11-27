@@ -21,9 +21,9 @@
 
 package org.opencastproject.event.comment.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.event.comment.persistence.EventCommentDatabaseServiceImpl.PERSISTENCE_UNIT;
@@ -44,8 +44,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class EventCommentDatabaseImplTest {
 
   private EventCommentDatabaseServiceImpl persistence;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
     UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);

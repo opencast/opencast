@@ -31,9 +31,9 @@ import org.opencastproject.usertracking.api.UserActionList;
 import org.opencastproject.usertracking.api.UserSession;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ import java.util.Map;
 public class UserTrackingServiceImplTest {
   private UserTrackingServiceImpl service = null;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Set up the annotation service
     service = new UserTrackingServiceImpl();
@@ -63,15 +63,15 @@ public class UserTrackingServiceImplTest {
     Map<String, Object> props = new HashMap<>();
 
     service.updated(props);
-    Assert.assertFalse(service.getUserTrackingEnabled());
+    Assertions.assertFalse(service.getUserTrackingEnabled());
 
     props.put("org.opencastproject.usertracking.detailedtrack", "true");
     service.updated(props);
-    Assert.assertTrue(service.getUserTrackingEnabled());
+    Assertions.assertTrue(service.getUserTrackingEnabled());
 
     props.put("org.opencastproject.usertracking.detailedtrack", "false");
     service.updated(props);
-    Assert.assertFalse(service.getUserTrackingEnabled());
+    Assertions.assertFalse(service.getUserTrackingEnabled());
   }
 
   /**
@@ -89,8 +89,8 @@ public class UserTrackingServiceImplTest {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
 
     //Sanity checks
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Assert that the correct things are in the correct places.
     list = getFootprintList("mp", null, 3);
@@ -109,8 +109,8 @@ public class UserTrackingServiceImplTest {
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session456", "mp", "someone else", "127.0.01", 560, 720);
 
     //Sanity checks
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Assert that the correct things are in the correct places.
     list = getFootprintList("mp", null, 5);
@@ -132,8 +132,8 @@ public class UserTrackingServiceImplTest {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 20, 30);
 
     //Sanity checks
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Assert that the correct things are in the correct places.
     list = getFootprintList("mp", null, 5);
@@ -156,8 +156,8 @@ public class UserTrackingServiceImplTest {
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session456", "mp", "someone else", "127.0.01", 950, 960);
 
     //Sanity checks
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Assert that the correct things are in the correct places.
     list = getFootprintList("mp", null, 7);
@@ -187,8 +187,8 @@ public class UserTrackingServiceImplTest {
   @Test
   public void testBasicUserActionLists() throws Exception {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -199,8 +199,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionLists(1, 0, 10, 1);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -211,8 +211,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionLists(1, 0, 10, 1);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -223,8 +223,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionLists(2, 0, 10, 2);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 50, 60);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -242,8 +242,8 @@ public class UserTrackingServiceImplTest {
   @Test
   public void testUserActionListsByType() throws Exception {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -263,8 +263,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByType("other", 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -284,8 +284,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByType("other", 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -305,8 +305,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByType("other", 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 50, 60);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -333,8 +333,8 @@ public class UserTrackingServiceImplTest {
   @Test
   public void testUserActionListsByTypeAndMediapackage() throws Exception {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -364,8 +364,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByTypeAndMediapackage("other", "not-mp", 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -395,8 +395,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByTypeAndMediapackage("other", "not-mp", 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -426,8 +426,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByTypeAndMediapackage("other", "not-mp", 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 50, 60);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -464,8 +464,8 @@ public class UserTrackingServiceImplTest {
   @Test
   public void testUserActionsListsByTypeAndDay() throws Exception {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     DateFormat df = new SimpleDateFormat("yyyyMMdd");
     Calendar c1 = Calendar.getInstance();
@@ -484,8 +484,8 @@ public class UserTrackingServiceImplTest {
   @Test
   public void testUserActionsListsByTypeAndDayWithTime() throws Exception {
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 10, 20);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
     Calendar c1 = Calendar.getInstance();
@@ -533,8 +533,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByTypeAndDay("other", yesterday, 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -564,8 +564,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByTypeAndDay("other", yesterday, 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -595,8 +595,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByTypeAndDay("other", yesterday, 0, 0, 10, 0);
 
     createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session123", "mp", "me", "127.0.0.1", 50, 60);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -633,8 +633,8 @@ public class UserTrackingServiceImplTest {
   @Test
   public void testArbitraryAction() throws Exception {
     createAndVerifyUserAction("arbitraryType", "session123", "mp", "me", "127.0.0.1", 10, 20);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
@@ -693,8 +693,8 @@ public class UserTrackingServiceImplTest {
     //Create an event that happens tomorrow, and check to make sure it does not appear in the stats for today
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 0, 10, tomorrowD);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     verifyUserActionListsByDay(today, 0, 0, 0, 0);
     verifyUserActionListsByDay(today, 0, 0, 1, 0);
@@ -704,8 +704,8 @@ public class UserTrackingServiceImplTest {
     //Create an event yesterday and check that it appears in the stats for today
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 10, 20, yesterdayD);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     verifyUserActionListsByDay(today, 0, 0, 0, 0);
     verifyUserActionListsByDay(today, 0, 0, 1, 0);
@@ -715,8 +715,8 @@ public class UserTrackingServiceImplTest {
     //Create an event today and check that it appears today
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 20, 30, todayD);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //verifyUserActionListsByDay(now, 0, 0, 0, 1);
     verifyUserActionListsByDay(today, 1, 0, 1, 1);
@@ -726,8 +726,8 @@ public class UserTrackingServiceImplTest {
     //Create an event for another user, and check that it appears today
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "other", "someone else", "127.0.01", 20, 30, todayD);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(1, service.getViews("other"));
 
     //verifyUserActionListsByDay(now, 0, 0, 0, 2);
     verifyUserActionListsByDay(today, 1, 0, 1, 2);
@@ -751,159 +751,159 @@ public class UserTrackingServiceImplTest {
 
     //Check against an empty session list
     Report rep = service.getReport(0, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30, backHalf);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Sanity checks against a single viewer, mediapackage, and session
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 45, forwardHalf);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Sanity checks against a single viewer, mediapackage, and two sessions
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(15, rep.getPlayed());
-    Assert.assertEquals(2, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(15, rep.getPlayed());
+    Assertions.assertEquals(2, rep.getViews());
 
     rep = service.getReport(1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(15, rep.getPlayed());
-    Assert.assertEquals(2, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(15, rep.getPlayed());
+    Assertions.assertEquals(2, rep.getViews());
 
     rep = service.getReport(1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 50, 55, forwardHalf);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(3, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Sanity checks against two viewers, mediapackage, and three sessions
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(20, rep.getPlayed());
-    Assert.assertEquals(3, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(20, rep.getPlayed());
+    Assertions.assertEquals(3, rep.getViews());
 
     rep = service.getReport(1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(20, rep.getPlayed());
-    Assert.assertEquals(3, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(20, rep.getPlayed());
+    Assertions.assertEquals(3, rep.getViews());
 
     rep = service.getReport(1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session4", "other", "someone else", "127.0.01", 0, 10, forwardHalf);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
+    Assertions.assertEquals(3, service.getViews("mp"));
+    Assertions.assertEquals(1, service.getViews("other"));
 
     //Sanity checks against two viewers, two mediapackages, and four sessions
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(2, rep.getTotal());
-    Assert.assertEquals(30, rep.getPlayed());
-    Assert.assertEquals(4, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(2, rep.getTotal());
+    Assertions.assertEquals(30, rep.getPlayed());
+    Assertions.assertEquals(4, rep.getViews());
 
     rep = service.getReport(1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(2, rep.getTotal());
-    Assert.assertEquals(30, rep.getPlayed());
-    Assert.assertEquals(4, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(2, rep.getTotal());
+    Assertions.assertEquals(30, rep.getPlayed());
+    Assertions.assertEquals(4, rep.getViews());
 
     rep = service.getReport(1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
   }
 
   /**
@@ -980,187 +980,187 @@ public class UserTrackingServiceImplTest {
 
     //Check against an empty session list
     Report rep = service.getReport(minusTwo, plusTwo, 0, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30, minusOne);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(1, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Sanity checks against a single viewer, mediapackage, and session
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(minusTwo, plusTwo, 0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(minusTwo, plusTwo, 1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(minusTwo, plusTwo, 0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(minusTwo, plusTwo, 1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(minusTwo, today, 0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(today, plusTwo, 1, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 45, plusOne);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(2, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Sanity checks against a single viewer, mediapackage, and two sessions
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(minusTwo, plusTwo, 0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(15, rep.getPlayed());
-    Assert.assertEquals(2, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(15, rep.getPlayed());
+    Assertions.assertEquals(2, rep.getViews());
 
     rep = service.getReport(minusTwo, plusTwo, 1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(minusTwo, plusTwo, 0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(15, rep.getPlayed());
-    Assert.assertEquals(2, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(15, rep.getPlayed());
+    Assertions.assertEquals(2, rep.getViews());
 
     rep = service.getReport(minusTwo, plusTwo, 1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(minusTwo, today, 0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(today, plusTwo, 0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(5, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(5, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 50, 55, plusOne);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
+    Assertions.assertEquals(3, service.getViews("mp"));
+    Assertions.assertEquals(0, service.getViews("other"));
 
     //Sanity checks against two viewers, mediapackage, and three sessions
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(20, rep.getPlayed());
-    Assert.assertEquals(3, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(20, rep.getPlayed());
+    Assertions.assertEquals(3, rep.getViews());
 
     rep = service.getReport(1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     rep = service.getReport(0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(20, rep.getPlayed());
-    Assert.assertEquals(3, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(20, rep.getPlayed());
+    Assertions.assertEquals(3, rep.getViews());
 
     rep = service.getReport(1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(0, rep.getTotal());
-    Assert.assertEquals(0, rep.getPlayed());
-    Assert.assertEquals(0, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(0, rep.getTotal());
+    Assertions.assertEquals(0, rep.getPlayed());
+    Assertions.assertEquals(0, rep.getViews());
 
     createAndVerifyUserAction(
         UserTrackingServiceImpl.FOOTPRINT_KEY, "session4", "other", "someone else", "127.0.01", 0, 10, plusOne);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
+    Assertions.assertEquals(3, service.getViews("mp"));
+    Assertions.assertEquals(1, service.getViews("other"));
 
     //Sanity checks against two viewers, two mediapackages, and four sessions
 
     //Test various limit and offset combinations
     //https://bugs.eclipse.org/bugs/show_bug.cgi?id=328730
     rep = service.getReport(0, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(2, rep.getTotal());
-    Assert.assertEquals(30, rep.getPlayed());
-    Assert.assertEquals(4, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(2, rep.getTotal());
+    Assertions.assertEquals(30, rep.getPlayed());
+    Assertions.assertEquals(4, rep.getViews());
 
     rep = service.getReport(1, 0);
-    Assert.assertEquals(0, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(0, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
 
     rep = service.getReport(0, 10);
-    Assert.assertEquals(10, rep.getLimit());
-    Assert.assertEquals(0, rep.getOffset());
-    Assert.assertEquals(2, rep.getTotal());
-    Assert.assertEquals(30, rep.getPlayed());
-    Assert.assertEquals(4, rep.getViews());
+    Assertions.assertEquals(10, rep.getLimit());
+    Assertions.assertEquals(0, rep.getOffset());
+    Assertions.assertEquals(2, rep.getTotal());
+    Assertions.assertEquals(30, rep.getPlayed());
+    Assertions.assertEquals(4, rep.getViews());
 
     rep = service.getReport(1, 1);
-    Assert.assertEquals(1, rep.getLimit());
-    Assert.assertEquals(1, rep.getOffset());
-    Assert.assertEquals(1, rep.getTotal());
-    Assert.assertEquals(10, rep.getPlayed());
-    Assert.assertEquals(1, rep.getViews());
+    Assertions.assertEquals(1, rep.getLimit());
+    Assertions.assertEquals(1, rep.getOffset());
+    Assertions.assertEquals(1, rep.getTotal());
+    Assertions.assertEquals(10, rep.getPlayed());
+    Assertions.assertEquals(1, rep.getViews());
   }
 
   /**
@@ -1175,8 +1175,8 @@ public class UserTrackingServiceImplTest {
       list = service.getFootprints(mediapackageId, userId);
     }
     //There's always a 0th footprint, so this should never be zero!
-    Assert.assertEquals(expectedFootprints, list.getTotal());
-    Assert.assertEquals(expectedFootprints, list.getFootprints().size());
+    Assertions.assertEquals(expectedFootprints, list.getTotal());
+    Assertions.assertEquals(expectedFootprints, list.getFootprints().size());
     return list;
   }
 
@@ -1185,8 +1185,8 @@ public class UserTrackingServiceImplTest {
    * @throws Exception
    */
   private void verifyFootprintViewsAndPositions(FootprintList list, int counter, int position, int views) {
-    Assert.assertEquals(position, list.getFootprints().get(counter).getPosition());
-    Assert.assertEquals(views, list.getFootprints().get(counter).getViews());
+    Assertions.assertEquals(position, list.getFootprints().get(counter).getPosition());
+    Assertions.assertEquals(views, list.getFootprints().get(counter).getViews());
   }
 
   /**
@@ -1195,10 +1195,10 @@ public class UserTrackingServiceImplTest {
    */
   private void verifyUserActionLists(int count, int offset, int limit, int total) {
     UserActionList ual = service.getUserActions(offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
   }
 
   /**
@@ -1207,10 +1207,10 @@ public class UserTrackingServiceImplTest {
    */
   private void verifyUserActionListsByType(String type, int count, int offset, int limit, int total) {
     UserActionList ual = service.getUserActionsByType(type, offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
   }
 
   /**
@@ -1226,24 +1226,24 @@ public class UserTrackingServiceImplTest {
       int total
   ) {
     UserActionList ual = service.getUserActionsByTypeAndMediapackageId(type, mp, offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
 
     //This method does the same thing, except it orders by creation date.
     ual = service.getUserActionsByTypeAndMediapackageIdByDate(type, mp, offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
 
     //This method does the same thing, except it orders by the reverse of the creation date.
     ual = service.getUserActionsByTypeAndMediapackageIdByDescendingDate(type, mp, offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
   }
 
   /**
@@ -1252,10 +1252,10 @@ public class UserTrackingServiceImplTest {
    */
   private void verifyUserActionListsByTypeAndDay(String type, String day, int count, int offset, int limit, int total) {
     UserActionList ual = service.getUserActionsByTypeAndDay(type, day, offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
   }
 
   /**
@@ -1264,10 +1264,10 @@ public class UserTrackingServiceImplTest {
    */
   private void verifyUserActionListsByDay(String day, int count, int offset, int limit, int total) {
     UserActionList ual = service.getUserActionsByDay(day, offset, limit);
-    Assert.assertEquals(limit, ual.getLimit());
-    Assert.assertEquals(offset, ual.getOffset());
-    Assert.assertEquals(total, ual.getTotal());
-    Assert.assertEquals(count, ual.getUserActions().size());
+    Assertions.assertEquals(limit, ual.getLimit());
+    Assertions.assertEquals(offset, ual.getOffset());
+    Assertions.assertEquals(total, ual.getTotal());
+    Assertions.assertEquals(count, ual.getUserActions().size());
   }
 
   /**
@@ -1310,22 +1310,22 @@ public class UserTrackingServiceImplTest {
     Long id = userAction.getId();
 
     // Ensure that, once persisted, the user action has an ID
-    Assert.assertNotNull(id);
+    Assertions.assertNotNull(id);
 
     //Sanity checks
     UserActionImpl fromDb = (UserActionImpl) service.getUserAction(id);
-    Assert.assertNotNull(fromDb);
-    Assert.assertNotNull(fromDb.getCreated());
-    Assert.assertEquals(id, fromDb.getId());
-    Assert.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
-    Assert.assertEquals(userAction.getSession().getSessionId(), fromDb.getSession().getSessionId());
-    Assert.assertEquals(userAction.getType(), fromDb.getType());
-    Assert.assertEquals(userAction.getSession().getUserId(), fromDb.getSession().getUserId());
-    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
-    Assert.assertEquals(userAction.getInpoint(), fromDb.getInpoint());
-    Assert.assertEquals(userAction.getOutpoint(), fromDb.getOutpoint());
-    Assert.assertEquals(userAction.getIsPlaying(), fromDb.getIsPlaying());
-    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
+    Assertions.assertNotNull(fromDb);
+    Assertions.assertNotNull(fromDb.getCreated());
+    Assertions.assertEquals(id, fromDb.getId());
+    Assertions.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
+    Assertions.assertEquals(userAction.getSession().getSessionId(), fromDb.getSession().getSessionId());
+    Assertions.assertEquals(userAction.getType(), fromDb.getType());
+    Assertions.assertEquals(userAction.getSession().getUserId(), fromDb.getSession().getUserId());
+    Assertions.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
+    Assertions.assertEquals(userAction.getInpoint(), fromDb.getInpoint());
+    Assertions.assertEquals(userAction.getOutpoint(), fromDb.getOutpoint());
+    Assertions.assertEquals(userAction.getIsPlaying(), fromDb.getIsPlaying());
+    Assertions.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     return userAction;
   }
 

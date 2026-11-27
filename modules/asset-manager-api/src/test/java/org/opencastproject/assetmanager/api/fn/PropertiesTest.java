@@ -20,16 +20,18 @@
  */
 package org.opencastproject.assetmanager.api.fn;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.assetmanager.api.fn.Properties.mkProperty;
 
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Value;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,10 +39,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-
-@RunWith(JUnitParamsRunner.class)
 public class PropertiesTest {
   static final Property pb1 = mkProperty("mp-1", "org.opencastproject.approval", "approved", Value.mk(false));
   static final Property ps1 = mkProperty("mp-1", "org.opencastproject.approval", "comment", Value.mk("Bad audio"));
@@ -58,31 +56,31 @@ public class PropertiesTest {
     }
   };
 
-  @Test
-  @Parameters({
-          "unknown.namespace | 0",
-          "org.opencastproject.approval | 3",
-          "org.opencastproject.comment | 2"})
+  @ParameterizedTest
+  @CsvSource(delimiter = '|', value = {
+      "unknown.namespace | 0",
+      "org.opencastproject.approval | 3",
+      "org.opencastproject.comment | 2"})
   public void testByNamespace(String namespace, int expectedCount) throws Exception {
     assertEquals(expectedCount, ps.stream().filter(p -> p.getId().getNamespace().equals(namespace)).count());
   }
 
-  @Test
-  @Parameters({
-          "unknown.name | 0",
-          "approved | 1",
-          "date | 1",
-          "comment | 2"})
+  @ParameterizedTest
+  @CsvSource(delimiter = '|', value = {
+      "unknown.name | 0",
+      "approved | 1",
+      "date | 1",
+      "comment | 2"})
   public void testByPropertyName(String propertyName, int expectedCount) throws Exception {
     assertEquals(expectedCount, ps.stream().filter(p -> p.getId().getName().equals(propertyName)).count());
   }
 
-  @Test
-  @Parameters({
-          "unknown.name | approved | 0",
-          "org.opencastproject.approval | approved | 1",
-          "org.opencastproject.approval | date | 1",
-          "org.opencastproject.approval | comment | 1"})
+  @ParameterizedTest
+  @CsvSource(delimiter = '|', value = {
+      "unknown.name | approved | 0",
+      "org.opencastproject.approval | approved | 1",
+      "org.opencastproject.approval | date | 1",
+      "org.opencastproject.approval | comment | 1"})
 
   public void testByFqnName(String namespace, String propertyName, int expectedCount) throws Exception {
     PropertyName pName = new PropertyName(namespace, propertyName);
@@ -93,12 +91,12 @@ public class PropertiesTest {
     );
   }
 
-  @Test
-  @Parameters({
-          "mp-x | 0",
-          "mp-1 | 2",
-          "mp-2 | 1",
-          "mp-3 | 2"})
+  @ParameterizedTest
+  @CsvSource(delimiter = '|', value = {
+      "mp-x | 0",
+      "mp-1 | 2",
+      "mp-2 | 1",
+      "mp-3 | 2"})
   public void testByMediaPackageId(String mpId, int expectedCount) throws Exception {
     assertEquals(expectedCount, ps.stream().filter(p -> p.getId().getMediaPackageId().equals(mpId)).count());
   }
@@ -115,9 +113,10 @@ public class PropertiesTest {
     assertEquals(values, ps.stream().map(p -> p.getValue()).collect(Collectors.toList()));
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetValueWithExpectedTypeTypesDoNotMatch() throws Exception {
-    ps.stream().map(p -> p.getValue().get(Value.STRING)).collect(Collectors.toList());
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream().map(p -> p.getValue().get(Value.STRING)).collect(Collectors.toList()));
   }
 
   @Test
@@ -161,24 +160,26 @@ public class PropertiesTest {
     );
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetValueFoldNotFound() throws Exception {
-    ps.stream()
-        .filter(p -> p.getId().getName().equals("unknown"))
-        .findFirst()
-        .get()
-        .getValue()
-        .get(Value.STRING);
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream()
+          .filter(p -> p.getId().getName().equals("unknown"))
+          .findFirst()
+          .get()
+          .getValue()
+          .get(Value.STRING));
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetValueFoldTypeDoesNotMatch() throws Exception {
-    ps.stream()
-        .filter(p -> p.getId().getName().equals("comment"))
-        .findFirst()
-        .get()
-        .getValue()
-        .get(Value.BOOLEAN);
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream()
+          .filter(p -> p.getId().getName().equals("comment"))
+          .findFirst()
+          .get()
+          .getValue()
+          .get(Value.BOOLEAN));
   }
 
   // TODO: Remove this?
@@ -221,15 +222,16 @@ public class PropertiesTest {
     );
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetValueFoldOptTypeDoesNotMatch() throws Exception {
-    assertEquals(Optional.empty(),
-        Optional.ofNullable(ps.stream()
-            .filter(p -> p.getId().getName().equals("comment"))
-            .findFirst()
-            .map(p -> p.getValue().get(Value.BOOLEAN))
-            .orElse(null))
-    );
+    assertThrows(java.lang.RuntimeException.class, () ->
+        assertEquals(Optional.empty(),
+          Optional.ofNullable(ps.stream()
+              .filter(p -> p.getId().getName().equals("comment"))
+              .findFirst()
+              .map(p -> p.getValue().get(Value.BOOLEAN))
+              .orElse(null))
+      ));
   }
 
   @Test
@@ -278,15 +280,16 @@ public class PropertiesTest {
     );
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetBooleanNotFound() throws Exception {
-    ps.stream()
-        .filter(p -> p.getId().getName().equals("unknown"))
-        .findFirst()
-        .map(p -> p.getValue().get(Value.BOOLEAN))
-        .orElseThrow(() -> {
-          throw new RuntimeException();
-        });
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream()
+          .filter(p -> p.getId().getName().equals("unknown"))
+          .findFirst()
+          .map(p -> p.getValue().get(Value.BOOLEAN))
+          .orElseThrow(() -> {
+            throw new RuntimeException();
+          }));
   }
 
   @Test
@@ -302,15 +305,16 @@ public class PropertiesTest {
     );
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetStringNotFound() throws Exception {
-    ps.stream()
-        .filter(p -> p.getId().getName().equals("unknown"))
-        .findFirst()
-        .map(p -> p.getValue().get(Value.STRING))
-        .orElseThrow(() -> {
-          throw new RuntimeException();
-        });
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream()
+          .filter(p -> p.getId().getName().equals("unknown"))
+          .findFirst()
+          .map(p -> p.getValue().get(Value.STRING))
+          .orElseThrow(() -> {
+            throw new RuntimeException();
+          }));
   }
 
   @Test
@@ -326,15 +330,16 @@ public class PropertiesTest {
     );
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetDateNotFound() throws Exception {
-    ps.stream()
-        .filter(p -> p.getId().getName().equals("unknown"))
-        .findFirst()
-        .map(p -> p.getValue().get(Value.DATE))
-        .orElseThrow(() -> {
-          throw new RuntimeException();
-        });
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream()
+          .filter(p -> p.getId().getName().equals("unknown"))
+          .findFirst()
+          .map(p -> p.getValue().get(Value.DATE))
+          .orElseThrow(() -> {
+            throw new RuntimeException();
+          }));
   }
 
   @Test
@@ -350,15 +355,16 @@ public class PropertiesTest {
     );
   }
 
-  @Test(expected = java.lang.RuntimeException.class)
+  @Test
   public void testGetNotFoundLong() throws Exception {
-    ps.stream()
-        .filter(p -> p.getId().getName().equals("unknown"))
-        .findFirst()
-        .map(p -> p.getValue().get(Value.LONG))
-        .orElseThrow(() -> {
-          throw new RuntimeException();
-        });
+    assertThrows(java.lang.RuntimeException.class, () ->
+        ps.stream()
+          .filter(p -> p.getId().getName().equals("unknown"))
+          .findFirst()
+          .map(p -> p.getValue().get(Value.LONG))
+          .orElseThrow(() -> {
+            throw new RuntimeException();
+          }));
   }
 
   @Test

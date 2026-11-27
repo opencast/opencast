@@ -21,13 +21,13 @@
 
 package org.opencastproject.util.doc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.junit.Assume;
-import org.junit.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -94,8 +94,8 @@ public class DocUtilTest {
       // The command is only escaped for the FreeMarker string literal: FreeMarker's Execute uses
       // Runtime.exec(String), which splits the command on whitespace without a shell, so shell
       // quoting would end up in the path as literal characters
-      Assume.assumeFalse("The marker path must not contain whitespace for the payload to work",
-              marker.toAbsolutePath().toString().matches(".*\\s.*"));
+      Assumptions.assumeFalse(marker.toAbsolutePath().toString().matches(".*\\s.*"),
+              "The marker path must not contain whitespace for the payload to work");
       String command = "touch " + marker.toAbsolutePath();
       String payload = "${\"freemarker.template.utility.Execute\"?new()(" + freeMarkerString(command) + ")}";
       try {
@@ -105,10 +105,10 @@ public class DocUtilTest {
         // Assert on the full stack trace including the cause chain: incident details store it,
         // so the template must not leak through a cause either
         String stackTrace = ExceptionUtils.getStackTrace(e);
-        assertFalse("The template source must not leak into the exception or its cause chain, got: " + stackTrace,
-                stackTrace.contains(command));
-        assertFalse("The template must not be able to instantiate classes (e.g. to execute commands)",
-                Files.exists(marker));
+        assertFalse(stackTrace.contains(command),
+                "The template source must not leak into the exception or its cause chain, got: " + stackTrace);
+        assertFalse(Files.exists(marker),
+                "The template must not be able to instantiate classes (e.g. to execute commands)");
       }
     } finally {
       Files.deleteIfExists(marker);
@@ -135,8 +135,8 @@ public class DocUtilTest {
     } catch (RuntimeException e) {
       // The include fails before any file is read; make sure that nothing of the file leaked anyway
       String stackTrace = ExceptionUtils.getStackTrace(e);
-      assertFalse("The included file's content must not leak into the exception, got: " + stackTrace,
-              stackTrace.contains("root:"));
+      assertFalse(stackTrace.contains("root:"),
+              "The included file's content must not leak into the exception, got: " + stackTrace);
     }
   }
 
@@ -151,10 +151,10 @@ public class DocUtilTest {
       // Assert on the full stack trace including the cause chain: incident details store it,
       // so the template and the data must not leak through a cause either
       String stackTrace = ExceptionUtils.getStackTrace(e);
-      assertFalse("The data model must not leak into the exception or its cause chain",
-              stackTrace.contains("super-secret-value"));
-      assertFalse("The template source must not leak into the exception or its cause chain",
-              stackTrace.contains("freemarker.template.utility.Execute"));
+      assertFalse(stackTrace.contains("super-secret-value"),
+              "The data model must not leak into the exception or its cause chain");
+      assertFalse(stackTrace.contains("freemarker.template.utility.Execute"),
+              "The template source must not leak into the exception or its cause chain");
     }
   }
 
@@ -168,8 +168,8 @@ public class DocUtilTest {
       // Assert on the full stack trace including the cause chain: incident details store it,
       // so the template must not leak through a cause either
       String stackTrace = ExceptionUtils.getStackTrace(e);
-      assertFalse("The template source must not leak into the exception or its cause chain, got: " + stackTrace,
-              stackTrace.contains("top-secret-payload-12345"));
+      assertFalse(stackTrace.contains("top-secret-payload-12345"),
+              "The template source must not leak into the exception or its cause chain, got: " + stackTrace);
     }
   }
 

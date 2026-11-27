@@ -30,10 +30,10 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
@@ -185,16 +185,16 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }

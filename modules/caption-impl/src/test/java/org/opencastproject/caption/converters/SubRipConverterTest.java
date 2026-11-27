@@ -25,10 +25,10 @@ package org.opencastproject.caption.converters;
 import org.opencastproject.caption.api.Caption;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class SubRipConverterTest {
       + "This is caption testing.\r\n"
       + "1. line.";
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     format = new SubRipCaptionConverter();
     inputStream = SubRipConverterTest.class.getResourceAsStream("/sample.srt");
@@ -67,14 +67,14 @@ public class SubRipConverterTest {
       // verify parsing and exporting without exceptions
       List<Caption> collection = format.importCaption(inputStream, null);
       format.exportCaption(outputStream, collection, null);
-      Assert.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
+      Assertions.assertTrue(outputStream.toString("UTF-8").startsWith(expectedOutput));
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
   }
 
-  @After
+  @AfterEach
   public void tear() throws IOException {
     IOUtils.closeQuietly(inputStream);
     IOUtils.closeQuietly(outputStream);

@@ -20,14 +20,14 @@
  */
 package org.opencastproject.scheduler.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Recur;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class UtilTests {
   private final TimeZone cet = TimeZone.getTimeZone("Europe/Zurich"); // European time (UTC +2)
   private final TimeZone nonDstTz = TimeZone.getTimeZone("America/Phoenix"); // Like UTC, it has no DaySavings Boundry
 
-  @Before
+  @BeforeEach
   public void setUp() {
 
   }

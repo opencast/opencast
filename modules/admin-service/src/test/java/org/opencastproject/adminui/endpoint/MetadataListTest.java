@@ -35,8 +35,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.osgi.service.component.ComponentException;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 public class MetadataListTest {
   private CommonEventCatalogUIAdapter episodeDublinCoreCatalogUIAdapter;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     episodeDublinCoreCatalogUIAdapter = new CommonEventCatalogUIAdapter();
     Properties episodeCatalogProperties = new Properties();

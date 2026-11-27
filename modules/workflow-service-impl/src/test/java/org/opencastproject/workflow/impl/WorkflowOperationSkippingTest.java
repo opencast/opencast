@@ -23,8 +23,8 @@ package org.opencastproject.workflow.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
@@ -70,9 +70,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -99,7 +99,7 @@ public class WorkflowOperationSkippingTest {
 
   private AccessControlList acl = new AccessControlList();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // create operation handlers for our workflows
     succeedingOperationHandler = new SucceedingWorkflowOperationHandler(mediapackage1);
@@ -194,10 +194,10 @@ public class WorkflowOperationSkippingTest {
       is = WorkflowOperationSkippingTest.class.getResourceAsStream("/mediapackage-1.xml");
       mediapackage1 = mediaPackageBuilder.loadFromXml(is);
       IOUtils.closeQuietly(is);
-      Assert.assertNotNull(mediapackage1.getIdentifier());
+      Assertions.assertNotNull(mediapackage1.getIdentifier());
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);

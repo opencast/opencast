@@ -24,8 +24,8 @@ import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
@@ -35,9 +35,9 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
@@ -52,12 +52,12 @@ public class SecurityEndpointTest {
 
   /** The json parser */
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     env.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     env.tearDownServer();
   }

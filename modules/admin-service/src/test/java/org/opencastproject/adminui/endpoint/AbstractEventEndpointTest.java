@@ -57,10 +57,10 @@ import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.HttpStatus;
 import org.easymock.EasyMock;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -228,7 +228,7 @@ public class AbstractEventEndpointTest {
     JsonObject parse = JsonParser.parseString(result).getAsJsonObject();
     JsonArray replies = parse.getAsJsonArray("replies");
     JsonObject reply = replies.get(0).getAsJsonObject();
-    Assert.assertEquals("Text", reply.get("text").getAsString());
+    Assertions.assertEquals("Text", reply.get("text").getAsString());
   }
 
   @Test
@@ -243,8 +243,8 @@ public class AbstractEventEndpointTest {
     JsonObject parse = JsonParser.parseString(result).getAsJsonObject();
     JsonArray replies = parse.getAsJsonArray("replies");
     JsonObject reply = replies.get(1).getAsJsonObject();
-    Assert.assertEquals("Text", reply.get("text").getAsString());
-    Assert.assertEquals(true, parse.get("resolvedStatus").getAsBoolean());
+    Assertions.assertEquals("Text", reply.get("text").getAsString());
+    Assertions.assertEquals(true, parse.get("resolvedStatus").getAsBoolean());
   }
 
   @Test
@@ -729,15 +729,15 @@ public class AbstractEventEndpointTest {
     };
 
     Response response = endpoint.getEvents(null, null, null, null, null, null, null, null);
-    Assert.assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
+    Assertions.assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
   }
 
-  @BeforeClass
+  @BeforeAll
   public static void oneTimeSetUp() {
     rt.setUpServer();
   }
 
-  @AfterClass
+  @AfterAll
   public static void oneTimeTearDown() {
     rt.tearDownServer();
   }

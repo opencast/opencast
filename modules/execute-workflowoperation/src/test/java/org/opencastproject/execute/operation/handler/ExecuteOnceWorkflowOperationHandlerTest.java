@@ -21,7 +21,7 @@
 
 package org.opencastproject.execute.operation.handler;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.execute.api.ExecuteException;
 import org.opencastproject.execute.api.ExecuteService;
@@ -41,8 +41,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -61,7 +61,7 @@ public class ExecuteOnceWorkflowOperationHandlerTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Mocking just about everything, just testing the mediapackage parse
     String expectedTypeString = "catalog";

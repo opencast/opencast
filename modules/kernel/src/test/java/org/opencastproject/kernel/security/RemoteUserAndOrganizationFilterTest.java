@@ -32,9 +32,9 @@ import org.opencastproject.security.api.UserDirectoryService;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -79,7 +79,7 @@ public class RemoteUserAndOrganizationFilterTest {
   /**
    * @throws java.lang.Exception
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     defaultUser = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
             SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
@@ -129,7 +129,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(response);
@@ -155,7 +155,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(securityService);
@@ -181,7 +181,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(response);
@@ -212,7 +212,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(response);
@@ -242,7 +242,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(securityService);
@@ -268,7 +268,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(response);
@@ -298,7 +298,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(response);
@@ -328,7 +328,7 @@ public class RemoteUserAndOrganizationFilterTest {
     try {
       filter.doFilter(request, response, chain);
     } catch (Exception e) {
-      Assert.fail(e.getMessage());
+      Assertions.fail(e.getMessage());
     }
 
     EasyMock.verify(securityService);

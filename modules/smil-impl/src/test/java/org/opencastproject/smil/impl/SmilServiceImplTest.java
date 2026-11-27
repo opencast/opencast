@@ -21,11 +21,12 @@
 
 package org.opencastproject.smil.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
@@ -46,8 +47,8 @@ import org.opencastproject.smil.entity.media.element.SmilMediaVideoImpl;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.List;
@@ -93,7 +94,7 @@ public class SmilServiceImplTest {
    */
   private static SmilService smilService;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUpClass() {
     smilService = new SmilServiceImpl();
   }
@@ -246,13 +247,15 @@ public class SmilServiceImplTest {
     assertEquals(16000L, mediaElement.getClipEndMS());
   }
 
-  @Test(expected = SmilException.class)
+  @Test
   public void testAddClipWithInvalidTrack() throws Exception {
-    TrackImpl videoTrack = new TrackImpl();
+    assertThrows(SmilException.class, () -> {
+      TrackImpl videoTrack = new TrackImpl();
 
-    SmilResponse smilResponse = smilService.createNewSmil();
-    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
-    fail("SmilException schould be thrown if you try to add an invalid track.");
+      SmilResponse smilResponse = smilService.createNewSmil();
+      smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
+      fail("SmilException schould be thrown if you try to add an invalid track.");
+    });
   }
 
   @Test
@@ -266,36 +269,40 @@ public class SmilServiceImplTest {
 
     SmilResponse smilResponse = smilService.createNewSmil();
     smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
-    assertTrue("Smil service does not add new par element", smilResponse.getEntitiesCount() > 0);
+    assertTrue(smilResponse.getEntitiesCount() > 0, "Smil service does not add new par element");
     assertNotNull(smilResponse.getEntities());
   }
 
-  @Test(expected = SmilException.class)
+  @Test
   public void testAddClipStartValueBiggerThanDuration() throws Exception {
-    TrackImpl videoTrack = new TrackImpl();
-    videoTrack.setIdentifier("track-1");
-    videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
-    videoTrack.setURI(new URI("http://hostname/video.mp4"));
-    videoTrack.addStream(new VideoStreamImpl());
-    videoTrack.setDuration(Long.valueOf(1000));
+    assertThrows(SmilException.class, () -> {
+      TrackImpl videoTrack = new TrackImpl();
+      videoTrack.setIdentifier("track-1");
+      videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
+      videoTrack.setURI(new URI("http://hostname/video.mp4"));
+      videoTrack.addStream(new VideoStreamImpl());
+      videoTrack.setDuration(Long.valueOf(1000));
 
-    SmilResponse smilResponse = smilService.createNewSmil();
-    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 1000, 10);
-    fail("Sequence start value is equal track duration but SmilService does not throw an SmilException.");
+      SmilResponse smilResponse = smilService.createNewSmil();
+      smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 1000, 10);
+      fail("Sequence start value is equal track duration but SmilService does not throw an SmilException.");
+    });
   }
 
-  @Test(expected = SmilException.class)
+  @Test
   public void testAddClipWithInvalidTrackURI() throws Exception {
-    TrackImpl videoTrack = new TrackImpl();
-    videoTrack.setIdentifier("track-1");
-    videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
-    videoTrack.addStream(new VideoStreamImpl());
-    videoTrack.setDuration(Long.MAX_VALUE);
-    // no track URI set
+    assertThrows(SmilException.class, () -> {
+      TrackImpl videoTrack = new TrackImpl();
+      videoTrack.setIdentifier("track-1");
+      videoTrack.setFlavor(new MediaPackageElementFlavor("source", "presentation"));
+      videoTrack.addStream(new VideoStreamImpl());
+      videoTrack.setDuration(Long.MAX_VALUE);
+      // no track URI set
 
-    SmilResponse smilResponse = smilService.createNewSmil();
-    smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
-    fail("SmilException schould be thrown if you try to add an invalid track.");
+      SmilResponse smilResponse = smilService.createNewSmil();
+      smilResponse = smilService.addClip(smilResponse.getSmil(), null, videoTrack, 0, 10);
+      fail("SmilException schould be thrown if you try to add an invalid track.");
+    });
   }
 
   /**
