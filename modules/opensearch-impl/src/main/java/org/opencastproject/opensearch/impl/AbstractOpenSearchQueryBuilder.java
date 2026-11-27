@@ -32,7 +32,9 @@ import org.opensearch.common.unit.Fuzziness;
 import org.opensearch.core.common.io.stream.StreamOutput;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.DisMaxQueryBuilder;
 import org.opensearch.index.query.MatchAllQueryBuilder;
+import org.opensearch.index.query.MatchNoneQueryBuilder;
 import org.opensearch.index.query.MultiMatchQueryBuilder;
 import org.opensearch.index.query.Operator;
 import org.opensearch.index.query.QueryBuilder;
@@ -40,16 +42,20 @@ import org.opensearch.index.query.QueryBuilders;
 import org.opensearch.index.query.QueryRewriteContext;
 import org.opensearch.index.query.QueryShardContext;
 import org.opensearch.index.query.RangeQueryBuilder;
+import org.opensearch.index.query.SpanNearQueryBuilder;
+import org.opensearch.index.query.SpanQueryBuilder;
 import org.opensearch.index.query.TermsQueryBuilder;
 import org.opensearch.index.query.WildcardQueryBuilder;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,6 +64,31 @@ import java.util.stream.Collectors;
  * Opencast implementation of the OpenSearch query builder.
  */
 public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> implements QueryBuilder {
+
+  /** Score boost for documents containing the search text as a phrase of complete words */
+  private static final float PHRASE_MATCH_BOOST = 3.0f;
+
+  /** Score boost for documents containing the search text as a phrase whose last word may be a prefix */
+  private static final float PHRASE_PREFIX_MATCH_BOOST = 0.5f;
+
+  /** Score boost for documents whose title starts with the search text (the last word may be a prefix) */
+  private static final float TITLE_START_MATCH_BOOST = 10.0f;
+
+  /**
+   * Up to this many tokens, the search text is also ranked by phrase and title start. Tokens are counted like the
+   * index splits words, including camel case ("AnalysisTwo" is two). The queries expand to a clause per token and
+   * field, so longer texts would exceed the clause limit of OpenSearch and fail the search.
+   */
+  private static final int MAX_RANKING_TOKENS = 10;
+
+  /** Up to this many tokens, the search is also matched with typos in the last word and words in different fields. */
+  private static final int MAX_FUZZY_TOKENS = 6;
+
+  /** Stricter than AUTO, which allows typos in short words and numbers ("2023" matches "2024"). */
+  private static final Fuzziness WORD_FUZZINESS = Fuzziness.build("AUTO:4,8");
+
+  /** The default weights of fields in text searches: a match in the title counts three times as much. */
+  public static final Map<String, Float> DEFAULT_FIELD_BOOSTS = Map.of("title", 3.0f);
 
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
@@ -88,6 +119,9 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
   /** Fuzzy text query */
   protected boolean fuzzy = false;
 
+  /** Score boosts of fields when searching by text, by field name */
+  private final Map<String, Float> fieldBoosts;
+
   /** The original search query */
   private final T query;
 
@@ -101,7 +135,13 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
    *          the search query
    */
   public AbstractOpenSearchQueryBuilder(T query) {
+    this(query, DEFAULT_FIELD_BOOSTS);
+  }
+
+  /** Creates a new OpenSearch query based on the raw query, with the weights of fields in text searches. */
+  public AbstractOpenSearchQueryBuilder(T query, Map<String, Float> fieldBoosts) {
     this.query = query;
+    this.fieldBoosts = fieldBoosts;
     buildQuery(query);
     createQuery();
   }
@@ -200,8 +240,51 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       if (fuzzy) {
         queryBuilder.fuzziness(Fuzziness.AUTO);
       }
+      // The prefix query scores every match the same, so rank the results by optional phrase queries. Only the better
+      // of phrase and phrase prefix counts, and the latter is weighted low: it favors long words over the exact one.
+      // The title is weighted above other fields, as a short value elsewhere would otherwise outrank it.
+      // Lenient, as not every "*.search" field is a text field and phrase queries fail on the others.
+      List<String> words = Arrays.stream(text.split("[^\\p{L}\\p{N}]+")).filter(word -> !word.isEmpty())
+          .collect(Collectors.toList());
+      // Count tokens like the index does, which also splits camel case words
+      long tokens = Arrays.stream(text.split("[^\\p{L}\\p{N}]+|(?<=\\p{Ll})(?=\\p{Lu})"))
+          .filter(token -> !token.isEmpty()).count();
+      boolean rankText = tokens <= MAX_RANKING_TOKENS;
+      boolean fuzzyText = tokens <= MAX_FUZZY_TOKENS;
+      // Numbers are not matched with typos (a text of only symbols has no words at all)
+      boolean lastWordHasLetters = !words.isEmpty() && words.get(words.size() - 1).matches(".*\\p{L}.*");
+      BoolQueryBuilder textQuery = QueryBuilders.boolQuery();
+      // A document matches if any of these alternatives matches
+      List<QueryBuilder> alternatives = new ArrayList<>();
+      alternatives.add(queryBuilder);
+      if (fuzzy && fuzzyText && lastWordHasLetters) {
+        // The prefix query does not tolerate typos in the last word, so also accept documents containing all words
+        // with typos. Scored, so that these results are ordered by relevance too.
+        alternatives.add(fuzzyWordsQuery());
+      }
+      if (fuzzyText && words.size() > 1) {
+        // The queries above need all words in the same field. People also search for e.g. a word of the title and
+        // the name of the presenter, so also accept documents where the words are spread over different fields.
+        alternatives.add(wordsInAnyFieldQuery(words));
+      }
+      if (alternatives.size() == 1) {
+        textQuery.must(queryBuilder);
+      } else {
+        BoolQueryBuilder anyAlternative = QueryBuilders.boolQuery().minimumShouldMatch(1);
+        alternatives.forEach(anyAlternative::should);
+        textQuery.must(anyAlternative);
+      }
+      if (rankText) {
+        DisMaxQueryBuilder phraseQuery = QueryBuilders.disMaxQuery();
+        phraseQuery.add(searchableFieldsQuery(text, MultiMatchQueryBuilder.Type.PHRASE).boost(PHRASE_MATCH_BOOST));
+        phraseQuery.add(searchableFieldsQuery(text, MultiMatchQueryBuilder.Type.PHRASE_PREFIX)
+            .boost(PHRASE_PREFIX_MATCH_BOOST));
+        textQuery.should(phraseQuery);
+        // Rank titles starting with the text before those which merely contain it
+        textQuery.should(titleStartQuery());
+      }
       booleanQuery.minimumShouldMatch(1);
-      booleanQuery.should(queryBuilder);
+      booleanQuery.should(textQuery);
       this.queryBuilder = booleanQuery;
     }
 
@@ -227,6 +310,72 @@ public abstract class AbstractOpenSearchQueryBuilder<T extends SearchQuery> impl
       this.queryBuilder = booleanQuery;
     }
 
+  }
+
+  /** Matches titles starting with the search text, the last word as a prefix. Only ranks, so constant score. */
+  private QueryBuilder titleStartQuery() {
+    // Approximates the analysis of the field: where it deviates, the title is still found, but not boosted
+    String normalized = Normalizer.normalize(text.toLowerCase(Locale.ROOT), Normalizer.Form.NFKD)
+        .replaceAll("\\p{M}+", "").replace("ß", "ss");
+    List<String> terms = Arrays.stream(normalized.split("[^\\p{L}\\p{N}]+"))
+        .filter(term -> !term.isEmpty())
+        .collect(Collectors.toList());
+    if (terms.isEmpty()) {
+      return new MatchNoneQueryBuilder();
+    }
+    String field = "title" + SEARCH_FIELD_NAME_EXTENSION;
+    int last = terms.size() - 1;
+    SpanQueryBuilder lastWord = QueryBuilders.spanMultiTermQueryBuilder(
+        QueryBuilders.prefixQuery(field, terms.get(last)));
+    SpanQueryBuilder title = lastWord;
+    if (last > 0) {
+      SpanNearQueryBuilder words = QueryBuilders.spanNearQuery(QueryBuilders.spanTermQuery(field, terms.get(0)), 0);
+      terms.subList(1, last).forEach(term -> words.addClause(QueryBuilders.spanTermQuery(field, term)));
+      title = words.addClause(lastWord).inOrder(true);
+    }
+    return QueryBuilders.constantScoreQuery(QueryBuilders.spanFirstQuery(title, terms.size()))
+        .boost(TITLE_START_MATCH_BOOST);
+  }
+
+  /** Matches fields containing all words of the search text, each of them with typos allowed. */
+  private MultiMatchQueryBuilder fuzzyWordsQuery() {
+    return searchableFieldsQuery(text, MultiMatchQueryBuilder.Type.BEST_FIELDS)
+        .operator(Operator.AND)
+        .fuzziness(WORD_FUZZINESS)
+        // A fixed first letter is much cheaper
+        .prefixLength(1);
+  }
+
+  /** Matches documents containing every word in any field, not necessarily the same one. */
+  private QueryBuilder wordsInAnyFieldQuery(List<String> words) {
+    BoolQueryBuilder query = QueryBuilders.boolQuery();
+    for (int i = 0; i < words.size(); i++) {
+      String word = words.get(i);
+      if (i == words.size() - 1) {
+        query.must(searchableFieldsQuery(word, MultiMatchQueryBuilder.Type.BOOL_PREFIX));
+      } else {
+        MultiMatchQueryBuilder wordQuery = searchableFieldsQuery(word, MultiMatchQueryBuilder.Type.BEST_FIELDS);
+        if (fuzzy && word.matches(".*\\p{L}.*")) {
+          wordQuery.fuzziness(WORD_FUZZINESS).prefixLength(1);
+        }
+        query.must(wordQuery);
+      }
+    }
+    return query;
+  }
+
+  /** Creates a lenient query of the given type on all searchable fields, weighted by the configured boosts. */
+  private MultiMatchQueryBuilder searchableFieldsQuery(String query, MultiMatchQueryBuilder.Type type) {
+    MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(query)
+        .field("*" + SEARCH_FIELD_NAME_EXTENSION)
+        .type(type)
+        .lenient(true);
+    fieldBoosts.forEach((field, boost) -> {
+      if (boost != 1.0f) {
+        queryBuilder.field(field + SEARCH_FIELD_NAME_EXTENSION, boost);
+      }
+    });
+    return queryBuilder;
   }
 
   /**

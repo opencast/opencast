@@ -93,6 +93,12 @@
       <version>${opensearch.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opensearch</groupId>
+      <artifactId>opensearch-x-content</artifactId>
+      <version>${opensearch.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
       <scope>compile</scope>

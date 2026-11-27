@@ -54,6 +54,11 @@ public class SeriesQueryBuilder extends AbstractOpenSearchQueryBuilder<SeriesSea
     super(query);
   }
 
+  /** Creates a new OpenSearch query based on the query, with the weights of fields in text searches. */
+  public SeriesQueryBuilder(SeriesSearchQuery query, Map<String, Float> fieldBoosts) {
+    super(query, fieldBoosts);
+  }
+
   @Override
   public void buildQuery(SeriesSearchQuery query) {
     // Organization

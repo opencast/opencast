@@ -74,6 +74,8 @@ Additional settings can be configured in `org.opencastproject.opensearch.index.O
 * `retry.waiting.period.get`
 * `retry.waiting.period.update`
 * `retry.delay.on.startup`
+* `search.boost.event`
+* `search.boost.series`
 
 The identifier defines which index opencast is looking for.
 This might be interesting if you run an OpenSearch cluster and want to follow a naming scheme.
@@ -91,6 +93,27 @@ By default, no retry will be attempted.
 
 The `retry.delay.on.startup` defines how long Opencast will wait between retry attempts
 when the connection to the index fails on startup. The default is 10 seconds.
+
+Text searches for events and series, e.g. in the search field of the admin interface, rank the results by relevance.
+By default, a match in the title counts three times as much as a match in any other field, like the description or the
+series of an event. Without this, a word which is the entire value of a short field would rank higher than the same word
+in a longer title.
+
+The `search.boost.event` and `search.boost.series` settings let you tune this separately for events and series.
+They are a comma separated list of `field^boost` entries:
+
+```properties
+search.boost.event=title^3.0,series_name^1.5,description^0.5
+search.boost.series=title^3.0
+```
+
+Fields are named as in the index, for example `title`, `description`, `creator`, `subject`, `contributor`, `uid`,
+`presenter`, `location` and `series_name` for events, or the fields of extended metadata
+(`extended_metadata_<schema>_<field>`).
+Fields which are not listed count normally, that is with a boost of 1, and the boost has to be greater than 0.
+The default is `title^3.0`. An empty value does not weight any field higher than the others.
+The settings only change the order of the results, not which results are found, and they can be changed without
+restarting Opencast. Invalid entries and fields which the index does not have are reported in the log.
 
 
 Query Insights Diagnostics

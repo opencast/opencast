@@ -1,0 +1,36 @@
+Text searches for series and events are now sorted by relevance
+
+Searching for a series or event by text, for example with the search field in the admin UI, found the right results
+but did not rank them: every match got the same score, so the order of the results was effectively arbitrary
+(typically the order in which the documents were indexed) and a good match could end up behind a poor one.
+
+Matches are now ranked. Results rank higher if they contain the search text as a phrase, with the words in the typed
+order, and results with shorter matching fields come first. For example, searching for `biology` now lists a series
+titled "Biology" before one titled "An Introduction to Probability Theory and Stochastic Processes with Applications
+to Biology". Titles which start with the search text rank before titles which only contain it, so `analysis` lists
+"Analysis II" before "Medical Image Analysis". Partially typed words still match.
+
+The search also tolerates typos in the last word of the search text, which was only the case for the other words
+before. For example, `vorlesng` now finds "Vorlesung". Words up to three characters long and numbers are not matched
+with typos.
+
+The words of the search text no longer have to be in the same field. Searching for a word of the title together with
+the name of the presenter or a word of the description, for example `analysis arnold`, finds the matching events and
+series. Before, such a search found nothing unless all words were in one field. Searches for several words may
+therefore list more results than before.
+
+Searching with typos or with the words in different fields is only done for search texts of up to six words (camel
+case words like "AnalysisTwo" count for every part), as it makes the search slower with every word. The ranking of
+results by phrase and by the start of the title is done for up to ten words. Longer texts are matched as before.
+
+By default, a match in the title counts three times as much as a match in another field, so that a word which is the
+entire value of a short field, like the series or description of an event, does not rank above the same word in a longer
+title. The weight of any field can be changed separately for events and series with `search.boost.event` and
+`search.boost.series` in `org.opencastproject.opensearch.index.OpenSearchIndex.cfg`, for example
+`search.boost.event=title^3.0,series_name^1.5,description^0.5`. See the OpenSearch configuration documentation.
+
+This applies wherever the search index is queried with a text filter, which includes the series and event lists in the
+admin UI and the corresponding External API endpoints. An explicit sort order, such as clicking a column header, still
+takes precedence over relevance.
+
+This change does not include a database schema change or a search index change. No rebuild of the index is needed.
