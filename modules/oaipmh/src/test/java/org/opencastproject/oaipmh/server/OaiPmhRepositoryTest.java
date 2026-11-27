@@ -94,7 +94,7 @@ public class OaiPmhRepositoryTest {
 
   // CHECKSTYLE:OFF
   @Rule
-  public Timeout globalTimeout = new Timeout(5000);
+  public Timeout globalTimeout = Timeout.millis(5000);
   // CHECKSTYLE:ON
 
   @BeforeClass

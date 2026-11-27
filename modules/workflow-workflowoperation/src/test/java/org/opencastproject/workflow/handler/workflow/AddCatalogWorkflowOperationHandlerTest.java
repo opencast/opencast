@@ -39,7 +39,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -55,9 +54,6 @@ public class AddCatalogWorkflowOperationHandlerTest {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setUp() throws Exception {
@@ -144,8 +140,7 @@ public class AddCatalogWorkflowOperationHandlerTest {
     operation.setConfiguration("catalog-type-collision-behavior", "keep");
 
     // execution
-    expectedException.expect(WorkflowOperationException.class);
-    operationHandler.start(instance, null);
+    Assert.assertThrows(WorkflowOperationException.class, () -> operationHandler.start(instance, null));
   }
 
   @Test
@@ -194,7 +189,6 @@ public class AddCatalogWorkflowOperationHandlerTest {
     // execution
     var result = operationHandler.start(instance, null);
     instance.setMediaPackage(result.getMediaPackage()); // Would usually be done by the workflow service
-    expectedException.expect(WorkflowOperationException.class);
-    operationHandler.start(instance, null);
+    Assert.assertThrows(WorkflowOperationException.class, () -> operationHandler.start(instance, null));
   }
 }

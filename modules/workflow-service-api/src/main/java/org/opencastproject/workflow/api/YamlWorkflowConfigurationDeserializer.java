@@ -43,7 +43,7 @@ public class YamlWorkflowConfigurationDeserializer extends StdDeserializer<JaxbW
   public JaxbWorkflowConfiguration deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
           throws IOException, JacksonException {
     ObjectNode jn = jsonParser.getCodec().readTree(jsonParser);
-    var fields = jn.fields();
+    var fields = jn.properties().iterator();
 
     if (fields.hasNext()) {
       var entry = fields.next();
