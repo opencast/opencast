@@ -1242,7 +1242,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(
       name = "addZippedMediaPackage",
       description = "Create media package from a compressed file containing a manifest.xml document and all media "
-          + "tracks, metadata catalogs and attachments",
+          + "tracks, metadata catalogs and attachments. This endpoint is disabled by default and needs to be enabled "
+          + "by setting zip.ingest.enabled in org.opencastproject.ingest.impl.IngestServiceImpl.cfg.",
       pathParameters = {
           @RestParameter(description = "Workflow definition id", isRequired = true,
               name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING)
@@ -1256,6 +1257,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       responses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The ingest of zipped media packages is disabled",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE)
       },
@@ -1263,6 +1266,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   public Response addZippedMediaPackage(@Context HttpServletRequest request,
           @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
     logger.trace("add zipped media package with workflow definition id: {} and workflow instance id: {}", wdID, wiID);
+    if (!ingestService.isZipIngestEnabled()) {
+      return zipIngestDisabledResponse(request);
+    }
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, wdID, wiID);
     } else {
@@ -1278,7 +1284,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(
       name = "addZippedMediaPackage",
       description = "Create media package from a compressed file containing a manifest.xml document and all media "
-          + "tracks, metadata catalogs and attachments",
+          + "tracks, metadata catalogs and attachments. This endpoint is disabled by default and needs to be enabled "
+          + "by setting zip.ingest.enabled in org.opencastproject.ingest.impl.IngestServiceImpl.cfg.",
       restParameters = {
           @RestParameter(description = "The workflow definition ID to run on this mediapackage. "
                   + "This parameter has to be set in the request prior to the zipped mediapackage "
@@ -1295,12 +1302,17 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       responses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The ingest of zipped media packages is disabled",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE)
       },
       returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request) {
     logger.trace("add zipped media package");
+    if (!ingestService.isZipIngestEnabled()) {
+      return zipIngestDisabledResponse(request);
+    }
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, null, null);
     } else {
@@ -1308,6 +1320,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           + "concurrently.");
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
+  }
+
+  private Response zipIngestDisabledResponse(HttpServletRequest request) {
+    logger.warn("Rejecting request from {} to ingest a zipped media package since this feature is disabled",
+        request.getRemoteHost());
+    return Response.status(Status.FORBIDDEN).type(MediaType.TEXT_PLAIN)
+        .entity("The ingest of zipped media packages is disabled").build();
   }
 
   private Response ingestZippedMediaPackage(HttpServletRequest request, String wdID, String wiID) {

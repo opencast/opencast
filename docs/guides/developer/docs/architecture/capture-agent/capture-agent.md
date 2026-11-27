@@ -486,6 +486,9 @@ and additional disk utilization.
 To ingest a zipped media package an HTTP POST is performed to `${INGEST-ENDPOINT}/addZippedMediaPackage`. The BODY of
 the POST must contain the zipped media package.
 
+This method is disabled by default and the endpoint responds with `403 Forbidden` unless `zip.ingest.enabled` is set to
+`true` in `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`.
+
 
 Further Reading
 ---------------

@@ -45,6 +45,13 @@ public interface IngestService extends JobProducer {
   String START_DATE_KEY = "ingest_start_date";
 
   /**
+   * Check if the ingest of zipped media packages is enabled. It is disabled by default.
+   *
+   * @return true if zipped media packages may be ingested
+   */
+  boolean isZipIngestEnabled();
+
+  /**
    * Ingests the compressed mediapackage and starts the workflow as defined by <code>workflowDefinitionID</code>. The
    * properties specified in <code>properties</code> will be submitted as configuration data to the workflow.
    *
@@ -60,7 +67,7 @@ public interface IngestService extends JobProducer {
    * @throws IOException
    *           if reading from the input stream fails
    * @throws IngestException
-   *           if an unexpected error occurs
+   *           if an unexpected error occurs or if the ingest of zipped media packages is disabled
    * @throws NotFoundException
    *           if the workflow definition was not found
    */
@@ -89,7 +96,7 @@ public interface IngestService extends JobProducer {
    * @throws IOException
    *           if reading from the input stream fails
    * @throws IngestException
-   *           if an unexpected error occurs
+   *           if an unexpected error occurs or if the ingest of zipped media packages is disabled
    * @throws NotFoundException
    *           if either one of the workflow definition or workflow instance was not found
    * @throws UnauthorizedException

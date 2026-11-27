@@ -1,0 +1,14 @@
+The ingest of zipped media packages is now disabled by default ([#XXXX](https://github.com/opencast/opencast/pull/XXXX)).
+
+This affects the REST endpoints `/ingest/addZippedMediaPackage` and
+`/ingest/addZippedMediaPackage/{workflowDefinitionId}`, which now respond with `403 Forbidden`, as well as zip files
+placed in an inbox, which are now ignored and left in place.
+
+If you still need this, enable it in `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`:
+
+```properties
+zip.ingest.enabled=true
+```
+
+The feature is assumed to be no longer in use and may be removed in a future release. If you turn it on, please let the
+Opencast community know.
