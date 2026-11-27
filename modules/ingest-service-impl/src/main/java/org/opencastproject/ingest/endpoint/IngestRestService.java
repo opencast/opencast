@@ -99,6 +99,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1721,6 +1722,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       try {
         dcFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
       } catch (IllegalArgumentException e) {
+        logger.warn("Rejected DublinCore catalog: Invalid flavor '{}': {}", flavor, e.getMessage());
         return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
       }
     }
@@ -1729,9 +1731,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mp);
     } catch (MediaPackageException e) {
+      logger.warn("Rejected DublinCore catalog (flavor {}): Unable to parse media package: {}",
+          dcFlavor, ExceptionUtils.getMessage(e));
       return Response.serverError().status(Status.BAD_REQUEST).build();
     }
-    if (MediaPackageSupport.sanityCheck(mediaPackage).isPresent()) {
+    Optional<List<String>> mediaPackageProblem = MediaPackageSupport.sanityCheck(mediaPackage);
+    if (mediaPackageProblem.isPresent()) {
+      logger.warn("Rejected DublinCore catalog (flavor {}) for media package {}: Invalid media package: {}",
+          dcFlavor, mediaPackage.getIdentifier(), mediaPackageProblem.get());
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -1739,6 +1746,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       DublinCoreXmlFormat.read(dc);
     } catch (Exception e) {
+      logger.warn("Rejected DublinCore catalog (flavor {}) for media package {}: {}",
+          dcFlavor, mediaPackage.getIdentifier(), ExceptionUtils.getMessage(e));
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
 

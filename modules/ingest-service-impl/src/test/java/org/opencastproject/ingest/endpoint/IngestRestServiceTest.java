@@ -530,6 +530,22 @@ public class IngestRestServiceTest {
   }
 
   @Test
+  public void testAddDCCatalogRejectsInvalidCatalog() throws Exception {
+    // A strict mock without expectations makes sure nothing is stored
+    IngestService ingestService = EasyMock.createMock(IngestService.class);
+    EasyMock.replay(ingestService);
+    restService.setIngestService(ingestService);
+
+    String mediaPackage = MediaPackageParser.getAsXml(
+            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    Response response = restService.addDCCatalog(mediaPackage, "not xml", "dublincore/episode");
+
+    assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    assertEquals("Content is not allowed in prolog.", response.getEntity());
+    EasyMock.verify(ingestService);
+  }
+
+  @Test
   public void testDiscardMediaPackageAsMultipartPreservesPlusCharacters() throws Exception {
     Capture<MediaPackage> mediaPackageCapture = EasyMock.newCapture();
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
