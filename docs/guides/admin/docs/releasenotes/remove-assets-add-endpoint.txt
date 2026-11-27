@@ -1,0 +1,2 @@
+The deprecated REST endpoint `POST /assets/add` has been removed. Use `POST /assets/snapshot` instead, which takes the
+same parameters and returns the same responses.
