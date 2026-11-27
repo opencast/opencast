@@ -82,6 +82,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
@@ -189,6 +190,10 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
   private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
   private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
+  // The areas of the editor in which the user can make changes, for automatic republishing
+  private static final List<String> EDITOR_AREAS = List.of("cutting", "tracks", "thumbnails", "metadata", "subtitles",
+          "chapters");
+  private static final String CHANGED_AREA_WF_PROPERTY_PREFIX = "editor_changed_";
   private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 300; // ( 5 mins )
   private static final int DEFAULT_LOCK_REFRESH_SECONDS = 60;  // ( 1 min )
 
@@ -1107,7 +1112,42 @@ public class EditorServiceImpl implements EditorService {
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, chapters,
-            localPublication, lockingActive, lockRefresh, user, "");
+            localPublication, lockingActive, lockRefresh, user, "", getChangedAreas(latestWfProperties),
+            hasLastWorkflowFailed(event));
+  }
+
+  /**
+   * Gets the areas of the editor that were changed since the last time a workflow was started.
+   */
+  static List<String> getChangedAreas(Map<String, String> workflowProperties) {
+    return EDITOR_AREAS.stream()
+            .filter(area -> Boolean.parseBoolean(workflowProperties.get(CHANGED_AREA_WF_PROPERTY_PREFIX + area)))
+            .collect(Collectors.toList());
+  }
+
+  /**
+   * Checks whether the last workflow of the event ended without finishing successfully.
+   */
+  static boolean hasLastWorkflowFailed(Event event) {
+    final String state = event.getWorkflowState();
+    if (state == null || state.isBlank()) {
+      return false;
+    }
+    final WorkflowState workflowState = WorkflowState.valueOf(state);
+    return workflowState == WorkflowState.FAILED || workflowState == WorkflowState.STOPPED;
+  }
+
+  /**
+   * Stores which areas of the editor have been changed since a workflow was last started.
+   * Areas that are not part of the given collection are marked as unchanged.
+   * Unknown areas are ignored.
+   */
+  void storeChangedAreas(MediaPackage mediaPackage, Collection<String> changedAreas) {
+    final Map<String, String> properties = new HashMap<>();
+    for (String area : EDITOR_AREAS) {
+      properties.put(CHANGED_AREA_WF_PROPERTY_PREFIX + area, Boolean.toString(changedAreas.contains(area)));
+    }
+    WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, properties);
   }
 
 
@@ -1183,6 +1223,11 @@ public class EditorServiceImpl implements EditorService {
     }
     WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
 
+    // Clients that do not report the changed areas leave the stored ones alone
+    if (editingData.getChangedAreas() != null) {
+      storeChangedAreas(mediaPackage, editingData.getChangedAreas());
+    }
+
     try {
       mediaPackage = addSmilToArchive(mediaPackage, smil);
     } catch (IOException e) {
@@ -1239,6 +1284,8 @@ public class EditorServiceImpl implements EditorService {
         final Workflows workflows = new Workflows(assetManager, workflowService);
         workflows.applyWorkflowToLatestVersion(Collections.singletonList(mediaPackage.getIdentifier().toString()),
                 ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters));
+        // The changes are now being processed
+        storeChangedAreas(mediaPackage, Collections.emptyList());
       } catch (AssetManagerException e) {
         errorExit("Unable to start workflow" + workflowId, mediaPackageId, ErrorStatus.WORKFLOW_ERROR, e);
       } catch (WorkflowDatabaseException e) {

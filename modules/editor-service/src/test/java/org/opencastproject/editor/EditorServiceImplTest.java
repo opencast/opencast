@@ -22,19 +22,26 @@ package org.opencastproject.editor;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
+import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.same;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.Value;
+import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
@@ -45,9 +52,12 @@ import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
+import org.easymock.CaptureType;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -58,8 +68,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** Test class for {@link EditorServiceImpl} */
@@ -289,5 +301,76 @@ public class EditorServiceImplTest {
     assertEquals(1, mp.getCatalogs().length);
     assertEquals(smil.getId(), mp.getCatalogs()[0].getIdentifier());
     assertEquals("smil/cutting", mp.getCatalogs()[0].getFlavor().toString());
+  }
+
+  @Test
+  public void testGetChangedAreas() {
+    final Map<String, String> properties = new HashMap<>();
+    properties.put("editor_changed_metadata", "true");
+    properties.put("editor_changed_thumbnails", "true");
+    properties.put("editor_changed_cutting", "false");
+    properties.put("hide_presenter_audio", "true");
+
+    // Unrelated properties and unchanged areas are ignored, the order does not depend on the properties
+    assertEquals(List.of("thumbnails", "metadata"), EditorServiceImpl.getChangedAreas(properties));
+    assertTrue(EditorServiceImpl.getChangedAreas(new HashMap<>()).isEmpty());
+  }
+
+  @Test
+  public void testHasLastWorkflowFailed() {
+    final Event event = new Event();
+
+    // Never processed
+    assertFalse(EditorServiceImpl.hasLastWorkflowFailed(event));
+
+    event.setWorkflowState(WorkflowState.SUCCEEDED);
+    assertFalse(EditorServiceImpl.hasLastWorkflowFailed(event));
+
+    event.setWorkflowState(WorkflowState.FAILED);
+    assertTrue(EditorServiceImpl.hasLastWorkflowFailed(event));
+
+    event.setWorkflowState(WorkflowState.STOPPED);
+    assertTrue(EditorServiceImpl.hasLastWorkflowFailed(event));
+  }
+
+  @Test
+  public void testStoreChangedAreas() throws Exception {
+    final String mpId = UUID.randomUUID().toString();
+
+    final Capture<Property> stored = EasyMock.newCapture(CaptureType.ALL);
+    final AssetManager assetManager = createNiceMock(AssetManager.class);
+    expect(assetManager.snapshotExists(mpId)).andReturn(true).anyTimes();
+    expect(assetManager.setProperty(capture(stored))).andReturn(true).anyTimes();
+    replay(assetManager);
+    editorService.setAssetManager(assetManager);
+
+    final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
+            .createNew(new IdImpl(mpId));
+    editorService.storeChangedAreas(mp, List.of("metadata", "chapters", "not-an-area"));
+
+    final Map<String, String> properties = new HashMap<>();
+    for (Property property : stored.getValues()) {
+      assertEquals(mpId, property.getId().getMediaPackageId());
+      properties.put(property.getId().getName(), property.getValue().get(Value.STRING));
+    }
+    // Every area is written, so areas that are no longer changed get reset. Unknown areas are ignored.
+    assertEquals(6, properties.size());
+    assertEquals("true", properties.get("editor_changed_metadata"));
+    assertEquals("true", properties.get("editor_changed_chapters"));
+    assertEquals("false", properties.get("editor_changed_cutting"));
+    assertEquals("false", properties.get("editor_changed_tracks"));
+    assertEquals("false", properties.get("editor_changed_thumbnails"));
+    assertEquals("false", properties.get("editor_changed_subtitles"));
+  }
+
+  @Test
+  public void testParseChangedAreas() {
+    final EditingData withAreas = EditingData.parse(
+            "{\"segments\": [], \"tracks\": [], \"changed_areas\": [\"metadata\", \"cutting\"]}");
+    assertEquals(List.of("metadata", "cutting"), withAreas.getChangedAreas());
+
+    // Clients that do not know about the changed areas must not reset what is stored
+    final EditingData withoutAreas = EditingData.parse("{\"segments\": [], \"tracks\": []}");
+    assertNull(withoutAreas.getChangedAreas());
   }
 }

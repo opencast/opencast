@@ -49,6 +49,20 @@ The interface honors title, description and display order of workflows.
 If only a single workflow exists, the selection will be skipped.
 
 
+Automatic Workflow Selection
+----------------------------
+
+Most changes do not need the whole video to be processed again.
+The editor can choose the workflow automatically: Changes that only affect what was already published,
+like metadata or thumbnails, start the quick `republish-fast` workflow. Everything else starts `publish`.
+Users can still select a workflow themselves from the publish dialog.
+
+For this, the editor remembers which areas were changed since a workflow was last started.
+They are stored as the workflow properties `editor_changed_<area>`, which are also available to your own workflows.
+
+This is disabled by default. See the `[workflow]` section of `editor-settings.toml` to enable and configure it.
+
+
 Replacing the Admin Interface Editor
 ------------------------------------
 

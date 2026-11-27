@@ -42,6 +42,8 @@ public class EditingData {
   public static final String LOCK_REFRESH = "lock_refresh";
   public static final String LOCK_UUID = "lock_uuid";
   public static final String LOCK_USER = "lock_user";
+  public static final String CHANGED_AREAS = "changed_areas";
+  public static final String LAST_WORKFLOW_FAILED = "last_workflow_failed";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
   private final List<TrackData> tracks;
@@ -59,6 +61,10 @@ public class EditingData {
   private final String lockUUID;
   @SerializedName(LOCK_USER)
   private final String lockUser;
+  @SerializedName(CHANGED_AREAS)
+  private final List<String> changedAreas;
+  @SerializedName(LAST_WORKFLOW_FAILED)
+  private final Boolean lastWorkflowFailed;
 
   private final List<String> waveformURIs;
   private final List<Subtitle> subtitles;
@@ -70,7 +76,8 @@ public class EditingData {
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
           List<String> waveformURIs, List<Subtitle> subtitles, List<Subtitle> chapters, Boolean local,
-          Boolean lockingActive, Integer lockRefresh, User user, String metadataJSON) {
+          Boolean lockingActive, Integer lockRefresh, User user, String metadataJSON,
+          List<String> changedAreas, Boolean lastWorkflowFailed) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -88,6 +95,8 @@ public class EditingData {
     this.lockUUID = UUID.randomUUID().toString();
     this.lockUser = user.getUsername();
     this.metadataJSON = metadataJSON;
+    this.changedAreas = changedAreas;
+    this.lastWorkflowFailed = lastWorkflowFailed;
   }
 
   public static EditingData parse(String json) {
@@ -129,6 +138,14 @@ public class EditingData {
 
   public String getMetadataJSON() {
     return metadataJSON;
+  }
+
+  public List<String> getChangedAreas() {
+    return changedAreas == null ? null : Collections.unmodifiableList(changedAreas);
+  }
+
+  public Boolean getLastWorkflowFailed() {
+    return lastWorkflowFailed;
   }
 
   public String toString() {
