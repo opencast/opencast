@@ -79,7 +79,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Configurable Publication REST Endpoint",
         "opencast.service.type=org.opencastproject.publication.configurable",
-        "opencast.service.path=/publication/api",
         "opencast.service.jobproducer=true"
     }
 )

@@ -29,10 +29,6 @@ public interface RestConstants {
   /** The service property indicating the type of service. This is an arbitrary ID, not necessarily a java interface. */
   String SERVICE_TYPE_PROPERTY = "opencast.service.type";
 
-  /** The service property indicating the URL path that the service is attempting to claim */
-  @Deprecated
-  String SERVICE_PATH_PROPERTY = "opencast.service.path";
-
   /** The service property indicating whether the service should be published in the service registry */
   String SERVICE_PUBLISH_PROPERTY = "opencast.service.publish";
 
@@ -42,8 +38,14 @@ public interface RestConstants {
   /** The ID by which this http context is known by the extended http service */
   String HTTP_CONTEXT_ID = "opencast";
 
-  /** The OSGI service filter that returns all registered services published as REST endpoints */
-  String SERVICES_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
+  /**
+   * The OSGI service filter that returns all registered services published as REST endpoints. These are the JAX-RS
+   * resources as defined by the JAX-RS whiteboard specification, i.e. services with the property
+   * <code>osgi.jaxrs.resource=true</code>, which the <code>@JaxrsResource</code> annotation sets. The path of an
+   * endpoint is defined by its class-level <code>@Path</code> annotation, see
+   * {@link org.opencastproject.util.RestUtil#getServicePath(Class)}.
+   */
+  String SERVICES_FILTER = "(osgi.jaxrs.resource=true)";
 
   /** The bundle header used to find the static resource URL alias */
   String HTTP_ALIAS = "Http-Alias";

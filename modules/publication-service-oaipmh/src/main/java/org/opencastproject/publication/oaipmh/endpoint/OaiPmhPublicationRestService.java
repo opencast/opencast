@@ -84,7 +84,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=OAI-PMH Publication REST Endpoint",
         "opencast.service.type=org.opencastproject.publication.oaipmh",
-        "opencast.service.path=/publication/oaipmh",
         "opencast.service.jobproducer=true"
     }
 )

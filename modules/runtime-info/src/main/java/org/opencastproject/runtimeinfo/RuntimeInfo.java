@@ -33,6 +33,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.userdirectory.UserIdRoleProvider;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -105,7 +106,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     property = {
         "service.description=Runtime Information REST Endpoint",
         "opencast.service.type=org.opencastproject.info",
-        "opencast.service.path=/info",
     }
 )
 @JaxrsResource
@@ -124,12 +124,6 @@ public class RuntimeInfo {
   public static final String HEALTH_CHECK_STATUS_PASS = "pass";
   public static final String HEALTH_CHECK_STATUS_WARN = "warn";
   public static final String HEALTH_CHECK_STATUS_FAIL = "fail";
-
-  /**
-   * The rest publisher looks for any non-servlet with the 'opencast.service.path' property
-   */
-  public static final String SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))("
-          + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
 
   private UserIdRoleProvider userIdRoleProvider;
   private SecurityService securityService;
@@ -546,7 +540,10 @@ public class RuntimeInfo {
       return result;
     }
     for (ServiceReference servletRef : sort(serviceRefs)) {
-      final String servletContextPath = (String) servletRef.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
+      final String servletContextPath = getServicePath(servletRef);
+      if (servletContextPath == null) {
+        continue;
+      }
       final Map<String, String> endpoint = new HashMap<>();
       endpoint.put("description", (String) servletRef.getProperty(Constants.SERVICE_DESCRIPTION));
       endpoint.put("version", servletRef.getBundle().getVersion().toString());
@@ -587,6 +584,22 @@ public class RuntimeInfo {
    *          the references
    * @return the sorted set of references
    */
+  /** Get the path of a REST service from the @Path annotation of its class, or null if it is not available. */
+  private String getServicePath(ServiceReference<?> reference) {
+    final Object service = bundleContext.getService(reference);
+    if (service == null) {
+      return null;
+    }
+    try {
+      return RestUtil.getServicePath(service.getClass());
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to determine the path of REST service {}: {}", reference, e.getMessage());
+      return null;
+    } finally {
+      bundleContext.ungetService(reference);
+    }
+  }
+
   private static SortedSet<ServiceReference> sort(ServiceReference[] references) {
     SortedSet<ServiceReference> sortedServiceRefs = new TreeSet<>((o1, o2) -> {
       final String o1Description = Objects.toString(o1.getProperty(Constants.SERVICE_DESCRIPTION), o1.toString());

@@ -54,7 +54,6 @@ import javax.ws.rs.Path;
     property = {
         "service.description=AmberScript Transcription REST Endpoint",
         "opencast.service.type=org.opencastproject.transcription.amberscript",
-        "opencast.service.path=/transcripts/amberscript",
         "opencast.service.jobproducer=true"
     }
 )

@@ -61,7 +61,6 @@ import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.opensearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -147,8 +146,7 @@ import javax.ws.rs.core.Response.Status;
     service = SeriesEndpoint.class,
     property = {
         "service.description=External API - Series Endpoint",
-        "opencast.service.type=org.opencastproject.external",
-        "opencast.service.path=/api/series"
+        "opencast.service.type=org.opencastproject.external"
     }
 )
 @JaxrsResource
@@ -203,7 +201,7 @@ public class SeriesEndpoint {
     logger.info("Activating External API - Series Endpoint");
 
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
-            RestConstants.SERVICE_PATH_PROPERTY);
+            getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }

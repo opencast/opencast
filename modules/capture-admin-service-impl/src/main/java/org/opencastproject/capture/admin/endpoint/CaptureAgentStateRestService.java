@@ -101,8 +101,7 @@ import javax.ws.rs.core.Response;
     service = CaptureAgentStateRestService.class,
     property = {
         "service.description=Capture Agent Admin REST Endpoint",
-        "opencast.service.type=org.opencastproject.capture.admin",
-        "opencast.service.path=/capture-admin"
+        "opencast.service.type=org.opencastproject.capture.admin"
     }
 )
 @JaxrsResource

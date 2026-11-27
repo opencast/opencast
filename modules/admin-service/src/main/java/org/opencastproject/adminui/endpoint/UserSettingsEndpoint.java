@@ -78,8 +78,7 @@ import javax.ws.rs.core.Response;
     service = UserSettingsEndpoint.class,
     property = {
         "service.description=Admin UI - Users Settings facade Endpoint",
-        "opencast.service.type=org.opencastproject.adminui.endpoint.UserSettingsEndpoint",
-        "opencast.service.path=/admin-ng/user-settings"
+        "opencast.service.type=org.opencastproject.adminui.endpoint.UserSettingsEndpoint"
     }
 )
 @JaxrsResource
@@ -115,7 +114,7 @@ public class UserSettingsEndpoint {
   @Activate
   protected void activate(ComponentContext cc) {
     logger.info("Activate the Admin ui - Users facade endpoint");
-    final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 

@@ -35,7 +35,6 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.opensearch.index.objects.event.Event;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.GsonUtil;
@@ -101,8 +100,7 @@ import javax.ws.rs.core.Response;
     service = WorkflowsEndpoint.class,
     property = {
         "service.description=External API - Workflow Instances Endpoint",
-        "opencast.service.type=org.opencastproject.external.workflows.instances",
-        "opencast.service.path=/api/workflows"
+        "opencast.service.type=org.opencastproject.external.workflows.instances"
     }
 )
 @JaxrsResource
@@ -144,7 +142,7 @@ public class WorkflowsEndpoint {
     logger.info("Activating External API - Workflow Instances Endpoint");
 
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
-            RestConstants.SERVICE_PATH_PROPERTY);
+            getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }

@@ -99,7 +99,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Static File Service REST Endpoint",
         "opencast.service.type=org.opencastproject.staticfiles",
-        "opencast.service.path=/staticfiles",
         "opencast.service.jobproducer=false"
     }
 )

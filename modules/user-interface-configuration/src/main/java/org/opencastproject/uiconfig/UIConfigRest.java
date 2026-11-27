@@ -78,8 +78,7 @@ import javax.ws.rs.core.Response;
 @Component(
     property = {
         "service.description=UI Config REST Endpoint",
-        "opencast.service.type=org.opencastproject.uiconfig",
-        "opencast.service.path=/ui/config"
+        "opencast.service.type=org.opencastproject.uiconfig"
     },
     immediate = true,
     service = UIConfigRest.class

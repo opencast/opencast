@@ -44,7 +44,6 @@ import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyImpl;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.opensearch.api.SearchIndexException;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQueryField;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
@@ -110,8 +109,7 @@ import javax.ws.rs.core.Response;
     service = LifeCycleManagementEndpoint.class,
     property = {
         "service.description=External API - LifeCycle Management Endpoint",
-        "opencast.service.type=org.opencastproject.external.lifecyclemanagement",
-        "opencast.service.path=/api/lifecyclemanagement"
+        "opencast.service.type=org.opencastproject.external.lifecyclemanagement"
     }
 )
 @JaxrsResource
@@ -152,7 +150,7 @@ public class LifeCycleManagementEndpoint {
     logger.info("Activating External API - LifeCycle Management Endpoint");
 
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
-        RestConstants.SERVICE_PATH_PROPERTY);
+            getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
 

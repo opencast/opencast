@@ -38,7 +38,6 @@ import javax.ws.rs.Path;
     property = {
         "service.description=AssetManager REST Endpoint",
         "opencast.service.type=org.opencastproject.assetmanager",
-        "opencast.service.path=/assets",
         "opencast.service.jobproducer=true"
     }
 )

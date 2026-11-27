@@ -58,7 +58,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Url Signing REST Endpoint",
         "opencast.service.type=org.opencastproject.security.urlsigning.testing",
-        "opencast.service.path=/signing",
         "opencast.service.publish=false",
         "opencast.service.jobproducer=false"
     }

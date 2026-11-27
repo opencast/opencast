@@ -111,7 +111,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Search REST Endpoint",
         "opencast.service.type=org.opencastproject.search",
-        "opencast.service.path=/search",
         "opencast.service.jobproducer=true"
     }
 )

@@ -26,6 +26,7 @@ import org.opencastproject.rest.StaticResource;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.RestUtil;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -56,7 +57,6 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -65,7 +65,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -76,7 +75,6 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -84,7 +82,6 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -105,9 +102,6 @@ public class RestPublisher implements RestConstants {
 
   /** The logger **/
   protected static final Logger logger = LoggerFactory.getLogger(RestPublisher.class);
-
-  /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
-  public static final String JAX_RS_SERVICE_FILTER = "(" + JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
 
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
   protected static final ConcurrentHashMap<String, String> NAMESPACE_MAP;
@@ -133,9 +127,6 @@ public class RestPublisher implements RestConstants {
   /** The base URL for this server */
   protected String baseServerUri;
 
-  /** Holds references to servlets that this class publishes, so they can be unpublished later */
-  protected Map<String, ServiceRegistration<?>> servletRegistrationMap;
-
   /** The JAX-RS Server */
   private Server server;
 
@@ -156,7 +147,6 @@ public class RestPublisher implements RestConstants {
     logger.debug("activate()");
     baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
-    servletRegistrationMap = new ConcurrentHashMap<>();
     providers = new ArrayList<>();
 
     JSONProvider jsonProvider = new OpencastJSONProvider();
@@ -240,33 +230,25 @@ public class RestPublisher implements RestConstants {
   /**
    * Creates a REST endpoint for the JAX-RS annotated service.
    *
-   * @param ref
-   *          the osgi service reference
    * @param service
    *          The service itself
+   * @param servicePath
+   *          The path of the service, used for logging
    */
-  protected synchronized void createEndpoint(ServiceReference<?> ref, Object service) {
-    String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
+  protected synchronized void createEndpoint(Object service, String servicePath) {
     serviceBeans.add(service);
     rewire();
-    logger.info("Registered REST endpoint at " + servicePath);
+    logger.info("Registered REST endpoint at {}", servicePath);
   }
 
   /**
    * Removes an endpoint
    *
-   * @param alias
-   *          The URL space to reclaim
    * @param service
-   *          The service reference
+   *          The service itself
    */
-  protected void destroyEndpoint(String alias, Object service) {
-    ServiceRegistration<?> reg = servletRegistrationMap.remove(alias);
+  protected void destroyEndpoint(Object service) {
     serviceBeans.remove(service);
-    if (reg != null) {
-      reg.unregister();
-    }
-
     rewire();
   }
 
@@ -360,20 +342,18 @@ public class RestPublisher implements RestConstants {
   }
 
   /**
-   * A custom ServiceTracker that published JAX-RS annotated services with the
-   * {@link RestPublisher#SERVICE_PATH_PROPERTY} property set to some non-null value.
+   * A custom ServiceTracker that publishes JAX-RS resources, see {@link RestConstants#SERVICES_FILTER}.
    */
   public class JaxRsServiceTracker extends ServiceTracker<Object, Object> {
 
     JaxRsServiceTracker() throws InvalidSyntaxException {
       super(componentContext.getBundleContext(),
-              componentContext.getBundleContext().createFilter(JAX_RS_SERVICE_FILTER), null);
+              componentContext.getBundleContext().createFilter(SERVICES_FILTER), null);
     }
 
     @Override
     public void removedService(ServiceReference<Object> reference, Object service) {
-      String servicePath = (String) reference.getProperty(SERVICE_PATH_PROPERTY);
-      destroyEndpoint(servicePath, service);
+      destroyEndpoint(service);
       super.removedService(reference, service);
     }
 
@@ -385,27 +365,15 @@ public class RestPublisher implements RestConstants {
         logger.info("JAX-RS service {} has not been instantiated yet, or has already been unregistered. Skipping "
                 + "endpoint creation.", reference);
       } else {
-        Path pathAnnotation = getAnnotationFromType(service.getClass(), Path.class);
-        if (pathAnnotation == null) {
-          logger.warn(
-                  "{} was registered with '{}={}', but the service is not annotated with the JAX-RS "
-                          + "@Path annotation",
-                  service, SERVICE_PATH_PROPERTY, reference.getProperty(SERVICE_PATH_PROPERTY));
-        } else {
-          createEndpoint(reference, service);
+        try {
+          createEndpoint(service, RestUtil.getServicePath(service.getClass()));
+        } catch (IllegalArgumentException e) {
+          logger.warn("{} was registered as JAX-RS resource, but the service is not annotated with the JAX-RS "
+                  + "@Path annotation", service);
         }
       }
       return service;
     }
-  }
-
-  private <A extends Annotation> A getAnnotationFromType(Class<?> classType, final Class<A> annotationClass) {
-    A annotation;
-    do {
-      annotation = classType.getAnnotation(annotationClass);
-      classType = classType.getSuperclass();
-    } while (annotation == null && !classType.equals(Object.class));
-    return annotation;
   }
 
   /**

@@ -93,8 +93,7 @@ import javax.ws.rs.core.Response.Status;
     service = CaptureAgentsEndpoint.class,
     property = {
         "service.description=Admin UI - Capture agents facade Endpoint",
-        "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
-        "opencast.service.path=/admin-ng/capture-agents"
+        "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint"
     }
 )
 @JaxrsResource

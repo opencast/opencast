@@ -101,7 +101,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Composer REST Endpoint",
         "opencast.service.type=org.opencastproject.composer",
-        "opencast.service.path=/composer/ffmpeg",
         "opencast.service.jobproducer=true"
     },
     immediate = true,

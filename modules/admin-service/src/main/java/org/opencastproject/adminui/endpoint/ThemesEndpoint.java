@@ -115,7 +115,6 @@ import javax.ws.rs.core.Response.Status;
     property = {
         "service.description=Admin UI - Themes Endpoint",
         "opencast.service.type=org.opencastproject.adminui.ThemesEndpoint",
-        "opencast.service.path=/admin-ng/themes",
     }
 )
 @JaxrsResource

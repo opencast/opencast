@@ -83,7 +83,6 @@ import org.opencastproject.opensearch.index.objects.IndexObject;
 import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -207,8 +206,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     service = { EventsEndpoint.class },
     property = {
         "service.description=External API - Events Endpoint",
-        "opencast.service.type=org.opencastproject.external.events",
-        "opencast.service.path=/api/events"
+        "opencast.service.type=org.opencastproject.external.events"
     }
 )
 @JaxrsResource
@@ -383,7 +381,7 @@ public class EventsEndpoint {
   @Activate
   void activate(ComponentContext cc) throws ConfigurationException {
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
-            RestConstants.SERVICE_PATH_PROPERTY);
+            getClass());
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
     logger.debug("Configured service endpoint is {}", endpointBaseUrl);
 

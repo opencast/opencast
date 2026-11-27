@@ -85,7 +85,6 @@ import javax.xml.transform.stream.StreamResult;
     property = {
         "service.description=Caption REST Endpoint",
         "opencast.service.type=org.opencastproject.caption",
-        "opencast.service.path=/caption",
         "opencast.service.jobproducer=true"
     }
 )
@@ -109,7 +108,6 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    */
   @Activate
   public void activate(ComponentContext cc) {
-    // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
   /**

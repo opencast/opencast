@@ -100,7 +100,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Tobira-related APIs",
         "opencast.service.type=org.opencastproject.tobira",
-        "opencast.service.path=/tobira",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

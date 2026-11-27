@@ -105,8 +105,7 @@ import javax.ws.rs.core.Response;
     service = GroupsEndpoint.class,
     property = {
         "service.description=External API - Groups Endpoint",
-        "opencast.service.type=org.opencastproject.external.groups",
-        "opencast.service.path=/api/groups"
+        "opencast.service.type=org.opencastproject.external.groups"
     }
 )
 @JaxrsResource

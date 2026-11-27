@@ -53,7 +53,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -159,8 +158,7 @@ import javax.ws.rs.core.Response.Status;
     service = SchedulerRestService.class,
     property = {
         "service.description=Scheduler REST Endpoint",
-        "opencast.service.type=org.opencastproject.scheduler",
-        "opencast.service.path=/recordings"
+        "opencast.service.type=org.opencastproject.scheduler"
     }
 )
 @JaxrsResource
@@ -288,7 +286,7 @@ public class SchedulerRestService {
       } else {
         serverUrl = ccServerUrl;
       }
-      serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      serviceUrl = RestUtil.getServicePath(getClass());
       defaultWorkflowDefinitionId = StringUtils
               .trimToNull(cc.getBundleContext().getProperty(DEFAULT_WORKFLOW_DEFINITION));
       if (defaultWorkflowDefinitionId == null) {

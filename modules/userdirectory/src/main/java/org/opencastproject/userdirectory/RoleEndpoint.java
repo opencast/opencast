@@ -52,7 +52,6 @@ import javax.ws.rs.core.MediaType;
     property = {
         "service.description=Role listing REST endpoint",
         "opencast.service.type=org.opencastproject.userdirectory.roles",
-        "opencast.service.path=/roles",
         "opencast.service.jobproducer=false"
     },
     immediate = true,

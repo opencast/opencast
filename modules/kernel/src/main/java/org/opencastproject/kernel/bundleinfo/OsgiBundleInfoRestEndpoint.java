@@ -34,8 +34,7 @@ import javax.ws.rs.Path;
     service = OsgiBundleInfoRestEndpoint.class,
     property = {
         "service.description=System BundleInfo REST Endpoint",
-        "opencast.service.type=org.opencastproject.kernel.bundleinfo",
-        "opencast.service.path=/sysinfo"
+        "opencast.service.type=org.opencastproject.kernel.bundleinfo"
     }
 )
 @JaxrsResource

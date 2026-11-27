@@ -53,7 +53,6 @@ import javax.ws.rs.Path;
     property = {
         "service.description=Microsoft Azure Transcription REST Endpoint",
         "opencast.service.type=org.opencastproject.transcription.microsoft.azure",
-        "opencast.service.path=/transcripts/azure",
         "opencast.service.jobproducer=true"
     }
 )

@@ -64,7 +64,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Video Editor Service REST Endpoint",
         "opencast.service.type=org.opencastproject.videoeditor",
-        "opencast.service.path=/videoeditor",
         "opencast.service.jobproducer=true"
     }
 )

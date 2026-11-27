@@ -74,8 +74,7 @@ import javax.ws.rs.core.Response;
     service = AutoScalingTerminationStateRestService.class,
     property = {
         "service.description=Termination State Rest Service: AWS Auto Scaling",
-        "opencast.service.type=org.opencastproject.terminationstate.aws.autoscaling",
-        "opencast.service.path=/termination/aws/autoscaling"
+        "opencast.service.type=org.opencastproject.terminationstate.aws.autoscaling"
     }
 )
 @JaxrsResource

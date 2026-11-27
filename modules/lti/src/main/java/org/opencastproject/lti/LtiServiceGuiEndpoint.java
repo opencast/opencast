@@ -79,8 +79,7 @@ import javax.ws.rs.core.Response.Status;
     service = LtiServiceGuiEndpoint.class,
     property = {
         "service.description=LTI Service GUI",
-        "opencast.service.type=org.opencastproject.lti.service.remote",
-        "opencast.service.path=/lti-service-gui"
+        "opencast.service.type=org.opencastproject.lti.service.remote"
     }
 )
 @JaxrsResource

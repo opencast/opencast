@@ -94,8 +94,7 @@ import javax.ws.rs.core.Response;
     service = JobEndpoint.class,
     property = {
         "service.description=Admin UI - Job facade Endpoint",
-        "opencast.service.type=org.opencastproject.adminui.endpoint.JobEndpoint",
-        "opencast.service.path=/admin-ng/job"
+        "opencast.service.type=org.opencastproject.adminui.endpoint.JobEndpoint"
     }
 )
 @JaxrsResource

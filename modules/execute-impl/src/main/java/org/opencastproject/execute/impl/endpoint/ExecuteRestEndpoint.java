@@ -71,7 +71,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Execute REST Endpoint",
         "opencast.service.type=org.opencastproject.execute",
-        "opencast.service.path=/execute",
         "opencast.service.jobproducer=true"
     }
 )

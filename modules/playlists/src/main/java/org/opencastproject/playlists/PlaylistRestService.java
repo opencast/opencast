@@ -98,8 +98,7 @@ import javax.xml.bind.JAXBException;
     service = PlaylistRestService.class,
     property = {
         "service.description=Playlist REST Endpoint",
-        "opencast.service.type=org.opencastproject.playlists",
-        "opencast.service.path=/playlists"
+        "opencast.service.type=org.opencastproject.playlists"
     }
 )
 @JaxrsResource

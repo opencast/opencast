@@ -70,7 +70,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=IBM Watson Transcription REST Endpoint",
         "opencast.service.type=org.opencastproject.transcription.ibmwatson",
-        "opencast.service.path=/transcripts/watson",
         "opencast.service.jobproducer=true"
     }
 )

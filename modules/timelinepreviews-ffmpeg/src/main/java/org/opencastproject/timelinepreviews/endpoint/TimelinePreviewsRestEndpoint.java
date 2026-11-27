@@ -76,7 +76,6 @@ import javax.ws.rs.core.Response;
     property = {
         "service.description=Timeline previews REST Endpoint",
         "opencast.service.type=org.opencastproject.timelinepreviews",
-        "opencast.service.path=/timelinepreviews",
         "opencast.service.jobproducer=true"
     }
 )
