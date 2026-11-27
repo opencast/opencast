@@ -29,6 +29,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
+import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.composer.api.LaidOutElement;
 import org.opencastproject.composer.api.VideoClip;
 import org.opencastproject.composer.layout.Dimension;
@@ -162,6 +163,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static final int PROCESS_SMIL_FAILED = 19;
   private static final int MULTI_ENCODE_FAILED = 20;
   private static final int NO_STREAMS = 23;
+  private static final int AUDIO_MERGE_FAILED = 24;
 
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(ComposerServiceImpl.class);
@@ -219,7 +221,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** List of available operations on jobs */
   enum Operation {
     Encode, Image, ImageConversion, Mux, Trim, Composite, Concat, ImageToVideo, ParallelEncode, Demux, ProcessSmil,
-    MultiEncode
+     MultiEncode, MergeAudioTracks
   }
 
   /** tracked encoder engines */
@@ -252,6 +254,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** Path to the FFmpeg binary */
   private String ffmpegBinary = FFMPEG_BINARY_DEFAULT;
 
+  /** Identifier of the audio-merge encoding profile, which has a built-in default **/
+  private static final String DEFAULT_AUDIO_MERGE_PROFILE = "audiomerge.work";
+
+  /** Default audio-merge encoding profile if no one is set **/
+  private EncodingProfile defaultAudioMergeEncodingProfile;
+
   /** Creates a new composer service instance. */
   public ComposerServiceImpl() {
     super(JOB_TYPE);
@@ -273,6 +281,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
             FFMPEG_BINARY_DEFAULT);
     logger.debug("ffmpeg binary: {}", ffmpegBinary);
+
+    // creating default encoding profile in case none is set
+    EncodingProfileImpl profile = new EncodingProfileImpl(DEFAULT_AUDIO_MERGE_PROFILE, "audiomerge", null);
+    profile.setOutputType(EncodingProfile.MediaType.Audio);
+    profile.setSuffix("-merged.mkv");
+    profile.setApplicableType(EncodingProfile.MediaType.AudioVisual);
+    profile.addExtension("ffmpeg.command", "#{audioMergeCommand} -c:a flac #{out.dir}/#{out.name}#{out.suffix}");
+    this.defaultAudioMergeEncodingProfile = profile;
+    logger.info("Default audio merge encoding profile set: " + profile.getIdentifier());
+
     logger.info("Activating composer service");
     updated(properties);
   }
@@ -983,8 +1001,31 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   @Override
+  public Job mergeAudioTracks(String profileId, List<Long> audioStartTimes, List<Track> audioTracks)
+          throws MediaPackageException, EncoderException {
+    try {
+      ArrayList<String> arguments = new ArrayList<String>();
+      arguments.add(0, profileId);
+      String audioStartsStringified = audioStartTimes.stream().map(String::valueOf).collect(Collectors.joining(","));
+      arguments.add(1, audioStartsStringified);
+      for (int i = 0; i < audioTracks.size(); i++) {
+        arguments.add(i + 2, MediaPackageElementParser.getAsXml(audioTracks.get(i)));
+      }
+      EncodingProfile profile = getAudioMergeProfile(profileId);
+      if (profile == null) {
+        throw new EncoderException(format("Profile %s is unknown", profileId));
+      }
+      return serviceRegistry.createJob(JOB_TYPE, Operation.MergeAudioTracks.toString(), arguments,
+          profile.getJobLoad());
+    } catch (ServiceRegistryException e) {
+      throw new EncoderException("Unable to create 'Merge Audio Tracks' job", e);
+    }
+  }
+
+  @Override
   public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec,
-      Track... tracks) throws EncoderException, MediaPackageException {
+      Track... tracks)
+          throws EncoderException, MediaPackageException {
     ArrayList<String> arguments = new ArrayList<String>();
     arguments.add(0, profileId);
     if (outputDimension != null) {
@@ -1005,8 +1046,98 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
+  /**
+   * Returns the audio merge encoding profile. If the default audio merge profile is not configured, the built-in
+   * default profile is used instead.
+   *
+   * @param profileId
+   *          the identifier of the encoding profile
+   * @return the encoding profile or null if it does not exist
+   */
+  private EncodingProfile getAudioMergeProfile(String profileId) {
+    EncodingProfile profile = profileScanner.getProfile(profileId);
+    if (profile == null && DEFAULT_AUDIO_MERGE_PROFILE.equals(profileId)) {
+      logger.debug("Profile {} is unknown. Using built-in default", profileId);
+      return defaultAudioMergeEncodingProfile;
+    }
+    return profile;
+  }
+
+  private Optional<Track> mergeAudioTracks(Job job, String profileId, List<Long> audioStartTimes,
+      List<Track> audioTracks)
+          throws EncoderException {
+    if (audioTracks.size() < 2) {
+      throw new EncoderException(String.format(
+        "The track parameter must at least have two tracks present. Provided tracks: %d", audioTracks.size()));
+    }
+
+    if (audioTracks.size() != audioStartTimes.size()) {
+      throw new EncoderException(String.format(
+        "Number of audio tracks (%d) and 'audio start times' (%d) are not equal.",
+         audioTracks.size(), audioStartTimes.size()));
+    }
+
+    List<File> audioFiles = new ArrayList<>();
+    for (Track t : audioTracks) {
+      if (t.hasVideo()) {
+        throw new EncoderException(String.format(
+          "There was at least one video in the audio track list: '%s'", t.getURI()));
+      }
+      audioFiles.add(loadTrackIntoWorkspace(job, "audio_merge", t, false));
+    }
+
+    EncodingProfile encodingProfile = getAudioMergeProfile(profileId);
+    if (encodingProfile == null) {
+      final String msg = format("Profile %s is unknown.", profileId);
+      logger.error(msg);
+      incident().recordFailure(job, PROFILE_NOT_FOUND, Map.of("profile", profileId));
+      throw new EncoderException(msg);
+    }
+
+    final EncoderEngine encoderEngine = getEncoderEngine();
+
+    String audioMergeCommand = buildAudioMergeCommand(audioStartTimes, audioFiles);
+    Map<String, String> properties = new HashMap<>();
+    properties.put(CMD_SUFFIX + ".audioMergeCommand", audioMergeCommand);
+
+    File mergedAudioTrack;
+    try {
+      mergedAudioTrack = encoderEngine.encode(audioFiles.get(0), encodingProfile, properties);
+    } catch (EncoderException e) {
+      Map<String, String> params = new HashMap<>();
+      List<String> trackList = new ArrayList<>();
+      for (Track t : audioTracks) {
+        trackList.add(t.getURI().toString());
+      }
+      params.put("tracks", StringUtils.join(trackList, ","));
+      params.put("profile", encodingProfile.getIdentifier());
+      params.put("properties", properties.toString());
+      incident().recordFailure(job, AUDIO_MERGE_FAILED, e, params, detailsFor(e, encoderEngine));
+      throw e;
+    } finally {
+      activeEncoder.remove(encoderEngine);
+    }
+
+    // audio merge did not return a file
+    if (!mergedAudioTrack.exists() || mergedAudioTrack.length() == 0) {
+      return Optional.empty();
+    }
+
+    // Put the file in the workspace
+    URI workspaceURI = putToCollection(job, mergedAudioTrack, "merged audio file");
+
+    // Have the merged audio track inspected and return the result
+    Track inspectedTrack = inspect(job, workspaceURI);
+
+    final String targetTrackId = IdImpl.fromUUID().toString();
+    inspectedTrack.setIdentifier(targetTrackId);
+
+    return Optional.of(inspectedTrack);
+  }
+
   private Optional<Track> concat(Job job, List<Track> tracks, String profileId, Dimension outputDimension,
-      float outputFrameRate, boolean sameCodec) throws EncoderException, MediaPackageException {
+          float outputFrameRate, boolean sameCodec)
+          throws EncoderException, MediaPackageException {
 
     if (tracks.size() < 2) {
       Map<String, String> params = new HashMap<>();
@@ -1663,6 +1794,23 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           outTracks = multiEncode(job, firstTrack, encodingProfiles2);
           serialized = StringUtils.trimToEmpty(MediaPackageElementParser.getArrayAsXml(outTracks));
           break;
+        case MergeAudioTracks:
+          List<Long> audioStartTimes = Arrays.stream(arguments.get(1).split(","))
+              .mapToLong(Long::parseLong).boxed().collect(Collectors.toList());
+          List<Track> audioTracks = new ArrayList<>();
+          for (int i = 2; i < arguments.size(); i++) {
+            audioTracks.add((Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
+          }
+          serialized = mergeAudioTracks(job, encodingProfile, audioStartTimes, audioTracks)
+              .map(element -> {
+                try {
+                  return MediaPackageElementParser.getAsXml(element);
+                } catch (MediaPackageException e) {
+                  throw new RuntimeException(e);
+                }
+              })
+              .orElse("");
+          break;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -1817,8 +1965,52 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return params;
   }
 
-  private String buildConcatCommand(boolean onlyAudio, Dimension dimension, float outputFrameRate, List<File> files,
-      List<Track> tracks) {
+  private String buildAudioMergeCommand(List<Long> audioStartTimes, List<File> audioTrackFiles) {
+
+    // example:
+    // ffmpeg -i in1.mp3 -i in2.mp3 -i in3.mp3 -filter_complex \
+    // "[0:a]aresample=async=1:first_pts=0,adelay=1500:all=1[a0]; \
+    // [1:a]aresample=async=1:first_pts=0,adelay=2500:all=1[a1]; \
+    // [2:a]aresample=async=1:first_pts=0,adelay=4000:all=1[a2]; \
+    // [a0][a1][a2]amix=inputs=3:duration=longest:normalize=0[aout]" \
+    // -map "[aout]" \
+    // -c:a flac \   <- thats in the encoding profile
+    // output.flac   <- thats managed by the encoding engine
+
+    StringBuilder command = new StringBuilder();
+
+    for (File f : audioTrackFiles) {
+      command.append("-i ").append(f.getAbsolutePath()).append(" ");
+    }
+    command.append("-filter_complex ");
+    command.append("\""); // opening double quote
+
+    StringBuilder audioMixParts = new StringBuilder();
+    for (int i = 0; i < audioStartTimes.size(); i++) {
+      // example: [0:a]aresample=async=1:first_pts=0,adelay=1500:all=1[a0];
+      // note: '0' is the incremental index
+      // aresample=async=1: fill timestamp gaps (e.g. lost packets or a muted microphone in BigBlueButton
+      // recordings) with silence. adelay and amix only count samples, so a gap would otherwise move all following
+      // audio of this track earlier, and a gap in the first track would make all other tracks late, since amix
+      // takes its timestamps from it.
+      command.append("[").append(i).append(":a]").append("aresample=async=1:first_pts=0,")
+          .append("adelay=").append(audioStartTimes.get(i))
+          .append(":all=1[a").append(i).append("];");
+      audioMixParts.append("[a").append(i).append("]");
+    }
+    // example: [a0][a1][a2]amix=inputs=3:duration=longest:normalize=0[aout]"
+    // normalize=0: amix would otherwise divide every input's volume by the number of inputs
+    command.append(audioMixParts).append("amix=inputs=").append(audioStartTimes.size())
+        .append(":duration=longest:normalize=0[aout]");
+    command.append("\" "); // closing double quote
+
+    command.append("-map \"[aout]\" ");
+
+    return command.toString();
+  }
+
+  private String buildConcatCommand(boolean onlyAudio, Dimension dimension, float outputFrameRate,
+      List<File> files, List<Track> tracks) {
     StringBuilder sb = new StringBuilder();
 
     // Add input file paths

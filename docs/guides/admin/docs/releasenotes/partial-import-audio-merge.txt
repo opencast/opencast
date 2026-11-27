@@ -1,0 +1,31 @@
+The `partial-import` workflow operation now merges the audio files of a partial ingest instead of joining them end to
+end ([#8367](https://github.com/opencast/opencast/pull/8367)). Every audio file is placed at its position from the
+SMIL file and all of them are mixed into one track. This supports overlapping audio files, as recorded by
+BigBlueButton 3, and fills timestamp gaps within an audio file with silence, so the audio stays in sync after lost
+packets or a muted microphone.
+
+This changes the behaviour of existing setups that use `partial-import`:
+
+- Merging audio requires FFmpeg 4.4 or newer.
+- The merged audio is encoded with the new, optional `audio-merge-encoding-profile` (default: `audiomerge.work`). If
+  no encoding profile with this name is configured, a built-in profile is used, which writes FLAC audio to a Matroska
+  file. The `concat-encoding-profile` is no longer used for audio-only files. If you rely on another audio format,
+  configure your own `audiomerge.work` profile.
+- The `preencode-encoding-profile` is only applied to tracks with a video stream. Audio options and filters in this
+  profile no longer affect audio-only files. A single audio file that covers the whole recording is passed on in its
+  original format.
+- Overlapping audio files are added up without normalization, so every file keeps its volume. Several loud sources at
+  the same time can clip.
+
+Related fixes for recordings whose video properties change mid-stream:
+
+- The video editor no longer reinitializes its video filters when the frame properties of an input change mid-stream
+  (`-reinit_filter:v 0`). Before, such videos could be cut short.
+- The `videogrid` workflow operation converts all sections to the same color properties (BT.709, TV range) and no
+  longer fails if there is only a single section.
+
+The composer service has a new job operation and REST endpoint for merging audio. As usual, all nodes of a cluster
+need to run the same version.
+
+There are no database schema or search index changes. Existing workflows and encoding profiles do not have to be
+changed.

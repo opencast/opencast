@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
+  <head/>
+  <body>
+    <par dur="14772ms">
+      <seq>
+        <video begin="0ms" dur="14772ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/d79699b2-d683-4f0d-95ff-2dc4da3c9c40/medium_w_g7vtgxrzp24d_1596617796429.webm"
+               xml:id="d79699b2-d683-4f0d-95ff-2dc4da3c9c40"/>
+      </seq>
+      <seq>
+        <audio begin="0ms" dur="14772ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/696bc7dc-caca-468c-9f8d-5f8fc57f0b83/0a62baa687baef56c59d74061eb85f04fa19a6eb_1596617773457_24877875.opus"
+               xml:id="696bc7dc-caca-468c-9f8d-5f8fc57f0b83"/>
+      </seq>
+    </par>
+  </body>
+</smil>
