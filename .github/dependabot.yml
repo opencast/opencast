@@ -37,19 +37,9 @@ updates:
     interval: monthly
   open-pull-requests-limit: 10
 
-# Java dependencies
+# Java dependencies (root pom.xml and all modules it aggregates)
 - package-ecosystem: maven
-  directory: "/modules/metrics-exporter"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: maven
-  directory: /modules/db
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: maven
-  directory: /modules/elasticsearch-impl
+  directory: /
   schedule:
     interval: monthly
   groups:
@@ -62,6 +52,11 @@ updates:
       applies-to: security-updates
       patterns:
         - "org.apache.httpcomponents.*"
+    # graphql-java and its companion libraries need to move together
+    graphql:
+      patterns:
+        - "com.graphql-java:*"
+        - "io.github.graphql-java:*"
   open-pull-requests-limit: 10
 
 # Development dependency containers
