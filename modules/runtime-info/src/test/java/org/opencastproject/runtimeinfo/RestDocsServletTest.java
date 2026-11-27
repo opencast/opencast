@@ -21,7 +21,6 @@
 package org.opencastproject.runtimeinfo;
 
 import org.opencastproject.rest.RestConstants;
-import org.opencastproject.systems.OpencastConstants;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.easymock.EasyMock;
@@ -48,10 +47,6 @@ public class RestDocsServletTest {
     String payload = "<script>alert(document.domain)</script>";
 
     BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty("org.opencastproject.anonymous.feedback.url"))
-        .andReturn(null);
-    EasyMock.expect(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY)).andReturn(null);
-    EasyMock.expect(bundleContext.getProperty("org.opencastproject.storage.dir")).andReturn(null);
     // no REST endpoint registered under the requested alias
     EasyMock.expect(bundleContext.getAllServiceReferences(
             EasyMock.<String>isNull(), EasyMock.eq(RestConstants.SERVICES_FILTER)))
