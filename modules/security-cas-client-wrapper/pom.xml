@@ -41,10 +41,6 @@
       <artifactId>jaxb-api</artifactId>
       <version>2.3.1</version>
     </dependency>
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-core</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -61,7 +57,6 @@
             <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.bouncycastle:bcpkix-jdk18on</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>javax.xml.bind:jaxb-api</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.glassfish.jaxb:jaxb-core</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
