@@ -4,6 +4,6 @@
   "version": "8.0.0",
   "type": "module",
   "devDependencies": {
-    "@asicupv/opencast-engage-paella-player": "^8.0.6"
+    "@asicupv/opencast-engage-paella-player": "^8.0.7"
   }
 }
