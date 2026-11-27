@@ -1,0 +1,24 @@
+meta {
+  name: post_event_track
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/api/events/:eventId/track
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:multipart-form {
+  flavor: presenter/source
+  track: @file(test.mp4) @contentType(video/mp4)
+}
+
+assert {
+  res.status: eq 200
+}

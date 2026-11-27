@@ -1,0 +1,21 @@
+meta {
+  name: delete_recording_invalid
+  type: http
+  seq: 22
+}
+
+delete {
+  url: {{baseUrl}}/capture-admin/recordings/non-existent-recording-123
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 404
+}
+
+tests {
+  test("Delete non-existent recording should return 404", function() {
+    expect(res.status).to.equal(404);
+  });
+}
