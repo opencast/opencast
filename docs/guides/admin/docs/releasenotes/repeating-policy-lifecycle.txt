@@ -1,0 +1,7 @@
+Repeating lifecycle policy jobs are now removed when their policy is deleted, disabled,
+or changed to a non-repeating timing. Changes to the cron expression take effect on
+the next policy check. Stopping the lifecycle policy checker removes its own jobs
+without shutting down the Quartz scheduler shared with other Opencast components.
+
+This change does not modify the database schema or search index and requires no
+configuration changes.
