@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import requests
 import json
+import os
+import requests
 
 from jinja2 import Template
 
@@ -9,8 +10,23 @@ from jinja2 import Template
 RELEASE_URL = 'https://api.github.com/repos/opencast/opencast/releases'
 BRANCH_URL = 'https://api.github.com/repos/opencast/opencast/branches?per_page=100'
 
+
+def api_get(url):
+    '''Request data from the GitHub API.
+    The request is authenticated if the environment variable GITHUB_TOKEN is
+    set. Otherwise, an anonymous request with lower rate limits is sent.
+    '''
+    headers = {}
+    token = os.environ.get('GITHUB_TOKEN')
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+
 def get_release_branches(page):
-    branches = requests.get(f"{BRANCH_URL}&page={page}").json()
+    branches = api_get(f"{BRANCH_URL}&page={page}")
     branch_names = map(lambda x: x['name'], branches)
     release_branches = filter(lambda x: x.startswith('r/') and x.endswith('.x') and not x.startswith('r/1.'),
                              branch_names)
@@ -18,7 +34,7 @@ def get_release_branches(page):
 
 
 def main():
-    releases = requests.get(RELEASE_URL).json()
+    releases = api_get(RELEASE_URL)
     versions = map(lambda x: float(x['tag_name']), releases)
     stable = int(max(versions))
     stable_branch = f'r/{stable}.x'
