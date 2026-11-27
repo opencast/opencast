@@ -1,0 +1,3 @@
+The optional Jetty configuration file `etc/jetty-opencast.xml` has been removed. Its only purpose was raising the idle
+timeout of the HTTP connector, which can now be set directly with `org.ops4j.pax.web.server.connector.idleTimeout`
+in `etc/org.ops4j.pax.web.cfg`.

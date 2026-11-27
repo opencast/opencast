@@ -15,3 +15,10 @@ TODO
   the results using `limit` and `offset`. The response contains no total count, so a client can only tell that more
   results exist if it receives exactly as many results as it asked for. Clients which request API version 1.12.0 or
   older keep the previous behavior.
+
+### New and Changed Options
+
+- **HTTP idle timeout**
+    - `etc/jetty-opencast.xml` has been removed. If you enabled it by setting `org.ops4j.pax.web.config.file` in
+      `etc/org.ops4j.pax.web.cfg` to raise the HTTP idle timeout, remove that setting and configure the timeout with
+      `org.ops4j.pax.web.server.connector.idleTimeout` (in milliseconds) in the same file instead.
