@@ -20,7 +20,7 @@ The following filters are available:
 Filter Name    | Description
 :--------------|:-----------
 `contributors` | Series where the contributors specified in the metadata field match. Can occur multiple times
-`Creator`      | Series where the creator specified in the metadata field match (please use `creator` for version 1.1.0 and higher instead)
+`Creator`      | Series where the creator specified in the metadata field match (please use `creator` instead)
 `creationDate` | Series that were created between two dates. The two dates are in UTC format to the second i.e. yyyy-MM-ddTHH:mm:ssZ e.g. 2014-09-27T16:25Z. They are seperated by a forward slash (url encoded or not) so an example of the full filter would be CreationDate:2015-05-08T00:00:00.000Z/2015-05-10T00:00:00.000Z
 `language`     | Series based upon the language specified
 `license`      | Series based upon the license specified
@@ -29,11 +29,11 @@ Filter Name    | Description
 `subject`      | By the subject they are a part of. Can occur multiple times
 `textFilter`   | Filters series where any part of the series' metadata fields match this value
 `title`        | By the title of the series
-`identifier`   | By the technical identifiers of the series. Can occur multiple times (version 1.1.0 and higher)
-`description`  | By the description of the series (version 1.1.0 and higher)
-`creator`      | Series where the creator specified in the metadata field match (version 1.1.0 and higher)
-`publishers`   | Series where the publishers specified in the metadata field match. Can occur multiple times (version 1.1.0 and higher)
-`rightsholder` | By the rights holder of the series (version 1.1.0 and higher)
+`identifier`   | By the technical identifiers of the series. Can occur multiple times
+`description`  | By the description of the series
+`creator`      | Series where the creator specified in the metadata field match
+`publishers`   | Series where the publishers specified in the metadata field match. Can occur multiple times
+`rightsholder` | By the rights holder of the series
 
 The list can be sorted by the following criteria:
 
@@ -49,7 +49,7 @@ the response:
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`withacl`                  | [`boolean`](types.md#basic) | Whether the acl should be included in the response (version 1.5.0 and higher)
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl should be included in the response
 
 __Sample request__
 ```xml
@@ -70,10 +70,10 @@ Field            | Type                                 | Description
 `publishers`\*   | [`array[string]`](types.md#array)    | The publishers of the series
 `subjects`\*     | [`array[string]`](types.md#array)    | The subjects of the series
 `organizers`\*   | [`array[string]`](types.md#array)    | The organizers of the series
-`description`\*  | [`string`](types.md#basic)           | The description of the series (version 1.1.0 and higher)
-`language`\*     | [`string`](types.md#basic)           | The language of the series (version 1.1.0 and higher)
-`license`\*      | [`string`](types.md#basic)           | The license of the series (version 1.1.0 and higher)
-`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series (version 1.1.0 and higher)
+`description`\*  | [`string`](types.md#basic)           | The description of the series
+`language`\*     | [`string`](types.md#basic)           | The language of the series
+`license`\*      | [`string`](types.md#basic)           | The license of the series
+`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series
 
 \* Metadata fields from the default metadata catalog `dublincore/series`
 
@@ -131,7 +131,7 @@ Returns a single series.
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`withacl`                  | [`boolean`](types.md#basic) | Whether the acl should be included in the response (version 1.5.0 and higher)
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl should be included in the response
 
 __Response__
 
@@ -149,9 +149,9 @@ Field            | Type                                 | Description
 `organizers`\*   | [`array[string]`](types.md#array)    | The organizers of the series
 `organization`\* | [`string`](types.md#basic)           | The identifier of the tenant this series belongs to
 `opt_out`        | [`string`](types.md#basic)           | Field is not used
-`language`\*     | [`string`](types.md#basic)           | The language of the series (version 1.1.0 and higher)
-`license`\*      | [`string`](types.md#basic)           | The license of the series (version 1.1.0 and higher)
-`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series (version 1.1.0 and higher)
+`language`\*     | [`string`](types.md#basic)           | The language of the series
+`license`\*      | [`string`](types.md#basic)           | The license of the series
+`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series
 
 \* Fields from the default metadata catalog `dublincore/series`
 
@@ -225,7 +225,7 @@ __Response__
 Field            | Type                                 | Description
 :----------------|:-------------------------------------|:-----------
 `identifier`     | [`string`](types.md#basic)           | The unique identifier of the series
-`license`\*      | [`string`](types.md#basic)           | The license of the series (version 1.1.0 and higher)
+`license`\*      | [`string`](types.md#basic)           | The license of the series
 `created`\*      | [`datetime`](types.md#date-and-time) | The data when the series was created
 `creator`        | [`string`](types.md#basic)           | The name of the user that has created the series
 `title`\*        | [`string`](types.md#basic)           | The title of the series
@@ -233,9 +233,9 @@ Field            | Type                                 | Description
 `publishers`\*   | [`array[string]`](types.md#array)    | The publishers of the series
 `subjects`\*     | [`array[string]`](types.md#array)    | The subjects of the series
 `organizers`\*   | [`array[string]`](types.md#array)    | The organizers of the series
-`description`\*  | [`string`](types.md#basic)           | The description of the series (version 1.1.0 and higher)
-`language`\*     | [`string`](types.md#basic)           | The language of the series (version 1.1.0 and higher)
-`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series (version 1.1.0 and higher)
+`description`\*  | [`string`](types.md#basic)           | The description of the series
+`language`\*     | [`string`](types.md#basic)           | The language of the series
+`rightsholder`\* | [`string`](types.md#basic)           | The rights holder of the series
 
 ### POST /api/series
 
@@ -523,10 +523,10 @@ __Example__
 
 Updates a series' access policy.
 
-Parameters | Required | Type                        | Description                 | Default | Version
-:----------|:---------|:----------------------------|:----------------------------|:--------|:-------
-`acl`      | yes      | [`acl`](types.md#acl)       | Access policy to be applied |         |
-`override` | no       | [`boolean`](types.md#basic) | Whether the episode ACL of all events of this series should be removed | false | 1.2.0
+Parameters | Required | Type                        | Description                 | Default
+:----------|:---------|:----------------------------|:----------------------------|:--------
+`acl`      | yes      | [`acl`](types.md#acl)       | Access policy to be applied |
+`override` | no       | [`boolean`](types.md#basic) | Whether the episode ACL of all events of this series should be removed | false
 
 Note that the existing access policy of the series will be overwritten.
 

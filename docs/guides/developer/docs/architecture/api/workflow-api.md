@@ -1,8 +1,6 @@
 [TOC]
 # General
 
-The Workflow API is available since API version 1.1.0.
-
 # Workflow instances
 
 ### POST /api/workflows

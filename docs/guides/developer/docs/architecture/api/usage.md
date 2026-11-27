@@ -20,7 +20,7 @@ Notes:
 __Example__
 
 ```
-Accept: application/v1.0.0+json
+Accept: application/v1.13.0+json
 ```
 
 If that header is not specified, or no version information can be extracted from the header, the assumption is that the
@@ -28,7 +28,7 @@ request should be executed against the most recent version. If the version speci
 ACCEPTABLE)` is returned as the HTTP response code.
 
 With every response, the API version is specified as part of the standard HTTP `Content-Type` header, as in
-`application/v1.0.0+json`.
+`application/v1.13.0+json`.
 
 Versions should be specified as obtained from the [Base API](base-api.md#versions) call to `/versions`.
 

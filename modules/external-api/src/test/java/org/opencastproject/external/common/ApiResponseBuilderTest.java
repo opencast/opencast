@@ -34,10 +34,10 @@ public class ApiResponseBuilderTest {
 
   @Test
   public void testJsonStringOk() throws Exception {
-    Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_0_0, "body");
+    Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_11_0, "body");
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
-    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0).toString());
+    assertEquals("application/v1.11.0+json", response.getMetadata().get("Content-Type").get(0).toString());
   }
 
   @Test
@@ -51,10 +51,10 @@ public class ApiResponseBuilderTest {
 
     json.add("values", values);
 
-    Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_0_0, json);
+    Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_11_0, json);
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
-    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0).toString());
+    assertEquals("application/v1.11.0+json", response.getMetadata().get("Content-Type").get(0).toString());
   }
 
 }

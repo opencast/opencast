@@ -9,7 +9,7 @@ The following query string parameters are supported to filter, sort and paginate
 
 Query String Parameter |Type                         | Description
 :----------------------|:----------------------------|:-----------
-`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters. Version 1.5.0 and newer support comma separated use of the `filter` keyword, creating a logical OR.
+`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters. If the `filter` parameter is given multiple times, only the first one is evaluated.
 `sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
 `limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination)). Version 1.13.0 and newer return at most 100 results if no limit is given and reject limits larger than 10000.
 `offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
@@ -20,23 +20,23 @@ Filter Name       | Description
 :-----------------|:-----------
 `contributors`    | Events where the contributors match. Can occur multiple times
 `location`        | Events based upon the location it is scheduled in
-`series`          | Events based upon which series they are a part of. Use the series identifier here. If using version 1.1.0 or higher, please use `is_part_of` instead
+`series`          | Events based upon which series they are a part of. Use the series identifier here. Please use `is_part_of` instead
 `subject`         | Filters events based upon which subject they are a part of
 `textFilter`      | Filters events where any part of the event's metadata fields match this value
-`identifier`      | Filters events whose identifiers match this value. Can occur multiple times (version 1.1.0 and higher)
-`title`           | Filters events whose title match this value (version 1.1.0 and higher)
-`description`     | Filters events whose description match this value (version 1.1.0 and higher)
-`series_name`     | Filters events that belong to series with the given name (version 1.1.0 or higher)
-`language`        | Filters events whose language match this value (version 1.1.0 or higher)
-`created`         | Filters events whose created match this value (version 1.1.0 or higher)
-`license`         | Filters events whose license match this value (version 1.1.0 or higher)
-`rightsholder`    | Filters events whose rights holder matches this value (version 1.1.0 or higher)
-`status`          | Filters events based on their status (version 1.1.0 or higher)
-`is_part_of`      | Events based upon which series they are a part of. Use the series identifier here (version 1.1.0 or higher)
-`source`          | Filter events whose source match this value (version 1.1.0 or higher)
-`agent_id`        | Filter events based on the capture agent id (version 1.1.0 or higher)
-`start`           | Filter events based on start date (version 1.1.0 or higher)
-`technical_start` | Filter events based on the technical start date (version 1.1.0 or higher)
+`identifier`      | Filters events whose identifiers match this value. Can occur multiple times
+`title`           | Filters events whose title match this value
+`description`     | Filters events whose description match this value
+`series_name`     | Filters events that belong to series with the given name
+`language`        | Filters events whose language match this value
+`created`         | Filters events whose created match this value
+`license`         | Filters events whose license match this value
+`rightsholder`    | Filters events whose rights holder matches this value
+`status`          | Filters events based on their status
+`is_part_of`      | Events based upon which series they are a part of. Use the series identifier here
+`source`          | Filter events whose source match this value
+`agent_id`        | Filter events based on the capture agent id
+`start`           | Filter events based on start date
+`technical_start` | Filter events based on the technical start date
 
 Note:
 The filters `start` and `technical_start` expect the following value:
@@ -62,15 +62,15 @@ the response:
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+`sign`                     | [`boolean`](types.md#basic) | Whether publication and distribution urls should be pre-signed.
 `withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
 `withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
 `withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
-`withscheduling`           | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response (version 1.1.0 and higher).
+`withscheduling`           | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
-on in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider
-the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign publication and distribution urls if URL
+signing is turned on in Opencast. Remember to consider the [maximum validity of signed
+URLs](security-api.md#Introduction) when caching this response.
 
 __Sample request__
 
@@ -90,7 +90,7 @@ Field                | Type                                 | Description
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
 `created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`              | [`datetime`](types.md#date-and-time) | The technical (version < 1.4.0) or bibliographic (version >= 1.4.0) start date and time of this event
+`start`              | [`datetime`](types.md#date-and-time) | The bibliographic start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
@@ -100,13 +100,13 @@ Field                | Type                                 | Description
 `has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
 `location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
 `publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
-`language`\*         | [`string`](types.md#basic)           | The language of this event (version 1.1.0 and higher)
-`rightsholder`\*     | [`string`](types.md#basic)           | The rights holder of this event (version 1.1.0 and higher)
-`license`\*          | [`string`](types.md#basic)           | The license of this event (version 1.1.0 and higher)
-`is_part_of`\*       | [`string`](types.md#basic)           | The technical identifier of the series this event belongs to (version 1.1.0 and higher)
-`series`             | [`string`](types.md#basic)           | The title of the series this event belongs to (version 1.1.0 and higher)
-`source`\*           | [`string`](types.md#basic)           | The source of this event (version 1.1.0 and higher)
-`status`             | [`string`](types.md#basic)           | The technical status of this event (version 1.1.0 and higher)
+`language`\*         | [`string`](types.md#basic)           | The language of this event
+`rightsholder`\*     | [`string`](types.md#basic)           | The rights holder of this event
+`license`\*          | [`string`](types.md#basic)           | The license of this event
+`is_part_of`\*       | [`string`](types.md#basic)           | The technical identifier of the series this event belongs to
+`series`             | [`string`](types.md#basic)           | The title of the series this event belongs to
+`source`\*           | [`string`](types.md#basic)           | The source of this event
+`status`             | [`string`](types.md#basic)           | The technical status of this event
 
 
 \* Metadata fields of metadata catalog `dublincore/episode`
@@ -186,7 +186,7 @@ Multipart Form Parameters  | Type                            | Description
 `presentation`             | [`file`](types.md#file)         | Presentation movie track
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
-`scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
+`scheduling`               | [`string`](types.md#basic)      | Scheduling information
 
 __Scheduling__
 
@@ -342,17 +342,17 @@ In case of a conflict (409):
 
 Returns a single event.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
-in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider the
-[maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign publication and distribution urls if URL
+signing is turned on in Opencast. Remember to consider the [maximum validity of signed
+URLs](security-api.md#Introduction) when caching this response.
 
 Query String Parameter | Type                        | Description
 :----------------------|:----------------------------|:-----------
-`sign`                 | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+`sign`                 | [`boolean`](types.md#basic) | Whether publication and distribution urls should be pre-signed.
 `withacl`              | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
 `withmetadata`         | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
 `withpublications`     | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
-`withscheduling`       | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response (version 1.1.0 and higher).
+`withscheduling`       | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response.
 
 
 __Response__
@@ -366,7 +366,7 @@ Field                | Type                                 | Description
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
 `created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`              | [`datetime`](types.md#date-and-time) | The technical (version < 1.4.0) or bibliographic (version >= 1.4.0) start date and time of this event
+`start`              | [`datetime`](types.md#date-and-time) | The bibliographic start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
@@ -376,13 +376,13 @@ Field                | Type                                 | Description
 `has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
 `location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
 `publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
-`language`\*         | [`string`](types.md#basic)           | The language of this event (version 1.1.0 and higher)
-`rightsholder`\*     | [`string`](types.md#basic)           | The rights holder of this event (version 1.1.0 and higher)
-`license`\*          | [`string`](types.md#basic)           | The license of this event (version 1.1.0 and higher)
-`is_part_of`\*       | [`string`](types.md#basic)           | The technical identifier of the series this event belongs to (version 1.1.0 and higher)
-`series`             | [`string`](types.md#basic)           | The title of the series this event belongs to (version 1.1.0 and higher)
-`source`\*           | [`string`](types.md#basic)           | The source of this event (version 1.1.0 and higher)
-`status`             | [`string`](types.md#basic)           | The technical status of this event (version 1.1.0 and higher)
+`language`\*         | [`string`](types.md#basic)           | The language of this event
+`rightsholder`\*     | [`string`](types.md#basic)           | The rights holder of this event
+`license`\*          | [`string`](types.md#basic)           | The license of this event
+`is_part_of`\*       | [`string`](types.md#basic)           | The technical identifier of the series this event belongs to
+`series`             | [`string`](types.md#basic)           | The title of the series this event belongs to
+`source`\*           | [`string`](types.md#basic)           | The source of this event
+`status`             | [`string`](types.md#basic)           | The technical status of this event
 
 \* Metadata fields of metadata catalog `dublincore/episode`
 
@@ -433,7 +433,7 @@ Multipart Form Parameters  |Type                             | Description
 `presentation`             | [`file`](types.md#file)         | Presentation movie track
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
-`scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
+`scheduling`               | [`string`](types.md#basic)      | Scheduling information
 
 __Sample__
 
@@ -481,8 +481,7 @@ In case of a conflict (when updating `scheduling`):
 
 ### DELETE /api/events/{event_id}
 
-Retracts possible publications and deletes an event. Since version 1.6.0 published events will be retracted by this
-endpoint, if you use a version previous to 1.6.0 don't call this endpoint before retracting published events.
+Retracts possible publications and deletes an event.
 
 __Response__
 
@@ -1045,11 +1044,11 @@ Returns an event's list of publications.
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+`sign`                     | [`boolean`](types.md#basic) | Whether publication and distribution urls should be pre-signed.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
-on in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider
-the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign publication and distribution urls if URL
+signing is turned on in Opencast. Remember to consider the [maximum validity of signed
+URLs](security-api.md#Introduction) when caching this response.
 
 __Response__
 
@@ -1079,11 +1078,11 @@ Returns a single publication.
 
 Query String Parameter     |Type                         | Description
 :--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether publication urls (version 1.7.0 or higher) and distribution urls should be pre-signed.
+`sign`                     | [`boolean`](types.md#basic) | Whether publication and distribution urls should be pre-signed.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
-on in Opencast. Starting with version 1.7.0, publication urls will also be signed if configured. Remember to consider
-the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign publication and distribution urls if URL
+signing is turned on in Opencast. Remember to consider the [maximum validity of signed
+URLs](security-api.md#Introduction) when caching this response.
 
 __Response__
 
@@ -1166,8 +1165,6 @@ __Response__
 
 ### GET /api/events/{event_id}/scheduling
 
-Available since API version 1.1.0.
-
 Returns an event's scheduling information.
 
 __Response__
@@ -1187,14 +1184,12 @@ __Response__
 
 ### PUT /api/events/{event_id}/scheduling
 
-Available since API version 1.1.0.
-
 Update the scheduling information of the event with id `{event_id}`.
 
-Form Parameters             |Type            | Description                              | Default | Version
-:---------------------------|:---------------|:-----------------------------------------|:--------|:-------
-`scheduling`                | `string`       | The scheduling information.              | <span class="required">Required</span>| 1.1.0
-`allowConflict`             | `boolean`      | Allow conflicts when updating scheduling.| false   | 1.2.0
+Form Parameters             |Type            | Description                              | Default
+:---------------------------|:---------------|:-----------------------------------------|:--------
+`scheduling`                | `string`       | The scheduling information.              | <span class="required">Required</span>
+`allowConflict`             | `boolean`      | Allow conflicts when updating scheduling.| false
 
 __Sample__
 

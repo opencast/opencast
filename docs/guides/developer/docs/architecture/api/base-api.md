@@ -24,7 +24,7 @@ __Example__
 ```
 {
   "url": "https:\/\/api.opencast.org\/api",
-  "version": "v1.0.1"
+  "version": "v1.13.0"
 }
 ```
 
@@ -159,10 +159,11 @@ __Example__
 ```
 {
   "versions": [
-    "v1.0.0",
-    "v1.1.0"
+    "v1.11.0",
+    "v1.12.0",
+    "v1.13.0"
   ],
-  "default": "v1.1.0"
+  "default": "v1.13.0"
 }
 ```
 
@@ -182,6 +183,6 @@ __Example__
 
 ```
 {
-  "default": "v1.1.0"
+  "default": "v1.13.0"
 }
 ```

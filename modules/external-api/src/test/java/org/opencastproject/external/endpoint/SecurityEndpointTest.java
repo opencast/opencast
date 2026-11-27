@@ -44,8 +44,8 @@ import java.util.Date;
 /** Test cases for {@link SecurityEndpoint} */
 public class SecurityEndpointTest {
 
-  private static final String APP_V1_0_0_JSON = "application/v1.0.0+json";
-  private static final String APP_V1_0_0_XML = "application/v1.0.0+xml";
+  private static final String APP_JSON = "application/v1.11.0+json";
+  private static final String APP_XML = "application/v1.11.0+xml";
 
   /** The REST test environment */
   private static final RestServiceTestEnv env = testEnvForClasses(TestSecurityEndpoint.class);
@@ -66,7 +66,7 @@ public class SecurityEndpointTest {
   public void testSignUrlJson() throws Exception {
     final Date validUntil = new Date(1429253432000L);
     final String response = given().formParam("url", "http://mycdn.com/path/movie.mp4")
-            .formParam("valid-until", toUTC(validUntil.getTime())).accept(APP_V1_0_0_JSON).log().all().expect()
+            .formParam("valid-until", toUTC(validUntil.getTime())).accept(APP_JSON).log().all().expect()
             .statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
     final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
@@ -78,13 +78,13 @@ public class SecurityEndpointTest {
   public void testSignUrlXml() throws Exception {
     final Date validUntil = new Date(1429253432000L);
     given().formParam("url", "http://mycdn.com/path/movie.mp4").formParam("valid-until", toUTC(validUntil.getTime()))
-            .accept(APP_V1_0_0_XML).log().all().expect().statusCode(SC_NOT_ACCEPTABLE).when().post(env.host("/sign"))
+            .accept(APP_XML).log().all().expect().statusCode(SC_NOT_ACCEPTABLE).when().post(env.host("/sign"))
             .asString();
   }
 
   @Test
   public void testSignUrlWithoutValidity() throws Exception {
-    final String response = given().formParam("url", "http://mycdn.com/path/movie.mp4").accept(APP_V1_0_0_JSON).log()
+    final String response = given().formParam("url", "http://mycdn.com/path/movie.mp4").accept(APP_JSON).log()
             .all().expect().statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
     final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
@@ -96,12 +96,12 @@ public class SecurityEndpointTest {
   public void testSignUrlWithMalformedValidity() throws Exception {
     // A date without the 'T' separator is not ISO-8601 and must not end up as a server error
     given().formParam("url", "http://mycdn.com/path/movie.mp4").formParam("valid-until", "2015-04-17 07:30:32Z")
-            .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_BAD_REQUEST).when().post(env.host("/sign"));
+            .accept(APP_JSON).log().all().expect().statusCode(SC_BAD_REQUEST).when().post(env.host("/sign"));
   }
 
   @Test
   public void testSignUnsupportedUrl() throws Exception {
-    final String response = given().formParam("url", "http://otherhost.com/path/file.txt").accept(APP_V1_0_0_JSON).log()
+    final String response = given().formParam("url", "http://otherhost.com/path/file.txt").accept(APP_JSON).log()
             .all().expect().statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
     final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
