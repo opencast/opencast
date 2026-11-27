@@ -56,6 +56,7 @@ import org.osgi.service.component.ComponentContext;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -75,7 +76,7 @@ public class EditorServiceImplTest {
     String trackSrc = "http://mh-allinone.localdomain/archive/archive/mediapackage/"
             + "0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/0/track.mp4";
     URI smilUrl = EditorServiceImplTest.class.getResource("/smil1.xml").toURI();
-    String smilString = IOUtils.toString(smilUrl);
+    String smilString = IOUtils.toString(smilUrl, StandardCharsets.UTF_8);
 
     String trackParamGroupId = "pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f";
 

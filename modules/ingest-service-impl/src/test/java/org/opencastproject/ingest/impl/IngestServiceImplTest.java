@@ -98,6 +98,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -516,7 +517,7 @@ public class IngestServiceImplTest {
               throws IOException {
         File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
         file.deleteOnExit();
-        FileUtils.write(file, IOUtils.toString(in), "UTF-8");
+        FileUtils.write(file, IOUtils.toString(in, StandardCharsets.UTF_8), "UTF-8");
         return file.toURI();
       }
 

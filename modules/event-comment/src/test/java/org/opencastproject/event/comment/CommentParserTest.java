@@ -37,6 +37,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+
 public class CommentParserTest {
 
   private UserDirectoryService userDirectoryService;
@@ -52,7 +54,8 @@ public class CommentParserTest {
 
   @Test
   public void testParseAndSerializeComment() throws Exception {
-    String serializedCommentXml = IOUtils.toString(getClass().getResource("/comment.xml").toURI());
+    String serializedCommentXml = IOUtils.toString(getClass().getResource("/comment.xml").toURI(),
+        StandardCharsets.UTF_8);
 
     EventComment comment = EventCommentParser.getCommentFromXml(serializedCommentXml, userDirectoryService);
     Assert.assertNotNull(comment);

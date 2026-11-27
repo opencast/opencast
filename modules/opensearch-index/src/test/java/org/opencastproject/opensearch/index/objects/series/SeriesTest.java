@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,8 +95,8 @@ public class SeriesTest {
     contributors.add(contributor2);
     contributors.add(contributor3);
     // Setup results
-    seriesJson = IOUtils.toString(getClass().getResource("/adminui_series_metadata.json"));
-    seriesXml = IOUtils.toString(getClass().getResource("/adminui_series_metadata.xml"));
+    seriesJson = IOUtils.toString(getClass().getResource("/adminui_series_metadata.json"), StandardCharsets.UTF_8);
+    seriesXml = IOUtils.toString(getClass().getResource("/adminui_series_metadata.xml"), StandardCharsets.UTF_8);
   }
 
   @Test

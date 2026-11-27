@@ -1612,7 +1612,7 @@ public class SchedulerServiceImplTest {
   }
 
   private static DublinCoreCatalog parseDc(String s) {
-    return DublinCores.read(IOUtils.toInputStream(s));
+    return DublinCores.read(IOUtils.toInputStream(s, StandardCharsets.UTF_8));
   }
 
   private static String decodeBase64(String base64) {

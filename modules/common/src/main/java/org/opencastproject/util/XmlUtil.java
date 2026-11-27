@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -141,7 +142,7 @@ public final class XmlUtil {
 
   /** Create an {@link org.xml.sax.InputSource} from an XML string. */
   public static InputSource fromXmlString(String xml) {
-    return new InputSource(IOUtils.toInputStream(xml));
+    return new InputSource(IOUtils.toInputStream(xml, StandardCharsets.UTF_8));
   }
 
   /**

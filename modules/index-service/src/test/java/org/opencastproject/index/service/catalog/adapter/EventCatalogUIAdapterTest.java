@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -145,7 +146,7 @@ public class EventCatalogUIAdapterTest {
 
   @Test
   public void testGetFields() throws Exception {
-    String eventJson = IOUtils.toString(getClass().getResource("/catalog-adapter/event.json"));
+    String eventJson = IOUtils.toString(getClass().getResource("/catalog-adapter/event.json"), StandardCharsets.UTF_8);
 
     ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter =
         new ConfigurableEventDCCatalogUIAdapter();

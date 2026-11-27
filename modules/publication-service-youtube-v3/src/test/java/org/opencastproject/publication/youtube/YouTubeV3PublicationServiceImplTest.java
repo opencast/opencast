@@ -51,6 +51,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,7 +97,7 @@ public class YouTubeV3PublicationServiceImplTest {
   @Test
   public void testPublishNewPlaylist() throws Exception {
     final File baseDir = new File(this.getClass().getResource("/mediapackage").toURI());
-    final String xml = FileUtils.readFileToString(new File(baseDir, "manifest.xml"));
+    final String xml = FileUtils.readFileToString(new File(baseDir, "manifest.xml"), StandardCharsets.UTF_8);
     final MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
         .loadFromXml(xml);
     //

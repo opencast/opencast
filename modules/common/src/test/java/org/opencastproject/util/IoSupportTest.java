@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -171,7 +172,7 @@ public class IoSupportTest {
     final File f1 = new File(this.getClass().getResource("/dublincore.xml").toURI());
     final Optional<String> r1 = withFile(f1, (in, file) -> {
       try {
-        return IOUtils.readLines(in).get(0);
+        return IOUtils.readLines(in, StandardCharsets.UTF_8).get(0);
       } catch (Exception e) {
         return chuck(e);
       }
@@ -180,7 +181,7 @@ public class IoSupportTest {
     final File f2 = new File("i-do-not-exist");
     final Optional<String> r2 = withFile(f2, (in, file) -> {
       try {
-        return IOUtils.readLines(in).get(0);
+        return IOUtils.readLines(in, StandardCharsets.UTF_8).get(0);
       } catch (Exception e) {
         return chuck(e);
       }

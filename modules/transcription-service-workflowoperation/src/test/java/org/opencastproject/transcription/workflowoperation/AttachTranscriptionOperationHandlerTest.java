@@ -47,6 +47,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -76,10 +77,10 @@ public class AttachTranscriptionOperationHandlerTest {
     URI mediaPackageURI = StartTranscriptionOperationHandlerTest.class.getResource("/mp.xml").toURI();
     mediaPackage = builder.loadFromXml(mediaPackageURI.toURL().openStream());
     URI dfxpURI = StartTranscriptionOperationHandlerTest.class.getResource("/attachment_dfxp.xml").toURI();
-    String dfxpXml = FileUtils.readFileToString(new File(dfxpURI));
+    String dfxpXml = FileUtils.readFileToString(new File(dfxpURI), StandardCharsets.UTF_8);
     Attachment captionDfxp = (Attachment) MediaPackageElementParser.getFromXml(dfxpXml);
     URI vttURI = StartTranscriptionOperationHandlerTest.class.getResource("/attachment_vtt.xml").toURI();
-    String vttXml = FileUtils.readFileToString(new File(vttURI));
+    String vttXml = FileUtils.readFileToString(new File(vttURI), StandardCharsets.UTF_8);
     Attachment captionVtt = (Attachment) MediaPackageElementParser.getFromXml(vttXml);
 
     // Service registry set up

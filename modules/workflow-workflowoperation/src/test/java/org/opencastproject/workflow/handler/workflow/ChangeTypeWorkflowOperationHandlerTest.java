@@ -43,6 +43,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class ChangeTypeWorkflowOperationHandlerTest {
     mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
     URI vttURI = ChangeTypeWorkflowOperationHandler.class.getResource("/vtt.xml").toURI();
-    String vttXml = FileUtils.readFileToString(new File(vttURI));
+    String vttXml = FileUtils.readFileToString(new File(vttURI), StandardCharsets.UTF_8);
     Attachment captionVtt = (Attachment) MediaPackageElementParser.getFromXml(vttXml);
     captionVtt.setFlavor(sourceFlavor);
     captionVtt.addTag("first");
