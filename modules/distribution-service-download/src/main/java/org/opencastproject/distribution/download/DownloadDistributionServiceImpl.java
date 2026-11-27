@@ -653,7 +653,14 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     String elementId = element.getIdentifier();
 
     try {
-      final File elementFile = getDistributionFile(channelId, mediapackage, element);
+      final File elementFile;
+      try {
+        elementFile = getDistributionFile(channelId, mediapackage, element);
+      } catch (IllegalStateException e) {
+        logger.debug("Skipping retraction of element {} of media package {} from publication channel {}: "
+            + "element URI does not belong to this channel ({})", elementId, mediapackageId, channelId, e.getMessage());
+        return element;
+      }
       final File mediapackageDir = getMediaPackageDirectory(channelId, mediapackage);
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise

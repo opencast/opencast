@@ -490,6 +490,25 @@ public class DownloadDistributionServiceImplTest {
     }
   }
 
+  /**
+   * When retracting with published elements copied from another channel (e.g. engage-player
+   * elements copied into the api publication), the element URI refers to a different channel.
+   * The retraction must skip such elements gracefully instead of throwing.
+   */
+  @Test
+  public void testRetractSkipsElementFromOtherChannel() throws Exception {
+    String orgId = defaultOrganization.getId();
+    String mpId = mp.getIdentifier().toString();
+
+    // An element whose URI points to the engage-player channel
+    MediaPackageElement engageElement = trackElement("track-1",
+            UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, orgId, "engage-player", mpId, "track-1", "media.mov"));
+
+    // Retracting this element from the api channel must not throw
+    MediaPackageElement result = service.retractElement("api", mp, engageElement);
+    Assert.assertNotNull(result);
+  }
+
   private static MediaPackageElement trackElement(String id, String url) throws Exception {
     String xml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"" + id
             + "\" type=\"presenter/source\"><url>" + url + "</url></track>";
