@@ -51,12 +51,13 @@ operations:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Encode to engage search result thumbnails
   - id: image
+    if: (NOT ${presentation/thumbnail_edited}) AND (NOT ${presentation_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Creating search result default thumbnails
     configurations:
       - source-flavor: '*/trimmed'
       - target-flavor: '*/search+preview'
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: search-cover.http
       - time: 3
 
@@ -68,7 +69,7 @@ operations:
     configurations:
       - source-flavor: presentation/trimmed
       - target-flavor: presentation/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
 
@@ -80,7 +81,7 @@ operations:
     configurations:
       - source-flavor: ${presentation_thumbnail_time_flavor}
       - target-flavor: presentation/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: ${presentation_thumbnail_time_time}
 
@@ -90,7 +91,7 @@ operations:
     description: Prepare thumbnail for publication
     configurations:
       - source-flavor: presentation/player+preview
-      - target-tags: +engage-download
+      - target-tags: +engage-download, +archive
 
   # Create a cover image
   - id: image
@@ -100,7 +101,7 @@ operations:
     configurations:
       - source-flavor: presenter/trimmed
       - target-flavor: presenter/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: 3
 
@@ -112,12 +113,13 @@ operations:
     configurations:
       - source-flavor: ${presenter_thumbnail_time_flavor}
       - target-flavor: presenter/player+preview
-      - target-tags: engage-download
+      - target-tags: engage-download, archive
       - encoding-profile: player-preview.http
       - time: ${presenter_thumbnail_time_time}
 
   - id: cover-image
-    if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})
+    # If there is no (video (_work_video) or edited thumbnail) AND there is audio
+    if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited} OR ${presentater/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})
     description: Create a cover image for audio-only files
     configurations:
       - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
@@ -128,12 +130,45 @@ operations:
       - target-tags: archive, engage-download
 
   - id: tag
+    # If there is a custom thumbnail uploaded, and it's *not* a time in the video
     if: ${presenter/thumbnail_edited} AND (NOT ${presenter_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Prepare thumbnail for publication
     configurations:
       - source-flavor: presenter/player+preview
-      - target-tags: +engage-download
+      - target-tags: +engage-download, +archive
+
+  - id: tag
+    # If there's a presenter file but no presentation, copy whatever thumbnail we have to the search preview
+    if: ${presenter_work_media} AND (NOT ${presentation_work_media})
+    exception-handler-workflow: partial-error
+    description: Setting search preview image for presenter/* audio-only files
+    configurations:
+      - source-flavor: 'presenter/player+preview'
+      - target-flavor: 'presentation/search+preview'
+      - target-tags: +engage-download, +archive
+      - copy: true
+
+  - id: tag
+    # If there's a presentation file but no presenter, copy whatever thumbnail we have to the search preview
+    if: ${presentation_work_media} AND (NOT ${presenter_work_media})
+    exception-handler-workflow: partial-error
+    description: Setting search preview image for presentation/* audio-only files
+    configurations:
+      - source-flavor: 'presentation/player+preview'
+      - target-flavor: 'presentation/search+preview'
+      - target-tags: +engage-download, +archive
+      - copy: true
+
+  - id: tag
+    if: ${presenter/thumbnail_edited} OR ${presenter_thumbnail_edited}
+    exception-handler-workflow: partial-error
+    description: Overwriting default search thumbnail with user provided one
+    configurations:
+      - source-flavor: '*/player+preview'
+      - target-flavor: '*/search+preview'
+      - target-tags: +engage-download, +archive
+      - copy: true
 
   # Generate timeline preview images
   - id: timelinepreviews
