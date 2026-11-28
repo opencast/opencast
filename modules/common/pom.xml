@@ -310,7 +310,6 @@
               org.opencastproject.mediapackage.attachment;version=${project.version},
               org.opencastproject.mediapackage.track;version=${project.version},
               org.opencastproject.mediapackage.identifier;version=${project.version},
-              org.opencastproject.mediapackage.elementbuilder;version=${project.version},
               org.opencastproject.mediapackage.selector;version=${project.version},
               org.opencastproject.fun;version=${project.version},
               org.opencastproject.fun.juc;version=${project.version},
