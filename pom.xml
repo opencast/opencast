@@ -113,9 +113,6 @@
     <module>modules/crop-remote</module>
     <module>modules/crop-workflowoperation</module>
     <module>modules/db</module>
-    <module>modules/dictionary-api</module>
-    <module>modules/dictionary-none</module>
-    <module>modules/dictionary-regexp</module>
     <module>modules/distribution-service-api</module>
     <module>modules/distribution-service-aws-s3-api</module>
     <module>modules/distribution-service-aws-s3-remote</module>

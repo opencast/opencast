@@ -9,7 +9,7 @@ The sequence of the Opencast services used during slide detection and text extra
     -----> Segmentation -----> TextAnalyzerService ----------------->
                                   /             \
                                  /               \
-                       TextExtractor          DictionaryService
+                       TextExtractor          Text filter
                     (OCR with Tesseract)   (Filter extracted texts)
 
 The segmentation will define the frames which are passed to the text analyzer. For extraction, a frame from the end of a
@@ -18,9 +18,8 @@ segment is used to make sure that most of a slides text is visible.
 The frame is then exported as image and passed to the text extraction service which calls an OCR engine to get the text
 output. For this, the Tesseract OCR engine is used by default.
 
-After the text extraction is done, the analysis service will pass the recognized text to the dictionary service which
-may filter it to remove messed up words, unknown words, single characters or other things depending on the actual
-implementation and configuration.
+After the text extraction is done, the analysis service filters the recognized text to remove messed up words, single
+characters or other things, depending on its configuration.
 
 Finally, the extracted text is attached to the media package as MPEG 7 XML and the Opencast workflow continues.
 
@@ -92,46 +91,44 @@ The kind of preprocessing you should use highly depends on the input material. I
 material are among others the blur filters, the denoise filters, the curves filter and in some cases the color-channel
 mixer.
 
-### DictionaryService (Filtering)
+### Text Filtering
 
 The filtering you want to do on the recognized texts highly depends on what you want to use the recognized texts for.
 For searching, you might want a higher degree of filtering, for users you might also want to present text with slight
 errors, for testing and debugging, you want no filtering at all.
 
-Starting with version 1.6, Opencast provides three different kinds of implementation for filtering which can be just
-swapped out at any time:
+Filtering is done by the text analyzer service and configured in
+`etc/org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg`.
 
-* dictionary-none
-* dictionary-regexp (default)
+#### No Filtering
 
-#### No Filtering (dictionary-none)
+To let the recognized texts pass through unmodified, disable the filter:
 
-The `dictionary-none` module is the simplest one. It will just let the recognized texts pass through
-unmodified. There is no additional configuration needed or even possible. Of course, this is also the fastest one.
+    filter.enabled=false
 
-#### Using a Regular Expression (dictionary-regexp)
+Only empty lines are dropped in this case.
 
-Starting with 1.6, this is the default implementation for the DictionaryService. It is limited in terms of filtering
-capabilities as it will not check if a recognized word actually makes sense. Here is how this service works: If
-configured with a valid pattern that compiles to a regular expression, then this pattern is used, otherwise a fall-
-back to the default expression `\w+`. The pattern is repeatedly applied to the extracted text, until the end is
-reached. Each match is returned, separated by a space character.
+#### Using a Regular Expression
 
-The default expression for this module is `\w+` which will let upper- and lowercase characters as well as digits pass
-through, but will block all other characters. For the German language, for example, this would mean that all special
-characters would be blocked as well. So you want to configure Opencast to let them pass as well.
+By default, the text is filtered using a regular expression. This is limited in terms of filtering capabilities as it
+will not check if a recognized word actually makes sense. Here is how this works: The pattern configured as
+`filter.pattern` is repeatedly applied to the extracted text, until the end is reached. Each match is returned,
+separated by a space character. Lines without any match are dropped. Opencast refuses a configuration with a pattern
+which is not a valid regular expression.
+
+The default expression is `\w+` which will let upper- and lowercase characters as well as digits pass through, but will
+block all other characters. For the German language, for example, this would mean that all special characters would be
+blocked as well. So you want to configure Opencast to let them pass as well.
 
 Example:
-    *pattern: `\w+`
-    * text input: "aäa bbb"
-    * text output: "a a bbb"
 
-If this is undesired, modify the `pattern` in
-`etc/org.opencastproject.dictionary.regexp.DictionaryServiceImpl.cfg`:
+* pattern: `\w+`
+* text input: "aäa bbb"
+* text output: "a a bbb"
 
-For German, a suitable pattern could be:
+If this is undesired, modify `filter.pattern`. For German, a suitable pattern could be:
 
-    pattern=[\\wäöüÄÖÜß][\\wäöüÄÖÜß]+[-.,:;!?]*
+    filter.pattern=[\\wäöüÄÖÜß][\\wäöüÄÖÜß]+[-.,:;!?]*
 
 This expression will let all words pass which contain upper- and lowercase [a-z], digits and German special characters
 as well as punctuation at the end of a word. Additionally, it requires that the words are at least two characters long
@@ -139,6 +136,6 @@ which will filter out most of the common noise. Note the double-escaping of `\w`
 
 A similar pattern that could be used for Spanish would be:
 
-    pattern=[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ][\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*
+    filter.pattern=[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ][\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*
 
 Note that equivalent to the Tesseract configuration, again the necessary languages have to be installed in the system.
