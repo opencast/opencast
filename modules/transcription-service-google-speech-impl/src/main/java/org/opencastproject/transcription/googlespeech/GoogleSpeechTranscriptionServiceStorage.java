@@ -24,8 +24,8 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.FileEntity;
@@ -63,10 +63,6 @@ public class GoogleSpeechTranscriptionServiceStorage {
    */
   public int startUpload(CloseableHttpClient httpClient, String bucket, String mpId,
           String fileExtension, File file, String byteSize, String contentType, String accessToken) throws IOException {
-    CloseableHttpResponse postResponse = null;
-    CloseableHttpResponse putResponse = null;
-    String location = null;
-
     try {
       HttpPost httpPost = new HttpPost(GOOGLE_STORAGE_LINK + String.format(
               "%s/o?uploadType=resumable&name=%s.%s", bucket, mpId, fileExtension));
@@ -75,24 +71,24 @@ public class GoogleSpeechTranscriptionServiceStorage {
       httpPost.addHeader("X-Upload-Content-Type", contentType);
       httpPost.addHeader("X-Upload-Content-Length", byteSize);
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
-      postResponse = httpClient.execute(httpPost);
-      int postCode = postResponse.getCode();
+      record PostResult(int code, Header location) { }
+      PostResult postResult = httpClient.execute(httpPost,
+          response -> new PostResult(response.getCode(), response.getLastHeader("Location")));
+      int postCode = postResult.code();
       if (postCode == HttpStatus.SC_OK) { // 200
         logger.info("Upload session has been successfully created");
         // Get upload session stored in location
-        try {
-          location = postResponse.getLastHeader("Location").getValue();
-        } catch (Exception ex) {
-          logger.warn("Exception when uploading file to Google Storage", ex);
+        if (postResult.location() == null) {
+          logger.warn("Google Storage did not return a location for the upload session");
           return DEFAULT_CODE;
         }
+        String location = postResult.location().getValue();
         try {
           HttpPut httpPut = new HttpPut(location);
           httpPut.setHeader(HttpHeaders.CONTENT_TYPE, contentType);
           FileEntity entity = new FileEntity(file, ContentType.APPLICATION_OCTET_STREAM);
           httpPut.setEntity(entity);
-          putResponse = httpClient.execute(httpPut);
-          int putCode = putResponse.getCode();
+          int putCode = httpClient.execute(httpPut, response -> response.getCode());
 
           switch (putCode) {
             case HttpStatus.SC_OK: // 200
@@ -115,12 +111,6 @@ public class GoogleSpeechTranscriptionServiceStorage {
     } finally {
       try {
         httpClient.close();
-        if (postResponse != null) {
-          postResponse.close();
-        }
-        if (putResponse != null) {
-          putResponse.close();
-        }
       } catch (IOException e) {
       }
     }
@@ -143,13 +133,11 @@ public class GoogleSpeechTranscriptionServiceStorage {
       String objectName,
       String accessToken
   ) throws IOException {
-    CloseableHttpResponse response = null;
     try {
       HttpDelete httpdelete = new HttpDelete(GOOGLE_STORAGE_MEDIA + String.format("%s/o/%s", bucket, objectName));
       logger.debug("Url to delete media file from Google Cloud Storage : {}", httpdelete.getRequestUri());
       httpdelete.addHeader("Authorization", "Bearer " + accessToken); // add the authorization header to the request;
-      response = httpClient.execute(httpdelete);
-      int code = response.getCode();
+      int code = httpClient.execute(httpdelete, response -> response.getCode());
 
       switch (code) {
         case HttpStatus.SC_NO_CONTENT: // 204
@@ -164,9 +152,6 @@ public class GoogleSpeechTranscriptionServiceStorage {
     } finally {
       try {
         httpClient.close();
-        if (response != null) {
-          response.close();
-        }
       } catch (IOException e) {
       }
     }

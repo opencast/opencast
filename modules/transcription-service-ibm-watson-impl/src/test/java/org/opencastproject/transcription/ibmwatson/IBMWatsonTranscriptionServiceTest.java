@@ -65,13 +65,14 @@ import com.google.gson.JsonParser;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -224,8 +225,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response));
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response));
     EasyMock.replay(httpClient);
 
     service.registerCallback();
@@ -244,8 +246,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response));
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response));
     EasyMock.replay(httpClient);
 
     service.registerCallback();
@@ -263,8 +266,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_BAD_REQUEST).anyTimes();
     EasyMock.replay(response);
 
-    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpPost.class), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpPost.class), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.registerCallback();
@@ -289,8 +293,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"));
@@ -317,8 +322,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"));
@@ -462,8 +468,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     long before = System.currentTimeMillis();
@@ -492,8 +499,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     try {
@@ -514,8 +522,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.getAndSaveJobResults(JOB_ID);
@@ -570,8 +579,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(response.getCode()).andReturn(HttpStatus.SC_OK).anyTimes();
     EasyMock.replay(httpEntity, response);
 
-    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpGet.class), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, JOB_ID, Track.TYPE);
@@ -656,8 +666,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response));
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response));
     EasyMock.replay(httpClient);
 
     Capture<Set<String>> capturedMpIds
@@ -695,8 +706,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
@@ -726,8 +738,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
@@ -764,8 +777,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
@@ -804,8 +818,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
@@ -841,8 +856,9 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpEntity, response);
 
     Capture<HttpGet> capturedGet = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class)))
-            .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet), EasyMock.anyObject(HttpClientContext.class),
+        anyHandler()))
+            .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0,
@@ -883,6 +899,18 @@ public class IBMWatsonTranscriptionServiceTest {
     TranscriptionJobControl job = database.findByJob(JOB_ID);
     Assert.assertNotNull(job);
     Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+  }
+
+  /** Matches any response handler passed to a mocked {@code execute} call. */
+  private static HttpClientResponseHandler<Object> anyHandler() {
+    return EasyMock.anyObject();
+  }
+  /** Answers a mocked {@code execute} call by passing the given response to the response handler. */
+  private static IAnswer<Object> handle(ClassicHttpResponse response) {
+    return () -> {
+      Object[] args = EasyMock.getCurrentArguments();
+      return ((HttpClientResponseHandler<?>) args[args.length - 1]).handleResponse(response);
+    };
   }
 
 }

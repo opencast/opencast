@@ -59,7 +59,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.easymock.EasyMock;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
@@ -101,7 +100,7 @@ public class OaiPmhRepositoryTest {
   public static void checkHttpConnection() {
     final CloseableHttpClient client = HttpClients.createDefault();
     try {
-      runValidation = !DISABLE_VALIDATION && HttpUtil.isOk(client.execute(HttpUtil.get(VALIDATOR_SERVICE)));
+      runValidation = !DISABLE_VALIDATION && client.execute(HttpUtil.get(VALIDATOR_SERVICE), HttpUtil::isOk);
       logger.info("Using external OAI-PMH validator service (" + VALIDATOR_SERVICE + "): " + runValidation);
     } catch (IOException e) {
       e.printStackTrace();
@@ -277,8 +276,8 @@ public class OaiPmhRepositoryTest {
     logger.info("--- REQUEST ---");
     logger.info(xml);
     try {
-      final ClassicHttpResponse res = client.execute(post);
-      final String json = withResource(res.getEntity().getContent(), IoSupport.readToString);
+      final String json = client.execute(post,
+          res -> withResource(res.getEntity().getContent(), IoSupport.readToString));
       logger.info("--- RESPONSE ---");
       logger.info(json);
       boolean ok = true;

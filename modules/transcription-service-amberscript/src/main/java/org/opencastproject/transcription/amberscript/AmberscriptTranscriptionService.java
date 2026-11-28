@@ -74,7 +74,7 @@ import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
@@ -628,14 +628,18 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     return result;
   }
 
+  /** Status code and body of a completely consumed HTTP response. */
+  private record HttpResult(int code, String body) { }
+
+  private static HttpResult execute(CloseableHttpClient httpClient, ClassicHttpRequest request) throws IOException {
+    return httpClient.execute(request, response -> new HttpResult(
+        response.getCode(),
+        response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity())));
+  }
+
   void createRecognitionsJob(String mpId, Track track, String languageCode, String jobType, String numberOfSpeakers,
           String transcriptionType, String glossary, String transcriptionStyle, String targetLanguage)
           throws TranscriptionServiceException {
-    // Timeout 3 hours (needs to include the time for the remote service to
-    // fetch the media URL before sending final response)
-    CloseableHttpClient httpClient = makeHttpClient(3 * 3600 * 1000);
-    CloseableHttpResponse response = null;
-
     String submitUrl = BASE_URL + "/jobs/upload-media"
             + "?apiKey=" + clientKey
             + "&language=" + languageCode
@@ -650,7 +654,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       submitUrl += "&targetLanguage=" + targetLanguage;
     }
 
-    try {
+    // Timeout 3 hours (needs to include the time for the remote service to
+    // fetch the media URL before sending final response)
+    try (CloseableHttpClient httpClient = makeHttpClient(3 * 3600 * 1000)) {
       FileBody fileBody = new FileBody(workspace.get(track.getURI()), ContentType.DEFAULT_BINARY);
       MultipartEntityBuilder builder = MultipartEntityBuilder.create();
       builder.setMode(HttpMultipartMode.LEGACY);
@@ -660,11 +666,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       HttpPost httpPost = new HttpPost(submitUrl);
       httpPost.setEntity(multipartEntity);
 
-      response = httpClient.execute(httpPost);
-      int code = response.getCode();
-      HttpEntity entity = response.getEntity();
-
-      String jsonString = EntityUtils.toString(response.getEntity());
+      HttpResult response = execute(httpClient, httpPost);
+      String jsonString = response.body();
       JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
 
       logger.debug("Submitting new transcription job: {}" + System.lineSeparator()
@@ -673,12 +676,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       JsonObject result = jsonObject.getAsJsonObject("jobStatus");
       String jobId = GsonUtil.getStringOrNull(result, "jobId");
 
+      int code = response.code();
       switch (code) {
         case HttpStatus.SC_OK: // 200
           logger.info("mp {} has been submitted to AmberScript service with jobId {}.", mpId, jobId);
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                   track.getDuration() == null ? 0 : track.getDuration().longValue(), new Date(), PROVIDER);
-          EntityUtils.consume(entity);
           return;
         default:
           String error = GsonUtil.getStringOrNull(result, "error");
@@ -690,14 +693,6 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
     } catch (Exception e) {
       logger.warn("Exception when calling the captions endpoint", e);
       throw new TranscriptionServiceException("Exception when calling the captions endpoint", e);
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
   }
 
@@ -705,19 +700,13 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
     String mpId = "unknown";
 
-    CloseableHttpClient httpClient = makeHttpClient();
-    CloseableHttpResponse response = null;
-
     String checkUrl = BASE_URL + "/jobs/status?jobId=" + jobId + "&apiKey=" + clientKey;
 
-    try {
+    try (CloseableHttpClient httpClient = makeHttpClient()) {
       HttpGet httpGet = new HttpGet(checkUrl);
-      response = httpClient.execute(httpGet);
-      int code = response.getCode();
-
-      HttpEntity entity = response.getEntity();
-      String jsonString = EntityUtils.toString(entity);
-      EntityUtils.consume(entity);
+      HttpResult response = execute(httpClient, httpGet);
+      int code = response.code();
+      String jsonString = response.body();
 
       logger.debug("AmberScript API call was '{}'." + System.lineSeparator() + "Response: {}",
               removePrivateInfo(checkUrl), jsonString);
@@ -757,66 +746,39 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
           throw new TranscriptionServiceException(
                   String.format("Captions job '%s' failed: Return Code %d", jobId, code), code);
       }
-    } catch (TranscriptionDatabaseException | IOException | JsonParseException
-        | org.apache.hc.core5.http.ParseException e) {
+    } catch (TranscriptionDatabaseException | IOException | JsonParseException e) {
       logger.warn("Error while checking status: {}", e.toString());
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
     return false;
   }
 
   private boolean getAndSaveJobResult(String jobId) throws TranscriptionServiceException, IOException {
 
-    CloseableHttpClient httpClient = makeHttpClient();
-    CloseableHttpResponse response = null;
-
     String transcriptUrl = BASE_URL + "/jobs/export?format=srt&jobId=" + jobId + "&apiKey=" + clientKey;
 
-    boolean done = false;
-
-    try {
+    try (CloseableHttpClient httpClient = makeHttpClient()) {
       HttpGet httpGet = new HttpGet(transcriptUrl);
 
-      response = httpClient.execute(httpGet);
-      int code = response.getCode();
+      int code = httpClient.execute(httpGet, response -> {
+        if (response.getCode() == HttpStatus.SC_OK) {
+          // Save the result subrip (srt) file into a collection
+          workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".srt", response.getEntity().getContent());
+        }
+        return response.getCode();
+      });
 
       logger.debug("AmberScript API {} http response {}", removePrivateInfo(transcriptUrl), code);
 
-      switch (code) {
-        case HttpStatus.SC_OK: // 200
-          HttpEntity entity = response.getEntity();
-          logger.info("Retrieved details for transcription with jobid: '{}'", jobId);
-
-          // Save the result subrip (srt) file into a collection
-          workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".srt", entity.getContent());
-          done = true;
-          break;
-
-        default:
-          logger.warn("Error retrieving details for transcription with jobid: '{}', return status: {}.", jobId, code);
-          break;
+      if (code == HttpStatus.SC_OK) {
+        logger.info("Retrieved details for transcription with jobid: '{}'", jobId);
+        return true;
       }
+      logger.warn("Error retrieving details for transcription with jobid: '{}', return status: {}.", jobId, code);
+      return false;
     } catch (Exception e) {
       throw new TranscriptionServiceException(String.format(
               "Exception when calling the transcription service for jobid: %s", jobId), e);
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
-
-    return done;
   }
 
   @Override

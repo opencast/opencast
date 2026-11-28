@@ -69,9 +69,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -506,8 +505,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     String audioUrl;
     audioUrl = uploadAudioFileToGoogleStorage(mpId, track);
-    CloseableHttpClient httpClient = makeHttpClient();
-    CloseableHttpResponse response = null;
     String token = getRefreshAccessToken();
     if (token.equals(INVALID_TOKEN) || audioUrl == null) {
       throw new TranscriptionServiceException("Could not create recognition job. Audio file or access token invalid");
@@ -526,18 +523,16 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     container.add("config", configValues);
     container.add("audio", audioValues);
 
-    try {
+    try (CloseableHttpClient httpClient = makeHttpClient()) {
       HttpPost httpPost = new HttpPost(UrlSupport.concat(GOOGLE_SPEECH_URL, REQUEST_METHOD));
       logger.debug("Url to invoke Google speech service: {}", httpPost.getRequestUri());
       StringEntity params = new StringEntity(container.toString(), ContentType.APPLICATION_JSON);
       httpPost.addHeader("Authorization", "Bearer " + token); // add the authorization header to the request;
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
       httpPost.setEntity(params);
-      response = httpClient.execute(httpPost);
-      int code = response.getCode();
-      HttpEntity entity = response.getEntity();
-      String jsonString = EntityUtils.toString(response.getEntity());
-      JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+      HttpResult response = execute(httpClient, httpPost);
+      int code = response.code();
+      JsonObject jsonObject = GsonUtil.gson().fromJson(response.body(), JsonObject.class);
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -557,7 +552,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                   track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
-          EntityUtils.consume(entity);
           return;
         default:
           JsonObject errorObj = jsonObject.getAsJsonObject("error");
@@ -569,14 +563,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (Exception e) {
       logger.warn("Exception when calling the recognitions endpoint", e);
       throw new TranscriptionServiceException("Exception when calling the recognitions endpoint", e);
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
   }
 
@@ -593,28 +579,24 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
    * "twenty" }, ] } ] }
    */
   boolean getAndSaveJobResults(String jobId) throws TranscriptionServiceException, IOException {
-    CloseableHttpClient httpClient = makeHttpClient();
-    CloseableHttpResponse response = null;
     String mpId = "unknown";
     JsonArray resultsArray = null;
     String token = getRefreshAccessToken();
     if (token.equals(INVALID_TOKEN)) {
       return false;
     }
-    try {
+    try (CloseableHttpClient httpClient = makeHttpClient()) {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(GOOGLE_SPEECH_URL, RESULT_PATH, jobId));
       logger.debug("Url to invoke Google speech service: {}", httpGet.getRequestUri());
       // add the authorization header to the request;
       httpGet.addHeader("Authorization", "Bearer " + token);
-      response = httpClient.execute(httpGet);
-      int code = response.getCode();
+      HttpResult response = execute(httpClient, httpGet);
+      int code = response.code();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          HttpEntity entity = response.getEntity();
           // Response returned is a json object described above
-          String jsonString = EntityUtils.toString(entity);
-          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          JsonObject jsonObject = GsonUtil.gson().fromJson(response.body(), JsonObject.class);
           Boolean jobDone = jsonObject.get("done").getAsBoolean();
           TranscriptionJobControl jc = database.findByJob(jobId);
           if (jc != null) {
@@ -624,7 +606,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
             resultsArray = getTranscriptionResult(jsonObject);
           }
           logger.info("Recognitions job {} has been found, completed status {}", jobId, jobDone.toString());
-          EntityUtils.consume(entity);
 
           if (jobDone && resultsArray != null) {
             transcriptionDone(mpId, jsonObject);
@@ -657,14 +638,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       logger.warn(msg, e);
       throw new TranscriptionServiceException(String.format(
               "Exception when calling the recognitions endpoint for media package %s, job id %s", mpId, jobId), e);
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
   }
 
@@ -679,26 +652,23 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
    */
   public String getTranscriptionResults(String jobId)
           throws TranscriptionServiceException, IOException {
-    CloseableHttpClient httpClient = makeHttpClient();
-    CloseableHttpResponse response = null;
     String token = getRefreshAccessToken();
     if (token.equals(INVALID_TOKEN)) {
       logger.warn("Invalid access token");
       return "No results found";
     }
-    try {
+    try (CloseableHttpClient httpClient = makeHttpClient()) {
       HttpGet httpGet = new HttpGet(UrlSupport.concat(GOOGLE_SPEECH_URL, RESULT_PATH, jobId));
       logger.debug("Url to invoke Google speech service: {}", httpGet.getRequestUri());
       // add the authorization header to the request;
       httpGet.addHeader("Authorization", "Bearer " + token);
-      response = httpClient.execute(httpGet);
-      int code = response.getCode();
+      HttpResult response = execute(httpClient, httpGet);
+      int code = response.code();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          HttpEntity entity = response.getEntity();
           logger.info("Retrieved details for transcription with job id: '{}'", jobId);
-          return EntityUtils.toString(entity);
+          return response.body();
         default:
           logger.warn("Error retrieving details for transcription with job id: '{}', return status: {}.", jobId, code);
           break;
@@ -707,14 +677,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       logger.warn("Exception when calling the transcription service for job id: {}", jobId, e);
       throw new TranscriptionServiceException(String.format(
               "Exception when calling the transcription service for job id: %s", jobId), e);
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
     return "No results found";
   }
@@ -790,20 +752,25 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return HttpUtil.clientBuilder(CONNECTION_TIMEOUT, SOCKET_TIMEOUT).build();
   }
 
+  /** Status code and body of a completely consumed HTTP response. */
+  private record HttpResult(int code, String body) { }
+
+  private static HttpResult execute(CloseableHttpClient httpClient, ClassicHttpRequest request) throws IOException {
+    return httpClient.execute(request, response -> new HttpResult(
+        response.getCode(),
+        response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity())));
+  }
+
   protected String refreshAccessToken(String clientId, String clientSecret, String refreshToken)
           throws TranscriptionServiceException, IOException {
-    CloseableHttpClient httpClient = makeHttpClient();
-    CloseableHttpResponse response = null;
-
-    try {
+    try (CloseableHttpClient httpClient = makeHttpClient()) {
       HttpPost httpPost = new HttpPost(tokenEndpoint + String.format(
               "?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token",
               clientId, clientSecret, refreshToken));
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
-      response = httpClient.execute(httpPost);
-      int code = response.getCode();
-      String jsonString = EntityUtils.toString(response.getEntity());
-      JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+      HttpResult response = execute(httpClient, httpPost);
+      int code = response.code();
+      JsonObject jsonObject = GsonUtil.gson().fromJson(response.body(), JsonObject.class);
       switch (code) {
         case HttpStatus.SC_OK: // 200
           accessToken = GsonUtil.getStringOrNull(jsonObject, ACCESS_TOKEN_NAME);
@@ -833,14 +800,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (Exception e) {
       logger.warn("Unable to generate access token for Google Cloud Services");
       return INVALID_TOKEN;
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null) {
-          response.close();
-        }
-      } catch (IOException e) {
-      }
     }
   }
 

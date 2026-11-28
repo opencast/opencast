@@ -25,11 +25,12 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -72,8 +73,8 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
     EasyMock.replay(response);
 
     Capture<HttpPost> capturedPost = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedPost), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     // Check if correct url was invoked
@@ -89,13 +90,26 @@ public class GoogleSpeechTranscriptionServiceStorageTest {
     EasyMock.replay(response);
 
     Capture<HttpDelete> capturedDel = Capture.newInstance();
-    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedDel)))
-        .andReturn(CloseableHttpResponse.adapt(response)).anyTimes();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedDel), anyHandler()))
+        .andAnswer(handle(response)).anyTimes();
     EasyMock.replay(httpClient);
 
     service.deleteGoogleStorageFile(httpClient, bucket, fileName, token);
     Assert.assertEquals("https://www.googleapis.com/storage/v1/b/bucket/o/myFile",
             capturedDel.getValue().getUri().toString());
+  }
+
+  /** Matches any response handler passed to a mocked {@code execute} call. */
+  private static HttpClientResponseHandler<Object> anyHandler() {
+    return EasyMock.anyObject();
+  }
+
+  /** Answers a mocked {@code execute} call by passing the given response to the response handler. */
+  private static IAnswer<Object> handle(ClassicHttpResponse response) {
+    return () -> {
+      Object[] args = EasyMock.getCurrentArguments();
+      return ((HttpClientResponseHandler<?>) args[args.length - 1]).handleResponse(response);
+    };
   }
 
 }
