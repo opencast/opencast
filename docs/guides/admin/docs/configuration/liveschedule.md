@@ -9,7 +9,8 @@ The Live Schedule Service manages a live event in the Search index on the engage
 When an event is scheduled and the publishLive configuration is set, a live media package is published to the Search
 index. The live media package contains track(s) with live streaming URLs.
 
-The live media package is retracted from the Search index when the capture finishes or if it fails.
+The live media package is retracted from the Search index when the capture finishes or if it fails. Retracting it on
+capture errors can be turned off with _live.deleteOnCaptureError_.
 
 If event metadata, such as title or duration, are updated, the live media package in the Search index is updated
 accordingly.
@@ -79,6 +80,10 @@ live.mimeType=application/x-mpegURL
 # For example: live.publishStreaming=presenter/delivery:1920x540
 # Default is not to publish streaming URIs
 # live.publishStreaming=
+
+# Retract the live publication of an event if the capture agent reports a capture error.
+# Default: true
+#live.deleteOnCaptureError=true
 
 # The distribution service to use: download or aws.s3
 # Default: (distribution.channel=download)

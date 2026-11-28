@@ -1,0 +1,6 @@
+The option to keep the live publication of an event if the capture agent reports a capture error has moved from
+`etc/org.opencastproject.liveschedule.message.SchedulerUpdateHandler.cfg` to
+`etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg` and has been renamed from
+`live.deleteOnCapureError` to `live.deleteOnCaptureError`. The old configuration file was never read, so the option
+had no effect since Opencast 12. If you set it to `false`, set the new option instead. The default (`true`) has not
+changed. [#8220](https://github.com/opencast/opencast/issues/8220)

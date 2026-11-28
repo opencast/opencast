@@ -22,3 +22,9 @@ TODO
     - `etc/jetty-opencast.xml` has been removed. If you enabled it by setting `org.ops4j.pax.web.config.file` in
       `etc/org.ops4j.pax.web.cfg` to raise the HTTP idle timeout, remove that setting and configure the timeout with
       `org.ops4j.pax.web.server.connector.idleTimeout` (in milliseconds) in the same file instead.
+- **Live schedule**
+    - The option to keep the live publication of an event when the capture agent reports a capture error has moved
+      from `etc/org.opencastproject.liveschedule.message.SchedulerUpdateHandler.cfg` to
+      `etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg` and has been renamed from
+      `live.deleteOnCapureError` to `live.deleteOnCaptureError`. If you had set it to `false`, set the new option
+      instead. The old file is no longer used and can be removed.

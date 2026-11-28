@@ -15,20 +15,12 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -68,7 +60,6 @@
               org.opencastproject.message.broker.api.comments;version=${project.version},
               org.opencastproject.message.broker.api.group;version=${project.version},
               org.opencastproject.message.broker.api.index;version=${project.version},
-              org.opencastproject.message.broker.api.scheduler;version=${project.version},
               org.opencastproject.message.broker.api.series;version=${project.version},
               org.opencastproject.message.broker.api.theme;version=${project.version},
               org.opencastproject.message.broker.api.update;version=${project.version},

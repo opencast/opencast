@@ -30,6 +30,7 @@ import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -39,9 +40,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
-import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
-import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -98,6 +96,7 @@ import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -136,7 +135,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -213,7 +211,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
-  private final List<SchedulerUpdateHandler> schedulerUpdateHandlers = new CopyOnWriteArrayList<>();
+
+  /** The live schedule service, keeping live publications of scheduled events up to date */
+  private LiveScheduleService liveScheduleService;
 
   /** The system user name */
   private String systemUserName;
@@ -221,22 +221,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private ComponentContext componentContext;
 
   /**
-   * OSGi callback to add an update handler.
+   * OSGi callback to set the live schedule service.
    *
-   * @param handler
+   * @param liveScheduleService
    */
-  @Reference(
-      cardinality = ReferenceCardinality.MULTIPLE,
-      policy = ReferencePolicy.DYNAMIC,
-      policyOption = ReferencePolicyOption.GREEDY,
-      unbind = "removeSchedulerUpdateHandler"
-  )
-  public void addSchedulerUpdateHandler(SchedulerUpdateHandler handler) {
-    this.schedulerUpdateHandlers.add(handler);
-  }
-
-  public void removeSchedulerUpdateHandler(SchedulerUpdateHandler handler) {
-    this.schedulerUpdateHandlers.remove(handler);
+  @Reference
+  public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
+    this.liveScheduleService = liveScheduleService;
   }
 
   /**
@@ -297,27 +288,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /**
-   * Update all of the handlers that an event has changed
-   *
-   * @param list The list of scheduler changes for a mediapackage
-   */
-  private void sendSchedulerUpdate(SchedulerItemList list) {
-    while (schedulerUpdateHandlers.size() != 1) {
-      logger.warn("Expecting 1 handler, but {} are registered.  Waiting 10s then retrying...",
-          schedulerUpdateHandlers.size());
-      try {
-        Thread.sleep(10000L);
-      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
-    }
-    String mpid = list.getId();
-    for (SchedulerItem item : list.getItems()) {
-      for (SchedulerUpdateHandler handler : this.schedulerUpdateHandlers) {
-        handler.execute(mpid, item);
-      }
-    }
   }
 
   /**
@@ -451,9 +421,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               Optional.of(captureAgentId), Optional.of(userIds), Optional.of(mediaPackage), Optional.of(wfProperties),
               Optional.of(finalCaProperties), schedulingSource);
 
-      // Update live event
-      updateLiveEvent(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
-              Optional.of(endDateTime), Optional.of(captureAgentId), Optional.of(finalCaProperties));
+      // Create live event
+      if (isLive(wfProperties)) {
+        createLiveEvent(mediaPackageId, dublinCore);
+      }
 
       // Update OpenSearch index
       updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
@@ -593,9 +564,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Misc.chuck(e);
         }
 
-        // Update live event
-        updateLiveEvent(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
-                Optional.of(endDateTime), Optional.of(captureAgentId), Optional.of(finalCaProperties));
+        // Create live event
+        if (isLive(wfProperties)) {
+          createLiveEvent(mediaPackageId, dublinCore);
+        }
 
         // Update OpenSearch index
         updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
@@ -794,8 +766,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               mediaPackageOpt, wfProperties, finalCaProperties, Optional.empty());
 
       // Update live event
-      updateLiveEvent(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, Optional.of(agentId),
-              finalCaProperties);
+      updateLiveEvent(mpId, isLive(wfProps), wfProperties.isPresent(), dublinCore);
 
       // Update OpenSearch index
       updateEventInIndex(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, userIds,
@@ -912,8 +883,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       long deletedSnapshots = assetManager.deleteSnapshots(mediaPackageId);
       notFoundInAssetManager = deletedSnapshots == 0;
 
-      // Update live event
-      sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
+      // Remove live event. We cannot rely on the workflow configuration here since the event may already be gone.
+      deleteLiveEvent(mediaPackageId);
 
       // Update OpenSearch index
       removeSchedulingInfoFromIndex(mediaPackageId);
@@ -1317,8 +1288,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         logger.debug("Setting Recording {} to state {}.", id, state);
 
         // Update live event
-        sendSchedulerUpdate(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
-                .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
+        if (isLive(deserializeExtendedEventProperties(optExtEvt.get().getWorkflowProperties()))) {
+          try {
+            liveScheduleService.updateLiveEventRecordingState(id, state);
+          } catch (Exception e) {
+            logger.warn("Failed to update the live publication of event {} for recording state {}", id, state, e);
+          }
+        }
 
         // Update OpenSearch index
         updateEventInIndex(r.getID(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
@@ -1377,8 +1353,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       persistence.resetRecordingState(id);
 
-      // Update live event
-      sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
+      // Remove live event
+      deleteLiveEvent(id);
 
       // Update OpenSearch index
       removeRecordingStatusFromIndex(id);
@@ -1505,41 +1481,81 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Send messages to trigger an update in the LiveScheduleService.
+   * Check whether the workflow configuration of an event asks for a live publication.
+   *
+   * @param wfProperties
+   *          the workflow configuration of the event
+   * @return true if the event is live
+   */
+  private static boolean isLive(Map<String, String> wfProperties) {
+    return BooleanUtils.toBoolean(wfProperties.get(LiveScheduleService.PUBLISH_LIVE_PROPERTY));
+  }
+
+  /**
+   * Create the live publication for a newly scheduled live event.
+   * Failing to do so is logged but does not fail the scheduling operation.
    *
    * @param mpId
-   * @param acl
+   *          the media package identifier
    * @param dublinCore
-   * @param startTime
-   * @param endTime
-   * @param agentId
-   * @param properties
+   *          the episode metadata of the event
    */
-  private void updateLiveEvent(String mpId, Optional<AccessControlList> acl, Optional<DublinCoreCatalog> dublinCore,
-          Optional<Date> startTime, Optional<Date> endTime, Optional<String> agentId,
-          Optional<Map<String, String>> properties) {
-    List<SchedulerItem> items = new ArrayList<>();
-    if (acl.isPresent()) {
-      items.add(SchedulerItem.updateAcl(acl.get()));
+  private void createLiveEvent(String mpId, Optional<DublinCoreCatalog> dublinCore) {
+    if (dublinCore.isEmpty()) {
+      logger.warn("Cannot create live publication for event {} without episode metadata", mpId);
+      return;
     }
-    if (dublinCore.isPresent()) {
-      items.add(SchedulerItem.updateCatalog(dublinCore.get()));
+    try {
+      liveScheduleService.createOrUpdateLiveEvent(mpId, dublinCore.get());
+    } catch (Exception e) {
+      logger.warn("Failed to create the live publication of event {}", mpId, e);
     }
-    if (startTime.isPresent()) {
-      items.add(SchedulerItem.updateStart(startTime.get()));
-    }
-    if (endTime.isPresent()) {
-      items.add(SchedulerItem.updateEnd(endTime.get()));
-    }
-    if (agentId.isPresent()) {
-      items.add(SchedulerItem.updateAgent(agentId.get()));
-    }
-    if (properties.isPresent()) {
-      items.add(SchedulerItem.updateProperties(properties.get()));
-    }
+  }
 
-    if (!items.isEmpty()) {
-      sendSchedulerUpdate(new SchedulerItemList(mpId, items));
+  /**
+   * Bring the live publication of an event in line with an update of the scheduled event.
+   * Failing to do so is logged but does not fail the scheduling operation.
+   *
+   * <p>
+   * Changes to the access control list need no special handling. They are part of the updated asset manager snapshot
+   * from which the live publication is rebuilt.
+   *
+   * @param mpId
+   *          the media package identifier
+   * @param isLive
+   *          whether the event is live after the update
+   * @param wfPropertiesUpdated
+   *          whether the update included the workflow properties. Only then can an event stop being live. In that case,
+   *          the live publication is retracted even if the event had not been live before, so that a previously failed
+   *          retraction is retried.
+   * @param dublinCore
+   *          the episode metadata of the event after the update
+   */
+  private void updateLiveEvent(String mpId, boolean isLive, boolean wfPropertiesUpdated,
+          DublinCoreCatalog dublinCore) {
+    if (isLive) {
+      try {
+        liveScheduleService.createOrUpdateLiveEvent(mpId, dublinCore);
+      } catch (Exception e) {
+        logger.warn("Failed to update the live publication of event {}", mpId, e);
+      }
+    } else if (wfPropertiesUpdated) {
+      deleteLiveEvent(mpId);
+    }
+  }
+
+  /**
+   * Retract the live publication of an event, if there is one.
+   * Failing to do so is logged but does not fail the scheduling operation.
+   *
+   * @param mpId
+   *          the media package identifier
+   */
+  private void deleteLiveEvent(String mpId) {
+    try {
+      liveScheduleService.deleteLiveEvent(mpId);
+    } catch (Exception e) {
+      logger.warn("Failed to retract the live publication of event {}", mpId, e);
     }
   }
 

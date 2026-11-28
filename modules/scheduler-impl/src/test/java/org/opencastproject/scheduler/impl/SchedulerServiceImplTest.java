@@ -22,9 +22,14 @@
 package org.opencastproject.scheduler.impl;
 
 import static net.fortuna.ical4j.model.Component.VEVENT;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -52,6 +57,7 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SUBJEC
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
+import static org.opencastproject.scheduler.api.RecordingState.CAPTURE_FINISHED;
 import static org.opencastproject.scheduler.api.RecordingState.CAPTURING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOADING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
@@ -71,6 +77,8 @@ import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.db.DBSession;
+import org.opencastproject.liveschedule.api.LiveScheduleException;
+import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -83,7 +91,6 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
-import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -136,6 +143,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -192,7 +200,6 @@ public class SchedulerServiceImplTest {
   private AssetManager assetManager;
   private static OrganizationDirectoryService orgDirectoryService;
   private SecurityService securityService;
-  private static SchedulerUpdateHandler handler;
 
   private User currentUser = new JaxbUser("admin", "provider", new DefaultOrganization(),
       new JaxbRole("admin", new DefaultOrganization(), "test"));
@@ -270,9 +277,7 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
-    handler = EasyMock.createNiceMock(SchedulerUpdateHandler.class);
-
-    EasyMock.replay(authorizationService, index, result, handler,
+    EasyMock.replay(authorizationService, index, result,
             extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
     schedSvc = new SchedulerServiceImpl();
@@ -319,7 +324,10 @@ public class SchedulerServiceImplTest {
     assetManager = mkAssetManager();
     schedSvc.setAssetManager(assetManager);
 
-    schedSvc.addSchedulerUpdateHandler(handler);
+    // Tests checking the live publication replace this with a strict mock
+    LiveScheduleService liveScheduleService = EasyMock.createNiceMock(LiveScheduleService.class);
+    EasyMock.replay(liveScheduleService);
+    schedSvc.setLiveScheduleService(liveScheduleService);
 
     schedSvc.lastModifiedCache.invalidateAll();
   }
@@ -328,7 +336,6 @@ public class SchedulerServiceImplTest {
   public void tearDown() throws Exception {
     workspace.clean();
     schedulerDatabase = null;
-    schedSvc.removeSchedulerUpdateHandler(handler);
   }
 
   @AfterClass
@@ -1074,6 +1081,140 @@ public class SchedulerServiceImplTest {
     assertEquals("DublinCore title", updatedTitle1,
             schedSvc.getDublinCore(mediaPackage.getIdentifier().toString()).getFirst(PROPERTY_TITLE));
     checkIcalFeed(updatedCaProps, updatedTitle1);
+  }
+
+  /**
+   * Scheduling, updating and un-publishing a live event keeps its live publication up to date.
+   */
+  @Test
+  public void testLiveEventLifecycle() throws Exception {
+    final Date start = new Date(System.currentTimeMillis() + seconds(10));
+    final Date end = new Date(start.getTime() + hours(1));
+    final MediaPackage mp = generateEvent(Optional.empty());
+    final String mpId = mp.getIdentifier().toString();
+    final String catalogId = addDublinCore(Optional.empty(), mp,
+            generateEvent("Device A", Optional.of(mpId), Optional.of("Live 1"), start, end));
+    final LiveScheduleService live = EasyMock.createMock(LiveScheduleService.class);
+    schedSvc.setLiveScheduleService(live);
+
+    // Scheduling a live event creates the live publication
+    expect(live.createOrUpdateLiveEvent(eq(mpId), anyObject(DublinCoreCatalog.class))).andReturn(true);
+    replay(live);
+    schedSvc.addEvent(start, end, "Device A", Collections.emptySet(), mp, Map.of("publishLive", "true"), Map.of(),
+            Optional.empty());
+    verify(live);
+
+    // Updating the metadata updates the live publication
+    final Capture<DublinCoreCatalog> dublinCore = Capture.newInstance();
+    reset(live);
+    expect(live.createOrUpdateLiveEvent(eq(mpId), capture(dublinCore))).andReturn(true);
+    replay(live);
+    addDublinCore(Optional.of(catalogId), mp,
+            generateEvent("Device A", Optional.of(mpId), Optional.of("Live 2"), start, end));
+    schedSvc.updateEvent(mpId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.of(mp), Optional.empty(), Optional.empty());
+    verify(live);
+    assertEquals("Live 2", dublinCore.getValue().getFirst(PROPERTY_TITLE));
+
+    // Recording state changes are passed on
+    reset(live);
+    expect(live.updateLiveEventRecordingState(mpId, CAPTURE_FINISHED)).andReturn(true);
+    replay(live);
+    schedSvc.updateRecordingState(mpId, CAPTURE_FINISHED);
+    verify(live);
+
+    // Switching publishLive off retracts the live publication
+    reset(live);
+    expect(live.deleteLiveEvent(mpId)).andReturn(true);
+    replay(live);
+    schedSvc.updateEvent(mpId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.of(Map.of("publishLive", "false")), Optional.empty());
+    verify(live);
+  }
+
+  /**
+   * Events which are not live do not create live publications. A live publication is only retracted when the workflow
+   * properties are updated, or when the event is removed, where we cannot know if the event was live.
+   */
+  @Test
+  public void testNonLiveEventIgnoresLivePublication() throws Exception {
+    final Date start = new Date(System.currentTimeMillis() + seconds(10));
+    final Date end = new Date(start.getTime() + hours(1));
+    final MediaPackage mp = generateEvent(Optional.empty());
+    final String mpId = mp.getIdentifier().toString();
+    addDublinCore(Optional.empty(), mp, generateEvent("Device A", Optional.of(mpId), Optional.empty(), start, end));
+    final LiveScheduleService live = EasyMock.createMock(LiveScheduleService.class);
+    schedSvc.setLiveScheduleService(live);
+
+    replay(live);
+    schedSvc.addEvent(start, end, "Device A", Collections.emptySet(), mp, wfProperties, Map.of(), Optional.empty());
+    schedSvc.updateEvent(mpId, Optional.empty(), Optional.of(new Date(end.getTime() + hours(1))), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    schedSvc.updateRecordingState(mpId, CAPTURING);
+    verify(live);
+
+    reset(live);
+    expect(live.deleteLiveEvent(mpId)).andReturn(false);
+    replay(live);
+    schedSvc.updateEvent(mpId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.of(wfPropertiesUpdated), Optional.empty());
+    verify(live);
+
+    reset(live);
+    expect(live.deleteLiveEvent(mpId)).andReturn(false);
+    replay(live);
+    schedSvc.removeEvent(mpId);
+    verify(live);
+  }
+
+  /**
+   * If retracting the live publication fails after publishLive has been switched off, the next update of the workflow
+   * properties tries again.
+   */
+  @Test
+  public void testFailedLiveRetractionIsRetried() throws Exception {
+    final Date start = new Date(System.currentTimeMillis() + seconds(10));
+    final Date end = new Date(start.getTime() + hours(1));
+    final MediaPackage mp = generateEvent(Optional.empty());
+    final String mpId = mp.getIdentifier().toString();
+    addDublinCore(Optional.empty(), mp, generateEvent("Device A", Optional.of(mpId), Optional.empty(), start, end));
+    final LiveScheduleService live = EasyMock.createNiceMock(LiveScheduleService.class);
+    replay(live);
+    schedSvc.setLiveScheduleService(live);
+    schedSvc.addEvent(start, end, "Device A", Collections.emptySet(), mp, Map.of("publishLive", "true"), Map.of(),
+            Optional.empty());
+
+    reset(live);
+    expect(live.deleteLiveEvent(mpId)).andThrow(new LiveScheduleException("Search service unavailable"));
+    expect(live.deleteLiveEvent(mpId)).andReturn(true);
+    replay(live);
+    schedSvc.updateEvent(mpId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.of(Map.of("publishLive", "false")), Optional.empty());
+    schedSvc.updateEvent(mpId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.of(Map.of("publishLive", "false", "comment", "true")), Optional.empty());
+    verify(live);
+  }
+
+  /**
+   * A failing live schedule service must not break scheduling.
+   */
+  @Test
+  public void testLivePublicationFailureDoesNotFailScheduling() throws Exception {
+    final Date start = new Date(System.currentTimeMillis() + seconds(10));
+    final Date end = new Date(start.getTime() + hours(1));
+    final MediaPackage mp = generateEvent(Optional.empty());
+    final String mpId = mp.getIdentifier().toString();
+    addDublinCore(Optional.empty(), mp, generateEvent("Device A", Optional.of(mpId), Optional.empty(), start, end));
+    final LiveScheduleService live = EasyMock.createMock(LiveScheduleService.class);
+    schedSvc.setLiveScheduleService(live);
+
+    expect(live.createOrUpdateLiveEvent(eq(mpId), anyObject(DublinCoreCatalog.class)))
+            .andThrow(new LiveScheduleException("Distribution failed"));
+    replay(live);
+    schedSvc.addEvent(start, end, "Device A", Collections.emptySet(), mp, Map.of("publishLive", "true"), Map.of(),
+            Optional.empty());
+    verify(live);
+    assertNotNull(schedSvc.getMediaPackage(mpId));
   }
 
   @Test

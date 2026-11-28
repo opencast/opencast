@@ -21,15 +21,29 @@
 package org.opencastproject.liveschedule.api;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.security.api.AccessControlList;
 
 public interface LiveScheduleService {
   String CHANNEL_ID = "engage-live";
+
+  /** Workflow configuration key marking a scheduled event as live */
+  String PUBLISH_LIVE_PROPERTY = "publishLive";
 
   boolean createOrUpdateLiveEvent(String mpId, DublinCoreCatalog episodeDc) throws LiveScheduleException;
 
   boolean deleteLiveEvent(String mpId) throws LiveScheduleException;
 
-  boolean updateLiveEventAcl(String mpId, AccessControlList acl) throws LiveScheduleException;
+  /**
+   * Notify the service that the recording state of a live event has changed. The live publication is retracted once
+   * the capture is over.
+   *
+   * @param mpId
+   *          the media package identifier
+   * @param recordingState
+   *          the new recording state, see {@code org.opencastproject.scheduler.api.RecordingState}
+   * @return true if the live publication has been retracted
+   * @throws LiveScheduleException
+   *           if retracting the live publication failed
+   */
+  boolean updateLiveEventRecordingState(String mpId, String recordingState) throws LiveScheduleException;
 
 }
